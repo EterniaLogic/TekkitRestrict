@@ -14,7 +14,7 @@ import net.minecraft.server.*;
 
 public class ContainerTransmutation extends Container
 {
-
+	public boolean clickingLeft = false;
     public ContainerTransmutation(PlayerInventory var1, EntityHuman var2, TransTabletData var3)
     {
         player = var2;
@@ -414,118 +414,122 @@ public class ContainerTransmutation extends Container
             slotClick(var1, var2, var3, var4, var5, var6);
         }
     }
-
-    public ItemStack slotClick(int var1, int var2, int var3, int var4, boolean var5, EntityHuman var6)
+    
+    boolean gettingLeft = false;
+    public ItemStack slotClick(int slotNum, int clickType, int var3, int var4, boolean var5, EntityHuman human)
     {
-        ItemStack var7 = null;
-        if(var2 > 1)
+    	if(slotNum <=8) gettingLeft=true;
+    	if(slotNum >=9 && gettingLeft) return null;
+    	ItemStack cloneTo = null;
+        if(clickType > 1)
             return null;
-        if(var2 == 0 || var2 == 1)
+        if(clickType == 0 || clickType == 1)
         {
-            PlayerInventory var8 = var6.inventory;
-            if(var1 == -999)
+            PlayerInventory inv = human.inventory;
+            if(slotNum == -999)
             {
-                if(var8.getCarried() != null && var1 == -999)
+                if(inv.getCarried() != null && slotNum == -999)
                 {
-                    if(var2 == 0)
+                    if(clickType == 0)
                     {
-                        var6.drop(var8.getCarried());
-                        var8.setCarried(null);
+                        human.drop(inv.getCarried());
+                        inv.setCarried(null);
                     }
-                    if(var2 == 1)
+                    if(clickType == 1)
                     {
-                        var6.drop(var8.getCarried().a(1));
-                        if(var8.getCarried().count == 0)
-                            var8.setCarried(null);
+                        human.drop(inv.getCarried().a(1));
+                        if(inv.getCarried().count == 0)
+                            inv.setCarried(null);
                     }
                 }
             } else
             if(var5)
             {
-                ItemStack var9 = a(var1);
+                ItemStack var9 = a(slotNum);
                 if(var9 != null)
                 {
                     int var10 = var9.id;
-                    var7 = var9.cloneItemStack();
-                    Slot var11 = (Slot)e.get(var1);
+                    cloneTo = var9.cloneItemStack();
+                    Slot var11 = (Slot)e.get(slotNum);
                     if(var11 != null && var11.getItem() != null && var11.getItem().id == var10)
-                        retrySlotClick(var1, var2, var3, var4, var5, var6);
+                        retrySlotClick(slotNum, clickType, var3, var4, var5, human);
                 }
             } else
             {
-                if(var1 < 0)
+                if(slotNum < 0)
                     return null;
-                Slot var14 = (Slot)e.get(var1);
-                if(var14 != null)
+                Slot slot = (Slot)e.get(slotNum);
+                if(slot != null)
                 {
-                    var14.d();
-                    ItemStack var16 = var14.getItem();
-                    ItemStack var15 = var8.getCarried();
-                    if(var16 != null)
-                        var7 = var16.cloneItemStack();
-                    if(var16 == null)
+                    slot.d();
+                    ItemStack slotItem = slot.getItem();
+                    ItemStack mouseItem = inv.getCarried();
+                    if(slotItem != null)
+                        cloneTo = slotItem.cloneItemStack();
+                    if(slotItem == null)
                     {
-                        if(var15 != null && var14.isAllowed(var15))
+                        if(mouseItem != null && slot.isAllowed(mouseItem))
                         {
-                            int var12 = var2 == 0 ? var15.count : 1;
-                            if(var12 > var14.a())
-                                var12 = var14.a();
-                            var14.set(var15.a(var12));
-                            if(var15.count == 0)
-                                var8.setCarried(null);
+                            int var12 = clickType == 0 ? mouseItem.count : 1;
+                            if(var12 > slot.a())
+                                var12 = slot.a();
+                            slot.set(mouseItem.a(var12));
+                            if(mouseItem.count == 0)
+                                inv.setCarried(null);
                         }
                     } else
-                    if(var15 == null)
+                    if(mouseItem == null) //NO ITEM IN MOUSE...
                     {
-                        int var12 = var2 == 0 ? var16.count : (var16.count + 1) / 2;
-                        ItemStack var13 = var14.a(var12);
-                        var8.setCarried(var13);
-                        if(var1 >= 10 && var1 <= 25)
-                            var14.set(new ItemStack(var13.id, 1, var13.getData()));
+                        int var12 = clickType == 0 ? slotItem.count : (slotItem.count + 1) / 2;
+                        ItemStack var13 = slot.a(var12);
+                        inv.setCarried(var13);
+                        if(slotNum >= 10 && slotNum <= 25)
+                            slot.set(new ItemStack(var13.id, 1, var13.getData()));
                         else
-                        if(var16.count == 0)
-                            var14.set(null);
-                        var14.c(var8.getCarried());
+                        if(slotItem.count == 0)
+                            slot.set(null);
+                        slot.c(inv.getCarried());
                     } else
-                    if(var14.isAllowed(var15))
+                    if(slot.isAllowed(mouseItem)) //ITEM IN MOUSE
                     {
-                        if(var16.id == var15.id && (!var16.usesData() || var16.getData() == var15.getData()) && ItemStack.equals(var16, var15))
+                        if(slotItem.id == mouseItem.id && (!slotItem.usesData() || slotItem.getData() == mouseItem.getData()) && ItemStack.equals(slotItem, mouseItem))
                         {
-                            int var12 = var2 == 0 ? var15.count : 1;
-                            if(var12 > var14.a() - var16.count)
-                                var12 = var14.a() - var16.count;
-                            if(var12 > var15.getMaxStackSize() - var16.count)
-                                var12 = var15.getMaxStackSize() - var16.count;
-                            var15.a(var12);
-                            if(var15.count == 0)
-                                var8.setCarried(null);
-                            var16.count += var12;
+                            int var12 = clickType == 0 ? mouseItem.count : 1;
+                            if(var12 > slot.a() - slotItem.count)
+                                var12 = slot.a() - slotItem.count;
+                            if(var12 > mouseItem.getMaxStackSize() - slotItem.count)
+                                var12 = mouseItem.getMaxStackSize() - slotItem.count;
+                            mouseItem.a(var12);
+                            if(mouseItem.count == 0)
+                                inv.setCarried(null);
+                            slotItem.count += var12;
                         } else
-                        if(var15.count <= var14.a())
+                        if(mouseItem.count <= slot.a())
                         {
-                            var14.set(var15);
-                            var8.setCarried(var16);
+                            slot.set(mouseItem);
+                            inv.setCarried(slotItem);
                         }
                     } else
-                    if(var16.id == var15.id && var15.getMaxStackSize() > 1 && (!var16.usesData() || var16.getData() == var15.getData()) && ItemStack.equals(var16, var15))
+                    if(slotItem.id == mouseItem.id && mouseItem.getMaxStackSize() > 1 && (!slotItem.usesData() || slotItem.getData() == mouseItem.getData()) && ItemStack.equals(slotItem, mouseItem))
                     {
-                        int var12 = var16.count;
-                        if(var12 > 0 && var12 + var15.count <= var15.getMaxStackSize())
+                        int var12 = slotItem.count;
+                        if(var12 > 0 && var12 + mouseItem.count <= mouseItem.getMaxStackSize())
                         {
-                            var15.count += var12;
-                            if(var1 < 10 || var1 > 25)
+                            mouseItem.count += var12;
+                            if(slotNum < 10 || slotNum > 25)
                             {
-                                var16.a(var12);
-                                if(var16.count == 0)
-                                    var14.set(null);
+                                slotItem.a(var12);
+                                if(slotItem.count == 0)
+                                    slot.set(null);
                             }
-                            var14.c(var8.getCarried());
+                            slot.c(inv.getCarried());
                         }
                     }
                 }
             }
         }
-        return var7;
+        if(slotNum <=8) gettingLeft=false;
+        return cloneTo;
     }
 
     private EntityHuman player;

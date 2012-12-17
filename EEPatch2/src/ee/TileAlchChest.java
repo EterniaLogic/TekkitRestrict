@@ -569,6 +569,7 @@ public class TileAlchChest extends TileEE
 
     private void GrabItems(Entity var1)
     {
+    	if(var1.dead) return;
         if(var1 != null && (var1 instanceof EntityItem))
         {
             ItemStack var9 = ((EntityItem)var1).itemStack;
@@ -577,7 +578,7 @@ public class TileAlchChest extends TileEE
                 var1.die();
                 return;
             }*/
-            var1.die();
+            
             if(var9.getItem() instanceof ItemLootBall)
             {
                 ItemLootBall var3 = (ItemLootBall)var9.getItem();
@@ -590,11 +591,11 @@ public class TileAlchChest extends TileEE
                     PushStack(var8);
                 }
 
-                //var1.die();
+                var1.die();
             } else
             {
                 PushStack(var9);
-                //var1.die();
+                var1.die();
             }
         } else
         if(var1 != null && (var1 instanceof EntityLootBall))
