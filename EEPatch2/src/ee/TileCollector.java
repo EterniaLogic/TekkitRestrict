@@ -31,6 +31,43 @@ public class TileCollector extends TileEE
         kleinProgressScaled = 0;
         sunTimeScaled = 0;
         kleinPoints = 0;
+        int ai[] = new int[Orientations.values().length];
+        try
+        {
+            ai[Orientations.Unknown.ordinal()] = 7;
+        }
+        catch(NoSuchFieldError _ex) { }
+        try
+        {
+            ai[Orientations.XNeg.ordinal()] = 5;
+        }
+        catch(NoSuchFieldError _ex) { }
+        try
+        {
+            ai[Orientations.XPos.ordinal()] = 6;
+        }
+        catch(NoSuchFieldError _ex) { }
+        try
+        {
+            ai[Orientations.YNeg.ordinal()] = 1;
+        }
+        catch(NoSuchFieldError _ex) { }
+        try
+        {
+            ai[Orientations.YPos.ordinal()] = 2;
+        }
+        catch(NoSuchFieldError _ex) { }
+        try
+        {
+            ai[Orientations.ZNeg.ordinal()] = 3;
+        }
+        catch(NoSuchFieldError _ex) { }
+        try
+        {
+            ai[Orientations.ZPos.ordinal()] = 4;
+        }
+        catch(NoSuchFieldError _ex) { }
+        orientationx = ai;
     }
 
     public int getSize()
@@ -111,7 +148,7 @@ public class TileCollector extends TileEE
 
     public boolean addItem(ItemStack var1, boolean var2, Orientations var3)
     {
-        switch($SWITCH_TABLE$buildcraft$api$Orientations()[var3.ordinal()])
+        switch(this.orientationx[var3.ordinal()])
         {
         default:
             break;
@@ -167,7 +204,7 @@ public class TileCollector extends TileEE
 
     public ItemStack extractItem(boolean var1, Orientations var2)
     {
-        switch($SWITCH_TABLE$buildcraft$api$Orientations()[var2.ordinal()])
+        switch(this.orientationx[var2.ordinal()])
         {
         case 1: // '\001'
         case 2: // '\002'
@@ -717,8 +754,8 @@ public class TileCollector extends TileEE
     {
     }
 
-    static Object orientationx = null;
-    static int[] $SWITCH_TABLE$buildcraft$api$Orientations()
+    static int[] orientationx = null;
+    /*static int[] $SWITCH_TABLE$buildcraft$api$Orientations()
     {
     	if(orientationx == null) return new int[]{0};
         int ai[] = new int[Orientations.values().length];
@@ -758,7 +795,7 @@ public class TileCollector extends TileEE
         }
         catch(NoSuchFieldError _ex) { }
         return (int[])(orientationx = ai);
-    }
+    }*/
 
     private ItemStack items[];
     public int currentSunStatus;

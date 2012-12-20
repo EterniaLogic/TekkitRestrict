@@ -32,6 +32,43 @@ public class TileCollector3 extends TileEE
         currentFuelProgress = 0;
         kleinProgressScaled = 0;
         sunTimeScaled = 0;
+        int ai[] = new int[Orientations.values().length];
+        try
+        {
+            ai[Orientations.Unknown.ordinal()] = 7;
+        }
+        catch(NoSuchFieldError _ex) { }
+        try
+        {
+            ai[Orientations.XNeg.ordinal()] = 5;
+        }
+        catch(NoSuchFieldError _ex) { }
+        try
+        {
+            ai[Orientations.XPos.ordinal()] = 6;
+        }
+        catch(NoSuchFieldError _ex) { }
+        try
+        {
+            ai[Orientations.YNeg.ordinal()] = 1;
+        }
+        catch(NoSuchFieldError _ex) { }
+        try
+        {
+            ai[Orientations.YPos.ordinal()] = 2;
+        }
+        catch(NoSuchFieldError _ex) { }
+        try
+        {
+            ai[Orientations.ZNeg.ordinal()] = 3;
+        }
+        catch(NoSuchFieldError _ex) { }
+        try
+        {
+            ai[Orientations.ZPos.ordinal()] = 4;
+        }
+        catch(NoSuchFieldError _ex) { }
+        orientationx = ai;
     }
 
     public void onBlockRemoval()
@@ -113,7 +150,7 @@ public class TileCollector3 extends TileEE
 
     public boolean addItem(ItemStack var1, boolean var2, Orientations var3)
     {
-        switch($SWITCH_TABLE$buildcraft$api$Orientations()[var3.ordinal()])
+        switch(this.orientationx[var3.ordinal()])
         {
         default:
             break;
@@ -169,7 +206,7 @@ public class TileCollector3 extends TileEE
 
     public ItemStack extractItem(boolean flag, Orientations orientations)
     {
-        switch($SWITCH_TABLE$buildcraft$api$Orientations()[orientations.ordinal()])
+        switch(this.orientationx[orientations.ordinal()])
         {
         case 1: // '\001'
         case 2: // '\002'
@@ -787,8 +824,8 @@ label1:
     public void setMaxStackSize(int i)
     {
     }
-    static Object orientationx = null;
-    static int[] $SWITCH_TABLE$buildcraft$api$Orientations()
+    static int[] orientationx = null;
+    /*static int[] $SWITCH_TABLE$buildcraft$api$Orientations()
     {
     	if(orientationx == null) return new int[]{0};
         int ai[] = new int[Orientations.values().length];
@@ -828,7 +865,7 @@ label1:
         }
         catch(NoSuchFieldError _ex) { }
         return (int[])(orientationx = ai);
-    }
+    }*/
 
     private ItemStack items[];
     public int currentSunStatus;
