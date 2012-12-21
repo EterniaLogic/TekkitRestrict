@@ -1,0 +1,49 @@
+#Configuration file for TekkitRestrict
+#Author: DreadEnd
+#Email: dreadslicer@gmail.com
+#BukkitDev: http://dev.bukkit.org/server-mods/tekkit-restrict/
+
+######### Threading Configuration
+# Do not edit these values unless you know what you are doing.
+# These numbers are in [Milliseconds]. (1000 milliseconds = 1 second)
+#Note, the faster you set this to, your server is more likely to lag out.
+
+##############################
+
+
+####ChunkUnloader####
+# Note, if you turn this on, it MAY lag your server.
+#	Use with caution. However, using this will be very useful for preventing your server
+#	from getting over 30,000 chunks.
+#		There is a bug with the Normal Tekkit server in which the server gains "Trash" in
+#		The memory from disposing of chunks. I recommend keeping your MaxChunks around
+#		2000-3000 to prevent this from disabling your server over time. (MCPCSpout fixed this)
+#		If you lower it below 1000, you have a chance of lagging your server by player movements.
+###	MaxRadii is in meters. 1 chunk = 16 meters. 1 meter = 1 block.
+UseChunkUnloader: true
+MaxChunks: 5000
+MaxRadii: 128
+
+
+# Runs a thread for each player upon the Inventory Thread tick. (May take up some processor if you have a ton of players)
+ThrottleInventoryThread: false
+
+
+GemArmorDThread: 120
+SSEntityRemoverThread: 350
+InventoryThread: 400
+WorldCleanerThread: 10000
+AutoSaveThreadSpeed: 11000
+
+
+##	GemArmorDThread enables:     [High-speed 2-commands (~4)]
+##	Inventory thread enables:    [DisableItems, CreativeDisable, MaxEU, EEDecharger, EEMaxCharger (~198-5000x)]
+##	WorldCleaner thread enables: [ChunkUnloader, RPTimer, DisabledItemBlockRemover (~40-Xx)]
+##	AutoSave thread enables:     [SaveToSQL, BlockLimiter RemoveBlk (~8+x)]
+
+
+
+
+##############################
+##############################
+##############################

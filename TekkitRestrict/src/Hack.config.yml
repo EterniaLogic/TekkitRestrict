@@ -1,0 +1,53 @@
+#Configuration file for TekkitRestrict
+#Author: DreadEnd
+#Email: dreadslicer@gmail.com
+#BukkitDev: http://dev.bukkit.org/server-mods/tekkit-restrict/
+
+#################################################
+######### Anti-Hack Configuration ######### 
+# Block hackers from screwing your server up!
+
+## Move Speed Max is the speed in Meters/second
+## (~3 seconds) Move Speed Tolerance is based off the number of "Moves" a player does.
+
+## Fly hack Tolerance is based off the number of "Moves" a player does (1~5 per second).
+
+## Forcefield Tolerance is based off the number of times a player hits a mob or player.
+
+####Default hack names
+##	"flyhack", "forcefieldhack", "speedhack"
+
+##############################
+
+
+HackMoveSpeedMax: 2.5
+HackMoveSpeedTolerance: 30
+
+HackFlyTolerance: 60
+HackFlyMinHeight: 2
+
+HackForcefieldTolerance: 15
+HackForcefieldAngle: 40
+
+
+HackBan: []
+HackKick: ["flyhack","forcefieldhack","speedhack"]
+HackBroadcasts: ["flyhack","forcefieldhack","speedhack"]
+HackBroadcastString: "[TRHack] {PLAYER} {ACTION} {HTYPE}!"
+
+
+####Dupes####
+PreventRMFurnaceDupe: true
+PreventAlcDupe: true
+PreventTransmuteDupe: true
+
+#####        "RMFurnace", "alc", "transmute"
+BroadcastDupes: ["rmfurnace", "alc"]
+BroadcastDupeString: "[TRDupe] {PLAYER} tried to dupe using {DTYPE}!"
+
+
+
+
+##############################
+##############################
+##############################

@@ -1,0 +1,101 @@
+#Configuration file for TekkitRestrict
+#Author: DreadEnd
+#Email: dreadslicer@gmail.com
+#BukkitDev: http://dev.bukkit.org/server-mods/tekkit-restrict/
+
+####################################################################
+
+#Limit fly time using rings and jet packs in minutes
+FlyLimitDailyMinutes: 99999999999
+
+####Global EE Options####
+AllowGemArmorOffensive: false
+AllowGemArmorDefensive: false
+
+# Limit RedPower timer's minimum time by seconds
+RPTimerMin: 1.1
+
+
+######## Set EMC ########
+# Set EMC Values for ANY Item, including items that are not previously in the system.
+#DIFFICULTY: HARD Mode -> DarkMatter, DM Blocks, RedMatter, RMBlocks EMC*2.
+#- "27541 300000"
+#- "126:8 800000"
+#- "27563 900000"
+#- "126:9 1300000"
+#########################
+SetEMC: 
+#DEFAULT: EMC farm removal [[Milk, Blaze Rod, Bonemeal, Indigo Flower, Flower, Rose, Seed]]
+- "335 100"
+- "369 780"
+- "351:15 30"
+- "139 4"
+- "37 4"
+- "38 4"
+- "295 4"
+
+
+
+
+######## Item Max EU ########
+#Max EU storable in an IC2 Item (Check out IC2 Wiki for MaxEU details)
+### Default EU values ###
+#- "30148 40000" #Nano saber
+#- "30234 10000" #Diamond Drill
+#- "30177 100000" #ANY piece Nano Armor
+#- "30173 1000000" #ANY piece Quantum Armor
+#############################
+MaxEU: []
+
+# Charge Quantum armor set 2x slower
+#- "30171-30174 1000000 500"
+# Charge Quantum armor set 4x slower
+#- "30171-30174 1000000 250"
+
+
+
+
+######## Max EE Tool Charge ########
+#MaxCharge limits the maximum EE charge of an item. (0-100%)
+#- "27573 30" (This will set the max charge of a morning star to 30%)
+#- "27564-27573 50" (This will Gimp ALL Red Matter Tools down to only 50% charge capacity)
+####################################
+MaxCharge: []
+
+
+
+
+#This will automatically decharge set EE items when a player enters a safezone. (Make your safezones very large)
+#       Requires SSDischargeEE to be true
+DechargeInSS: 
+- 27526
+- 27527
+- 27530
+- 27531
+- 27533
+- 27534
+- 27535
+- 27583
+- 27593
+- 27543
+- 27544
+- 27545
+- 27546
+- 27547
+- 27548
+- 27564
+- 27565
+- 27566
+- 27567
+- 27568
+- 27569
+- 27570
+- 27573
+- 27574
+
+
+
+
+##############################
+##############################
+##############################

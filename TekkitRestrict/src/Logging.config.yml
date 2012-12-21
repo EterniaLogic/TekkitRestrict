@@ -1,0 +1,66 @@
+#Configuration file for TekkitRestrict
+#Author: DreadEnd
+#Email: dreadslicer@gmail.com
+#BukkitDev: http://dev.bukkit.org/server-mods/tekkit-restrict/
+
+####################################################################
+
+#### Logging ####
+LogLocation: "log"
+LogNameFormat: "{DTYPE}-{MONTH}-{DAY}-{YEAR}.txt"
+LogStringFormat: "[{HOUR}:{MINUTE}:{SECOND}] {INFO}"
+LogIsEnabled: true
+
+#--- Console/Debug (Console splits the console output into many parts in the /log/ folder)
+LogConsole: true
+LogDebug: false
+
+#--- Hacks/Dupes
+LogFlyHack: true
+LogMovementSpeedHack: true
+LogForcefieldHack: true
+LogDupes: true
+
+#--- EE
+LogAmulets: true
+LogRings: true
+LogDMTools: true
+LogRMTools: true
+LogEEMisc: true
+LogEEDestructive: true
+LogEECrafting: true
+
+#--- Commands
+LogOpenAlc: true
+
+
+###########################################################################
+#Filter out your logs! All you have to do is enter a bit of the text of that
+#       console log that you want to filter out.
+#       ** cApsLOCK safe.
+LogFilter:
+- "joined with"
+- "overloaded?"
+- "perhaps you are running a custom one"
+- "latest artifact information"
+- "sending serverside check to"
+- "server permissions file permissions.yml is empty, ignoring it"
+- "connection reset"
+- "repair is active.."
+- "player found.."
+- "slotchanging("
+- "attempted to place a tile entity"
+- "chunk coordinates:"
+
+# Please use /log/Error and /log/Warning to find logs for these.
+# TR is known to throw tons of "useless" errors when it comes to the 
+#       Chunk unloader. It cannot be helped if you want to use it because
+#       the only way to fix it is to put it onto the main server thread
+#       which will set your server ticks to 2 TPS.
+- "severe"
+- "warning"
+
+
+##############################
+##############################
+##############################

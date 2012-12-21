@@ -1,0 +1,49 @@
+#Configuration file for TekkitRestrict
+#Author: DreadEnd
+#Email: dreadslicer@gmail.com
+#BukkitDev: http://dev.bukkit.org/server-mods/tekkit-restrict/
+
+##############################################
+######### DisableItems Configuration #########
+# Permission: tekkitrestrict.noitem.ID.DATA
+
+#- EE
+#- RedPowerCore
+#- RedPowerControl
+#- RedPowerLogic
+#- RedPowerMachine
+#- RedPowerLighting
+#- WirelessRedstone
+#- BuildCraft
+#- AdditionalPipes
+#- AdvancedMachines
+#- IndustrialCraft
+#- NuclearControl
+#- CompactSolars
+#- ChargingBench
+#- PowerConverters
+#- Mffs
+#- RailCraft
+#- TubeStuffs (Buffer, AutoCraftTableII, BlackHoleChest, Incinerator. Duplicator, Retrievulator)
+#- IronChests
+#- BalkonWeaponMod
+#- EnderChest (EnderChest, EnderPouch)
+#-----Cross-Mod------
+#- ChunkLoaders
+#- 200-3000
+#- 246
+#- "150:3"
+
+##############################
+
+
+RemoveDisabledItemBlocks: false
+ChangeDisabledItemsIntoId: 3
+DisableItems: []
+
+
+
+
+##############################
+##############################
+##############################

@@ -1,0 +1,39 @@
+#Configuration file for TekkitRestrict
+#Author: DreadEnd
+#Email: dreadslicer@gmail.com
+#BukkitDev: http://dev.bukkit.org/server-mods/tekkit-restrict/
+
+##############################################
+######### DisableClick Configuration #########
+
+### Disable the left or right click of the item.
+#- "27562 left"                 (All Item Data Types)
+#- "27562-27566 left"           (All Items in range)
+#- "27562:1 left"               (Single Item Data Type)
+#- "27562:1 right"              (Prevent right click)
+#- "27562:1 left air"   (Prevents clicking in the air with left click)
+#- "27562:1 left block" (Prevents clicking on a block with left click)
+#- "27562-27566 left air"               (Prevents Range of Items from being clicked in air with left click)
+#- "27562-27566 right block"    (Prevents Range of Items from being clicked on a block with left click)
+#- "27562-27566 right safezone" (Prevents Range of Items from being right clicked inside a SafeZone
+#- "27562-27566 right air safezone"     (Prevents Range of Items from being right clicked on air inside a SafeZone
+#- "ee left"					(Prevents EE items from being right-clicked)
+
+### Disable the Gui or Right-click on a block(s).
+#- "block 126:1"
+#- "block 126-150"
+#- "block ee"
+
+##############################
+
+
+
+
+DisableClick: []
+
+
+
+
+##############################
+##############################
+##############################

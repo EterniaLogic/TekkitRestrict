@@ -1,0 +1,45 @@
+#Configuration file for TekkitRestrict
+#Author: DreadEnd
+#Email: dreadslicer@gmail.com
+#BukkitDev: http://dev.bukkit.org/server-mods/tekkit-restrict/
+
+#################################################
+######### LimitedCreative Configuration ######### 
+
+
+##############################
+
+# Prevents the use of ANY container, including alchemy bags
+LimitedCreativeNoContainer: true
+
+# Prevent the use of these mods or IDs in creative
+LimitedCreative:
+- EE
+- RedPowerControl
+- RedPowerLogic
+- RedPowerMachine
+- WirelessRedstone
+- BuildCraft
+- AdditionalPipes
+- AdvancedMachines
+- IndustrialCraft
+- NuclearControl
+- CompactSolars
+- ChargingBench
+- PowerConverters
+- Mffs
+- RailCraft
+- TubeStuffs
+- IronChests
+- BalkonWeaponMod
+- EnderChest
+- ChunkLoaders
+#- RedPowerCore
+#- RedPowerLighting
+
+
+
+
+##############################
+##############################
+##############################

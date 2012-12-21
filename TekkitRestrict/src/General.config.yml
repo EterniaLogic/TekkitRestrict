@@ -1,0 +1,43 @@
+#Configuration file for TekkitRestrict
+#Author: DreadEnd
+#Email: dreadslicer@gmail.com
+#BukkitDev: http://dev.bukkit.org/server-mods/tekkit-restrict/
+
+
+########################################################
+##  Some fast notes for you all. First, every option  ##
+## in this file is Reloadable. That means that by     ##
+## typing "/tr reload" in-game as an admin with       ##
+## "tekkitrestrict.admin", or typing "tr reload" in   ##
+## the console, you can reload every single config    ##
+## change in this file.                               ##
+##                                                    ##
+## Have fun, Play safe. Good luck.                    ##
+## * DreadEnd * out.                                  ##
+########################################################
+
+UseAutoRPTimer: true
+UseAntiFlyHack: true
+UseAntiMovementSpeedHack: true
+UseAntiForcefield: true
+UseItemLimiter: true
+UseLimitedCreative: true
+UseOpenAlc: true
+UseNoItem: true
+
+
+####SafeZones####
+UseSafeZones: true
+SSDisableAllItems: true
+#SSDisableGemArmor: true
+SSDisableEntities: true
+SSDechargeEE: true
+SSDisableRingOfArcana: true
+SSEnabledPlugins: ["griefprevention","factions","towny","preciousstones"]
+SSDisableFlying: false
+
+
+
+
+######################################
+######################################

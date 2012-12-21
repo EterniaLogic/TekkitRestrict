@@ -1,0 +1,62 @@
+name: tekkitrestrict
+main: com.github.dreadslicer.tekkitrestrict.tekkitrestrict
+version: 1.03
+
+permissions:
+    tekkitrestrict.admin:
+        description: Allows access to TekkitRestrict Admin commands
+        children:
+            tekkitrestrict.safezone.bypass: true
+            tekkitrestrict.creative.bypass: true
+            tekkitrestrict.alc: true
+            tekkitrestrict.dupe.bypass: true
+            tekkitrestrict.noitem.bypass: true
+            tekkitrestrict.limiter.bypass: true
+            tekkitrestrict.craftblock.bypass: true
+            tekkitrestrict.hack.bypass: true
+            tekkitrestrict.lwc.bypass: true
+            tekkitrestrict.flylimit.bypass: true
+    tekkitrestrict.noitem.*:
+        description: removes the ability to GET "*" by item ID. (Valid 111, datavalue 1111.11, range 111-222, MOD (ic2, ee2, redpower))
+    tekkitrestrict.craftblock.*:
+        description: removes the ability to craft "*" by item ID. (Valid 111, datavalue 1111.11, range 111-222, MOD (ic2, ee2, redpower))
+    tekkitrestrict.noitem.bypass:
+        description: Allows the use of all items as described in noitem. 
+    tekkitrestrict.limit.*:
+        description: removes the ability to craft or GET "*" by item ID. (Valid 111, datavalue 1111.11, range 111-222, MOD (ic2, ee2, redpower))   
+    tekkitrestrict.limit.bypass:
+        description: removes item limiter.
+    tekkitrestrict.alc:
+        description: adds the ability to use /alc [player] [bagcolor].
+    tekkitrestrict.creative.*:
+        description: Disables the use of certain defined items
+    tekkitrestrict.creative.bypass:
+        description: Enables the use of any block in creative. 
+    tekkitrestrict.safezone.bypass:
+        description:  Enables somebody to bypass all safezone.
+    tekkitrestrict.hack.bypass:
+        description:  Enables somebody to bypass no oil derrick preventers.
+    tekkitrestrict.dupe.bypass:
+        description:  Enables somebody to bypass the anti-dupe.
+    tekkitrestrict.limiter.bypass:
+        description:  Enables somebody to have no block limits.
+    tekkitrestrict.craftblock.bypass:
+        description:  Enables somebody to craft ANY item.
+    tekkitrestrict.lwc.bypass:
+        description:  Enables somebody to bypass LWC attached protections.
+    tekkitrestrict.flylimit.bypass:
+        description:  Bypass global flight time limit
+
+commands:
+   tekkitrestrict:
+      description: View commands.
+      usage: /<command>
+   tr:
+      description: View TekkitRestrict commands.
+      usage: /<command>
+   openalc:
+      description: View a player's Alchemy bag. Color 'white', 'lightblue', ect.
+      usage: /<command> [player] [color] [needs perm tekkitrestrict.alc]
+   tpic:
+      description: Teleports you to an area where a cluster of items is sitting on the ground.
+      usage: /<command> [Min Items Threshhold]
