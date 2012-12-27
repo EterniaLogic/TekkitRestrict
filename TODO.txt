@@ -1,0 +1,9 @@
+Most bugs and errors can be found at:
+http://dev.bukkit.org/server-mods/tekkit-restrict/tickets/
+
+::Small list of things to do:
+- Fix threading problem (convert DisableItemsThread -> Create new threads to only a single thread) [fixes 100% cpu] [TRThreads]
+- Fix several dupes (Retrievulator, Tank cart, ect)
+- Fix any intermediate bugs
+- Fix Flying bugs (Boat, Hurricane boots, Quantum boots) [TRFlyHandler]
+- Document code (aka, place comments before each segment explaining how it works... I haven't implemented this a lot because I change my code sometimes)
