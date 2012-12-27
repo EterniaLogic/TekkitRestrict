@@ -291,16 +291,16 @@ class DisableItemThread extends Thread {
 					try {
 						oos = pp;
 
-						if (throttle) {
+						/*if (throttle) {
 							exe.execute((new Runnable() {
 								@Override
 								public void run() {
 									disableItems(oos);
 								}
 							}));
-						} else {
+						} else {*/
 							disableItems(pp);
-						}
+						//}
 					} catch (Exception e) {
 						TRLogger.Log(
 								"debug",
