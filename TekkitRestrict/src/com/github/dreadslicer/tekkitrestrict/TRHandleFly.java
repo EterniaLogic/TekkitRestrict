@@ -51,48 +51,24 @@ public class TRHandleFly {
 			if (!e.getPlayer().isOp() && !player.abilities.canFly) {
 				if (!TRPermHandler.hasPermission(e.getPlayer(), "hack",
 						"bypass", "")) {
-					// do they have a swiftwolf in their inventory?
-					PlayerInventory pi = e.getPlayer().getInventory();
-					ItemStack[] iss = pi.getContents();
-					boolean hasFlyItem = false;
-					if (pi.getChestplate() != null) {
-						int chest = pi.getChestplate().getTypeId();
-						int data = pi.getChestplate().getData().getData();
-						if (chest == 30209) {
-							if (data <= 25 && data != 0) { // fuel check
-								hasFlyItem = true;
-							}
-						} else if (chest == 30210) {
-							if (data < 18000 && data != 0) { // fuel check
-								hasFlyItem = true;
-							}
-						}
-					}
-					if (!hasFlyItem) {
-						for (ItemStack s : iss) {
-							if (s != null) {
-								int id = s.getTypeId();
-								if (id == 27536 || id == 27584) {
-									hasFlyItem = true;
-								}
-							}
-						}
-					}
+					
+					     
+					
 					// tekkitrestrict.log.info("fly!");
 
 					// tekkitrestrict.log.info("fly?");
-					if (!hasFlyItem) {
+					//if (!hasFlyItem) {
 						// ok, so they are flying without permission!
 						// Ground them!
 						if (enabled) {
 							TRNoHack.groundPlayer(e.getPlayer());
 							TRNoHack.handleHack(e.getPlayer(), HackType.fly);
 						}
-					} else {
+					//} else {
 						// flight time!
 
 						// TRLimitFly.willGround(e.getPlayer());
-					}
+					//}
 				}
 			}
 		} else {
@@ -101,6 +77,46 @@ public class TRHandleFly {
 	}
 
 	public static boolean isFlying(Player e) {
+		PlayerInventory pi = e.getPlayer().getInventory();
+		ItemStack[] iss = pi.getContents();
+		int data = 0;
+		
+		data = pi.getBoots().getData().getData();
+		if(pi.getBoots() !=null) { //checks if the player is wearing boots before deciding whether or not they are flyhacking
+			int boots = pi.getBoots().getTypeId();
+			
+			if (boots == 30171 && (data < 27)) { //wearing quantum boots. checks for charge
+		    	//if charged boots, increase fly tolerance. *10 is just an example
+				flyTolerance *= 2;
+		    } else if (boots == 27582) { //checks for hurricane boots
+		    	return false; //has flyItem
+		    }
+		}
+		
+		if (pi.getChestplate() != null) { //jetpack check
+			int chest = pi.getChestplate().getTypeId();
+			data = pi.getChestplate().getData().getData();
+			if (chest == 30209) {
+				if (data <= 25 && data != 0) { // fuel check
+					return false; //has flyItem
+				}
+			} else if (chest == 30210) {
+				if (data < 18000 && data != 0) { // fuel check
+					return false; //has flyItem
+				}
+			}
+		}
+		
+		for (ItemStack s : iss) { //ring check
+			if (s != null) {
+				int id = s.getTypeId();
+				if (id == 27536 || id == 27584) {
+					return false; //has flyItem
+				}
+			}
+		}
+		
+		
 		List<Integer> nearBlocks = new LinkedList<Integer>();
 		nearBlocks.add(220);
 		nearBlocks.add(235);
