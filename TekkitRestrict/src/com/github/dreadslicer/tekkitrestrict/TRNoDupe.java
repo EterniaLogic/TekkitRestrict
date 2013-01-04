@@ -28,7 +28,7 @@ public class TRNoDupe {
 				.toLowerCase();
 		
 		
-		tekkitrestrict.log.info("t0-"+title+"-"+slot+"-"+event.isShiftClick());
+		//tekkitrestrict.log.info("t0-"+title+"-"+slot+"-"+event.isShiftClick());
 		// RMDupe Slot35
 		if (!TRPermHandler.hasPermission(player, "dupe", "bypass", "")) {
 			// tekkitrestrict.log.info("t0-"+title+"-");
