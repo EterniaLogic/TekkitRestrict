@@ -56,6 +56,11 @@ public class TRLogFilter implements Filter {
 					TRLogger.LogConsole("Error", a);
 				} else if (b.contains("player_command")) {
 					TRLogger.LogConsole("Command", a);
+					if (b.contains("/i ")) {
+						TRLogger.LogConsole("SpawnItem", a);
+					} else if (b.contains("/give ")) {
+						TRLogger.LogConsole("SpawnItem", a);
+					}
 				} else {
 					boolean cc = false;
 
@@ -67,8 +72,15 @@ public class TRLogFilter implements Filter {
 										.toLowerCase())
 								|| b.contains(pl[i].getPlayerListName()
 										.toLowerCase())) {
-							if (b.contains("[34;1mGiving")) {
-								TRLogger.LogConsole("GiveItem", chatline);
+							if (b.contains("[34;1mgiving")) {
+								TRLogger.LogConsole("SpawnItem", "[CONSOLE] " + a);
+								cc = true;
+							} else if ((b.contains("giving " + pl[i].getName().toLowerCase())
+									|| b.contains("giving " + pl[i].getDisplayName().toLowerCase())
+									|| b.contains("giving " + pl[i].getPlayerListName().toLowerCase()))
+									&& b.contains(" of ")) {
+								//Extensive check to reduce the chance of someone saying something triggering this.
+								TRLogger.LogConsole("SpawnItem", "[NEI] " + a);
 								cc = true;
 							} else {
 								TRLogger.LogConsole("Chat", chatline);
