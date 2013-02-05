@@ -465,7 +465,7 @@ public class TRListener implements Listener {
 
 	@EventHandler
 	public void onPlayerQuit(org.bukkit.event.player.PlayerQuitEvent e) {
-		if (tekkitrestrict.config.getBoolean("UseItemLimiter")) {
+		if ((tekkitrestrict.config.getBoolean("UseItemLimiter") != null) && tekkitrestrict.config.getBoolean("UseItemLimiter")) {
 			try {TRLimitBlock.setExpire(e.getPlayer().getName());}catch(Exception eee){}
 			try {TRNoHack.playerLogout(e.getPlayer());}catch(Exception eee){}
 			try{TRNoDupeProjectTable.playerUnuse(e.getPlayer().getName().toLowerCase());}catch(Exception eee){}
@@ -474,7 +474,7 @@ public class TRListener implements Listener {
 
 	@EventHandler
 	public void onPlayerKick(org.bukkit.event.player.PlayerKickEvent e) {
-		if (tekkitrestrict.config.getBoolean("UseItemLimiter")) {
+		if (tekkitrestrict.config.getBoolean("UseItemLimiter") != null) && tekkitrestrict.config.getBoolean("UseItemLimiter")) {
 			try {TRLimitBlock.setExpire(e.getPlayer().getName());}catch(Exception eee){}
 			try {TRNoHack.playerLogout(e.getPlayer());}catch(Exception eee){}
 			try{TRNoDupeProjectTable.playerUnuse(e.getPlayer().getName().toLowerCase());}catch(Exception eee){}
@@ -484,7 +484,7 @@ public class TRListener implements Listener {
 	@EventHandler
 	public void onPlayerLogin(org.bukkit.event.player.PlayerJoinEvent e) {
 		try{
-			if (tekkitrestrict.config.getBoolean("UseItemLimiter")) {
+			if (tekkitrestrict.config.getBoolean("UseItemLimiter") != null) && tekkitrestrict.config.getBoolean("UseItemLimiter")) {
 				TRLimitBlock.removeExpire(e.getPlayer().getName());
 				TRLimitBlock.getLimiter(e.getPlayer());
 			}
