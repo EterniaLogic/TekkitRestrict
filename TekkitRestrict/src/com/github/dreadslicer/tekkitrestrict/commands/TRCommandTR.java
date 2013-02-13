@@ -215,7 +215,7 @@ public class TRCommandTR implements CommandExecutor {
 								}
 							}
 						} else if (args[1].equalsIgnoreCase("limit")) {
-							if (args[2] == null) {
+							if (args.length == 2) {
 								message.add("[TekkitRestrict "
 										+ tekkitrestrict.getInstance()
 												.getDescription().getVersion()
@@ -282,7 +282,7 @@ public class TRCommandTR implements CommandExecutor {
 							}
 						} else if (args[1].equalsIgnoreCase("emc")) {
 							// tempset, lookup
-							if (args[2] == null) {
+							if (args.length == 2) {
 								message.add("/tr admin emc tempset [id:data] [EMC]");
 								message.add("/tr admin emc lookup [id:data]");
 							} else if (args[2].equalsIgnoreCase("tempset")) {
