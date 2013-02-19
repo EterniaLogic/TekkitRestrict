@@ -6,7 +6,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 public class TRNoDupe {
 
 	@SuppressWarnings("unused")
-	private static boolean preventAlcDupe, preventRMDupe, preventTransmuteDupe;
+	private static boolean preventAlcDupe, preventRMDupe, preventTransmuteDupe,
+			preventTankCartDupe, preventTankCartGlitch;
 	public static int dupeAttempts = 0;
 	public static String lastPlayer = "";
 
@@ -16,6 +17,10 @@ public class TRNoDupe {
 				.getBoolean("PreventRMFurnaceDupe");
 		preventTransmuteDupe = tekkitrestrict.config
 				.getBoolean("PreventTransmuteDupe");
+		preventTankCartDupe = tekkitrestrict.config
+				.getBoolean("PreventTankCartDupe");
+		preventTankCartGlitch = tekkitrestrict.config
+				.getBoolean("PreventTankCartGlitch");
 	}
 
 	public static void handleDupes(InventoryClickEvent event) {
@@ -58,14 +63,23 @@ public class TRNoDupe {
 				if (slot == 35) {
 					// tekkitrestrict.log.info("t2");
 					if (event.isShiftClick()) {
-						event.setCancelled(true);
-						player.sendRawMessage("[TRDupe] you are not allowed to Shift+Click here while using a Tank Cart!");
+						if (preventTankCartDupe){
+							event.setCancelled(true);
+							player.sendRawMessage("[TRDupe] you are not allowed to Shift+Click here while using a Tank Cart!");
 
-						TRLogger.Log("Dupe", player.getName()
+							TRLogger.Log("Dupe", player.getName()
 								+ " attempted to dupe using a Tank Cart!");
-						dupeAttempts++;
-						TRLogger.broadcastDupe(player.getName(),
+							dupeAttempts++;
+							TRLogger.broadcastDupe(player.getName(),
 								"the Tank Cart", "TankCart");
+						}
+					}
+				} else if (slot <= 8){
+					if (event.isShiftClick()) {
+						if (preventTankCartGlitch){
+							event.setCancelled(true);
+							player.sendRawMessage("[TR] you are not allowed to Shift+Click here while using a Tank Cart!");
+						}
 					}
 				}
 			} else if (title.equals("trans tablet")) {
