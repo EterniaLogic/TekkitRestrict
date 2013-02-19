@@ -40,8 +40,10 @@ HackBroadcastString: "[TRHack] {PLAYER} {ACTION} {HTYPE}!"
 PreventRMFurnaceDupe: true
 PreventAlcDupe: true
 PreventTransmuteDupe: true
+PreventTankCartDupe: true
+PreventTankCartGlitch: true
 
-#####        "RMFurnace", "alc", "transmute"
+#####        "RMFurnace", "alc", "transmute", "tankcart"
 BroadcastDupes: ["rmfurnace", "alc"]
 BroadcastDupeString: "[TRDupe] {PLAYER} tried to dupe using {DTYPE}!"
 
