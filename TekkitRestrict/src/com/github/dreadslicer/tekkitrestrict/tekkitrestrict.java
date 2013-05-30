@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
@@ -83,8 +84,7 @@ public class tekkitrestrict extends JavaPlugin {
 		// getLogger().info("onEnabled has been invoked!");
 		// log.info("[TekkitRestrict] Begin Enable");
 		ttt = new TRThread();
-		this.getServer().getPluginManager()
-				.registerEvents(new TRListener(), this);
+		this.getServer().getPluginManager().registerEvents(new TRListener(), this); //IMPORTANT assigner
 		new TRLogger();
 		TRSafeZone.init();
 		TRLimitFly.init();
@@ -96,10 +96,10 @@ public class tekkitrestrict extends JavaPlugin {
 		getCommand("tpic").setExecutor(new TRCommandTPIC(this));
 
 		// determine if EE2 is enabled by using pluginmanager
-			if (pm.isPluginEnabled("mod_EE"))
-				tekkitrestrict.EEEnabled = true;
-			else
-				tekkitrestrict.EEEnabled = false;
+		if (pm.isPluginEnabled("mod_EE"))
+			tekkitrestrict.EEEnabled = true;
+		else
+			tekkitrestrict.EEEnabled = false;
 
 		try {
 			if (pm.isPluginEnabled("PermissionsEx")) {
@@ -190,8 +190,8 @@ public class tekkitrestrict extends JavaPlugin {
 		}
 
 		// done!
-		// log.info("[TekkitRestrict] Enabled!");
-		TRNoItem.test();
+		log.info("TekkitRestrict v " + getDescription().getVersion()+ " Enabled!");
+		
 		/*
 		 * log.info("T: "+config.get("UseChunkUnloader").toString());
 		 * log.info("T1: "+config.get("FlyLimitDailyMinutes").toString());
@@ -218,7 +218,7 @@ public class tekkitrestrict extends JavaPlugin {
 		}
 
 		disable = true;
-		log.info("[tekkitrestrict] Disabled!");
+		log.info("TekkitRestrict v " + getDescription().getVersion()+ " disabled!");
 	}
 
 	public static tekkitrestrict getInstance() {
@@ -285,14 +285,19 @@ public class tekkitrestrict extends JavaPlugin {
 			//remove all relevant information from both databases.
 			//tr_saferegion =	id name mode data world
 			//tr_limiter = 		id player blockdata
-			try{
-				srvals=this.getTableVals("tr_saferegion");
-			} catch(Exception ex){}
-			try{
-				limvals=this.getTableVals("tr_limiter");
-			} catch(Exception ex){}
+			try {
+				srvals = this.getTableVals("tr_saferegion");
+			} catch(SQLException ex){
+				log.warning("Minor exception occured when trying to load the safezones from the database.");
+			}
+			try {
+				limvals = this.getTableVals("tr_limiter");
+			} catch(SQLException ex){
+				log.warning("Minor exception occured when trying to load the limiter from the database.");
+			}
 			
-			tekkitrestrict.log.info("DB - Copied "+(srvals.size()+limvals.size())+" rows");
+			if (srvals != null && limvals != null)
+				tekkitrestrict.log.info("DB - Copied "+(srvals.size() + limvals.size())+" rows");
 			
 			try{db.query("DROP TABLE `tr_saferegion`;");} catch(Exception ex){}
 			try{db.query("DROP TABLE `tr_limiter`;");} catch(Exception ex){}
@@ -352,7 +357,8 @@ public class tekkitrestrict extends JavaPlugin {
 		rs1.close();*/
 		ResultSet rs = db.query("SELECT * FROM `"+table+"`");
 		List<List<String>> ls = new LinkedList<List<String>>();
-		if(rs != null) while(rs.next()) {
+		if (rs == null) return ls;
+		while(rs.next()) {
 			List<String> j = new LinkedList<String>();
 			
 			for(int i=1;i<=100;i++){
@@ -362,6 +368,7 @@ public class tekkitrestrict extends JavaPlugin {
 			//tekkitrestrict.log.info("t: "+j.size());
 			ls.add(j);
 		}
+		rs.close();
 		return ls;
 	}
 	
@@ -427,17 +434,22 @@ public class tekkitrestrict extends JavaPlugin {
 		// newConfig.loadFromString(s)
 		InputStream defConfigStream = getResource(loc);
 		if (defConfigStream != null) {
-			YamlConfiguration defConfig = YamlConfiguration
-					.loadConfiguration(defConfigStream);
+			YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(defConfigStream);
 			conf.setDefaults(defConfig);
+			try {
+				defConfigStream.close();
+			} catch (IOException e) {
+				tekkitrestrict.log.warning("Exception while trying to reload the config!");
+				e.printStackTrace();
+			}
 		}
 		return conf;
 	}
 
 	@Override
 	public void saveDefaultConfig() {
-		java.util.logging.Level ll = log.getLevel();
-		log.setLevel(java.util.logging.Level.SEVERE);
+		Level ll = log.getLevel();
+		log.setLevel(Level.SEVERE);
 		try {
 			saveResource("General.config.yml", false);
 		} catch (Exception e) {

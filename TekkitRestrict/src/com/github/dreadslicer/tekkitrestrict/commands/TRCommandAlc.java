@@ -382,7 +382,7 @@ public class TRCommandAlc implements CommandExecutor {
 			return -1;
 		}
 	}
-	private static String getColor(int color) {
+	public static String getColor(int color) {
 		switch (color){
 			case 0: return "white";
 			case 1: return "orange";
