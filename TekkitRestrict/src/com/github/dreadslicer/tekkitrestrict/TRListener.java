@@ -540,8 +540,9 @@ public class TRListener implements Listener {
 				// TRLogger.broadcastDupe(player.getName(),
 				// "the Alchemy Bag and "+cache.dupeItem);
 
-				if (PickupTick.get(player) != null) {
-					if (PickupTick.get(player) >= 40) {
+				Integer tick = PickupTick.get(player);
+				if (tick != null) {
+					if (tick >= 40) {
 						TRLogger.Log("Dupe", player.getName() + " [" + cache.inBagColor + " bag] attempted to pick up (dupe) with the "
 								+ cache.dupeItem + "!");
 						// player.sendMessage("You may not pick that up while a "+cache.dupeItem+" is in your ["+cache.inBagColor+" bag]");
@@ -550,9 +551,12 @@ public class TRListener implements Listener {
 
 						// remove the BHB / Void ring!!!
 						cache.removeAlc();
+						PickupTick.put(player, 1);
 					}
-				}
-				PickupTick.put(player, PickupTick.get(player) != null ? PickupTick.get(player) + 1 : 1);
+					PickupTick.put(player, tick + 1);
+				} else
+					PickupTick.put(player, 1);
+				
 			}
 		} catch (Exception ee) {
 			TRLogger.Log("debug", "Error! [TRNoDupePickup] : " + ee.getMessage());

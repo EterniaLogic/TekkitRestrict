@@ -6,9 +6,12 @@ import java.util.Map;
 
 import net.minecraft.server.EntityHuman;
 
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import com.github.dreadslicer.tekkitrestrict.commands.TRCommandAlc;
+
+import ee.AlchemyBagData;
 
 public class TRNoDupe_BagCache {
 	public TRNoDupe_BagCache() {
@@ -31,15 +34,11 @@ public class TRNoDupe_BagCache {
 	public void removeAlc() {
 		// removes all "Devices" form alc bag.
 		if (preventAlcDupe) {
-			if (tekkitrestrict.EEEnabled
-					&& !TRPermHandler.hasPermission(player, "dupe", "bypass",
-							"")) {
+			if (tekkitrestrict.EEEnabled && !TRPermHandler.hasPermission(player, "dupe", "bypass", "")) {
 				for (int i = 0; i < 16; i++) {
 					try {
-						EntityHuman H = ((org.bukkit.craftbukkit.entity.CraftPlayer) player)
-								.getHandle();
-						ee.AlchemyBagData ABD = ee.ItemAlchemyBag.getBagData(i,
-								H, H.world);
+						EntityHuman H = ((CraftPlayer) player).getHandle();
+						AlchemyBagData ABD = ee.ItemAlchemyBag.getBagData(i, H, H.world);
 						// tekkitrestrict.log.info("???l5");
 						// ok, now we search!
 						net.minecraft.server.ItemStack[] iss = ABD.items;
@@ -94,12 +93,10 @@ public class TRNoDupe_BagCache {
 			// This function will also clean up the ones with non-players.
 
 			// loop through all of teh players
-			Player[] players = tekkitrestrict.getInstance().getServer()
-					.getOnlinePlayers();
+			Player[] players = tekkitrestrict.getInstance().getServer().getOnlinePlayers();
 			for (int i = 0; i < players.length; i++) {
 				try {
-					Player p = players[i];
-					setCheck(p); // checks and sets the vars.
+					setCheck(players[i]); // checks and sets the vars.
 				} catch (Exception e) {
 				}
 			}
@@ -125,15 +122,11 @@ public class TRNoDupe_BagCache {
 
 	public static void setCheck(Player player) {
 		if (preventAlcDupe) {
-			if (tekkitrestrict.EEEnabled
-					&& !TRPermHandler.hasPermission(player, "dupe", "bypass",
-							"")) {
+			if (tekkitrestrict.EEEnabled && !TRPermHandler.hasPermission(player, "dupe", "bypass", "")) {
 				for (int i = 0; i < 16; i++) {
 					try {
-						EntityHuman H = ((org.bukkit.craftbukkit.entity.CraftPlayer) player)
-								.getHandle();
-						ee.AlchemyBagData ABD = ee.ItemAlchemyBag.getBagData(i,
-								H, H.world);
+						EntityHuman H = ((CraftPlayer) player).getHandle();
+						AlchemyBagData ABD = ee.ItemAlchemyBag.getBagData(i, H, H.world);
 						// tekkitrestrict.log.info("???l5");
 						// ok, now we search!
 						net.minecraft.server.ItemStack[] iss = ABD.items;
@@ -144,10 +137,9 @@ public class TRNoDupe_BagCache {
 								if (iss[j].id == 27532 || iss[j].id == 27593) {
 									if (player.isOnline()) {
 										// they are attempting to dupe?
-										TRNoDupe_BagCache cache = watchers
-												.get(player) != null ? watchers
-												.get(player)
-												: new TRNoDupe_BagCache();
+										
+										TRNoDupe_BagCache cache = watchers.get(player);
+										if (cache == null) cache = new TRNoDupe_BagCache();
 
 										cache.player = player;
 										cache.inBagColor = TRCommandAlc
