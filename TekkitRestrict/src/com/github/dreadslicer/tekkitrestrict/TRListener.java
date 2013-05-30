@@ -4,10 +4,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.TileEntity;
 import net.minecraft.server.WorldServer;
 
 import org.bukkit.block.Block;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
+import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -18,9 +21,16 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.github.dreadslicer.tekkitrestrict.commands.TRCommandAlc;
 import com.github.dreadslicer.tekkitrestrict.lib.TRNoClick;
 
 import eloraam.core.TileCovered;
@@ -137,25 +147,16 @@ public class TRListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void onBlockBreak(BlockBreakEvent e) {
-		// forget about basic types!
+		//IMPORTANT Change this to separate listener where it can be assigned instead of checking for useblocklimit
 		for (int eee : Exceptions) {
-			if (e.getBlock().getTypeId() == eee) {
-				return;
-			}
+			if (e.getBlock().getTypeId() == eee) return;
 		}
 		
-		String[] exempt = new String[] { "[buildcraft]", "[redpower]" };
-		try{
-		if (e.getPlayer() != null) {
-			Player player = e.getPlayer();
-			for (String ex : exempt) {
-				if (ex == player.getName().toLowerCase()) {
-					return;
-				}
-			}
-		}
-		} catch(Exception eee){}
-		try{
+		Player player = e.getPlayer();
+		if (player == null) return;
+		String pname = player.getName().toLowerCase();
+		if (pname.equals("[buildcraft]") || pname.equals("[redpower]")) return;
+		try {
 			if (UseBlockLimit) {
 				String pl = TRLimitBlock.getPlayerAt(e.getBlock());
 				//tekkitrestrict.log.info(pl);
@@ -164,7 +165,10 @@ public class TRListener implements Listener {
 					il.checkBreakLimit(e);
 				}
 			}
-		} catch(Exception eee){}
+		} catch(Exception eee){
+			tekkitrestrict.log.warning("A minor exception occured in tekkitrestrict. Please give the developer the following information: ");
+			tekkitrestrict.log.warning(" - onBlockBreak, block limiter.");
+		}
 	}
 
 	int lastdata = 0;
@@ -177,83 +181,88 @@ public class TRListener implements Listener {
 				return;
 			}
 		}
-		try{
-			if (e.getPlayer() != null) {
-				Player player = e.getPlayer();
-				TRLWCProtect.checkLWC(e);
-	
-				int id = e.getBlock().getTypeId();
-				int data = e.getBlock().getData();
-				WorldServer ws = ((org.bukkit.craftbukkit.CraftWorld) e.getBlock()
-						.getWorld()).getHandle();
-				Block block = e.getBlock();
-				TileEntity te1 = ws.getTileEntity(block.getX(), block.getY(),
-						block.getZ());
-	
-				if (UseBlockLimit) {
-					TRLimitBlock il = TRLimitBlock.getLimiter(player);
-					if (!il.checkLimit(e)) {
-						if (!TRPermHandler.hasPermission(player, "limiter",
-								"bypass", "")) {
-							player.sendRawMessage("[TRItemLimiter] You cannot place down any more of that block!");
-							e.setCancelled(true);
-							if (te1 instanceof TileCovered) {
-								TileCovered tc = (TileCovered) te1;
-								for (int i = 0; i < 6; i++) {
-									if (tc.getCover(i) != -1
-											&& tc.getCover(i) == data) {
-										tc.tryRemoveCover(i);
-									}
+		
+		
+		Player player = e.getPlayer();
+		if (player == null) {
+			lastdata = e.getBlock().getData();
+			return;
+		}
+		
+		try {
+			TRLWCProtect.checkLWC(e);
+
+			Block block = e.getBlock();
+			int id = block.getTypeId();
+			int data = block.getData();
+			WorldServer ws = ((CraftWorld) block.getWorld()).getHandle();
+			
+			TileEntity te1 = ws.getTileEntity(block.getX(), block.getY(), block.getZ());
+
+			if (UseBlockLimit) {
+				TRLimitBlock il = TRLimitBlock.getLimiter(player);
+				if (!il.checkLimit(e)) {
+					if (!TRPermHandler.hasPermission(player, "limiter", "bypass", "")) {
+						player.sendMessage("[TRItemLimiter] You cannot place down any more of that block!");
+						e.setCancelled(true);
+						if (te1 instanceof TileCovered) {
+							TileCovered tc = (TileCovered) te1;
+							for (int i = 0; i < 6; i++) {
+								if (tc.getCover(i) != -1
+										&& tc.getCover(i) == data) {
+									tc.tryRemoveCover(i);
 								}
-								tc.updateBlockChange();
 							}
+							tc.updateBlockChange();
 						}
-					}
-				}
-	
-				if (te1 != null && data == 0) {
-	
-					if (te1 instanceof TileCovered) {
-						// TileCovered tc = (TileCovered)te1;
-						// tekkitrestrict.log.info("ar "+lastdata);
-						data = lastdata;
-					}
-				}
-				com.github.dreadslicer.tekkitrestrict.ItemStack cc = new com.github.dreadslicer.tekkitrestrict.ItemStack(
-						id, 0, data);
-				if (TRNoItem.isItemBanned(e.getPlayer(), cc)) {
-					// tekkitrestrict.log.info(cc.id+":"+cc.getData());
-					e.getPlayer()
-							.sendRawMessage(
-									"[TRItemDisabler] You cannot place down this type of block!");
-					e.setCancelled(true);
-					if (te1 instanceof TileCovered) {
-						TileCovered tc = (TileCovered) te1;
-						for (int i = 0; i < 6; i++) {
-							if (tc.getCover(i) != -1 && tc.getCover(i) == data) {
-								tc.tryRemoveCover(i);
-							}
-						}
-						tc.updateBlockChange();
 					}
 				}
 			}
+
+			if (te1 != null && data == 0) {
+
+				if (te1 instanceof TileCovered) {
+					// TileCovered tc = (TileCovered)te1;
+					// tekkitrestrict.log.info("ar "+lastdata);
+					data = lastdata;
+				}
+			}
+			com.github.dreadslicer.tekkitrestrict.ItemStack cc = new com.github.dreadslicer.tekkitrestrict.ItemStack(id, 0, data);
+			if (TRNoItem.isItemBanned(e.getPlayer(), cc)) {
+				// tekkitrestrict.log.info(cc.id+":"+cc.getData());
+				e.getPlayer().sendMessage("[TRItemDisabler] You cannot place down this type of block!");
+				e.setCancelled(true);
+				if (te1 instanceof TileCovered) {
+					TileCovered tc = (TileCovered) te1;
+					for (int i = 0; i < 6; i++) {
+						if (tc.getCover(i) != -1 && tc.getCover(i) == data) {
+							tc.tryRemoveCover(i);
+						}
+					}
+					tc.updateBlockChange();
+				}
+			}
+			lastdata = e.getBlock().getData();
+		} catch(Exception ex){
+			tekkitrestrict.log.warning("A minor exception occured in tekkitrestrict. Please give the developer the following information: ");
+			tekkitrestrict.log.warning(" - onBlockPlace, " + ex.getMessage());
 		}
-		catch(Exception eee){}
-		lastdata = e.getBlock().getData();
+		
 	}
 
 	@EventHandler
-	public void onDropItem(org.bukkit.event.player.PlayerDropItemEvent event) {
+	public void onDropItem(PlayerDropItemEvent event) {
+		Player player = event.getPlayer();
+		if (player == null) return;
 		try {
 			TRNoDupe.handleDropDupes(event);
-		} catch (Exception e) {
-			TRLogger.Log("debug", "Error! [TRNoDropDupe] : " + e.getMessage());
+		} catch (Exception ex) {
+			tekkitrestrict.log.warning("A minor exception occured in tekkitrestrict. Please give the developer the following information: ");
+			tekkitrestrict.log.warning(" - onDropItem, handleDropDupes");
 		}
-		try{
-			Player player = event.getPlayer();
-			net.minecraft.server.EntityPlayer ep = ((org.bukkit.craftbukkit.entity.CraftPlayer) player)
-					.getHandle();
+		
+		try {
+			EntityPlayer ep = ((CraftPlayer) player).getHandle();
 			if (ep.abilities.canInstantlyBuild) {
 				if (!TRPermHandler.hasPermission(player, "creative", "bypass", "")) {
 					/*Item ccr = event.getItemDrop();
@@ -272,66 +281,55 @@ public class TRListener implements Listener {
 
 	// /////// START INTERACT //////////////
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
-	public void onPlayerInteract(org.bukkit.event.player.PlayerInteractEvent e) {
-		if (e.getPlayer() != null) {
-			// determine if this is Buildcraft or RedPower... Then exempt.
-			String pname = e.getPlayer().getName().toLowerCase();
-			if (!pname.equals("[buildcraft]") && !pname.equals("[redpower]")) {
-				// lets do this based on a white-listed approach.
-				// First, lets loop through the DisableClick list to stop
-				// clicks.
-				// Perf: 8x
-				try {
-					TRNoClick.compareAll(e);
-				} catch (Exception e1) {
-					TRLogger.Log("debug", "Error: [ListenInteract TRNoClick] "
-							+ e1.getMessage());
-				}
+	public void onPlayerInteract(PlayerInteractEvent e) {
+		Player player = e.getPlayer();
+		if (player == null) return;
+		
+		// determine if this is Buildcraft or RedPower... Then exempt.
+		String pname = player.getName().toLowerCase();
+		if (!pname.equals("[buildcraft]") && !pname.equals("[redpower]")) {
+			// lets do this based on a white-listed approach.
+			// First, lets loop through the DisableClick list to stop
+			// clicks.
+			// Perf: 8x
+			try {
+				TRNoClick.compareAll(e);
+			} catch (Exception ex) {
+				TRLogger.Log("debug", "Error: [ListenInteract TRNoClick] " + ex.getMessage());
+			}
+			
+			try {
+				TRNoDupeProjectTable.checkTable(e);
+			} catch(Exception ex){}
+
+			try {
+				// if(e.getAction() == Action.RIGHT_CLICK_BLOCK ||
+				// e.getAction() == Action.RIGHT_CLICK_AIR){
+
 				
-				try{TRNoDupeProjectTable.checkTable(e);}catch(Exception eee){}
-
-				try {
-					// if(e.getAction() == Action.RIGHT_CLICK_BLOCK ||
-					// e.getAction() == Action.RIGHT_CLICK_AIR){
-
-					Player player = e.getPlayer();
-					net.minecraft.server.EntityPlayer ep = ((org.bukkit.craftbukkit.entity.CraftPlayer) player)
-							.getHandle();
-					if (ep.abilities.canInstantlyBuild) {
-						if (e.getPlayer().getItemInHand() != null) {
-							org.bukkit.inventory.ItemStack str = e.getPlayer()
-									.getItemInHand();
-							com.github.dreadslicer.tekkitrestrict.ItemStack ee = new com.github.dreadslicer.tekkitrestrict.ItemStack(
-									str.getTypeId(), str.getAmount(), str
-											.getData().getData());
-							if (TRNoItem
-									.isCreativeItemBanned(e.getPlayer(), ee)) {
-								e.getPlayer()
-										.sendRawMessage(
-												"[TRLimitedCreative] You may not interact with this item.");
-								e.setCancelled(true);
-								e.getPlayer().setItemInHand(null);
-							}
+				EntityPlayer ep = ((CraftPlayer) player).getHandle();
+				if (ep.abilities.canInstantlyBuild) {
+					org.bukkit.inventory.ItemStack str = player.getItemInHand();
+					if (str != null) {
+						com.github.dreadslicer.tekkitrestrict.ItemStack ee = new com.github.dreadslicer.tekkitrestrict.ItemStack(
+								str.getTypeId(), str.getAmount(), str.getData().getData());
+						if (TRNoItem.isCreativeItemBanned(player, ee)) {
+							player.sendMessage("[TRLimitedCreative] You may not interact with this item.");
+							e.setCancelled(true);
+							player.setItemInHand(null);
 						}
 					}
-					// }
-				} catch (Exception e1) {
-					TRLogger.Log(
-							"debug",
-							"Error: [ListenInteract TRLimitedCreative] "
-									+ e1.getMessage());
 				}
-
-				// Lastly, lets see if it's loggable.
-				// Perf: 19
-				if (!e.isCancelled()) {
-					itemLogUse(e);
-				}
+				// }
+			} catch (Exception ex) {
+				TRLogger.Log("debug", "Error: [ListenInteract TRLimitedCreative] " + ex.getMessage());
 			}
+
+			if (!e.isCancelled()) itemLogUse(e);
 		}
 	}
 
-	private void itemLogUse(org.bukkit.event.player.PlayerInteractEvent e) {
+	private void itemLogUse(PlayerInteractEvent e) {
 		try {
 			Player p = e.getPlayer();
 			int x = p.getLocation().getBlockX();
@@ -401,30 +399,27 @@ public class TRListener implements Listener {
 	public void eventInventoryClick(InventoryClickEvent event) {
 		try {
 			// we want to stop non-players from being activated here.
+			
 			if (event.getWhoClicked() != null) {
 				// Determine if this inventory click is a dupe action:
 				// Perf: 13-27-(9+14x)
 				try {
 					TRNoDupe.handleDupes(event);
 				} catch (Exception e) {
-					TRLogger.Log("debug",
-							"Error! [TRNoDupe] : " + e.getMessage());
+					TRLogger.Log("debug", "Error! [TRNoDupe] : " + e.getMessage());
 					for(StackTraceElement eer:e.getStackTrace()){
 						TRLogger.Log("debug","    "+eer.toString()); 
 					}
 				}
 
 				try {
-					Player player = tekkitrestrict.getInstance().getServer()
-							.getPlayer(event.getWhoClicked().getName());
-					net.minecraft.server.EntityPlayer ep = ((org.bukkit.craftbukkit.entity.CraftPlayer) player)
-							.getHandle();
+					Player player = (Player) event.getWhoClicked();
+					EntityPlayer ep = ((CraftPlayer) player).getHandle();
 					if (ep.abilities.canInstantlyBuild) {
 						TRLimitedCreative.handleCreativeInvClick(event);
 					}
 				} catch (Exception e) {
-					TRLogger.Log("debug",
-							"Error! [handleCreativeInv Listener] : " + e.getMessage());
+					TRLogger.Log("debug", "Error! [handleCreativeInv Listener] : " + e.getMessage());
 					for(StackTraceElement eer:e.getStackTrace()){
 						TRLogger.Log("debug","    "+eer.toString()); 
 					}
@@ -435,8 +430,7 @@ public class TRListener implements Listener {
 				try {
 					handleCraftBlock(event);
 				} catch (Exception e) {
-					TRLogger.Log("debug",
-							"Error! [TRhandleCraftBlock] : " + e.getMessage());
+					TRLogger.Log("debug", "Error! [TRhandleCraftBlock] : " + e.getMessage());
 				}
 			}
 		} catch (Exception e) {
@@ -444,16 +438,14 @@ public class TRListener implements Listener {
 	}
 
 	private void handleCraftBlock(InventoryClickEvent event) {
-		Player player = tekkitrestrict.getInstance().getServer()
-				.getPlayer(event.getWhoClicked().getName());
+		Player player = (Player) event.getWhoClicked();
 		try {if (event.getCurrentItem() != null) {
 			if (!TRPermHandler.hasPermission(player, "noitem", "bypass", "")) {
 				ItemStack ccc = event.getCurrentItem();
-				if (TRNoItem.isItemBanned(
-						player,
+				if (TRNoItem.isItemBanned(player,
 						new com.github.dreadslicer.tekkitrestrict.ItemStack(ccc
 								.getTypeId(), 0, ccc.getData().getData()))) {
-					player.sendRawMessage("[TRItemDisabler] You cannot obtain/modify this Item type!");
+					player.sendMessage("[TRItemDisabler] You cannot obtain/modify this Item type!");
 					event.setCancelled(true);
 				}
 			}
@@ -464,61 +456,64 @@ public class TRListener implements Listener {
 	// ////////////////END INVClicks //////////////////////////
 
 	@EventHandler
-	public void onPlayerQuit(org.bukkit.event.player.PlayerQuitEvent e) {
-		if ((tekkitrestrict.config.getBoolean("UseItemLimiter") != null) && tekkitrestrict.config.getBoolean("UseItemLimiter")) {
-			try {TRLimitBlock.setExpire(e.getPlayer().getName());}catch(Exception eee){}
-			try {TRNoHack.playerLogout(e.getPlayer());}catch(Exception eee){}
-			try{TRNoDupeProjectTable.playerUnuse(e.getPlayer().getName().toLowerCase());}catch(Exception eee){}
+	public void onPlayerQuit(PlayerQuitEvent e) {
+		//IMPORTANT assigner
+		if (tekkitrestrict.config.getBoolean("UseItemLimiter") && tekkitrestrict.config.getBoolean("UseItemLimiter")) {
+			Player player = e.getPlayer();
+			try {TRLimitBlock.setExpire(player.getName());}catch(Exception eee){}
+			try {TRNoHack.playerLogout(player);}catch(Exception eee){}
+			try{TRNoDupeProjectTable.playerUnuse(player.getName());}catch(Exception eee){}
 		}
 	}
 
 	@EventHandler
-	public void onPlayerKick(org.bukkit.event.player.PlayerKickEvent e) {
-		if (tekkitrestrict.config.getBoolean("UseItemLimiter") != null) && tekkitrestrict.config.getBoolean("UseItemLimiter")) {
-			try {TRLimitBlock.setExpire(e.getPlayer().getName());}catch(Exception eee){}
-			try {TRNoHack.playerLogout(e.getPlayer());}catch(Exception eee){}
-			try{TRNoDupeProjectTable.playerUnuse(e.getPlayer().getName().toLowerCase());}catch(Exception eee){}
-		}
+	public void onPlayerKick(PlayerKickEvent e) {
+		//IMPORTANT assigner
+				if (tekkitrestrict.config.getBoolean("UseItemLimiter") && tekkitrestrict.config.getBoolean("UseItemLimiter")) {
+					Player player = e.getPlayer();
+					try {TRLimitBlock.setExpire(player.getName());}catch(Exception eee){}
+					try {TRNoHack.playerLogout(player);}catch(Exception eee){}
+					try{TRNoDupeProjectTable.playerUnuse(player.getName());}catch(Exception eee){}
+				}
 	}
 
 	@EventHandler
-	public void onPlayerLogin(org.bukkit.event.player.PlayerJoinEvent e) {
-		try{
-			if (tekkitrestrict.config.getBoolean("UseItemLimiter") != null) && tekkitrestrict.config.getBoolean("UseItemLimiter")) {
-				TRLimitBlock.removeExpire(e.getPlayer().getName());
-				TRLimitBlock.getLimiter(e.getPlayer());
+	public void onPlayerLogin(PlayerJoinEvent e) {
+		Player player = e.getPlayer();
+		try {
+			if (tekkitrestrict.config.getBoolean("UseItemLimiter") && tekkitrestrict.config.getBoolean("UseItemLimiter")) {
+				TRLimitBlock.removeExpire(player.getName());
+				TRLimitBlock.getLimiter(player);
 			}
-			if (TRNoDupe.lastPlayer.equals(e.getPlayer().getName())) {
+			if (TRNoDupe.lastPlayer.equals(player.getName())) {
 				TRNoDupe.lastPlayer = "";
 			}
-		}
-		catch(Exception e1){}
-		try{TRPermHandler.testPerms(e.getPlayer());}catch(Exception e1){}
-		try{TRNoDupe_BagCache.setCheck(e.getPlayer());}catch(Exception e1){}
+		} catch(Exception e1){}
+		
+		try{TRPermHandler.testPerms(player);}catch(Exception e1){}
+		try{TRNoDupe_BagCache.setCheck(player);}catch(Exception e1){}
 	}
 
 	@EventHandler
-	public void onInventoryCloseEvent(
-			org.bukkit.event.inventory.InventoryCloseEvent e) {
-		HumanEntity player = e.getPlayer();
-		String pname = player.getName();
-		try{TRNoDupeProjectTable.playerUnuse(pname.toLowerCase());}catch(Exception eee){}
+	public void onInventoryCloseEvent(InventoryCloseEvent e) {
 		try {
-			TRCommandAlc.setPlayerInv(pname);
-		} catch (Exception e1) {
-		}
+			TRNoDupeProjectTable.playerUnuse(e.getPlayer().getName());
+		} catch(Exception ex){}
+
 	}
 
 	@EventHandler
 	public void onEntityDamageByEntityEvent(EntityDamageByEntityEvent e) {
 		// ookay.
 		if (AntiForcefield) {
-			try {TRNoHackForcefield.checkForcefield(e);}catch(Exception eee){}
+			try {
+				TRNoHackForcefield.checkForcefield(e);
+			} catch(Exception ex){}
 		}
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL)
-	public void onPlayerMoveEvent(org.bukkit.event.player.PlayerMoveEvent e) {
+	public void onPlayerMoveEvent(PlayerMoveEvent e) {
 		// this event is going to happen... often.
 		if (AntiFly) {
 			try {TRHandleFly.handleFly(e);}catch(Exception eee){}
@@ -526,12 +521,11 @@ public class TRListener implements Listener {
 		}
 	}
 
-	private Map<Player, Integer> PickupTick = Collections
-			.synchronizedMap(new HashMap<Player, Integer>());
+	private Map<Player, Integer> PickupTick = Collections.synchronizedMap(new HashMap<Player, Integer>());
 
 	@EventHandler
-	public void onPlayerPickupEvent(
-			org.bukkit.event.player.PlayerPickupItemEvent e) {
+	public void onPlayerPickupEvent(PlayerPickupItemEvent e) {
+		//IMPORTANT Fix this in the next version to the new version.
 		Player player = e.getPlayer();
 		try {
 			TRNoDupe_BagCache cache;
@@ -548,29 +542,20 @@ public class TRListener implements Listener {
 
 				if (PickupTick.get(player) != null) {
 					if (PickupTick.get(player) >= 40) {
-						TRLogger.Log("Dupe", player.getName() + " ["
-								+ cache.inBagColor
-								+ " bag] attempted to pick up (dupe) with the "
+						TRLogger.Log("Dupe", player.getName() + " [" + cache.inBagColor + " bag] attempted to pick up (dupe) with the "
 								+ cache.dupeItem + "!");
 						// player.sendMessage("You may not pick that up while a "+cache.dupeItem+" is in your ["+cache.inBagColor+" bag]");
-						player.kickPlayer("[TRDupe] A " + cache.dupeItem
-								+ " has been removed from your ["
-								+ cache.inBagColor + "] Alchemy Bag!");
-						TRLogger.broadcastDupe(player.getName(),
-								"the Alchemy Bag and " + cache.dupeItem, "alc");
+						player.kickPlayer("[TRDupe] A " + cache.dupeItem + " has been removed from your [" + cache.inBagColor + "] Alchemy Bag!");
+						TRLogger.broadcastDupe(player.getName(), "the Alchemy Bag and " + cache.dupeItem, "alc");
 
 						// remove the BHB / Void ring!!!
 						cache.removeAlc();
 					}
 				}
-				PickupTick
-						.put(player,
-								PickupTick.get(player) != null ? PickupTick
-										.get(player) + 1 : 1);
+				PickupTick.put(player, PickupTick.get(player) != null ? PickupTick.get(player) + 1 : 1);
 			}
 		} catch (Exception ee) {
-			TRLogger.Log("debug",
-					"Error! [TRNoDupePickup] : " + ee.getMessage());
+			TRLogger.Log("debug", "Error! [TRNoDupePickup] : " + ee.getMessage());
 			for(StackTraceElement eer:ee.getStackTrace()){
 				TRLogger.Log("debug","    "+eer.toString()); 
 			}

@@ -15,9 +15,6 @@ import java.util.concurrent.Executors;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-import lib.PatPeter.SQLibrary.SQLite;
-
-import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -62,8 +59,7 @@ public class tekkitrestrict extends JavaPlugin {
 		try {
 			double g = tekkitrestrict.config.getDouble("RPTimerMin");
 			double ticks = g * 20.0;
-			net.minecraft.server.RedPowerLogic.minInterval = Integer
-					.parseInt(String.valueOf(ticks));
+			net.minecraft.server.RedPowerLogic.minInterval = Integer.parseInt(String.valueOf(ticks));
 		} catch (Exception e) {
 
 		}
@@ -78,8 +74,8 @@ public class tekkitrestrict extends JavaPlugin {
 		
 		// ///////////
 
-		log.info("[TekkitRestrict] Log filter Placed!");
-		log.info("[TekkitRestrict] SQLite loaded!");
+		log.info("Log filter Placed!");
+		log.info("SQLite loaded!");
 	}
 
 	@Override
@@ -95,35 +91,22 @@ public class tekkitrestrict extends JavaPlugin {
 		TRLimitBlock.init();
 		TRNoDupe_BagCache.init();
 
-		try {
-			PluginCommand PC3 = getCommand("tekkitrestrict");
-			PC3.setExecutor(new TRCommandTR(this));
-			PluginCommand PC2 = getCommand("tr");
-			PC2.setExecutor(new TRCommandTR(this));
-			PluginCommand PC1 = getCommand("openalc");
-			PC1.setExecutor(new TRCommandAlc(this));
-			PluginCommand PC = getCommand("tpic");
-			PC.setExecutor(new TRCommandTPIC(this));
-		} catch (Exception e) {
-			// TRLogger.Log("debug", "comen "+e.getMessage());
-			// e.printStackTrace();
-		}
+		getCommand("tekkitrestrict").setExecutor(new TRCommandTR(this));
+		getCommand("openalc").setExecutor(new TRCommandAlc());
+		getCommand("tpic").setExecutor(new TRCommandTPIC(this));
 
 		// determine if EE2 is enabled by using pluginmanager
-		try {
-			if (pm.isPluginEnabled("mod_EE")) {
+			if (pm.isPluginEnabled("mod_EE"))
 				tekkitrestrict.EEEnabled = true;
-			}
-		} catch (Exception e) {
-			tekkitrestrict.EEEnabled = false;
-		}
+			else
+				tekkitrestrict.EEEnabled = false;
+
 		try {
 			if (pm.isPluginEnabled("PermissionsEx")) {
-				perm = ru.tehkode.permissions.bukkit.PermissionsEx
-						.getPermissionManager();
+				perm = ru.tehkode.permissions.bukkit.PermissionsEx.getPermissionManager();
 				log.info("PEX is enabled!");
 			}
-		} catch (Exception e) {
+		} catch (Exception ex) {
 			// Was not able to load permissionsEx
 		}
 
@@ -138,8 +121,7 @@ public class tekkitrestrict extends JavaPlugin {
 		}
 		try {
 			Metrics metrics = new Metrics(this);
-			Metrics.Graph g = metrics
-					.createGraph("TekkitRestrict Stats (Since last server restarts)");
+			Metrics.Graph g = metrics.createGraph("TekkitRestrict Stats (Since last server restarts)");
 			/*
 			 * g.addPlotter(new Metrics.Plotter("Total Safezones") {
 			 * 
@@ -149,10 +131,9 @@ public class tekkitrestrict extends JavaPlugin {
 			g.addPlotter(new Metrics.Plotter("Hack attempts") {
 				@Override
 				public int getValue() {
-					try{
+					try {
 						return TRNoHack.hacks;
-					}
-					catch(Exception e){
+					} catch(Exception e){
 						return 0;
 					}
 				}
@@ -162,8 +143,7 @@ public class tekkitrestrict extends JavaPlugin {
 				public int getValue() {
 					try{
 						int size = 0;
-						List<String> ssr = tekkitrestrict.config
-								.getStringList("RecipeBlock");
+						List<String> ssr = tekkitrestrict.config.getStringList("RecipeBlock");
 						for (int i = 0; i < ssr.size(); i++) {
 							List<TRCacheItem> iss = TRCacheItem.processItemString(
 									"", ssr.get(i), -1);
@@ -186,10 +166,9 @@ public class tekkitrestrict extends JavaPlugin {
 			g.addPlotter(new Metrics.Plotter("Dupe attempts") {
 				@Override
 				public int getValue() {
-					try{
+					try {
 						return TRNoDupe.dupeAttempts;
-					}
-					catch(Exception e){
+					} catch(Exception ex){
 						return 0;
 					}
 				}
@@ -197,10 +176,9 @@ public class tekkitrestrict extends JavaPlugin {
 			g.addPlotter(new Metrics.Plotter("Disabled items") {
 				@Override
 				public int getValue() {
-					try{
+					try {
 						return TRNoItem.getTotalLen();
-					}
-					catch(Exception e){
+					} catch(Exception ex){
 						return 0;
 					}
 				}

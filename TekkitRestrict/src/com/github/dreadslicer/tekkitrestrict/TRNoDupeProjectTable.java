@@ -8,8 +8,8 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 public class TRNoDupeProjectTable {
-	private static Map<String,String> UsedTables = new ConcurrentHashMap(); //loc, player
-	private static Map<String,String> PlayerUsed = new ConcurrentHashMap(); //player, loc
+	private static Map<String,String> UsedTables = new ConcurrentHashMap<String, String>(); //loc, player
+	private static Map<String,String> PlayerUsed = new ConcurrentHashMap<String, String>(); //player, loc
 	public static void checkTable(org.bukkit.event.player.PlayerInteractEvent e){
 		if (!TRPermHandler.hasPermission(e.getPlayer(), "dupe", "bypass", "")) {
 			Block blk = e.getClickedBlock();

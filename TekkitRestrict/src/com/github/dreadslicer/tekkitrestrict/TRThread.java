@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import net.minecraft.server.EntityHuman;
 import net.minecraft.server.Item;
 import net.minecraft.server.NBTTagCompound;
 import net.minecraft.server.TileEntity;
@@ -262,13 +261,11 @@ class TEntityRemover extends Thread {
 class DisableItemThread extends Thread {
 	private int TSpeed, toid;
 	private boolean throttle, SSDechargeEE, SSDisableArcane;
-	private List<TRCacheItem> SSDecharged = Collections
-			.synchronizedList(new LinkedList<TRCacheItem>());
+	private List<TRCacheItem> SSDecharged = Collections.synchronizedList(new LinkedList<TRCacheItem>());
 	private List<TRCharge> MCharges = Collections
 			.synchronizedList(new LinkedList<TRCharge>()), maxEU = Collections
 			.synchronizedList(new LinkedList<TRCharge>());
-	private List<TRCharge> originalEU = Collections
-			.synchronizedList(new LinkedList<TRCharge>());
+	private List<TRCharge> originalEU = Collections.synchronizedList(new LinkedList<TRCharge>());
 	private List<String> MChargeStr = Collections
 			.synchronizedList(new LinkedList<String>()),
 			SSDechargedStr = Collections
@@ -285,8 +282,7 @@ class DisableItemThread extends Thread {
 			try {
 				// Disabled Items remover
 				// if (UseNoItem) {
-				Player[] ps = tekkitrestrict.getInstance().getServer()
-						.getOnlinePlayers();
+				Player[] ps = tekkitrestrict.getInstance().getServer().getOnlinePlayers();
 				for (Player pp : ps) {
 					try {
 						oos = pp;
@@ -302,10 +298,7 @@ class DisableItemThread extends Thread {
 							disableItems(pp);
 						//}
 					} catch (Exception e) {
-						TRLogger.Log(
-								"debug",
-								"Error: [ItemDisabler[1] thread] "
-										+ e.getMessage());
+						TRLogger.Log("debug", "Error: [ItemDisabler[1] thread] " + e.getMessage());
 						for(StackTraceElement eer:e.getStackTrace()){
 							TRLogger.Log("debug","    "+eer.toString()); 
 						}
@@ -318,8 +311,7 @@ class DisableItemThread extends Thread {
 				} catch (InterruptedException e) {
 				}
 			} catch (Exception e) {
-				TRLogger.Log("debug",
-						"Error: [ItemDisabler thread] " + e.getMessage());
+				TRLogger.Log("debug", "Error: [ItemDisabler thread] " + e.getMessage());
 			}
 		}
 	}

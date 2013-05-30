@@ -2,6 +2,7 @@ package com.github.dreadslicer.tekkitrestrict;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 
 public class TRNoDupe {
 
@@ -25,8 +26,7 @@ public class TRNoDupe {
 
 	public static void handleDupes(InventoryClickEvent event) {
 		// event.getInventory();
-		Player player = tekkitrestrict.getInstance().getServer()
-				.getPlayer(event.getWhoClicked().getName());
+		Player player = (Player) event.getWhoClicked();
 		int slot = event.getSlot();
 
 		String title = event.getView().getTopInventory().getTitle()
@@ -45,7 +45,7 @@ public class TRNoDupe {
 						// tekkitrestrict.log.info("t3");
 						if (preventRMDupe) {
 							event.setCancelled(true);
-							player.sendRawMessage("[TRDupe] you are not allowed to Shift+Click here while using a RM Furnace!");
+							player.sendMessage("[TRDupe] you are not allowed to Shift+Click here while using a RM Furnace!");
 
 							TRLogger.Log("Dupe", player.getName()
 									+ " attempted to dupe using a RM Furnace!");
@@ -65,7 +65,7 @@ public class TRNoDupe {
 					if (event.isShiftClick()) {
 						if (preventTankCartDupe){
 							event.setCancelled(true);
-							player.sendRawMessage("[TRDupe] you are not allowed to Shift+Click here while using a Tank Cart!");
+							player.sendMessage("[TRDupe] you are not allowed to Shift+Click here while using a Tank Cart!");
 
 							TRLogger.Log("Dupe", player.getName()
 								+ " attempted to dupe using a Tank Cart!");
@@ -124,8 +124,7 @@ public class TRNoDupe {
 		}
 	}
 
-	public static void handleDropDupes(
-			org.bukkit.event.player.PlayerDropItemEvent e) {
+	public static void handleDropDupes(PlayerDropItemEvent e) {
 		Player player = e.getPlayer();
 		TRNoDupe_BagCache cache;
 		if ((cache = TRNoDupe_BagCache.check(player)) != null) {

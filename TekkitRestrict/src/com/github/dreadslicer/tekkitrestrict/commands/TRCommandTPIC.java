@@ -84,8 +84,7 @@ public class TRCommandTPIC implements CommandExecutor {
 	public static void tpic(Player player, int max) {
 		// ok, so the first thing is...
 		// loop through all entities in the world
-		List<org.bukkit.World> ww = tekkitrestrict.getInstance().getServer()
-				.getWorlds();
+		List<org.bukkit.World> ww = tekkitrestrict.getInstance().getServer().getWorlds();
 		for (int k = 0; k < ww.size(); k++) {
 			org.bukkit.World w = ww.get(k);
 			Object[] oo = w.getEntities().toArray();
