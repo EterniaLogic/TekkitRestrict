@@ -1,6 +1,6 @@
 name: tekkitrestrict
 main: com.github.dreadslicer.tekkitrestrict.tekkitrestrict
-version: 1.03
+version: 1.1.0
 
 permissions:
     tekkitrestrict.admin:
@@ -8,7 +8,7 @@ permissions:
         children:
             tekkitrestrict.safezone.bypass: true
             tekkitrestrict.creative.bypass: true
-            tekkitrestrict.alc: true
+            tekkitrestrict.openalc: true
             tekkitrestrict.dupe.bypass: true
             tekkitrestrict.noitem.bypass: true
             tekkitrestrict.limiter.bypass: true
@@ -26,7 +26,7 @@ permissions:
         description: removes the ability to craft or GET "*" by item ID. (Valid 111, datavalue 1111.11, range 111-222, MOD (ic2, ee2, redpower))   
     tekkitrestrict.limit.bypass:
         description: removes item limiter.
-    tekkitrestrict.alc:
+    tekkitrestrict.openalc:
         description: adds the ability to use /alc [player] [bagcolor].
     tekkitrestrict.creative.*:
         description: Disables the use of certain defined items
@@ -49,14 +49,12 @@ permissions:
 
 commands:
    tekkitrestrict:
-      description: View commands.
-      usage: /<command>
-   tr:
       description: View TekkitRestrict commands.
       usage: /<command>
+      aliases: tr
    openalc:
-      description: View a player's Alchemy bag. Color 'white', 'lightblue', ect.
-      usage: /<command> [player] [color] [needs perm tekkitrestrict.alc]
+      description: View a player's Alchemy bag.
+      usage: /<command> <player> <color>
    tpic:
       description: Teleports you to an area where a cluster of items is sitting on the ground.
       usage: /<command> [Min Items Threshhold]
