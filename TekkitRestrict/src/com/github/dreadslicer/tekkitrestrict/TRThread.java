@@ -20,6 +20,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.PlayerInventory;
@@ -256,7 +257,8 @@ class TEntityRemover extends Thread {
 
 class DisableItemThread extends Thread {
 	private int TSpeed, toid;
-	private boolean throttle, SSDechargeEE, SSDisableArcane;
+	//private boolean throttle;
+	private boolean SSDechargeEE, SSDisableArcane;
 	private List<TRCacheItem> SSDecharged = Collections.synchronizedList(new LinkedList<TRCacheItem>());
 	private List<TRCharge> MCharges = Collections
 			.synchronizedList(new LinkedList<TRCharge>()), maxEU = Collections
@@ -349,8 +351,7 @@ class DisableItemThread extends Thread {
 
 						ItemStack ee = new ItemStack(st1[i].getTypeId(),
 								st1[i].getAmount(), st1[i].getData().getData());
-						net.minecraft.server.ItemStack var1 = ((org.bukkit.craftbukkit.inventory.CraftItemStack) st1[i])
-								.getHandle();
+						net.minecraft.server.ItemStack var1 = ((CraftItemStack) st1[i]).getHandle();
 
 						// tekkitrestrict.log.info("heh1");
 						// //// BAN THE ITEM
@@ -622,8 +623,8 @@ class DisableItemThread extends Thread {
 		this.SSDechargeEE = tekkitrestrict.config.getBoolean("SSDechargeEE");
 		this.SSDisableArcane = tekkitrestrict.config
 				.getBoolean("SSDisableRingOfArcana");
-		this.throttle = tekkitrestrict.config
-				.getBoolean("ThrottleInventoryThread");
+		//this.throttle = tekkitrestrict.config
+		//		.getBoolean("ThrottleInventoryThread");
 		List<String> MaxCharges = tekkitrestrict.config
 				.getStringList("MaxCharge");
 		List<String> sstr = tekkitrestrict.config.getStringList("DechargeInSS");
@@ -855,7 +856,7 @@ class TWorldScrubber extends Thread {
 					}
 
 					if (UseRPTimer) {
-						if (tekkitrestrict.pm.isPluginEnabled("mod_RedPowerLogic")) {
+						if (tekkitrestrict.getInstance().getServer().getPluginManager().isPluginEnabled("mod_RedPowerLogic")) {
 							try {
 								BlockState[] ggg = c.getTileEntities();
 								for (BlockState gg : ggg) {

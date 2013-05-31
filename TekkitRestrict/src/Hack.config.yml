@@ -24,7 +24,7 @@ HackMoveSpeedMax: 2.5
 HackMoveSpeedTolerance: 30
 
 HackFlyTolerance: 60
-HackFlyMinHeight: 2
+HackFlyMinHeight: 3
 
 HackForcefieldTolerance: 15
 HackForcefieldAngle: 40

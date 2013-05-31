@@ -37,7 +37,7 @@ SSDechargeEE: true
 SSDisableRingOfArcana: true
 SSEnabledPlugins: ["griefprevention","factions","towny","preciousstones"]
 SSDisableFlying: false
-
+SSAllowNormalUserToHaveSafeZones: true
 
 
 

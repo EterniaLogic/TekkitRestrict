@@ -59,6 +59,45 @@ permissions:
         children:
             tekkitrestrict.notify.hack: true
             tekkitrestrict.notify.dupe: true
+    tekkitrestrict.admin.safezone:
+        description: Grants the ability to use /tr admin safezone commands
+        default: op
+    tekkitrestrict.admin.safezone.list:
+        description: Enables someone to list safezones
+        default: op
+        children:
+            tekkitrestrict.admin.safezone: true
+    tekkitrestrict.admin.safezone.remove:
+        description: Ability to remove safezones
+        default: op
+        children:
+            tekkitrestrict.admin.safezone: true
+    tekkitrestrict.admin.safezone.check:
+        description: The ability to check if you are inside a safezone.
+        default: op
+        children:
+            tekkitrestrict.admin.safezone: true
+    tekkitrestrict.admin.safezone.check.others:
+        description: The ability to check if someone else is in a safezone.
+        default: op
+        children:
+            tekkitrestrict.admin.safezone: true
+            tekkitrestrict.admin.safezone.check: true
+    tekkitrestrict.admin.safezone.help:
+        description: Grants the ability to use /tr admin safezone help.
+        default: op
+        children:
+            tekkitrestrict.admin.safezone: true
+    tekkitrestrict.admin.safezone.addwg:
+        description: Grants the ability to create WorldGuard safezones.
+        default: op
+        children:
+            tekkitrestrict.admin.safezone: true
+    tekkitrestrict.admin.safezone.addgp:
+        description: Grants the power to create GriefPrevention safezones.
+        default: op
+        children:
+            tekkitrestrict.admin.safezone: true
 
 commands:
    tekkitrestrict:

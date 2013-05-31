@@ -9,13 +9,16 @@ import java.lang.management.ThreadMXBean;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
+
 public class TRPerformance {
 	public static void reload() {
 		ServerThreads = tekkitrestrict.config.getInt("ServerThreads");
 		MaxTicks = tekkitrestrict.config.getInt("MaxTicks");
 	}
 
-	public static void getThreadLag(org.bukkit.entity.Player p) {
+	public static void getThreadLag(CommandSender sender) {
 		// java.lang.management.ThreadInfo ti = new ThreadInfo(null, 0, ti,
 		// null, 0, 0, 0, 0, null);
 		ThreadMXBean mxBean = ManagementFactory.getThreadMXBean();
@@ -97,12 +100,7 @@ public class TRPerformance {
 				}
 			}
 			out.close();
-			if (p != null) {
-				p.sendRawMessage("File 'threadinfo.txt' generated at serverdir");
-			} else {
-				tekkitrestrict.log
-						.info("File 'threadinfo.txt' generated at serverdir");
-			}
+			sender.sendMessage(ChatColor.YELLOW + "File 'threadinfo.txt' generated at serverdir.");
 		} catch (Exception e) {
 
 		}

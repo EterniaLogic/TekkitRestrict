@@ -11,7 +11,6 @@ import net.minecraft.server.WorldServer;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.CraftWorld;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -439,17 +438,19 @@ public class TRListener implements Listener {
 
 	private void handleCraftBlock(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
-		try {if (event.getCurrentItem() != null) {
+		try {
+			ItemStack currentItem = event.getCurrentItem();
+			if (currentItem == null) return;
+			
 			if (!TRPermHandler.hasPermission(player, "noitem", "bypass", "")) {
-				ItemStack ccc = event.getCurrentItem();
+				
 				if (TRNoItem.isItemBanned(player,
-						new com.github.dreadslicer.tekkitrestrict.ItemStack(ccc
-								.getTypeId(), 0, ccc.getData().getData()))) {
+						new com.github.dreadslicer.tekkitrestrict.ItemStack(currentItem.getTypeId(), 0, currentItem.getData().getData()))) {
 					player.sendMessage("[TRItemDisabler] You cannot obtain/modify this Item type!");
 					event.setCancelled(true);
 				}
 			}
-		}}catch(Exception eee){}
+			} catch(Exception ex) {}
 		
 	}
 
@@ -490,7 +491,7 @@ public class TRListener implements Listener {
 			}
 		} catch(Exception e1){}
 		
-		try{TRPermHandler.testPerms(player);}catch(Exception e1){}
+		//try{TRPermHandler.testPerms(player);}catch(Exception e1){}
 		try{TRNoDupe_BagCache.setCheck(player);}catch(Exception e1){}
 	}
 

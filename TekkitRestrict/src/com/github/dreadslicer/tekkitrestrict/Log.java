@@ -8,6 +8,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.Command;
 
+import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Global;
+
 public class Log {
 	
 	/**
@@ -87,7 +89,7 @@ public class Log {
 		tekkitrestrict.log.info(msg);
 	}
 	public static void Debug(String msg){
-		if (!tekkitrestrict.debug) return;
+		if (!Global.debug) return;
 		tekkitrestrict.log.log(Level.parse("Debug"), msg);
 	}
 	public static void Dupe(String niceName, String type, String playername){

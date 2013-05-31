@@ -20,7 +20,9 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Dupes;
+import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Global;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Hacks;
+import com.github.dreadslicer.tekkitrestrict.TRConfigCache.SafeZones;
 import com.github.dreadslicer.tekkitrestrict.commands.TRCommandAlc;
 import com.github.dreadslicer.tekkitrestrict.commands.TRCommandTPIC;
 import com.github.dreadslicer.tekkitrestrict.commands.TRCommandTR;
@@ -33,12 +35,11 @@ public class tekkitrestrict extends JavaPlugin {
 	public static Logger log;
 	public static TRFileConfiguration config;
 	public static boolean EEEnabled = false, disable = false, rp = false;
-	public static PluginManager pm;
+	//public static PluginManager pm;
 	public static Object perm = null;
 	public static TRSQLDB db;
 	private static tekkitrestrict instance;
 	public static ExecutorService basfo = Executors.newCachedThreadPool();
-	public static boolean debug;
 	
 	private static TRThread ttt = null;
 	public static List<YamlConfiguration> configList = new LinkedList<YamlConfiguration>();
@@ -51,7 +52,7 @@ public class tekkitrestrict extends JavaPlugin {
 
 		loadSqlite();
 		initSqlite();
-		pm = this.getServer().getPluginManager();
+		//pm = this.getServer().getPluginManager();
 		TRStackLoader.init();
 
 		this.saveDefaultConfig();
@@ -94,11 +95,12 @@ public class tekkitrestrict extends JavaPlugin {
 		TRLimitBlock.init();
 		TRNoDupe_BagCache.init();
 
-		getCommand("tekkitrestrict").setExecutor(new TRCommandTR(this));
+		getCommand("tekkitrestrict").setExecutor(new TRCommandTR());
 		getCommand("openalc").setExecutor(new TRCommandAlc());
 		getCommand("tpic").setExecutor(new TRCommandTPIC(this));
 
 		// determine if EE2 is enabled by using pluginmanager
+		PluginManager pm = this.getServer().getPluginManager();
 		if (pm.isPluginEnabled("mod_EE"))
 			tekkitrestrict.EEEnabled = true;
 		else
@@ -193,7 +195,8 @@ public class tekkitrestrict extends JavaPlugin {
 		}
 
 		// done!
-		debug = config.getBoolean("ShowDebugMessages", false);
+		
+		loadConfigCache();
 		log.info("TekkitRestrict v " + getDescription().getVersion()+ " Enabled!");
 		
 		/*
@@ -253,10 +256,17 @@ public class tekkitrestrict extends JavaPlugin {
 		Hacks.broadcast = config.getStringList("HackBroadcasts");
 		Hacks.broadcastFormat = config.getString("HackBroadcastString", "{PLAYER} tried to {TYPE}-hack!"); //TODO add colors
 		Hacks.kick = config.getStringList("HackKick");
+		Hacks.flyTolerance = config.getInt("HackFlyTolerance", 60);
+		Hacks.flyMinHeight = config.getInt("HackFlyMinHeight", 3);
 		
 		Dupes.broadcast = config.getStringList("BroadcastDupes");
 		Dupes.broadcastFormat = config.getString("BroadcastDupeString", "{PLAYER} tried to dupe using {TYPE}!"); //TODO add colors
 		Dupes.kick = config.getStringList("DupeKick");
+		
+		Global.debug = config.getBoolean("ShowDebugMessages", false);
+		Global.kickFromConsole = config.getBoolean("KickFromConsole", false);
+		
+		SafeZones.allowNormalUser = config.getBoolean("SSAllowNormalUserToHaveSafeZones", true);
 	}
 
 	private static void initHeartBeat() {

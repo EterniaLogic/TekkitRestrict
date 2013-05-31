@@ -26,7 +26,7 @@ MaxRadii: 128
 
 
 # Runs a thread for each player upon the Inventory Thread tick. (May take up some processor if you have a ton of players)
-ThrottleInventoryThread: false
+# ThrottleInventoryThread: false currently unused
 
 
 GemArmorDThread: 120

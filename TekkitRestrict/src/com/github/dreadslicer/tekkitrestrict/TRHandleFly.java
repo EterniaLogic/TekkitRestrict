@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.TileEntity;
 
 import org.bukkit.block.Block;
@@ -30,8 +31,7 @@ public class TRHandleFly {
 	}
 
 	public static void handleFly(PlayerMoveEvent e) {
-		net.minecraft.server.EntityPlayer player = ((CraftPlayer) e.getPlayer())
-				.getHandle();
+		EntityPlayer player = ((CraftPlayer) e.getPlayer()).getHandle();
 		// lets determine if they are flying...
 		// Are they crouching?
 		// Are they falling?
