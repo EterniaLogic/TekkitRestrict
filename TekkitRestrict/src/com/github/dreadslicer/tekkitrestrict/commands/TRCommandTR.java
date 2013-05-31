@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -33,10 +34,8 @@ public class TRCommandTR implements CommandExecutor {
 		this.plugin = plugin;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public boolean onCommand(CommandSender sender, Command cmd, String label,
-			String[] args) {
+	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		Player player = null;
 		boolean admin = false;
 		if (sender instanceof Player) {
@@ -60,39 +59,61 @@ public class TRCommandTR implements CommandExecutor {
 		}
 		LinkedList<String> message = new LinkedList<String>();
 		boolean usemsg = true;
-		if (cmd.getName().equalsIgnoreCase("tekkitrestrict")
-				|| cmd.getName().equalsIgnoreCase("tr")) { // If the player
-															// typed /basic then
-															// do the
+		if (cmd.getName().equalsIgnoreCase("tekkitrestrict")) {
+			if (args.length == 0) {
+				sender.sendMessage("[TekkitRestrict " + tekkitrestrict.getInstance().getDescription().getVersion() + " Commands]");
+				sender.sendMessage("Aliases: /tr, /tekkitrestrict");
 
+				if (admin) {
+					sender.sendMessage("/tr admin - list admin commands");
+				}
+			}
 			try {
 				// following...
 				if (args.length == 0) {
-					message.add("[TekkitRestrict "
-							+ tekkitrestrict.getInstance().getDescription()
-									.getVersion() + " Commands]");
-					message.add("Aliases: /tr, /tekkitrestrict");
+					sender.sendMessage("[TekkitRestrict " + tekkitrestrict.getInstance().getDescription().getVersion() + " Commands]");
+					sender.sendMessage("Aliases: /tr, /tekkitrestrict");
 
 					if (admin) {
-						message.add("/tr admin - list admin commands");
+						sender.sendMessage("/tr admin - list admin commands");
 					}
 				} else {
-					if (args[0].equalsIgnoreCase("reload") && admin) {
-						plugin.reload();
-						if (player != null) {
-							message.add("Tekkit Restrict Reloaded!");
+					String arg0 = args[0].toLowerCase();
+					if (arg0.equals("reload")) {
+						if (!sender.hasPermission("TekkitRestrict.admin.reload")){
+							sender.sendMessage(ChatColor.RED + "You don't have permission to use this command!");
+							return true;
 						}
-					} else if (args[0].equalsIgnoreCase("threadlag") && admin) {
+						plugin.reload();
+						sender.sendMessage("Tekkit Restrict Reloaded!");
+						
+					} else if (arg0.equals("threadlag")) {
+						if (!sender.hasPermission("TekkitRestrict.admin.threadlag")){
+							sender.sendMessage(ChatColor.RED + "You don't have permission to use this command!");
+							return true;
+						}
 						TRPerformance.getThreadLag(player);
-					} else if (args[0].equalsIgnoreCase("reinit") && admin) {
+					} else if (arg0.equals("reinit")) {
+						if (!sender.hasPermission("TekkitRestrict.admin.reinit")){
+							sender.sendMessage(ChatColor.RED + "You don't have permission to use this command!");
+							return true;
+						}
+						sender.sendMessage(ChatColor.RED + "Reinitializing server.");
 						tekkitrestrict.getInstance().getServer().reload();
-					} else if (args[0].equalsIgnoreCase("admin") && admin) {
+					} else if (arg0.equals("admin")) {
+						if (!sender.hasPermission("TekkitRestrict.admin")){
+							sender.sendMessage(ChatColor.RED + "You don't have permission to use this command!");
+							return true;
+						}
 						if (args.length == 1) {
 							message.addAll(help(1));
-						} else if (args[1].equalsIgnoreCase("help")) {
+							return true;
+						}
+						
+						if (args[1].equalsIgnoreCase("help")) {
 							try {
 								message.addAll(help(Integer.parseInt(args[2])));
-							} catch (Exception e) {
+							} catch (NumberFormatException ex) {
 								message.addAll(help(2));
 							}
 						} else if (args[1].equalsIgnoreCase("safezone")) {
@@ -105,8 +126,7 @@ public class TRCommandTR implements CommandExecutor {
 									if (TRSafeZone.zones.size() > i) {
 										TRSafeZone z = TRSafeZone.zones.get(i);
 										if (z != null) {
-											message.add("[" + z.world + "] "
-													+ z.name);
+											message.add("[" + z.world + "] " + z.name);
 										}
 									}
 								}
@@ -131,8 +151,7 @@ public class TRCommandTR implements CommandExecutor {
 											TRSafeZone z = TRSafeZone.zones
 													.get(i);
 											if (z != null) {
-												message.add("[" + z.world
-														+ "] " + z.name);
+												message.add("[" + z.world + "] " + z.name);
 											}
 										}
 									}
@@ -436,7 +455,7 @@ public class TRCommandTR implements CommandExecutor {
 			message.add("[TekkitRestrict "
 					+ tekkitrestrict.getInstance().getDescription()
 							.getVersion() + " Admin Commands]");
-			message.add("[Help page 1] - /tr help [page]");
+			message.add("[Help page 1] - /tr admin help <page>");
 			message.add("/tr admin safezone list [page] - list safezones");
 			message.add("/tr admin safezone addwg [region] - add safezone using WorldGuard");
 			message.add("/tr admin safezone rem [name] - remove safezone");
@@ -448,7 +467,7 @@ public class TRCommandTR implements CommandExecutor {
 			message.add("[TekkitRestrict "
 					+ tekkitrestrict.getInstance().getDescription()
 							.getVersion() + " Admin Commands]");
-			message.add("[Help page 2]");
+			message.add("[Help page 2] - /tr admin help <page>");
 			message.add("/tr admin emc tempset [id:data] [EMC]");
 			message.add("/tr admin emc lookup [id:data]");
 			message.add("[2/2 pages]");

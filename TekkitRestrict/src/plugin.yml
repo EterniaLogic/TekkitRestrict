@@ -1,5 +1,6 @@
 name: tekkitrestrict
 main: com.github.dreadslicer.tekkitrestrict.tekkitrestrict
+prefix: TekkitRestrict
 version: 1.15
 
 permissions:

@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Queue;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -14,7 +15,7 @@ import lib.PatPeter.SQLibrary.SQLite;
 public class TRSQLDB {
 	private SQLite db=null;
 	private ExecutorService s = Executors.newFixedThreadPool(5);
-	private Queue<String> qs = new java.util.concurrent.ConcurrentLinkedQueue<String>();
+	private Queue<String> qs = new ConcurrentLinkedQueue<String>();
 	public TRSQLDB(Logger log, String schema, String Table, String file){
 		db = new SQLite(log, schema, Table, file);
 	}
