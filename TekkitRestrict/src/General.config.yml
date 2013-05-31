@@ -24,6 +24,8 @@ UseItemLimiter: true
 UseLimitedCreative: true
 UseOpenAlc: true
 UseNoItem: true
+ShowDebugMessages: false
+KickFromConsole: false
 
 
 ####SafeZones####

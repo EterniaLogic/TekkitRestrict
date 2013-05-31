@@ -31,9 +31,9 @@ HackForcefieldAngle: 40
 
 
 HackBan: []
-HackKick: ["flyhack","forcefieldhack","speedhack"]
-HackBroadcasts: ["flyhack","forcefieldhack","speedhack"]
-HackBroadcastString: "[TRHack] {PLAYER} {ACTION} {HTYPE}!"
+HackKick: ["fly","forcefield","speed"]
+HackBroadcasts: ["fly","forcefield","speed"]
+HackBroadcastString: "{PLAYER} tried to {TYPE}-hack!"
 
 
 ####Dupes####
@@ -45,7 +45,8 @@ PreventTankCartGlitch: true
 
 #####        "RMFurnace", "alc", "transmute", "tankcart"
 BroadcastDupes: ["rmfurnace", "alc"]
-BroadcastDupeString: "[TRDupe] {PLAYER} tried to dupe using {DTYPE}!"
+BroadcastDupeString: "{PLAYER} tried to dupe using {TYPE}!"
+DupeKick: []
 
 
 

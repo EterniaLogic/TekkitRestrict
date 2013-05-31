@@ -19,6 +19,8 @@ import java.util.logging.Logger;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Dupes;
+import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Hacks;
 import com.github.dreadslicer.tekkitrestrict.commands.TRCommandAlc;
 import com.github.dreadslicer.tekkitrestrict.commands.TRCommandTPIC;
 import com.github.dreadslicer.tekkitrestrict.commands.TRCommandTR;
@@ -36,6 +38,7 @@ public class tekkitrestrict extends JavaPlugin {
 	public static TRSQLDB db;
 	private static tekkitrestrict instance;
 	public static ExecutorService basfo = Executors.newCachedThreadPool();
+	public static boolean debug;
 	
 	private static TRThread ttt = null;
 	public static List<YamlConfiguration> configList = new LinkedList<YamlConfiguration>();
@@ -190,6 +193,7 @@ public class tekkitrestrict extends JavaPlugin {
 		}
 
 		// done!
+		debug = config.getBoolean("ShowDebugMessages", false);
 		log.info("TekkitRestrict v " + getDescription().getVersion()+ " Enabled!");
 		
 		/*
@@ -244,6 +248,16 @@ public class tekkitrestrict extends JavaPlugin {
 	 * //tekkitrestrict.log.info("playerperms+ "+cr.getPermission()); } return
 	 * false; } } else{ return hasPermission(p,perm); } }
 	 */
+	
+	public static void loadConfigCache(){
+		Hacks.broadcast = config.getStringList("HackBroadcasts");
+		Hacks.broadcastFormat = config.getString("HackBroadcastString", "{PLAYER} tried to {TYPE}-hack!"); //TODO add colors
+		Hacks.kick = config.getStringList("HackKick");
+		
+		Dupes.broadcast = config.getStringList("BroadcastDupes");
+		Dupes.broadcastFormat = config.getString("BroadcastDupeString", "{PLAYER} tried to dupe using {TYPE}!"); //TODO add colors
+		Dupes.kick = config.getStringList("DupeKick");
+	}
 
 	private static void initHeartBeat() {
 		instance.getServer().getScheduler()

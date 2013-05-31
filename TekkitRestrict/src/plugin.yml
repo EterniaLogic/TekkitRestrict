@@ -47,6 +47,18 @@ permissions:
         description:  Enables somebody to bypass LWC attached protections.
     tekkitrestrict.flylimit.bypass:
         description:  Bypass global flight time limit
+    
+    tekkitrestrict.notify.hack:
+        description: Get notified if someone hacks.
+        default: op
+    tekkitrestrict.notify.dupe:
+        description: Get notified if someone dupes.
+        default: op
+    tekkitrestrict.notify.*:
+        description: Get notified of everything.
+        children:
+            tekkitrestrict.notify.hack: true
+            tekkitrestrict.notify.dupe: true
 
 commands:
    tekkitrestrict:
