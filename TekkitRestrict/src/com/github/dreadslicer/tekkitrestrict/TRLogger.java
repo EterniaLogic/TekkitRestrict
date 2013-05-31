@@ -172,12 +172,12 @@ public class TRLogger {
 	}
 
 	public static void broadcastHack(String player, String hack, String action) {
-		if (hacks.contains(hack.toLowerCase())) {
-			String eeer = TRLogger.BroadcastHackString;
-			eeer = eeer.replace("{PLAYER}", player);
-			eeer = eeer.replace("{HTYPE}", hack);
-			eeer = eeer.replace("{ACTION}", action);
-			tekkitrestrict.getInstance().getServer().broadcastMessage(eeer);
+		if (TRConfigCache.Hacks.broadcast.contains(hack.toLowerCase())) {
+			String broadcastString = TRLogger.BroadcastHackString;
+			broadcastString = broadcastString.replace("{PLAYER}", player);
+			broadcastString = broadcastString.replace("{HTYPE}", hack);
+			broadcastString = broadcastString.replace("{ACTION}", action);
+			tekkitrestrict.getInstance().getServer().broadcast(broadcastString, "tekkitrestrict.notify.hack");
 		}
 	}
 
