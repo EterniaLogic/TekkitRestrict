@@ -31,8 +31,7 @@ public class TRPermHandler {
 
 			PluginManager pm = Bukkit.getPluginManager();
 			if(pm.isPluginEnabled("Vault")){
-				if(v == null) v = tekkitrestrict.getInstance().getServer()
-						.getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
+				if(v == null) v = Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
 		        if (v != null) {
 		        	net.milkbowl.vault.permission.Permission permission = v.getProvider();
 		        	return permission.has(p, perm);

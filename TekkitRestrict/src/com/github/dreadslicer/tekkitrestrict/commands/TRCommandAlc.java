@@ -3,6 +3,7 @@ package com.github.dreadslicer.tekkitrestrict.commands;
 import java.io.File;
 import java.util.HashMap;
 import java.util.logging.Level;
+
 import net.minecraft.server.BaseMod;
 import net.minecraft.server.Container;
 import net.minecraft.server.EntityPlayer;
@@ -21,9 +22,8 @@ import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.event.CraftEventFactory;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryCloseEvent;
+
 import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
-import com.github.dreadslicer.tekkitrestrict.listeners.InventoryListener;
 
 import ee.AlchemyBagData;
 import forge.IGuiHandler;
@@ -40,7 +40,7 @@ public class TRCommandAlc implements CommandExecutor {
 	 * Second string is the player that views the bag.
 	 */
 	public static HashMap<String, String> openAlc2 = new HashMap<String, String>();
-	private static int counter = 0;
+	//private static int counter = 0;
 	
 	//private static HashMap<String, Object[]> InvAlc = new java.util.HashMap<String, Object[]>();
 
@@ -135,11 +135,7 @@ public class TRCommandAlc implements CommandExecutor {
 			
 			tekkitrestrict.log.info(player.getName() + " opened " + OName + "'s " + strcolor + " Alchemy Bag!");
 			
-			tekkitrestrict plugin = tekkitrestrict.getInstance();
-			InventoryCloseEvent.getHandlerList().unregister(plugin);
-			plugin.getServer().getPluginManager().registerEvents(new InventoryListener(), plugin);
-			
-			counter++;
+			//counter++;
 			
 		} catch (Exception e) {
 			sender.sendMessage(ChatColor.RED + "An error has occured processing your command.");
@@ -264,12 +260,10 @@ public class TRCommandAlc implements CommandExecutor {
 			for (AlchemyBagData current : data.values()) current.a();
 		} else return;
 		
-		if (openAlc.isEmpty()) counter = 0;
-		else counter--;
+		//if (openAlc.isEmpty()) counter = 0;
+		//else counter--;
 		
 		player.updateInventory();
-		
-		if (counter == 0) InventoryCloseEvent.getHandlerList().unregister(tekkitrestrict.getInstance());
 	}
 	
 	/** Called when a player closes his inventory. */
@@ -296,11 +290,8 @@ public class TRCommandAlc implements CommandExecutor {
 			}
 		} else return;
 		
-		
-		if (openAlc.isEmpty()) counter = 0;
-		else counter--;
-		
-		if (counter == 0) InventoryCloseEvent.getHandlerList().unregister(tekkitrestrict.getInstance());
+		//if (openAlc.isEmpty()) counter = 0;
+		//else counter--;
 	}
 	
 	/**

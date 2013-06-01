@@ -1,133 +1,105 @@
 package com.github.dreadslicer.tekkitrestrict.commands;
 
-import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import com.github.dreadslicer.tekkitrestrict.TRLogger;
-import com.github.dreadslicer.tekkitrestrict.TRPermHandler;
-import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
+import com.github.dreadslicer.tekkitrestrict.Log;
+import com.github.dreadslicer.tekkitrestrict.Send;
 
 public class TRCommandTPIC implements CommandExecutor {
-
-	// private tekkitrestrict plugin; // pointer to your main class, unrequired
-	// if you don't need methods from the main class
-
-	public TRCommandTPIC(tekkitrestrict plugin) {
-		// this.plugin = plugin;
-
+	private Send send;
+	public TRCommandTPIC(){
+		send = new Send();
 	}
-
-	// private static java.util.HashMap<String, Object[]> InvAlc = new
-	// java.util.HashMap<String, Object[]>();
-
+	
 	@Override
-	public boolean onCommand(CommandSender sender, Command cmd, String label,
-			String[] args) {
-		Player player = null;
-		boolean admin = false;
-
-		if (sender instanceof Player) {
-			player = (Player) sender;
-			try {
-				if (TRPermHandler.hasPermission(player, "admin", "", "")) {
-					admin = true;
-				}
-			} catch (Exception e) {
-				if (player.isOp()) {
-					admin = true;
-				}
-			}
-		}
-		List<String> message = new LinkedList<String>();
-		boolean usemsg = true;
-		if (cmd.getName().equalsIgnoreCase("tpic") && (admin)) {
-			try {
-				if (player != null) {
-					int max = 0;
-					if (args.length == 0) {
-						max = 200;
-					} else {
-						try {
-							max = Integer.valueOf(args[0]);
-						} catch (Exception e) {
-							message.add("This is not a number!");
-						}
-					}
-					// ok, tp here.
-					tpic(player, max);
-				}
-			} catch (Exception e) {
-				message.add("An error has occured processing your command.");
-				TRLogger.Log("debug", "TRCommandTPIC Error: " + e.getMessage());
-				for (StackTraceElement ee : e.getStackTrace()) {
-					TRLogger.Log("debug", "     " + ee.toString());
-				}
-			}
-			if (usemsg) {
-				sendMessage(player, message.toArray(new String[0]));
-				message.clear();
-			}
+	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+		if (!cmd.getName().toLowerCase().equals("tpic")){
+			Log.Debug("Please inform the developer that onCommand is acting strangely.");
 			return true;
 		}
-		// ?
-		return false;
+		
+		send.sender = sender;
+		
+		if (send.noConsole()) return true;
+		if (send.noPerm("tpic")) return true;
+		
+		int max = 0;
+		boolean thorough = false;
+		
+		if (args.length == 0) max = 200;
+		else {
+			try {
+				max = Integer.parseInt(args[0]);
+			} catch (NumberFormatException ex) {
+				send.msg(ChatColor.RED + "This is not a valid number!");
+				return true;
+			}
+		}
+			
+		if (args.length == 2){
+			String arg1 = args[1].toLowerCase();
+			
+			if (arg1.equals("true") || arg1.equals("yes")) thorough = true;
+			else if (!arg1.equals("false") && !arg1.equals("no")){
+				send.msg(ChatColor.RED + "Incorrect syntaxis! Correct usage:");
+				send.msg(ChatColor.RED + "/tpic [treshold] [include all entities]");
+				send.msg(ChatColor.RED + "[include all entities] can be true, false, yes or no.");
+				return true;
+			}
+		}
+		
+		tpic((Player) sender, max, thorough);
+		return true;
 	}
 
-	public static void tpic(Player player, int max) {
-		// ok, so the first thing is...
-		// loop through all entities in the world
-		List<org.bukkit.World> ww = tekkitrestrict.getInstance().getServer().getWorlds();
-		for (int k = 0; k < ww.size(); k++) {
-			org.bukkit.World w = ww.get(k);
-			Object[] oo = w.getEntities().toArray();
-			for (int i = 0; i < oo.length; i++) {
-
-				if (oo[i] instanceof Item) {
-					List<Item> nearby = new LinkedList<Item>();
-					Item ei = (Item) oo[i];
-					Vector V = ei.getLocation().toVector();
-					// find nearby items...
-					// tekkitrestrict.log.info("MAIN---");
-					for (int j = 0; j < oo.length; j++) {
-						if (oo[j] instanceof Item) {
-							Item ej = (Item) oo[j];
-							Vector Vj = ej.getLocation().toVector();
-							if (V.distance(Vj) <= 16) {
-								nearby.add(ej);
-								// tekkitrestrict.log.info("link");
-							}
-						}
-					}
-					// tekkitrestrict.log.info(""+nearby.size());
-					if (nearby.size() >= max) {
-						player.sendMessage("Found (" + nearby.size()
-								+ ") in this area!");
-						player.teleport(ei.getLocation());
-						return;
-					}
+	/**
+	 * Searches for chunks with more than max items in them.<br>
+	 * If thorough, searches for chunks with more than max <b>entities</b>.
+	 */
+	public static void tpic(Player player, int max, boolean thorough) {
+		List<World> worlds = Bukkit.getServer().getWorlds();
+		for (World world : worlds){
+			List<Entity> Entities = world.getEntities();
+			for (Entity current : Entities){
+				if (!thorough) if (!(current instanceof Item)) continue;
+				
+				Vector vector = current.getLocation().toVector();
+				
+				int count = 0;
+				for (Entity current2 : Entities){
+					if (!thorough) if (!(current2 instanceof Item)) continue;
+					
+					Vector vectorNearby = current2.getLocation().toVector();
+					if (vector.distance(vectorNearby) <= 16) count++;
+				}
+				
+				if (count >= max) {
+					player.sendMessage(ChatColor.GREEN + "Found " + count + " items in this area!");
+					player.teleport(current.getLocation());
+					return;
 				}
 			}
 		}
-		player.sendMessage("There are no " + max + "-item chunks.");
+		if (thorough)
+			player.sendMessage(ChatColor.YELLOW + "There are no chunks with " + max + " entities.");
+		else
+			player.sendMessage(ChatColor.YELLOW + "There are no chunks with " + max + " items.");
 	}
-
-	public static void sendMessage(Player player, String[] message) {
-		if (player != null) {
-			for (int k = 0; k < message.length; k++) {
-				player.sendRawMessage(message[k]);
-			}
-		} else {
-			for (int k = 0; k < message.length; k++) {
-				tekkitrestrict.log.log(Level.OFF, message[k]);
-			}
-		}
+	
+	@Override
+	protected void finalize(){
+		Logger.getLogger("Minecraft").info("Class TRCommandTP has been killed.");
 	}
 }
