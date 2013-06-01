@@ -17,9 +17,6 @@
 ########################################################
 
 UseAutoRPTimer: true
-UseAntiFlyHack: true
-UseAntiMovementSpeedHack: true
-UseAntiForcefield: true
 UseItemLimiter: true
 UseLimitedCreative: true
 UseOpenAlc: true

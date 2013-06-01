@@ -31,6 +31,7 @@ import com.github.dreadslicer.tekkitrestrict.lib.TRFileConfiguration;
 import com.github.dreadslicer.tekkitrestrict.lib.YamlConfiguration;
 //import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 //import com.sk89q.worldedit.bukkit.selections.Selection;
+import com.github.dreadslicer.tekkitrestrict.listeners.Assigner;
 
 public class tekkitrestrict extends JavaPlugin {
 	public enum ConfigFile {
@@ -60,8 +61,7 @@ public class tekkitrestrict extends JavaPlugin {
 
 		this.saveDefaultConfig();
 
-		// load the configuration file
-		config = this.getConfigx();
+		config = this.getConfigx(); // load the configuration file
 
 		// set minimum interval for logic timers...
 		try {
@@ -88,8 +88,11 @@ public class tekkitrestrict extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
+		loadConfigCache();
+		
 		ttt = new TRThread();
-		this.getServer().getPluginManager().registerEvents(new TRListener(), this); //IMPORTANT assigner
+		Assigner.assign(this); //Register the required listeners
+		
 		new TRLogger();
 		TRSafeZone.init();
 		TRLimitFly.init();
@@ -193,7 +196,6 @@ public class tekkitrestrict extends JavaPlugin {
 			// Failed to submit the stats :-(
 		}
 		
-		loadConfigCache();
 		if (!("" + version).equals(getDescription().getVersion())){
 			Log.Debug("Version Mismatch!");
 		}

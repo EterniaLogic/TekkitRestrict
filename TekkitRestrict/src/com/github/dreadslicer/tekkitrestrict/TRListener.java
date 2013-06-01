@@ -16,20 +16,18 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
+import com.github.dreadslicer.tekkitrestrict.commands.TRCommandAlc;
 import com.github.dreadslicer.tekkitrestrict.lib.TRNoClick;
 
 import eloraam.core.TileCovered;
@@ -38,9 +36,7 @@ public class TRListener implements Listener {
 	private static TRListener instance;
 	boolean SSInnvincible, UseBlockLimit;
 	boolean LogAmulets, LogRings, LogDMTools, LogRMTools, LogEEMisc;
-	boolean AntiFly, AntiForcefield;
-	private Map<Integer, String> EENames = Collections
-			.synchronizedMap(new HashMap<Integer, String>());
+	private Map<Integer, String> EENames = Collections.synchronizedMap(new HashMap<Integer, String>());
 	private int[] Exceptions = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
 			11, 12, 13, 17, 24, 35, 44, 98, 142 };
 
@@ -122,20 +118,15 @@ public class TRListener implements Listener {
 	}
 
 	public static void reload() {
-		instance.SSInnvincible = tekkitrestrict.config
-				.getBoolean("SSInvincible");
-		instance.UseBlockLimit = tekkitrestrict.config
-				.getBoolean("UseItemLimiter");
+		instance.SSInnvincible = tekkitrestrict.config.getBoolean("SSInvincible");
+		instance.UseBlockLimit = tekkitrestrict.config.getBoolean("UseItemLimiter");
 
 		instance.LogAmulets = tekkitrestrict.config.getBoolean("LogAmulets");
 		instance.LogRings = tekkitrestrict.config.getBoolean("LogRings");
 		instance.LogDMTools = tekkitrestrict.config.getBoolean("LogDMTools");
 		instance.LogRMTools = tekkitrestrict.config.getBoolean("LogRMTools");
 		instance.LogEEMisc = tekkitrestrict.config.getBoolean("LogEEMisc");
-		instance.AntiFly = tekkitrestrict.config.getBoolean("UseAntiFlyHack");
-		instance.AntiForcefield = tekkitrestrict.config
-				.getBoolean("UseAntiForcefield");
-
+		
 		TRNoClick.reload();
 		TRNoDupe_BagCache.reload();
 	}
@@ -143,33 +134,7 @@ public class TRListener implements Listener {
 	public static TRListener getInstance() {
 		return instance;
 	}
-
-	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-	public void onBlockBreak(BlockBreakEvent e) {
-		//IMPORTANT Change this to separate listener where it can be assigned instead of checking for useblocklimit
-		for (int eee : Exceptions) {
-			if (e.getBlock().getTypeId() == eee) return;
-		}
-		
-		Player player = e.getPlayer();
-		if (player == null) return;
-		String pname = player.getName().toLowerCase();
-		if (pname.equals("[buildcraft]") || pname.equals("[redpower]")) return;
-		try {
-			if (UseBlockLimit) {
-				String pl = TRLimitBlock.getPlayerAt(e.getBlock());
-				//tekkitrestrict.log.info(pl);
-				if (pl != null) {
-					TRLimitBlock il = TRLimitBlock.getLimiter(pl);
-					il.checkBreakLimit(e);
-				}
-			}
-		} catch(Exception eee){
-			tekkitrestrict.log.warning("A minor exception occured in tekkitrestrict. Please give the developer the following information: ");
-			tekkitrestrict.log.warning(" - onBlockBreak, block limiter.");
-		}
-	}
-
+	
 	int lastdata = 0;
 
 	@EventHandler
@@ -396,62 +361,56 @@ public class TRListener implements Listener {
 	// /////////// START INVClicks/////////////
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void eventInventoryClick(InventoryClickEvent event) {
-		try {
-			// we want to stop non-players from being activated here.
-			
-			if (event.getWhoClicked() != null) {
-				// Determine if this inventory click is a dupe action:
-				// Perf: 13-27-(9+14x)
-				try {
-					TRNoDupe.handleDupes(event);
-				} catch (Exception e) {
-					TRLogger.Log("debug", "Error! [TRNoDupe] : " + e.getMessage());
-					for(StackTraceElement eer:e.getStackTrace()){
-						TRLogger.Log("debug","    "+eer.toString()); 
-					}
-				}
-
-				try {
-					Player player = (Player) event.getWhoClicked();
-					EntityPlayer ep = ((CraftPlayer) player).getHandle();
-					if (ep.abilities.canInstantlyBuild) {
-						TRLimitedCreative.handleCreativeInvClick(event);
-					}
-				} catch (Exception e) {
-					TRLogger.Log("debug", "Error! [handleCreativeInv Listener] : " + e.getMessage());
-					for(StackTraceElement eer:e.getStackTrace()){
-						TRLogger.Log("debug","    "+eer.toString()); 
-					}
-				}
-				// Determine if they are crafting an uncraftable. Log EE
-				// Crafting.
-				// Perf: [0]
-				try {
-					handleCraftBlock(event);
-				} catch (Exception e) {
-					TRLogger.Log("debug", "Error! [TRhandleCraftBlock] : " + e.getMessage());
+		// we want to stop non-players from being activated here.
+		
+		if (event.getWhoClicked() != null) {
+			// Determine if this inventory click is a dupe action:
+			// Perf: 13-27-(9+14x)
+			try {
+				TRNoDupe.handleDupes(event);
+			} catch (Exception e) {
+				TRLogger.Log("debug", "Error! [TRNoDupe] : " + e.getMessage());
+				for(StackTraceElement eer:e.getStackTrace()){
+					TRLogger.Log("debug","    "+eer.toString()); 
 				}
 			}
-		} catch (Exception e) {
+
+			try {
+				Player player = (Player) event.getWhoClicked();
+				EntityPlayer ep = ((CraftPlayer) player).getHandle();
+				if (ep.abilities.canInstantlyBuild) {
+					TRLimitedCreative.handleCreativeInvClick(event);
+				}
+			} catch (Exception e) {
+				TRLogger.Log("debug", "Error! [handleCreativeInv Listener] : " + e.getMessage());
+				for(StackTraceElement eer:e.getStackTrace()){
+					TRLogger.Log("debug","    "+eer.toString()); 
+				}
+			}
+			// Determine if they are crafting an uncraftable. Log EE
+			// Crafting.
+			// Perf: [0]
+			try {
+				handleCraftBlock(event);
+			} catch (Exception e) {
+				TRLogger.Log("debug", "Error! [TRhandleCraftBlock] : " + e.getMessage());
+			}
 		}
 	}
 
 	private void handleCraftBlock(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
-		try {
-			ItemStack currentItem = event.getCurrentItem();
-			if (currentItem == null) return;
-			
-			if (!TRPermHandler.hasPermission(player, "noitem", "bypass", "")) {
-				
-				if (TRNoItem.isItemBanned(player,
-						new com.github.dreadslicer.tekkitrestrict.ItemStack(currentItem.getTypeId(), 0, currentItem.getData().getData()))) {
-					player.sendMessage("[TRItemDisabler] You cannot obtain/modify this Item type!");
-					event.setCancelled(true);
-				}
-			}
-			} catch(Exception ex) {}
+		ItemStack currentItem = event.getCurrentItem();
+		if (currentItem == null) return;
 		
+		if (!TRPermHandler.hasPermission(player, "noitem", "bypass", "")) {
+			
+			if (TRNoItem.isItemBanned(player,
+					new com.github.dreadslicer.tekkitrestrict.ItemStack(currentItem.getTypeId(), 0, currentItem.getDurability()))) {
+				player.sendMessage("[TRItemDisabler] You cannot obtain/modify this Item type!");
+				event.setCancelled(true);
+			}
+		}
 	}
 
 	// ////////////////END INVClicks //////////////////////////
@@ -459,8 +418,9 @@ public class TRListener implements Listener {
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent e) {
 		//IMPORTANT assigner
+		Player player = e.getPlayer();
+		TRCommandAlc.setPlayerInv(player);
 		if (tekkitrestrict.config.getBoolean("UseItemLimiter") && tekkitrestrict.config.getBoolean("UseItemLimiter")) {
-			Player player = e.getPlayer();
 			try {TRLimitBlock.setExpire(player.getName());}catch(Exception eee){}
 			try {TRNoHack.playerLogout(player);}catch(Exception eee){}
 			try{TRNoDupeProjectTable.playerUnuse(player.getName());}catch(Exception eee){}
@@ -470,12 +430,13 @@ public class TRListener implements Listener {
 	@EventHandler
 	public void onPlayerKick(PlayerKickEvent e) {
 		//IMPORTANT assigner
-				if (tekkitrestrict.config.getBoolean("UseItemLimiter") && tekkitrestrict.config.getBoolean("UseItemLimiter")) {
-					Player player = e.getPlayer();
-					try {TRLimitBlock.setExpire(player.getName());}catch(Exception eee){}
-					try {TRNoHack.playerLogout(player);}catch(Exception eee){}
-					try{TRNoDupeProjectTable.playerUnuse(player.getName());}catch(Exception eee){}
-				}
+		Player player = e.getPlayer();
+		TRCommandAlc.setPlayerInv(player);
+		if (tekkitrestrict.config.getBoolean("UseItemLimiter") && tekkitrestrict.config.getBoolean("UseItemLimiter")) {
+			try {TRLimitBlock.setExpire(player.getName());}catch(Exception eee){}
+			try {TRNoHack.playerLogout(player);}catch(Exception eee){}
+			try{TRNoDupeProjectTable.playerUnuse(player.getName());}catch(Exception eee){}
+		}
 	}
 
 	@EventHandler
@@ -500,26 +461,7 @@ public class TRListener implements Listener {
 		try {
 			TRNoDupeProjectTable.playerUnuse(e.getPlayer().getName());
 		} catch(Exception ex){}
-
-	}
-
-	@EventHandler
-	public void onEntityDamageByEntityEvent(EntityDamageByEntityEvent e) {
-		// ookay.
-		if (AntiForcefield) {
-			try {
-				TRNoHackForcefield.checkForcefield(e);
-			} catch(Exception ex){}
-		}
-	}
-
-	@EventHandler(priority = EventPriority.NORMAL)
-	public void onPlayerMoveEvent(PlayerMoveEvent e) {
-		// this event is going to happen... often.
-		if (AntiFly) {
-			try {TRHandleFly.handleFly(e);}catch(Exception eee){}
-			try {TRNoHackSpeed.handleMove(e);}catch(Exception eee){}
-		}
+		TRCommandAlc.setPlayerInv2((Player) e.getPlayer());
 	}
 
 	private Map<Player, Integer> PickupTick = Collections.synchronizedMap(new HashMap<Player, Integer>());
@@ -553,8 +495,9 @@ public class TRListener implements Listener {
 						// remove the BHB / Void ring!!!
 						cache.removeAlc();
 						PickupTick.put(player, 1);
+					} else {
+						PickupTick.put(player, tick + 1);
 					}
-					PickupTick.put(player, tick + 1);
 				} else
 					PickupTick.put(player, 1);
 				
