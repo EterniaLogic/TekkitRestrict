@@ -14,6 +14,8 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 
 import com.github.dreadslicer.tekkitrestrict.lib.TRLimit;
 
@@ -75,7 +77,7 @@ public class TRLimitBlock {
 		return TLimit;
 	}
 
-	public boolean checkLimit(org.bukkit.event.block.BlockPlaceEvent event) {
+	public boolean checkLimit(BlockPlaceEvent event) {
 		// Return decides whether that player has already maxed out their
 		// limits.
 		boolean r = true;
@@ -147,7 +149,7 @@ public class TRLimitBlock {
 		return r;
 	}
 
-	public void checkBreakLimit(org.bukkit.event.block.BlockBreakEvent event) {
+	public void checkBreakLimit(BlockBreakEvent event) {
 		// event.getPlayer();
 
 		// loop through player's limits.

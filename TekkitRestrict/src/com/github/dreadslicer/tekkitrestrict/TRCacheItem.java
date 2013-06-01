@@ -113,9 +113,7 @@ public class TRCacheItem {
 			if (s.contains("=")) {
 				String[] gg = s.split("=");
 				String mod = gg[0];
-				TRNoItem.aasdf(mod, 
-						addCacheList(mod,
-								processModString("", mod, gg[1])));
+				TRNoItem.aasdf(mod, addCacheList(mod, processModString("", mod, gg[1])));
 			}
 		}
 
@@ -225,23 +223,30 @@ public class TRCacheItem {
 		}
 	}
 
-	public static TRCacheItem getPermCacheItem(Player p, String permType,
-			int id, int data) {
-		if (id == 0 || TRPermHandler.hasPermission(p, permType, "bypass", "")) {
+	/**
+	 * @param player
+	 * @param permType
+	 * @param id
+	 * @param data
+	 * @return null if id = 0 or player has bypass permission.
+	 */
+	public static TRCacheItem getPermCacheItem(Player player, String permType, int id, int data) {
+		if (id == 0 || player.hasPermission("tekkitrestrict.bypass."+permType)) {
 			return null;
 		}
+		
 		Set<String> l = cachePermTypes.get(permType.toLowerCase());
 		if (l == null) {
-			l = new HashSet<String>(); // tekkitrestrict.log.info("notHas "); }
+			l = new HashSet<String>();
 		}
 		// else tekkitrestrict.log.info("has "+permType);
 		Iterator<String> itt = l.iterator();
 		while (itt.hasNext()) {
 			String type = itt.next();
 			
-			boolean hasALL = TRPermHandler.hasPermission(p, permType, "*", "");
+			boolean hasALL = TRPermHandler.hasPermission(player, permType, "*", "");
 			
-			if (hasALL || TRPermHandler.hasPermission(p, permType, type, "") || type.equals("afsd90ujpj")) {
+			if (hasALL || TRPermHandler.hasPermission(player, permType, type, "") || type.equals("afsd90ujpj")) {
 				boolean C = hasCacheItem(permType, type, 999999999, 999999999);
 				if(C || hasALL) return new TRCacheItem(); // has "*"
 				
@@ -270,8 +275,8 @@ public class TRCacheItem {
 		return hasCacheItem(permType+";"+type,id,data);
 	}
 	
-	public static boolean hasCacheItem(String type, int id,
-			int data) {
+	public static boolean hasCacheItem(String type, int id, int data) {
+		//noitem;type=99999999:9999999
 		String keybase = type + "=" + id + ":";
 		String key = keybase + data;
 		String key0 = keybase + "0";
@@ -310,23 +315,20 @@ public class TRCacheItem {
 		return null;
 	}
 
-	public static List<TRCacheItem> processItemString(String permType,
-			String type, String item) {
+	public static List<TRCacheItem> processItemString(String permType, String type, String item) {
 		String key = permType + ";" + type;
 		cpermtype(permType, type);
 		return processItemString(key, item, -1);
 	}
 
-	public static List<TRCacheItem> processItemString(String permType,
-			String type, String item, int data2) {
+	public static List<TRCacheItem> processItemString(String permType, String type, String item, int data2) {
 		String key = permType + ";" + type;
 		cpermtype(permType, type);
 		return processItemString(key, item, data2);
 	}
 
 	// used for reloads...
-	public static List<TRCacheItem> processItemString(String type, String item,
-			int data2) {
+	public static List<TRCacheItem> processItemString(String type, String item, int data2) {
 		String itemx = item.replace(":-", ":=");
 		// converts a variable string into a list of data.
 		List<TRCacheItem> tci = new LinkedList<TRCacheItem>();
@@ -439,8 +441,7 @@ public class TRCacheItem {
 		return m;
 	}
 
-	public static TRCacheItem cacheItem(String type, int id, int data,
-			int numdata) {
+	public static TRCacheItem cacheItem(String type, int id, int data, int numdata) {
 		String key = type + "=" + id + ":" + data;
 		TRCacheItem m = cache.get(key.toLowerCase());
 		if (m == null) {

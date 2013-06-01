@@ -49,8 +49,7 @@ public class TRHandleFly {
 				return;
 			}
 			if (!e.getPlayer().isOp() && !player.abilities.canFly) {
-				if (!TRPermHandler.hasPermission(e.getPlayer(), "hack",
-						"bypass", "")) {
+				if (!TRPermHandler.hasPermission(e.getPlayer(), "hack", "bypass", "")) {
 					
 					     
 					

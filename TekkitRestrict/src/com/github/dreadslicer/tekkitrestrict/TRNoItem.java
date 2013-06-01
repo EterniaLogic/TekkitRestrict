@@ -14,13 +14,12 @@ import org.bukkit.entity.Player;
 //	the user has "specified" to be banned.
 
 public class TRNoItem {
-	private static List<TRCacheItem> DisabledItems=new LinkedList<TRCacheItem>(), DisabledCreativeItems=new LinkedList<TRCacheItem>();
+	private static List<TRCacheItem> DisabledItems = new LinkedList<TRCacheItem>(), DisabledCreativeItems = new LinkedList<TRCacheItem>();
 	private static List<String> DisabledItemsStr = Collections
 			.synchronizedList(new LinkedList<String>()),
 			DisabledCreativeStr = Collections
 					.synchronizedList(new LinkedList<String>());
-	public static Map<String, List<TRCacheItem>> modItemDat = Collections
-			.synchronizedMap(new HashMap<String, List<TRCacheItem>>());
+	public static Map<String, List<TRCacheItem>> modItemDat = Collections.synchronizedMap(new HashMap<String, List<TRCacheItem>>());
 	private static boolean useNoItem, useNoCreative;
 
 	public static void clear() {
@@ -66,16 +65,51 @@ public class TRNoItem {
 	}
 
 	public static boolean isItemBanned(Player p, ItemStack e) {
-		return useNoItem ? isTypeBanned("noitem", DisabledItems,
-				DisabledItemsStr, p, e) : false;
+		return useNoItem ? isTypeBanned("noitem", DisabledItems, DisabledItemsStr, p, e) : false;
+	}
+	
+	public static boolean isTypeBanned(String Type, List<TRCacheItem> tlist, List<String> indices, Player p, int id, short data) {
+		if (TRPermHandler.hasPermission(p, Type, "bypass", "")) return false;
+
+		/*
+		 * TRCacheItem ci = TRCacheItem.getPermCacheItem(p, Type, id, 0);
+		 * if(ci != null) return true;
+		 */
+		TRCacheItem ci1 = TRCacheItem.getPermCacheItem(p, Type, id, data);
+		if (ci1 != null) return true;
+
+		if (TRPermHandler.hasPermission(p, Type, id + "", data + ""))
+			return true;
+		else if (TRPermHandler.hasPermission(p, Type, id + "", ""))
+			return true;
+		else {
+
+			Iterator<String> keys = modItemDat.keySet().iterator();
+			while (keys.hasNext()) {
+				String g = keys.next();
+				if (TRPermHandler.hasPermission(p, Type, g, "")) {
+					List<TRCacheItem> mi = modItemDat.get(g);
+					for(TRCacheItem c:mi){
+						if (c == null) continue;
+						if(c.compare(id, data)) return true;
+					}
+				}
+			}
+		}
+		if (tlist != null) {
+			for (TRCacheItem cc : tlist){
+				if (cc.compare(id, data)) return true;
+			}
+		}
+		
+		return false;
 	}
 
-	public static boolean isTypeBanned(String Type, List<TRCacheItem> tlist,
-			List<String> indices, Player p, ItemStack e) {
+	public static boolean isTypeBanned(String Type, List<TRCacheItem> tlist, List<String> indices, Player p, ItemStack e) {
 		// tekkitrestrict.log.info("itb1");
 		if (!TRPermHandler.hasPermission(p, Type, "bypass", "")) {
 			int id = e.id;
-			int data = e.getData();
+			int data = e.data;
 
 			// tekkitrestrict.log.info("from");
 			/*
@@ -247,11 +281,7 @@ public class TRNoItem {
 			int to = Integer.parseInt(t[1]);
 
 			for (int i = from; i <= to; i++) {
-				try {
-					r.add(new ItemStack(i, 1, 0));
-				} catch (Exception e) {
-				}
-
+				r.add(new ItemStack(i, 1, 0));
 			}
 		} else if (insx.contains(":")) { // A single item with a datatype
 			String[] t = insx.split(":");
@@ -260,13 +290,9 @@ public class TRNoItem {
 			if (t[1].equals("0")) {
 				data = -10;// tekkitrestrict.log.info(id+":::"+data);}
 			}
-			try {
-				ItemStack e = new ItemStack(id, 1, data);
-				e.setData(data);
-				r.add(e);
-			} catch (Exception e) {
-
-			}
+			ItemStack e = new ItemStack(id, 1, data);
+			r.add(e);
+			
 		} else { // Just a single item
 					// if(ins.contains(":")) ins = ins.split(":")[0];
 			try {
@@ -307,7 +333,7 @@ public class TRNoItem {
 	}
 
 	public static boolean equalSet(ItemStack is1, ItemStack is2) {
-		return equalSet(is1.id, is1.getData(), is2.id, is2.getData());
+		return equalSet(is1.id, is1.data, is2.id, is2.data);
 	}
 
 	public static boolean equalSet(int id1, int data1, int id2, int data2) {
