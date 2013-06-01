@@ -32,10 +32,14 @@ import com.github.dreadslicer.tekkitrestrict.lib.YamlConfiguration;
 //import com.sk89q.worldedit.bukkit.selections.Selection;
 
 public class tekkitrestrict extends JavaPlugin {
+	public enum ConfigFile {
+		General, Advanced, ModModifications, DisableClick, DisableItems, Hack, LimitedCreative, Logging, TPreformance, MicroPermissions;
+	}
+	
 	public static Logger log;
 	public static TRFileConfiguration config;
-	public static boolean EEEnabled = false, disable = false, rp = false;
-	//public static PluginManager pm;
+	public static boolean EEEnabled = false, disable = false;
+	public static final double version = 1.15;
 	public static Object perm = null;
 	public static TRSQLDB db;
 	private static tekkitrestrict instance;
@@ -49,11 +53,9 @@ public class tekkitrestrict extends JavaPlugin {
 	public void onLoad() {
 		instance = this;
 		log = this.getLogger();
-
+		
 		loadSqlite();
 		initSqlite();
-		//pm = this.getServer().getPluginManager();
-		TRStackLoader.init();
 
 		this.saveDefaultConfig();
 
@@ -64,15 +66,15 @@ public class tekkitrestrict extends JavaPlugin {
 		try {
 			double g = tekkitrestrict.config.getDouble("RPTimerMin");
 			double ticks = g * 20.0;
-			net.minecraft.server.RedPowerLogic.minInterval = Integer.parseInt(String.valueOf(ticks));
+			net.minecraft.server.RedPowerLogic.minInterval = (int) Math.round(ticks);
 		} catch (Exception e) {
-
+			log.warning("Setting the RedPower Timer failed.");
 		}
 
 		// ///////////
 		
 		TRLogFilter.reload(); 
-		Enumeration<String> cc =LogManager.getLogManager().getLoggerNames(); 
+		Enumeration<String> cc = LogManager.getLogManager().getLoggerNames(); 
 		while(cc.hasMoreElements()) {
 			Logger.getLogger(cc.nextElement()).setFilter(new TRLogFilter()); 
 		}
@@ -85,8 +87,6 @@ public class tekkitrestrict extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
-		// getLogger().info("onEnabled has been invoked!");
-		// log.info("[TekkitRestrict] Begin Enable");
 		ttt = new TRThread();
 		this.getServer().getPluginManager().registerEvents(new TRListener(), this); //IMPORTANT assigner
 		new TRLogger();
@@ -97,7 +97,7 @@ public class tekkitrestrict extends JavaPlugin {
 
 		getCommand("tekkitrestrict").setExecutor(new TRCommandTR());
 		getCommand("openalc").setExecutor(new TRCommandAlc());
-		getCommand("tpic").setExecutor(new TRCommandTPIC(this));
+		getCommand("tpic").setExecutor(new TRCommandTPIC());
 
 		// determine if EE2 is enabled by using pluginmanager
 		PluginManager pm = this.getServer().getPluginManager();
@@ -154,8 +154,7 @@ public class tekkitrestrict extends JavaPlugin {
 									"", ssr.get(i), -1);
 							size += iss.size();
 						}
-						ssr = tekkitrestrict.config
-								.getStringList("RecipeFurnaceBlock");
+						ssr = tekkitrestrict.config.getStringList("RecipeFurnaceBlock");
 						for (int i = 0; i < ssr.size(); i++) {
 							List<TRCacheItem> iss = TRCacheItem.processItemString(
 									"", ssr.get(i), -1);
@@ -191,12 +190,12 @@ public class tekkitrestrict extends JavaPlugin {
 			metrics.start();
 		} catch (IOException e) {
 			// Failed to submit the stats :-(
-			// e.printStackTrace();
 		}
-
-		// done!
 		
 		loadConfigCache();
+		if (!("" + version).equals(getDescription().getVersion())){
+			Log.Debug("Version Mismatch!");
+		}
 		log.info("TekkitRestrict v " + getDescription().getVersion()+ " Enabled!");
 		
 		/*
@@ -253,15 +252,24 @@ public class tekkitrestrict extends JavaPlugin {
 	 */
 	
 	public static void loadConfigCache(){
-		Hacks.broadcast = config.getStringList("HackBroadcasts");
-		Hacks.broadcastFormat = config.getString("HackBroadcastString", "{PLAYER} tried to {TYPE}-hack!"); //TODO add colors
-		Hacks.kick = config.getStringList("HackKick");
-		Hacks.flyTolerance = config.getInt("HackFlyTolerance", 60);
-		Hacks.flyMinHeight = config.getInt("HackFlyMinHeight", 3);
+		Hacks.broadcast = config.getStringList(ConfigFile.Hack, "HackBroadcasts");
+		Hacks.broadcastFormat = config.getString(ConfigFile.Hack, "HackBroadcastString", "{PLAYER} tried to {TYPE}-hack!"); //TODO add colors
+		Hacks.kick = config.getStringList(ConfigFile.Hack, "HackKick");
+		Hacks.flyTolerance = config.getInt(ConfigFile.Hack, "HackFlyTolerance", 60);
+		Hacks.flyMinHeight = config.getInt(ConfigFile.Hack, "HackFlyMinHeight", 3);
+		Hacks.forcefield = config.getBoolean(ConfigFile.Hack, "HackForcefieldEnabled", true);
+		Hacks.fly = config.getBoolean(ConfigFile.Hack, "HackFlyEnabled", false);
+		Hacks.speed = config.getBoolean(ConfigFile.Hack, "HackSpeedEnabled", false);
 		
-		Dupes.broadcast = config.getStringList("BroadcastDupes");
-		Dupes.broadcastFormat = config.getString("BroadcastDupeString", "{PLAYER} tried to dupe using {TYPE}!"); //TODO add colors
-		Dupes.kick = config.getStringList("DupeKick");
+		Dupes.broadcast = config.getStringList(ConfigFile.Hack, "Dupes.Broadcast");
+		Dupes.broadcastFormat = config.getString(ConfigFile.Hack, "Dupes.BroadcastString", "{PLAYER} tried to dupe using {TYPE}!"); //TODO add colors
+		Dupes.kick = config.getStringList(ConfigFile.Hack, "Dupes.Kick");
+		Dupes.alcBag = config.getBoolean(ConfigFile.Hack, "Dupes.PreventAlchemyBagDupe", true);
+		Dupes.rmFurnace = config.getBoolean(ConfigFile.Hack, "Dupes.PreventRMFurnaceDupe", true);
+		Dupes.tankcart = config.getBoolean(ConfigFile.Hack, "Dupes.PreventTankCartDupe", true);
+		Dupes.tankcartGlitch = config.getBoolean(ConfigFile.Hack, "Dupes.PreventTankCartGlitch", true);
+		Dupes.transmute = config.getBoolean(ConfigFile.Hack, "Dupes.PreventTransmuteDupe", true);
+		Dupes.pedestal = config.getBoolean(ConfigFile.Hack, "Dupes.PedestalEmcGen", true);
 		
 		Global.debug = config.getBoolean("ShowDebugMessages", false);
 		Global.kickFromConsole = config.getBoolean("KickFromConsole", false);
@@ -270,13 +278,12 @@ public class tekkitrestrict extends JavaPlugin {
 	}
 
 	private static void initHeartBeat() {
-		instance.getServer().getScheduler()
-				.scheduleAsyncRepeatingTask(instance, new Runnable() {
-					@Override
-					public void run() {
-						TRLimitBlock.expireLimiters();
-					}
-				}, 60L, 32L);
+		instance.getServer().getScheduler().scheduleAsyncRepeatingTask(instance, new Runnable() {
+			@Override
+			public void run() {
+				TRLimitBlock.expireLimiters();
+			}
+		}, 60L, 32L);
 	}
 
 	private void loadSqlite() {
@@ -397,7 +404,6 @@ public class tekkitrestrict extends JavaPlugin {
 	}
 	
 	public void reload() {
-		// this.reloadConfig();
 		this.reloadConfig();		
 		config = this.getConfigx();
 		TRNoItem.clear(); //TRNI
@@ -429,7 +435,7 @@ public class tekkitrestrict extends JavaPlugin {
 		return ins;
 	}
 
-	public TRFileConfiguration getConfigx() {
+	private TRFileConfiguration getConfigx() {
 		if (configList.size() == 0) {
 			reloadConfig();
 		}
