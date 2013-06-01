@@ -1,8 +1,3 @@
-/*jadclipse*/// Decompiled by Jad v1.5.8e. Copyright 2001 Pavel Kouznetsov.
-// Jad home page: http://www.geocities.com/kpdus/jad.html
-// Decompiler options: packimports(3) radix(10) lradix(10) 
-// Source File Name:   YamlConfiguration.java
-
 package com.github.dreadslicer.tekkitrestrict.lib;
 
 import java.io.File;
@@ -240,11 +235,3 @@ public class YamlConfiguration extends FileConfiguration {
 		return config;
 	}
 }
-
-/*
- * DECOMPILATION REPORT
- * 
- * Decompiled from: /home/dread/tekkit_server/Tekkit_.jar Total time: 57 ms Jad
- * reported messages/errors: The class file version is 49.0 (only 45.3, 46.0 and
- * 47.0 are supported) Exit status: 0 Caught exceptions:
- */

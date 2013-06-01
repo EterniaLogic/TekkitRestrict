@@ -7,7 +7,7 @@
 ######### Anti-Hack Configuration ######### 
 # Block hackers from screwing your server up!
 
-## Move Speed Max is the speed in Meters/second
+## Move Speed Max is the speed in Blocks/second
 ## (~3 seconds) Move Speed Tolerance is based off the number of "Moves" a player does.
 
 ## Fly hack Tolerance is based off the number of "Moves" a player does (1~5 per second).
@@ -15,17 +15,19 @@
 ## Forcefield Tolerance is based off the number of times a player hits a mob or player.
 
 ####Default hack names
-##	"flyhack", "forcefieldhack", "speedhack"
+##	"fly", "forcefield", "speed"
 
 ##############################
 
-
+HackSpeedEnabled: true
 HackMoveSpeedMax: 2.5
 HackMoveSpeedTolerance: 30
 
+HackFlyEnabled: true
 HackFlyTolerance: 60
 HackFlyMinHeight: 3
 
+HackForcefieldEnabled: true
 HackForcefieldTolerance: 15
 HackForcefieldAngle: 40
 
@@ -37,16 +39,21 @@ HackBroadcastString: "{PLAYER} tried to {TYPE}-hack!"
 
 
 ####Dupes####
-PreventRMFurnaceDupe: true
-PreventAlcDupe: true
-PreventTransmuteDupe: true
-PreventTankCartDupe: true
-PreventTankCartGlitch: true
-
+Dupes:
+    PreventAlchemyBagDupe: true
+    PreventRMFurnaceDupe: true
+    PreventTransmuteDupe: true
+    PreventTankCartDupe: true
+    PreventTankCartGlitch: true
+    PreventTeleportDupe: true
+    PreventPedestalEmcGen: true
+    BroadcastString: "{PLAYER} tried to dupe using {TYPE}!"
+    Broadcast: ["rmfurnace", "alc"]
+    Kick: []
 #####        "RMFurnace", "alc", "transmute", "tankcart"
-BroadcastDupes: ["rmfurnace", "alc"]
-BroadcastDupeString: "{PLAYER} tried to dupe using {TYPE}!"
-DupeKick: []
+
+
+
 
 
 

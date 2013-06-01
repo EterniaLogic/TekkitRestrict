@@ -22,6 +22,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Dupes;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Global;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Hacks;
+import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Listeners;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.SafeZones;
 import com.github.dreadslicer.tekkitrestrict.commands.TRCommandAlc;
 import com.github.dreadslicer.tekkitrestrict.commands.TRCommandTPIC;
@@ -255,11 +256,18 @@ public class tekkitrestrict extends JavaPlugin {
 		Hacks.broadcast = config.getStringList(ConfigFile.Hack, "HackBroadcasts");
 		Hacks.broadcastFormat = config.getString(ConfigFile.Hack, "HackBroadcastString", "{PLAYER} tried to {TYPE}-hack!"); //TODO add colors
 		Hacks.kick = config.getStringList(ConfigFile.Hack, "HackKick");
+		
+		Hacks.fly = config.getBoolean(ConfigFile.Hack, "HackFlyEnabled", false);
 		Hacks.flyTolerance = config.getInt(ConfigFile.Hack, "HackFlyTolerance", 60);
 		Hacks.flyMinHeight = config.getInt(ConfigFile.Hack, "HackFlyMinHeight", 3);
+		
 		Hacks.forcefield = config.getBoolean(ConfigFile.Hack, "HackForcefieldEnabled", true);
-		Hacks.fly = config.getBoolean(ConfigFile.Hack, "HackFlyEnabled", false);
+		Hacks.ffTolerance = config.getInt(ConfigFile.Hack, "HackForcefieldTolerance", 15);
+		Hacks.ffVangle = config.getDouble(ConfigFile.Hack, "HackForcefieldAngle", 40);
+		
 		Hacks.speed = config.getBoolean(ConfigFile.Hack, "HackSpeedEnabled", false);
+		Hacks.speedTolerance = config.getInt(ConfigFile.Hack, "HackMoveSpeedTolerance", 30);
+		Hacks.speedMaxSpeed = config.getDouble(ConfigFile.Hack, "HackMoveSpeedMax", 2.5);
 		
 		Dupes.broadcast = config.getStringList(ConfigFile.Hack, "Dupes.Broadcast");
 		Dupes.broadcastFormat = config.getString(ConfigFile.Hack, "Dupes.BroadcastString", "{PLAYER} tried to dupe using {TYPE}!"); //TODO add colors
@@ -273,6 +281,7 @@ public class tekkitrestrict extends JavaPlugin {
 		
 		Global.debug = config.getBoolean("ShowDebugMessages", false);
 		Global.kickFromConsole = config.getBoolean("KickFromConsole", false);
+		Listeners.UseBlockLimit = config.getBoolean("UseItemLimiter", true);
 		
 		SafeZones.allowNormalUser = config.getBoolean("SSAllowNormalUserToHaveSafeZones", true);
 	}

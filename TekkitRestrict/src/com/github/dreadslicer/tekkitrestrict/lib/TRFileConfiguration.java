@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 
 import org.apache.commons.lang.Validate;
@@ -24,6 +25,7 @@ import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.representer.Representer;
 
 import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
+import com.github.dreadslicer.tekkitrestrict.tekkitrestrict.ConfigFile;
 
 @SuppressWarnings("rawtypes")
 public class TRFileConfiguration extends FileConfiguration {
@@ -41,10 +43,23 @@ public class TRFileConfiguration extends FileConfiguration {
 		}
 		return null;
 	}
+	
+	public Object getDefault(ConfigFile file, String path) {
+		YamlConfiguration conf = tekkitrestrict.configList.get(file.ordinal());
+		Object j;
+		if ((j = conf.getDefault(path)) != null) {
+			return j;
+		}
+		return null;
+	}
 
 	@Override
 	public Object get(String path) {
 		return get(path, getDefault(path));
+	}
+	
+	public Object get(ConfigFile file, String path) {
+		return get(file, path, getDefault(file, path));
 	}
 
 	@Override
@@ -54,6 +69,15 @@ public class TRFileConfiguration extends FileConfiguration {
 			if ((j = conf.get(path, def)) != def) {
 				return j;
 			}
+		}
+		return def;
+	}
+	
+	public Object get(ConfigFile file, String path, Object def) {
+		YamlConfiguration conf = tekkitrestrict.configList.get(file.ordinal());
+		Object j;
+		if ((j = conf.get(path, def)) != def) {
+			return j;
 		}
 		return def;
 	}
@@ -67,6 +91,11 @@ public class TRFileConfiguration extends FileConfiguration {
 	@Override
 	public String getString(String path, String def) {
 		Object val = get(path, def);
+		return val == null ? def : val.toString();
+	}
+	
+	public String getString(ConfigFile file, String path, String def) {
+		Object val = get(file, path, def);
 		return val == null ? def : val.toString();
 	}
 
@@ -86,6 +115,11 @@ public class TRFileConfiguration extends FileConfiguration {
 	@Override
 	public int getInt(String path, int def) {
 		Object val = get(path, Integer.valueOf(def));
+		return (val instanceof Number) ? NumberConversions.toInt(val) : def;
+	}
+	
+	public int getInt(ConfigFile file, String path, int def) {
+		Object val = get(file, path, Integer.valueOf(def));
 		return (val instanceof Number) ? NumberConversions.toInt(val) : def;
 	}
 
@@ -108,6 +142,11 @@ public class TRFileConfiguration extends FileConfiguration {
 		Object val = get(path, Boolean.valueOf(def));
 		return (val instanceof Boolean) ? ((Boolean) val).booleanValue() : def;
 	}
+	
+	public boolean getBoolean(ConfigFile file, String path, boolean def) {
+		Object val = get(file, path, Boolean.valueOf(def));
+		return (val instanceof Boolean) ? ((Boolean) val).booleanValue() : def;
+	}
 
 	@Override
 	public boolean isBoolean(String path) {
@@ -118,14 +157,17 @@ public class TRFileConfiguration extends FileConfiguration {
 	@Override
 	public double getDouble(String path) {
 		Object def = getDefault(path);
-		return getDouble(path,
-				(def instanceof Number) ? NumberConversions.toDouble(def)
-						: 0.0D);
+		return getDouble(path, (def instanceof Number) ? NumberConversions.toDouble(def) : 0.0D);
 	}
 
 	@Override
 	public double getDouble(String path, double def) {
 		Object val = get(path, Double.valueOf(def));
+		return (val instanceof Number) ? NumberConversions.toDouble(val) : def;
+	}
+	
+	public double getDouble(ConfigFile file, String path, double def) {
+		Object val = get(file, path, Double.valueOf(def));
 		return (val instanceof Number) ? NumberConversions.toDouble(val) : def;
 	}
 
@@ -147,6 +189,11 @@ public class TRFileConfiguration extends FileConfiguration {
 		Object val = get(path, Long.valueOf(def));
 		return (val instanceof Number) ? NumberConversions.toLong(val) : def;
 	}
+	
+	public long getLong(ConfigFile file, String path, long def) {
+		Object val = get(file, path, Long.valueOf(def));
+		return (val instanceof Number) ? NumberConversions.toLong(val) : def;
+	}
 
 	@Override
 	public boolean isLong(String path) {
@@ -159,11 +206,22 @@ public class TRFileConfiguration extends FileConfiguration {
 		Object def = getDefault(path);
 		return getList(path, (def instanceof List) ? (List) def : null);
 	}
+	
+	public List<Object> getList(ConfigFile file, String path) {
+		Object def = getDefault(file, path);
+		return getList(file, path, (def instanceof List) ? (List) def : null);
+	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Object> getList(String path, List def) {
 		Object val = get(path, def);
+		return (List<Object>) ((val instanceof List) ? val : def);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Object> getList(ConfigFile file, String path, List def) {
+		Object val = get(file, path, def);
 		return (List<Object>) ((val instanceof List) ? val : def);
 	}
 
@@ -176,6 +234,25 @@ public class TRFileConfiguration extends FileConfiguration {
 	@Override
 	public List<String> getStringList(String path) {
 		List<Object> list = getList(path);
+		if (list == null) {
+			return new ArrayList<String>(0);
+		}
+		List<String> result = new ArrayList<String>();
+		Iterator<Object> i$ = list.iterator();
+		do {
+			if (!i$.hasNext()) {
+				break;
+			}
+			Object object = i$.next();
+			if ((object instanceof String) || isPrimitiveWrapper(object)) {
+				result.add(String.valueOf(object));
+			}
+		} while (true);
+		return result;
+	}
+	
+	public List<String> getStringList(ConfigFile file, String path) {
+		List<Object> list = getList(file, path);
 		if (list == null) {
 			return new ArrayList<String>(0);
 		}
@@ -524,7 +601,7 @@ public class TRFileConfiguration extends FileConfiguration {
 
 	protected void convertMapsToSections(Map input, ConfigurationSection section) {
 		for (Iterator i$ = input.entrySet().iterator(); i$.hasNext();) {
-			java.util.Map.Entry entry = (java.util.Map.Entry) i$.next();
+			Entry entry = (Entry) i$.next();
 			String key = entry.getKey().toString();
 			Object value = entry.getValue();
 			if (value instanceof Map) {
