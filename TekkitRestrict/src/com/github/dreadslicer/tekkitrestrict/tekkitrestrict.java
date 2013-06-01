@@ -1,7 +1,5 @@
 package com.github.dreadslicer.tekkitrestrict;
 
-//import net.milkbowl.vault.permission.Permission;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,8 +27,6 @@ import com.github.dreadslicer.tekkitrestrict.commands.TRCommandTPIC;
 import com.github.dreadslicer.tekkitrestrict.commands.TRCommandTR;
 import com.github.dreadslicer.tekkitrestrict.lib.TRFileConfiguration;
 import com.github.dreadslicer.tekkitrestrict.lib.YamlConfiguration;
-//import com.sk89q.worldedit.bukkit.WorldEditPlugin;
-//import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.github.dreadslicer.tekkitrestrict.listeners.Assigner;
 
 public class tekkitrestrict extends JavaPlugin {
