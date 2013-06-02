@@ -6,6 +6,8 @@
 ####################################################################
 
 #### Logging ####
+# If you turn UseLogFilter off, log splitting and log filtering will be disabled completely.
+UseLogFilter: true
 LogLocation: "log"
 LogNameFormat: "{DTYPE}-{MONTH}-{DAY}-{YEAR}.txt"
 LogStringFormat: "[{HOUR}:{MINUTE}:{SECOND}] {INFO}"
@@ -57,8 +59,8 @@ LogFilter:
 #       Chunk unloader. It cannot be helped if you want to use it because
 #       the only way to fix it is to put it onto the main server thread
 #       which will set your server ticks to 2 TPS.
-- "severe"
-- "warning"
+# - "severe"
+# - "warning"
 
 
 ##############################

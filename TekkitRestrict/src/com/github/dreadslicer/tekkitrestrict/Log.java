@@ -112,6 +112,11 @@ public class Log {
 		String message = playername + " tried to glitch using a " + type + ".";
 		McLogger.log(Level.parse("TEDupe"), message);
 	}
+	public static void Exception(Exception ex){
+		for (StackTraceElement element : ex.getStackTrace()) {
+			TRLogger.Log("debug", "     " + element.toString());
+		}
+	}
 	
 	public static String replaceColors(String str){
 		if (str == null) return "null";

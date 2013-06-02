@@ -8,5 +8,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/PermissionPlugins"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/ProtectionPlugins"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/TownPlugins"/>
+	<classpathentry kind="lib" path="C:/Users/Taico/workspace/libraries/Essentials.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

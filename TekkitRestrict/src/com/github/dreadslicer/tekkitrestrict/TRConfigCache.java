@@ -32,4 +32,10 @@ public class TRConfigCache {
 				11, 12, 13, 17, 24, 35, 44, 98, 142 };
 		public static boolean UseBlockLimit;
 	}
+	
+	public static class LogFilter {
+		public static List<String> replaceList = new ArrayList<String>();
+		public static boolean logConsole;
+		public static String logLocation;
+	}
 }

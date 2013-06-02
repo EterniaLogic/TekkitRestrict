@@ -69,22 +69,25 @@ public class tekkitrestrict extends JavaPlugin {
 		}
 
 		// ///////////
+		loadConfigCache();
 		
-		TRLogFilter.reload(); 
-		Enumeration<String> cc = LogManager.getLogManager().getLoggerNames(); 
-		while(cc.hasMoreElements()) {
-			Logger.getLogger(cc.nextElement()).setFilter(new TRLogFilter()); 
+		if (config.getBoolean("UseLogFilter", true)){
+			Enumeration<String> cc = LogManager.getLogManager().getLoggerNames();
+			TRLogFilter filter = new TRLogFilter();
+			while(cc.hasMoreElements()) {
+				Logger.getLogger(cc.nextElement()).setFilter(filter); 
+			}
+			log.info("Log filter Placed!");
 		}
 		
 		// ///////////
 
-		log.info("Log filter Placed!");
+		
 		log.info("SQLite loaded!");
 	}
 
 	@Override
 	public void onEnable() {
-		loadConfigCache();
 		
 		ttt = new TRThread();
 		Assigner.assign(this); //Register the required listeners
@@ -223,6 +226,7 @@ public class tekkitrestrict extends JavaPlugin {
 		}
 
 		disable = true;
+		TRLogFilter.disable();
 		log.info("TekkitRestrict v " + getDescription().getVersion()+ " disabled!");
 	}
 
@@ -280,6 +284,10 @@ public class tekkitrestrict extends JavaPlugin {
 		Global.debug = config.getBoolean("ShowDebugMessages", false);
 		Global.kickFromConsole = config.getBoolean("KickFromConsole", false);
 		Listeners.UseBlockLimit = config.getBoolean("UseItemLimiter", true);
+		
+		TRConfigCache.LogFilter.replaceList = config.getStringList("LogFilter");
+		TRConfigCache.LogFilter.logConsole = config.getBoolean("LogConsole", true);
+		TRConfigCache.LogFilter.logLocation = config.getString("LogLocation", "log");
 		
 		SafeZones.allowNormalUser = config.getBoolean("SSAllowNormalUserToHaveSafeZones", true);
 	}
@@ -417,7 +425,6 @@ public class tekkitrestrict extends JavaPlugin {
 		TRCacheItem.reload();
 		TRNoItem.reload(); //TRNI2
 		TRChunkUnloader.reload();
-		TRLogFilter.reload();
 		TRThread.reload(); // branches out
 		TRListener.reload();
 		TRLimitBlock.reload();
