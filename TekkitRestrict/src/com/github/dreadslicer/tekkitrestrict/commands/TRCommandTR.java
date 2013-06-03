@@ -27,6 +27,8 @@ import com.github.dreadslicer.tekkitrestrict.TRSafeZone;
 import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
 import com.github.dreadslicer.tekkitrestrict.TRSafeZone.SafeZoneCreate;
 import com.github.dreadslicer.tekkitrestrict.lib.TRLimit;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 public class TRCommandTR implements CommandExecutor {
 	private Send send;
@@ -47,35 +49,117 @@ public class TRCommandTR implements CommandExecutor {
 			args[i] = args[i].toLowerCase();
 		}
 		
-		if (args.length == 0) {
+		if (args.length == 0 || args[0].equals("help")) {
 			send.msg("[TekkitRestrict " + tekkitrestrict.version + " Commands]");
 			send.msg("Aliases: /tr, /tekkitrestrict");
-
+			if (sender.hasPermission("tekkitrestrict.emc")) send.msg("/tr EMC", "List EMC commands.");
 			if (sender.hasPermission("tekkitrestrict.admin")) send.msg("/tr admin", "list admin commands");
 			return true;
 		}
 		
-		if (args[0].equals("reload")) {
-			if (send.noPerm("admin.reload")) return true;
-
-			tekkitrestrict.getInstance().reload();
-			send.msg("Tekkit Restrict Reloaded!");
-			return true;
-		}
-		
-		if (args[0].equals("threadlag")) {
-			if (send.noPerm("admin.threadlag")) return true;
+		if (args[0].equals("emc")) {
+			if (send.noPerm("emc")) return true;
 			
-			TRPerformance.getThreadLag(sender);
-			return true;
-		}
-		
-		if (args[0].equals("reinit")) {
-			if (send.noPerm("admin.reinit")) return true;
+			if (args.length == 1 || args[1].equals("help")) {
+				send.msg("[TekkitRestrict v " + tekkitrestrict.version + " EMC Commands]");
+				send.msg("/tr emc tempset <id[:data]> <EMC>", "Set an emc value till the next restart.");
+				send.msg("/tr emc lookup <id[:data]>", "Check the emc value of an item.");
+				return true;
+			}
 			
-			send.msg(ChatColor.RED + "Reinitializing server.");
-			tekkitrestrict.getInstance().getServer().reload();
-			return true;
+			if (args[1].equals("tempset")) {
+				if (send.noPerm("emc.tempset")) return true;
+				
+				if (args.length != 4){
+					send.msg(ChatColor.RED + "Incorrect syntaxis!");
+					send.msg(ChatColor.RED + "Correct usage: /tr emc tempset <id:data> <EMC>");
+					return true;
+				}
+				
+				int emc = 0;
+				try {
+					emc = Integer.parseInt(args[3]);
+					if (emc < 0){
+						send.msg(ChatColor.RED + "Negative values are not allowed!");
+						return true;
+					}
+				} catch (NumberFormatException ex){
+					send.msg(ChatColor.RED + "This is not a valid number!");
+					return true;
+				}
+				
+				try {
+					List<TRCacheItem> iss = TRCacheItem.processItemString("", args[2], -1);
+					for (TRCacheItem isr : iss) {
+						int data = isr.getData();
+						if (emc > 0) ee.EEMaps.addEMC(isr.id, data, emc);
+						else {
+							//Remove EMC value.
+							HashMap<Integer, Integer> hm = (HashMap<Integer, Integer>) ee.EEMaps.alchemicalValues.get(isr.id);
+							if (hm != null){
+								hm.remove(data);
+								if (hm.isEmpty()) ee.EEMaps.alchemicalValues.remove(isr.id);
+								else ee.EEMaps.alchemicalValues.put(isr.id, hm);
+							}
+						}
+						send.msg(ChatColor.GREEN + "Temporary EMC set successful!");
+					}
+				} catch (Exception ex){
+					send.msg(ChatColor.RED + "Incorrect syntaxis!");
+					send.msg(ChatColor.RED + "Correct usage:");
+					send.msg(ChatColor.RED + "/tr emc tempset <id[:data]> <EMC>");
+					send.msg(ChatColor.RED + "/tr emc tempset <id-id2> <EMC>");
+				}
+				
+				return true;
+			}
+			
+			if (args[1].equals("lookup")) {
+				if (send.noPerm("emc.lookup")) return true;
+				
+				if (args.length != 3){
+					send.msg(ChatColor.RED + "Incorrect syntaxis!");
+					send.msg(ChatColor.RED + "Correct usage: /tr emc lookup <id[:data]>");
+					return true;
+				}
+				
+				boolean found = false;
+				try {
+					List<TRCacheItem> iss = TRCacheItem.processItemString("", args[2], -1);
+					for (TRCacheItem isr : iss) {
+						HashMap<Integer, Integer> hm = (HashMap<Integer, Integer>) ee.EEMaps.alchemicalValues.get(isr.id);
+						if (hm == null) continue;
+						
+						if (isr.data == 0) { //Get all data values
+							Iterator<Integer> ks = hm.keySet().iterator();//Every data value
+							while (ks.hasNext()) {
+								Integer dat = ks.next();
+								Integer emc = hm.get(dat);
+								if (emc == null) continue; //Should never happen.
+								found = true;
+								send.msg("[" + isr.id + ":" + dat + "] EMC: " + emc);
+							}
+						} else {
+							Integer emc = hm.get(isr.data);
+							if (emc == null) continue;
+							found = true;
+							int datax = isr.data == -10 ? 0 : isr.data;
+							send.msg("[" + isr.id + ":" + datax + "] EMC: " + emc);
+						}
+					}
+					
+					if (!found){
+						send.msg(ChatColor.RED + "No EMC values found for " + args[2] + ".");
+					}
+				} catch (Exception ex) {
+					//Should never happen.
+					TRLogger.Log("debug", "[COM] EMCLookup " + ex.getMessage());
+					send.msg(ChatColor.RED + "Sorry, EMC lookup unsuccessful...");
+					send.msg("/tr emc lookup <id[:data]>");
+					send.msg("/tr emc lookup <id-id2>");
+				}
+				return true;
+			}
 		}
 		
 		try {
@@ -93,6 +177,30 @@ public class TRCommandTR implements CommandExecutor {
 						try { page = Integer.parseInt(args[2]); } catch (NumberFormatException ex) {}
 					}
 					sendHelp(page);
+					return true;
+				}
+				
+				if (args[1].equals("reload")) {
+					if (send.noPerm("admin.reload")) return true;
+
+					tekkitrestrict.getInstance().reload();
+					send.msg("Tekkit Restrict Reloaded!");
+					return true;
+				}
+				
+				if (args[1].equals("threadlag")) {
+					if (send.noPerm("admin.threadlag")) return true;
+					
+					TRPerformance.getThreadLag(sender);
+					return true;
+				}
+				
+				if (args[1].equals("reinit")) {
+					if ((sender instanceof Player) && send.noPerm("admin.reinit")) return true;
+					//Console should always be able to use this, even though permission default is false in plugin.yml
+					
+					send.msg(ChatColor.RED + "Reinitializing server.");
+					tekkitrestrict.getInstance().getServer().reload();
 					return true;
 				}
 				
@@ -156,9 +264,9 @@ public class TRCommandTR implements CommandExecutor {
 								return true;
 							}
 						}
-						
-						if (TRSafeZone.inSafeZone(target))
-							send.msg(ChatColor.BLUE + target.getName() + " is currently in a safezone.");
+						String name = TRSafeZone.getSafeZone(target);
+						if (!name.equals(""))
+							send.msg(ChatColor.BLUE + target.getName() + " is currently in the safezone " + name + ".");
 						else
 							send.msg(ChatColor.BLUE + target.getName() + " is currently " + ChatColor.RED + "not" + ChatColor.BLUE + " in a safezone.");
 						
@@ -174,16 +282,28 @@ public class TRCommandTR implements CommandExecutor {
 							return true;
 						}
 						
+						boolean found = false;
 						String name = null;
 						for (int i = 0; i < TRSafeZone.zones.size(); i++) {
 							TRSafeZone zone = TRSafeZone.zones.get(i);
 							name = zone.name;
 							if (!name.toLowerCase().equals(args[3])) continue;
+							found = true;
+							if (!TRSafeZone.removeSafeZone(zone)){
+								send.msg(ChatColor.RED + "Unable to remove the safezone. Was the claim already removed?");
+								return true;
+							}
 							
 							TRSafeZone.zones.remove(i);
 							send.msg(ChatColor.GREEN + "Safezone " + name + " removed.");
 							break;
 						}
+						
+						if (!found){
+							send.msg(ChatColor.RED + "Cannot find safezone " + args[3] + "!");
+							return true;
+						}
+						
 						//FIXME uppercase problem
 						try {
 							tekkitrestrict.db.query("DELETE FROM `tr_saferegion` WHERE `name` = '"
@@ -215,10 +335,9 @@ public class TRCommandTR implements CommandExecutor {
 						}
 						
 						try {
-							com.sk89q.worldguard.bukkit.WorldGuardPlugin wg = (com.sk89q.worldguard.bukkit.WorldGuardPlugin) pm.getPlugin("WorldGuard");
-							Map<String, com.sk89q.worldguard.protection.regions.ProtectedRegion> rm = wg
-									.getRegionManager(player.getWorld()).getRegions();
-							com.sk89q.worldguard.protection.regions.ProtectedRegion pr = rm.get(name);
+							WorldGuardPlugin wg = (WorldGuardPlugin) pm.getPlugin("WorldGuard");
+							Map<String, ProtectedRegion> rm = wg.getRegionManager(player.getWorld()).getRegions();
+							ProtectedRegion pr = rm.get(name);
 							if (pr != null) {
 								TRSafeZone zone = new TRSafeZone();
 								zone.mode = 1;
@@ -395,117 +514,17 @@ public class TRCommandTR implements CommandExecutor {
 					send.msg("/tr admin limit list <player>", "View a players limits");
 					send.msg("/tr admin limit list <player> <id>", "View a specific limit.");
 					send.msg("/tr admin limit clear <player>", "Clear a players limits.");
-					send.msg("/tr admin limit clear <player> <id>[:data]", "Clear a players limits for a specific itemid.");
+					send.msg("/tr admin limit clear <player> <id[:data]>", "Clear a players limits for a specific itemid.");
 					return true;
 					
-				} else if (args[1].equals("emc")) {
-					if (send.noPerm("admin.emc")) return true;
-					
-					if (args.length == 2 || args[2].equals("help")) {
-						send.msg("[TekkitRestrict v " + tekkitrestrict.version + " EMC Commands]");
-						send.msg("/tr admin emc tempset <id[:data]> <EMC>", "Set an emc value till the next restart.");
-						send.msg("/tr admin emc lookup <id[:data]>", "Check the emc value of an item.");
-						return true;
-					}
-					
-					if (args[2].equals("tempset")) {
-						if (send.noPerm("admin.emc.tempset")) return true;
-						
-						if (args.length != 5){
-							send.msg(ChatColor.RED + "Incorrect syntaxis!");
-							send.msg(ChatColor.RED + "Correct usage: /tr admin emc tempset <id:data> <EMC>");
-							return true;
-						}
-						
-						int emc = 0;
-						try {
-							emc = Integer.parseInt(args[4]);
-							if (emc < 0){
-								send.msg(ChatColor.RED + "Negative values are not allowed!");
-								return true;
-							}
-						} catch (NumberFormatException ex){
-							send.msg(ChatColor.RED + "This is not a valid number!");
-							return true;
-						}
-						
-						try {
-							List<TRCacheItem> iss = TRCacheItem.processItemString("", args[3], -1);
-							for (TRCacheItem isr : iss) {
-								int data = isr.getData();
-								if (emc > 0) ee.EEMaps.addEMC(isr.id, data, emc);
-								else {
-									//Remove EMC value.
-									HashMap<Integer, Integer> hm = (HashMap<Integer, Integer>) ee.EEMaps.alchemicalValues.get(isr.id);
-									if (hm != null){
-										hm.remove(data);
-										if (hm.isEmpty()) ee.EEMaps.alchemicalValues.remove(isr.id);
-										else ee.EEMaps.alchemicalValues.put(isr.id, hm);
-									}
-								}
-								send.msg(ChatColor.GREEN + "Temporary EMC set successful!");
-							}
-						} catch (Exception ex){
-							send.msg(ChatColor.RED + "Incorrect syntaxis!");
-							send.msg(ChatColor.RED + "Correct usage:");
-							send.msg(ChatColor.RED + "/tr admin emc tempset <id[:data]> <EMC>");
-							send.msg(ChatColor.RED + "/tr admin emc tempset <id-id2> <EMC>");
-						}
-						
-						return true;
-					}
-					
-					if (args[2].equals("lookup")) {
-						if (send.noPerm("admin.emc.lookup")) return true;
-						
-						if (args.length != 4){
-							send.msg(ChatColor.RED + "Incorrect syntaxis!");
-							send.msg(ChatColor.RED + "Correct usage: /tr admin emc lookup <id[:data]>");
-							return true;
-						}
-						
-						boolean found = false;
-						try {
-							List<TRCacheItem> iss = TRCacheItem.processItemString("", args[3], -1);
-							for (TRCacheItem isr : iss) {
-								HashMap<Integer, Integer> hm = (HashMap<Integer, Integer>) ee.EEMaps.alchemicalValues.get(isr.id);
-								if (hm == null) continue;
-								
-								if (isr.data == 0) { //Get all data values
-									Iterator<Integer> ks = hm.keySet().iterator();//Every data value
-									while (ks.hasNext()) {
-										Integer dat = ks.next();
-										Integer emc = hm.get(dat);
-										if (emc == null) continue; //Should never happen.
-										found = true;
-										send.msg("[" + isr.id + ":" + dat + "] EMC: " + emc);
-									}
-								} else {
-									Integer emc = hm.get(isr.data);
-									if (emc == null) continue;
-									found = true;
-									int datax = isr.data == -10 ? 0 : isr.data;
-									send.msg("[" + isr.id + ":" + datax + "] EMC: " + emc);
-								}
-							}
-							
-							if (!found){
-								send.msg(ChatColor.RED + "No EMC values found for " + args[3] + ".");
-							}
-						} catch (Exception ex) {
-							//Should never happen.
-							TRLogger.Log("debug", "[COM] EMCLookup " + ex.getMessage());
-							send.msg(ChatColor.RED + "Sorry, EMC lookup unsuccessful...");
-							send.msg("/tr admin emc lookup <id[:data]>");
-							send.msg("/tr admin emc lookup <id-id2>");
-						}
-						return true;
-					}
 				}
+				
+				
+				
 			} else {
 				send.msg("[TekkitRestrict " + tekkitrestrict.version + " Commands]");
 				send.msg("Aliases: /tr, /tekkitrestrict");
-
+				if (sender.hasPermission("tekkitrestrict.emc")) send.msg("/tr emc", "List EMC commands.");
 				if (sender.hasPermission("tekkitrestrict.admin")) send.msg("/tr admin", "list admin commands");
 				return true;
 			}
@@ -525,18 +544,19 @@ public class TRCommandTR implements CommandExecutor {
 		if (page == 1) {
 			send.msg("[TekkitRestrict " + tekkitrestrict.version + " Admin Commands] Page 1 / 2");
 			send.msg("/tr admin help <page>", "Show this help.");
+			send.msg("/tr admin reload", "Reload TekkitRestrict");
+			send.msg("/tr admin reinit", "Reload the server.");
+			send.msg("/tr admin limit clear <player>", "Clear a players limits.");
+			send.msg("/tr admin limit clear <player> <id[:data]>", "Clear a players limits for a specific item.");
+			send.msg("/tr admin limit list <player> [id]", "List a players limits.");
+		} else if (page == 2) {
+			send.msg("[TekkitRestrict " + tekkitrestrict.version + " Admin Commands] Page 2 / 2");
 			send.msg("/tr admin safezone list [page]", "List safezones.");
 			send.msg("/tr admin safezone check [player]", "Check if a player is in a safezone.");
 			send.msg("/tr admin safezone addwg <region>", "Add a safezone using WorldGuard.");
 			send.msg("/tr admin safezone addgp <name>", "Add a safezone using GriefPrevention.");
 			send.msg("/tr admin safezone rem <name>", "Remove a safezone.");
-		} else if (page == 2) {
-			send.msg("[TekkitRestrict " + tekkitrestrict.version + " Admin Commands] Page 2 / 2");
-			send.msg("/tr admin limit clear [player]");
-			send.msg("/tr admin limit clear [player] [INDEX[id:data]]");
-			send.msg("/tr admin limit list [player]");
-			send.msg("/tr admin emc tempset [id:data] [EMC]");
-			send.msg("/tr admin emc lookup [id:data]");
+			send.msg("/tr admin threadlag", "Display threadlag information.");
 		} else {
 			send.msg(ChatColor.RED + "Page doesnt exist.");
 		}

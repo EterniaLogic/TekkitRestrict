@@ -4,12 +4,11 @@ prefix: TekkitRestrict
 version: 1.15
 
 permissions:
-    tekkitrestrict.admin:
+    tekkitrestrict.bypass.*:
         description: Allows access to TekkitRestrict Admin commands
         children:
             tekkitrestrict.safezone.bypass: true
             tekkitrestrict.creative.bypass: true
-            tekkitrestrict.openalc: true
             tekkitrestrict.dupe.bypass: true
             tekkitrestrict.noitem.bypass: true
             tekkitrestrict.limiter.bypass: true
@@ -29,6 +28,7 @@ permissions:
         description: removes item limiter.
     tekkitrestrict.openalc:
         description: adds the ability to use /alc [player] [bagcolor].
+        default: op
     tekkitrestrict.creative.*:
         description: Disables the use of certain defined items
     tekkitrestrict.creative.bypass:
@@ -59,9 +59,29 @@ permissions:
         children:
             tekkitrestrict.notify.hack: true
             tekkitrestrict.notify.dupe: true
+    tekkitrestrict.admin:
+        description: Allows someone to use /tr admin commands
+        default: op
+    tekkitrestrict.admin.reload:
+        description: Allows someone to use /tr reload
+        default: op
+        children:
+            tekkitrestrict.admin: true
+    tekkitrestrict.admin.threadlag:
+        description: Allows someone to use /tr threadlag
+        default: op
+        children:
+            tekkitrestrict.admin: true
+    tekkitrestrict.admin.reinit:
+        description: Allows someone to reload the server.
+        default: false
+        children:
+            tekkitrestrict.admin: true
     tekkitrestrict.admin.safezone:
         description: Grants the ability to use /tr admin safezone commands
         default: op
+        children:
+            tekkitrestrict.admin: true
     tekkitrestrict.admin.safezone.list:
         description: Enables someone to list safezones
         default: op
@@ -98,6 +118,29 @@ permissions:
         default: op
         children:
             tekkitrestrict.admin.safezone: true
+    tekkitrestrict.emc:
+        description: Allows the use of /tr emc
+        default: op
+    tekkitrestrict.emc.tempset:
+        description: Grants the power to set temporary emc values.
+        default: op
+        children:
+            tekkitrestrict.emc: true
+    tekkitrestrict.emc.lookup:
+        description: Grants the ability to lookup emc values
+        default: op
+        children:
+            tekkitrestrict.emc: true
+    tekkitrestrict.emc:
+        description: 
+        default: op
+        children:
+            tekkitrestrict.: true
+    tekkitrestrict.emc:
+        description: 
+        default: op
+        children:
+            tekkitrestrict.: true
 
 commands:
    tekkitrestrict:

@@ -39,7 +39,13 @@ public class TRSafeZone {
 	public String name;
 	public String world, data = "";
 	public boolean loadedFromSqlite = false;
-	/** 0 = NONE, 1 = WorldGuard, 2 = PStones, 3 = Factions, 4 = GriefPrevention */
+	/**
+	 * 0 = NONE<br>
+	 * 1 = WorldGuard<br>
+	 * 2 = PStones<br>
+	 * 3 = Factions<br>
+	 * 4 = GriefPrevention
+	 */
 	public int mode = 0;
 
 	public static List<TRSafeZone> zones = Collections.synchronizedList(new LinkedList<TRSafeZone>());
@@ -108,7 +114,35 @@ public class TRSafeZone {
 			}
 		}
 	}
-
+	public static boolean removeSafeZone(TRSafeZone zone){
+		if (zone.mode == 1){
+			return true;
+		}
+		
+		if (zone.mode == 4){
+			//IMPORTANT Potential problem when a claim gets resized.
+			PluginManager PM = Bukkit.getPluginManager();
+			if (!PM.isPluginEnabled("GriefPrevention") || !depends.contains("griefprevention")) return false;
+			if (zone.data == null) return false;
+			
+			String locStr[] = zone.data.split(",");
+			int x, y, z;
+			try {
+				x = Integer.parseInt(locStr[0]);
+				y = Integer.parseInt(locStr[1]);
+				z = Integer.parseInt(locStr[2]);
+			} catch (Exception ex){
+				return false;
+			}
+			Location loc = new Location(Bukkit.getWorld(zone.world), x, y, z);
+			GriefPrevention pl = (GriefPrevention) PM.getPlugin("GriefPrevention");
+			Claim claim = pl.dataStore.getClaimAt(loc, true, null);
+			if (claim == null) return true; //Already removed
+			return claim.managers.remove("[tekkitrestrict]");
+		}
+		
+		return false;
+	}
 	public static SafeZoneCreate addSafeZone(Player player, String pluginName, String name){
 		if (!tekkitrestrict.config.getBoolean("UseSafeZones")) return SafeZoneCreate.SafeZonesDisabled;
 		
@@ -137,6 +171,8 @@ public class TRSafeZone {
 			
 			TRSafeZone zone = new TRSafeZone();
 			zone.mode = 4;
+			Location loc = player.getLocation();
+			zone.data = loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ();
 			zone.name = name;
 			zone.world = player.getWorld().getName();
 			TRSafeZone.zones.add(zone);
