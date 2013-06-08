@@ -26,6 +26,7 @@ public class TRSQLDB {
 		}
 		dbCall dc = new dbCall();
 		dc.tocall = ins;
+		@SuppressWarnings({ "unused", "unchecked" })
 		Future<ResultSet> r = s.submit(dc);
 		return db.query(ins);
 	}
@@ -34,6 +35,7 @@ public class TRSQLDB {
 		db.open();
 	}
 	
+	@SuppressWarnings("rawtypes")
 	public class dbCall implements Callable {
 		/**
 		 * @return future called object.

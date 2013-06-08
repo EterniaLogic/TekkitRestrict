@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 /*
  * Both
  */
-
+@SuppressWarnings({"resource", "null"})
 public class SQLite extends Database {
 	public String location;
 	public String name;

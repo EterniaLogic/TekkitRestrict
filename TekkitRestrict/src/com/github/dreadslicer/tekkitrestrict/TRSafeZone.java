@@ -229,6 +229,7 @@ public class TRSafeZone {
 							p.getLocation(),
 							cb.getTypeId(),
 							com.palmergames.bukkit.towny.object.TownyPermission.ActionType.DESTROY);
+			@SuppressWarnings("unused")
 			TownBlockStatus tbs = com.palmergames.bukkit.towny.utils.PlayerCacheUtil.getTownBlockStatus(p, WorldCoord.parseWorldCoord(p.getLocation()));
 			//boolean ls = tbs != TownBlockStatus.UNCLAIMED_ZONE && tbs != TownBlockStatus.WARZONE && tbs != TownBlockStatus.UNKOWN;
 			if (!hasperm) {

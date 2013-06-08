@@ -15,6 +15,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Logger;
 
+@SuppressWarnings({"resource", "null"})
 public class MySQL extends Database {
 	private String hostname = "localhost";
 	private String portnmbr = "3306";

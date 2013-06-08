@@ -2,45 +2,24 @@ package com.github.dreadslicer.tekkitrestrict;
 
 import java.awt.EventQueue;
 
-import javax.swing.DefaultListModel;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
-import javax.swing.ListModel;
-
 import java.awt.BorderLayout;
 import javax.swing.JMenu;
 import javax.swing.JSplitPane;
-import javax.swing.JInternalFrame;
-import java.awt.GridLayout;
 import javax.swing.JPopupMenu;
 import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JButton;
-import javax.swing.SwingConstants;
 import javax.swing.JLabel;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
-import net.miginfocom.swing.MigLayout;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-
 import com.github.dreadslicer.tekkitrestrict.gui.GUIItemListPerm;
 import com.github.dreadslicer.tekkitrestrict.gui.GUIItemListPermLimit;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.factories.FormFactory;
-import com.jgoodies.forms.layout.RowSpec;
 import java.awt.FlowLayout;
-import javax.swing.JTree;
-import javax.swing.JScrollPane;
 import javax.swing.JCheckBox;
 import java.awt.Font;
 import javax.swing.BoxLayout;
-import javax.swing.border.TitledBorder;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JMenuItem;
@@ -49,18 +28,9 @@ import java.awt.Color;
 import java.awt.event.HierarchyBoundsAdapter;
 import java.awt.event.HierarchyEvent;
 import javax.swing.JMenuBar;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ChangeEvent;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.JList;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
-import javax.swing.AbstractListModel;
 import javax.swing.ListSelectionModel;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -103,6 +73,7 @@ public class TRConfigGUI {
 	private JTable table_3;
 	private JTable table_4;
 	private JTable table_5;
+	@SuppressWarnings("serial")
 	private void initialize() {
 		frmTekkitRestrictConfiguration = new JFrame();
 		frmTekkitRestrictConfiguration.setResizable(false);
@@ -387,9 +358,11 @@ public class TRConfigGUI {
 				"New column", "New column"
 			}
 		) {
+			@SuppressWarnings("rawtypes")
 			Class[] columnTypes = new Class[] {
 				String.class, Object.class
 			};
+			@SuppressWarnings({ "unchecked", "rawtypes" })
 			public Class getColumnClass(int columnIndex) {
 				return columnTypes[columnIndex];
 			}
@@ -925,6 +898,7 @@ public class TRConfigGUI {
 		
 	}
 
+	@SuppressWarnings("unused")
 	private static void addPopup(Component component, final JPopupMenu popup) {
 		component.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {

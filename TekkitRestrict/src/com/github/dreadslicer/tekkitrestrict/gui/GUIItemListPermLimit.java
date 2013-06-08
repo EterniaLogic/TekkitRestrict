@@ -1,8 +1,5 @@
 package com.github.dreadslicer.tekkitrestrict.gui;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -24,6 +21,7 @@ import java.awt.event.ActionEvent;
 import java.util.LinkedList;
 import java.util.List;
 
+@SuppressWarnings({"serial", "deprecation", "unchecked", "rawtypes", "cast"})
 public class GUIItemListPermLimit extends JDialog {
 
 	private JPanel contentPane;
@@ -129,7 +127,8 @@ public class GUIItemListPermLimit extends JDialog {
 		        //String msgString2 = "blah2";
 		        String s = (String)JOptionPane.showInputDialog("Item(s) - Ranges can be denoted by using a '-'");
 				
-		        ItemStack[] gg = TRNoItem.gettRangedItemValues(s);
+		        @SuppressWarnings("unused")
+				ItemStack[] gg = TRNoItem.gettRangedItemValues(s);
 				
 				DefaultListModel Jmodelx = ((DefaultListModel) ((ListModel)Ilist.getModel()));
 				Jmodelx.addElement(s);

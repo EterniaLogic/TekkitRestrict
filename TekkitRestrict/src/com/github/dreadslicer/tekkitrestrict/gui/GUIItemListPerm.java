@@ -1,8 +1,5 @@
 package com.github.dreadslicer.tekkitrestrict.gui;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -24,6 +21,7 @@ import java.awt.event.ActionEvent;
 import java.util.LinkedList;
 import java.util.List;
 
+@SuppressWarnings("serial")
 public class GUIItemListPerm extends JDialog {
 
 	private JPanel contentPane;
@@ -57,7 +55,9 @@ public class GUIItemListPerm extends JDialog {
 	public boolean resultready=false,done=false;
 	public Object waitobject = new Object();
 	private JTextField txtDefault;
+	@SuppressWarnings("rawtypes")
 	private JList Ilist;
+	@SuppressWarnings({"rawtypes", "cast", "unchecked", "deprecation"})
 	public void init() {
 		final GUIItemListPerm THIS = this;
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -126,7 +126,8 @@ public class GUIItemListPerm extends JDialog {
 		        //String msgString2 = "blah2";
 		        String s = (String)JOptionPane.showInputDialog("Item(s) - Ranges can be denoted by using a '-'");
 				
-		        ItemStack[] gg = TRNoItem.gettRangedItemValues(s);
+		        @SuppressWarnings("unused")
+				ItemStack[] gg = TRNoItem.gettRangedItemValues(s);
 				
 				DefaultListModel Jmodelx = ((DefaultListModel) ((ListModel)Ilist.getModel()));
 				Jmodelx.addElement(s);
@@ -150,6 +151,7 @@ public class GUIItemListPerm extends JDialog {
 		contentPane.add(btnRemove);
 	}
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void refElem(){
 		DefaultListModel dlm = (DefaultListModel)Ilist.getModel();
 		for(String a:this.resultTypes) dlm.addElement(a);
