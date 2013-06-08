@@ -111,7 +111,7 @@ private static boolean disabled = false;
 		if (c(b, " disconnected: ") || c(b, " lost connection for an unknown reason.") || c(b, "logged in with")
 		 || c(b, "joined with: [") || c(b, "sending serverside check to"))
 			login.log(a);
-		else if (c(b, "player_command") || record.getLevel() == Level.parse("PLAYER_COMMAND")) {
+		else if (c(b, "player_command") || record.getLevel() == Level.parse("Command")) {
 			command.log(a);
 			if (c(b, "/i ") || c(b, "/give "))
 				spawnitem.log(a);

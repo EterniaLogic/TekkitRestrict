@@ -368,7 +368,7 @@ public class TRListener implements Listener {
 			
 			//EntityPlayer ep = ((CraftPlayer) player).getHandle();
 			//if (ep.abilities.canInstantlyBuild) {
-			TRLimitedCreative.handleCreativeInvClick(event);
+			//TRLimitedCreative.handleCreativeInvClick(event);
 			//}
 		} catch (Exception ex) {
 			TRLogger.Log("debug", "Error! [handleCreativeInv Listener] : " + ex.getMessage());
