@@ -24,16 +24,12 @@ public class TRRecipeBlock {
 				try {
 					blockRecipeVanilla(ir.id, ir.getData());
 				} catch (Exception e) {
-					TRLogger.Log(
-							"debug",
-							"Error! [TRRecipe-RecipeBlockVanilla] "
-									+ e.getMessage());
+					TRLogger.Log("debug", "Error! [TRRecipe-RecipeBlockVanilla] " + e.getMessage());
 				}
 				try {
 					blockRecipeForge(ir.id, ir.getData());
 				} catch (Exception e) {
-					TRLogger.Log("debug", "Error! [TRRecipe-RecipeBlockForge] "
-							+ e.getMessage());
+					TRLogger.Log("debug", "Error! [TRRecipe-RecipeBlockForge] " + e.getMessage());
 				}
 			}
 		}
@@ -45,8 +41,7 @@ public class TRRecipeBlock {
 				try {
 					blockFurnaceRecipe(ir.id, ir.getData());
 				} catch (Exception e) {
-					TRLogger.Log("debug", "Error! [TRRecipe-Furnace Block] "
-							+ e.getMessage());
+					TRLogger.Log("debug", "Error! [TRRecipe-Furnace Block] " + e.getMessage());
 				}
 			}
 		}

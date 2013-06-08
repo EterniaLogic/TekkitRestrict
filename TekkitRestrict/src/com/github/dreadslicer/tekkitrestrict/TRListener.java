@@ -8,6 +8,8 @@ import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.TileEntity;
 import net.minecraft.server.WorldServer;
 
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.CraftWorld;
@@ -191,9 +193,9 @@ public class TRListener implements Listener {
 				}
 			}
 			com.github.dreadslicer.tekkitrestrict.ItemStack cc = new com.github.dreadslicer.tekkitrestrict.ItemStack(id, 0, data);
-			if (TRNoItem.isItemBanned(e.getPlayer(), cc)) {
+			if (TRNoItem.isItemBanned(player, cc)) {
 				// tekkitrestrict.log.info(cc.id+":"+cc.getData());
-				e.getPlayer().sendMessage("[TRItemDisabler] You cannot place down this type of block!");
+				player.sendMessage("[TRItemDisabler] You cannot place down this type of block!");
 				e.setCancelled(true);
 				if (te1 instanceof TileCovered) {
 					TileCovered tc = (TileCovered) te1;
@@ -248,46 +250,46 @@ public class TRListener implements Listener {
 		
 		// determine if this is Buildcraft or RedPower... Then exempt.
 		String pname = player.getName().toLowerCase();
-		if (!pname.equals("[buildcraft]") && !pname.equals("[redpower]")) {
-			// lets do this based on a white-listed approach.
-			// First, lets loop through the DisableClick list to stop
-			// clicks.
-			// Perf: 8x
-			try {
-				TRNoClick.compareAll(e);
-			} catch (Exception ex) {
-				TRLogger.Log("debug", "Error: [ListenInteract TRNoClick] " + ex.getMessage());
-			}
+		if (pname.equals("[buildcraft]") || pname.equals("[redpower]")) return;
+		// lets do this based on a white-listed approach.
+		// First, lets loop through the DisableClick list to stop clicks.
+		// Perf: 8x
+		try {
+			TRNoClick.compareAll(e);
+		} catch (Exception ex) {
+			TRLogger.Log("debug", "Error: [ListenInteract TRNoClick] " + ex.getMessage());
+		}
+		
+		try {
+			TRNoDupeProjectTable.checkTable(e);
+		} catch(Exception ex){}
+
+		try {
+			// if(e.getAction() == Action.RIGHT_CLICK_BLOCK ||
+			// e.getAction() == Action.RIGHT_CLICK_AIR){
+
 			
-			try {
-				TRNoDupeProjectTable.checkTable(e);
-			} catch(Exception ex){}
-
-			try {
-				// if(e.getAction() == Action.RIGHT_CLICK_BLOCK ||
-				// e.getAction() == Action.RIGHT_CLICK_AIR){
-
-				
-				EntityPlayer ep = ((CraftPlayer) player).getHandle();
-				if (ep.abilities.canInstantlyBuild) {
-					org.bukkit.inventory.ItemStack str = player.getItemInHand();
-					if (str != null) {
-						com.github.dreadslicer.tekkitrestrict.ItemStack ee = new com.github.dreadslicer.tekkitrestrict.ItemStack(
-								str.getTypeId(), str.getAmount(), str.getData().getData());
-						if (TRNoItem.isCreativeItemBanned(player, ee)) {
-							player.sendMessage("[TRLimitedCreative] You may not interact with this item.");
-							e.setCancelled(true);
-							player.setItemInHand(null);
-						}
+			//EntityPlayer ep = ((CraftPlayer) player).getHandle();
+			//if (ep.abilities.canInstantlyBuild) {
+			if (player.getGameMode() == GameMode.CREATIVE) {
+				org.bukkit.inventory.ItemStack str = player.getItemInHand();
+				if (str != null) {
+					com.github.dreadslicer.tekkitrestrict.ItemStack ee = new com.github.dreadslicer.tekkitrestrict.ItemStack(
+							str.getTypeId(), str.getAmount(), str.getData().getData());
+					if (TRNoItem.isCreativeItemBanned(player, ee)) {
+						player.sendMessage(ChatColor.RED + "[TRLimitedCreative] You may not interact with this item.");
+						e.setCancelled(true);
+						player.setItemInHand(null);
 					}
 				}
-				// }
-			} catch (Exception ex) {
-				TRLogger.Log("debug", "Error: [ListenInteract TRLimitedCreative] " + ex.getMessage());
 			}
-
-			if (!e.isCancelled()) itemLogUse(e);
+			// }
+		} catch (Exception ex) {
+			TRLogger.Log("debug", "Error: [ListenInteract TRLimitedCreative] " + ex.getMessage());
 		}
+
+		if (!e.isCancelled()) itemLogUse(e);
+		
 	}
 
 	private void itemLogUse(PlayerInteractEvent e) {
@@ -358,15 +360,16 @@ public class TRListener implements Listener {
 	// /////////// START INVClicks/////////////
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void eventInventoryClick(InventoryClickEvent event) {
-		// we want to stop non-players from being activated here.
-		
 		if (event.getWhoClicked() == null) return;
 		try {
 			Player player = (Player) event.getWhoClicked();
-			EntityPlayer ep = ((CraftPlayer) player).getHandle();
-			if (ep.abilities.canInstantlyBuild) {
+			if (player.getGameMode() == GameMode.CREATIVE)
 				TRLimitedCreative.handleCreativeInvClick(event);
-			}
+			
+			//EntityPlayer ep = ((CraftPlayer) player).getHandle();
+			//if (ep.abilities.canInstantlyBuild) {
+			TRLimitedCreative.handleCreativeInvClick(event);
+			//}
 		} catch (Exception ex) {
 			TRLogger.Log("debug", "Error! [handleCreativeInv Listener] : " + ex.getMessage());
 			Log.Exception(ex);
@@ -431,9 +434,6 @@ public class TRListener implements Listener {
 			if (tekkitrestrict.config.getBoolean("UseItemLimiter") && tekkitrestrict.config.getBoolean("UseItemLimiter")) {
 				TRLimitBlock.removeExpire(player.getName());
 				TRLimitBlock.getLimiter(player);
-			}
-			if (TRNoDupe.lastPlayer.equals(player.getName())) {
-				TRNoDupe.lastPlayer = "";
 			}
 		} catch(Exception e1){}
 		

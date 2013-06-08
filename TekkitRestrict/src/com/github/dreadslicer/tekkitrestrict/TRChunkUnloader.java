@@ -12,23 +12,16 @@ import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.CraftChunk;
 
+import com.github.dreadslicer.tekkitrestrict.TRConfigCache.ChunkUnloader;
+
 public class TRChunkUnloader {
-	private static int maxChunks = 2000, maxRadii = 256;
-	private static boolean enabled = false;
-
-	public static void reload() {
-		maxChunks = tekkitrestrict.config.getInt("MaxChunks");
-		maxRadii = tekkitrestrict.config.getInt("MaxRadii");
-		enabled = tekkitrestrict.config.getBoolean("UseChunkUnloader");
-	}
-
 	public static void unloadSChunks() {
-		if (!enabled) return;
+		if (!ChunkUnloader.enabled) return;
 		try {
 			// TRChunkRunner cr = new TRChunkRunner();
 			
 			int tot = getTotalChunks();
-			if (tot < maxChunks) return; //If the max chunk amount isn't reached, do nothing.
+			if (tot < ChunkUnloader.maxChunks) return; //If the max chunk amount isn't reached, do nothing.
 			
 			List<World> worlds = tekkitrestrict.getInstance().getServer().getWorlds();
 			
@@ -48,8 +41,8 @@ public class TRChunkUnloader {
 					net.minecraft.server.Chunk mcChunk = ((CraftChunk) chunk).getHandle();
 
 					// Check for maximum chunks.
-					if (!isChunkInUse(ws, chunk.getX(), chunk.getZ(), maxRadii)) {
-						if (tot > maxChunks) {
+					if (!isChunkInUse(ws, chunk.getX(), chunk.getZ(), ChunkUnloader.maxRadii)) {
+						if (tot > ChunkUnloader.maxChunks) {
 							// cr.chunks.add(new Object[]{ccc,ws});
 							// wo.unloadChunk(x, z, true, false);
 							// WorldServer world =
@@ -95,9 +88,7 @@ public class TRChunkUnloader {
 		return r;
 	}
 
-	/**
-	 * @return If there are currently players near that chunk.
-	 */
+	/** @return If there are currently players near that chunk. */
 	private static boolean isChunkInUse(WorldServer world, int x, int z, int dist) {
 		// Get All players
 		List<World> worlds = tekkitrestrict.getInstance().getServer().getWorlds();

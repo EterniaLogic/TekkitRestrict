@@ -1,94 +1,56 @@
 package com.github.dreadslicer.tekkitrestrict;
 
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 
 public class TRNoDupe {
-	@SuppressWarnings("unused")
-	private static boolean preventAlcDupe, preventRMDupe, preventTransmuteDupe,
-			preventTankCartDupe, preventTankCartGlitch;
+	//public static String lastPlayer = "";
 
-	public static String lastPlayer = "";
-
-	public static void reload() {
-		preventAlcDupe = tekkitrestrict.config.getBoolean("PreventAlcDupe");
-		preventRMDupe = tekkitrestrict.config.getBoolean("PreventRMFurnaceDupe");
-		preventTransmuteDupe = tekkitrestrict.config.getBoolean("PreventTransmuteDupe");
-		preventTankCartDupe = tekkitrestrict.config.getBoolean("PreventTankCartDupe");
-		preventTankCartGlitch = tekkitrestrict.config.getBoolean("PreventTankCartGlitch");
-	}
-
-	public static void handleDupes(InventoryClickEvent event) {
-		// event.getInventory();
+	/*
+	private static void handleDupes(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
 		int slot = event.getSlot();
 
 		String title = event.getView().getTopInventory().getTitle().toLowerCase();
 		
-		
-		//tekkitrestrict.log.info("t0-"+title+"-"+slot+"-"+event.isShiftClick());
 		// RMDupe Slot35
 		if (!Util.hasBypass(player, "dupe")) {
-			// tekkitrestrict.log.info("t0-"+title+"-");
 			if (title.equals("rm furnace")) {
-				// tekkitrestrict.log.info("t1");
-				if (slot == 35) {
-					// tekkitrestrict.log.info("t2");
-					if (event.isShiftClick()) {
-						// tekkitrestrict.log.info("t3");
-						if (preventRMDupe) {
-							event.setCancelled(true);
-							player.sendMessage("[TRDupe] you are not allowed to Shift+Click here while using a RM Furnace!");
+				if (slot == 35 && event.isShiftClick()) {
+					if (preventRMDupe) {
+						event.setCancelled(true);
+						player.sendMessage("[TRDupe] you are not allowed to Shift+Click here while using a RM Furnace!");
 
-							TRLogger.Log("Dupe", player.getName()
-									+ " attempted to dupe using a RM Furnace!");
-						} else {
-							TRLogger.Log("Dupe", player.getName()
-									+ " duped using a RM Furnace!");
-						}
-						TRLogger.broadcastDupe(player.getName(),
-								"the RM Furnace", "RMFurnace");
+						TRLogger.Log("Dupe", player.getName() + " attempted to dupe using a RM Furnace!");
+					} else {
+						TRLogger.Log("Dupe", player.getName() + " duped using a RM Furnace!");
 					}
+					TRLogger.broadcastDupe(player.getName(), "the RM Furnace", "RMFurnace");	
 				}
 			} else if (title.equals("tank cart")) {
-				// tekkitrestrict.log.info("t1");
-				if (slot == 35) {
-					// tekkitrestrict.log.info("t2");
-					if (event.isShiftClick()) {
-						if (preventTankCartDupe){
-							event.setCancelled(true);
-							player.sendMessage("[TRDupe] you are not allowed to Shift+Click here while using a Tank Cart!");
+				if (slot == 35 && event.isShiftClick()) {
+					if (preventTankCartDupe){
+						event.setCancelled(true);
+						player.sendMessage("[TRDupe] you are not allowed to Shift+Click here while using a Tank Cart!");
 
-							TRLogger.Log("Dupe", player.getName()
-								+ " attempted to dupe using a Tank Cart!");
-							TRLogger.broadcastDupe(player.getName(),
-								"the Tank Cart", "TankCart");
-						}
+						TRLogger.Log("Dupe", player.getName() + " attempted to dupe using a Tank Cart!");
+						TRLogger.broadcastDupe(player.getName(), "the Tank Cart", "TankCart");
 					}
-				} else if (slot <= 8){
-					if (event.isShiftClick()) {
-						if (preventTankCartGlitch){
-							event.setCancelled(true);
-							player.sendRawMessage("[TR] you are not allowed to Shift+Click here while using a Tank Cart!");
-						}
+				} else if (slot <= 8 && event.isShiftClick()) {
+					if (preventTankCartGlitch){
+						event.setCancelled(true);
+						player.sendMessage("[TR] you are not allowed to Shift+Click here while using a Tank Cart!");
 					}
 				}
 			} else if (title.equals("trans tablet")) {
 				// slots-6 7 5 3 1 0 2
 				int item = event.getCurrentItem().getTypeId();
-				if (item == 27557) {
-				}
-				if (item == 27558) {
-				}
-				if (item == 27559) {
-				}
-				if (item == 27560) {
-				}
-				if (item == 27561) {
-				}
-				if (item == 27591) {
-				}
+				if (item == 27557) {}
+				if (item == 27558) {}
+				if (item == 27559) {}
+				if (item == 27560) {}
+				if (item == 27561) {}
+				if (item == 27591) {}
 				if (event.isShiftClick()) {
 					// if (isKlein) {
 					boolean isslot = slot == 0 || slot == 1 || slot == 2
@@ -97,43 +59,33 @@ public class TRNoDupe {
 					if (isslot) {
 						if (preventTransmuteDupe) {
 							event.setCancelled(true);
-							player.sendRawMessage("[TRDupe] you are not allowed to Shift+Click any ");
-							player.sendRawMessage("           item out of the transmutation table!");
+							player.sendMessage("[TRDupe] you are not allowed to Shift+Click any ");
+							player.sendMessage("           item out of the transmutation table!");
 
-							TRLogger.Log("Dupe", player.getName()
-									+ " attempted to transmute dupe!");
+							TRLogger.Log("Dupe", player.getName() + " attempted to transmute dupe!");
 						} else {
-							TRLogger.Log("Dupe", player.getName()
-									+ " attempted to transmute dupe!");
+							TRLogger.Log("Dupe", player.getName() + " attempted to transmute dupe!");
 						}
-						TRLogger.broadcastDupe(player.getName(),
-								"the Transmutation Table", "transmute");
+						TRLogger.broadcastDupe(player.getName(), "the Transmutation Table", "transmute");
 					}
-					// }
 				}
 			}
 		}
-	}
+	}*/
 
-	public static void handleDropDupes(PlayerDropItemEvent e) {
-		Player player = e.getPlayer();
+	public static void handleDropDupes(PlayerDropItemEvent event) {
+		Player player = event.getPlayer();
 		TRNoDupe_BagCache cache;
 		if ((cache = TRNoDupe_BagCache.check(player)) != null) {
 			if (cache.hasBHBInBag) {
 				try {
 					TRNoDupe_BagCache.expire(cache);
-					e.setCancelled(true);
-					player.kickPlayer("[TRDupe] you have a Black Hole Band in your ["
-							+ cache.inBagColor
-							+ "] Alchemy Bag! Please remove it NOW!");
+					event.setCancelled(true);
+					player.kickPlayer("[TRDupe] you have a Black Hole Band in your [" + cache.inBagColor + "] Alchemy Bag! Please remove it NOW!");
 
 					
-					TRLogger.Log("Dupe", player.getName() + " ["
-							+ cache.inBagColor
-							+ " bag] attempted to dupe with the "
-							+ cache.dupeItem + "!");
-					TRLogger.broadcastDupe(player.getName(),
-							"the Alchemy Bag and " + cache.dupeItem, "alc");
+					TRLogger.Log("Dupe", player.getName() + " [" + cache.inBagColor + " bag] attempted to dupe with the " + cache.dupeItem + "!");
+					TRLogger.broadcastDupe(player.getName(), "the Alchemy Bag and " + cache.dupeItem, "alc");
 				} catch (Exception err) {
 				}
 			}

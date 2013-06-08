@@ -20,6 +20,7 @@ import net.minecraft.server.RedPowerLogic;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.github.dreadslicer.tekkitrestrict.TRConfigCache.ChunkUnloader;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Dupes;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Global;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Hacks;
@@ -290,6 +291,7 @@ public class tekkitrestrict extends JavaPlugin {
 		Global.debug = config.getBoolean("ShowDebugMessages", false);
 		Global.kickFromConsole = config.getBoolean("KickFromConsole", false);
 		Listeners.UseBlockLimit = config.getBoolean("UseItemLimiter", true);
+		Listeners.BlockCreativeContainer = config.getBoolean("LimitedCreativeNoContainer", true);
 		
 		TRConfigCache.LogFilter.replaceList = config.getStringList("LogFilter");
 		TRConfigCache.LogFilter.logConsole = config.getBoolean("LogConsole", true);
@@ -312,11 +314,18 @@ public class tekkitrestrict extends JavaPlugin {
 		Threads.UseRPTimer = config.getBoolean("UseAutoRPTimer", false);
 		Threads.ChangeDisabledItemsIntoId = config.getInt("ChangeDisabledItemsIntoId", 3);
 		Threads.RPTickTime = (int) Math.round(config.getDouble("RPTimerMin", 0.2) * 20);
+		
 		List<String> lwcprevent = config.getStringList("LWCPreventNearLocked");
 		if (lwcprevent == null) LWC.blocked = Collections.synchronizedList(new LinkedList<String>());
 		else LWC.blocked = Collections.synchronizedList(lwcprevent);
 		
 		SafeZones.allowNormalUser = config.getBoolean("SSAllowNormalUserToHaveSafeZones", true);
+		SafeZones.SSPlugins = config.getStringList("SSEnabledPlugins");
+		SafeZones.SSDisableFly = config.getBoolean("SSDisableFlying", false);
+		
+		ChunkUnloader.enabled = config.getBoolean("UseChunkUnloader", false);
+		ChunkUnloader.maxChunks = config.getInt("MaxChunks", 3000);
+		ChunkUnloader.maxRadii = config.getInt("MaxRadii", 256);
 	}
 
 	private static void initHeartBeat() {
@@ -452,18 +461,13 @@ public class tekkitrestrict extends JavaPlugin {
 		TRNoItem.clear(); //TRNI
 		TRCacheItem.reload();
 		TRNoItem.reload(); //TRNI2
-		TRChunkUnloader.reload();
 		TRThread.reload(); // branches out
 		TRListener.reload();
 		TRLimitBlock.reload();
 		TRLogger.reload();
-		TRPerformance.reload();
 		TRRecipeBlock.reload();
 		TRNoHack.reload();
 		TRLimitFly.reload();
-		TRNoDupe.reload(); // branches out
-		TRSafeZone.reload();
-		TRLimitedCreative.reload();
 		TREMCSet.reload();
 		log.info("TekkitRestrict Reloaded!");
 	}

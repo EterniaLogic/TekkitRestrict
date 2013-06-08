@@ -13,6 +13,7 @@ import net.sacredlabyrinth.Phaed.PreciousStones.FieldFlag;
 import net.sacredlabyrinth.Phaed.PreciousStones.vectors.Field;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -49,13 +50,6 @@ public class TRSafeZone {
 	public int mode = 0;
 
 	public static List<TRSafeZone> zones = Collections.synchronizedList(new LinkedList<TRSafeZone>());
-	private static List<String> depends;
-	private static boolean SSDisableFly;
-
-	public static void reload() {
-		depends = tekkitrestrict.config.getStringList("SSEnabledPlugins");
-		SSDisableFly = tekkitrestrict.config.getBoolean("SSDisableFlying");
-	}
 
 	public static void init() {
 		ResultSet rs = null;
@@ -122,7 +116,7 @@ public class TRSafeZone {
 		if (zone.mode == 4){
 			//IMPORTANT Potential problem when a claim gets resized.
 			PluginManager PM = Bukkit.getPluginManager();
-			if (!PM.isPluginEnabled("GriefPrevention") || !depends.contains("griefprevention")) return false;
+			if (!PM.isPluginEnabled("GriefPrevention") || !SafeZones.SSPlugins.contains("griefprevention")) return false;
 			if (zone.data == null) return false;
 			
 			String locStr[] = zone.data.split(",");
@@ -159,7 +153,7 @@ public class TRSafeZone {
 		pluginName = pluginName.toLowerCase();
 		PluginManager PM = Bukkit.getPluginManager();
 		
-		if (pluginName.equals("griefprevention") && PM.isPluginEnabled("GriefPrevention") && depends.contains("griefprevention")) {
+		if (pluginName.equals("griefprevention") && PM.isPluginEnabled("GriefPrevention") && SafeZones.SSPlugins.contains("griefprevention")) {
 			GriefPrevention pl = (GriefPrevention) PM.getPlugin("GriefPrevention");
 			Claim claim = pl.dataStore.getClaimAt(player.getLocation(), false, null);
 			if (claim == null){
@@ -179,7 +173,7 @@ public class TRSafeZone {
 			TRSafeZone.save();
 			return SafeZoneCreate.Success;
 			
-		} else if (pluginName.equals("WorldGuard") && PM.isPluginEnabled("WorldGuard") && depends.contains("worldguard")) {
+		} else if (pluginName.equals("WorldGuard") && PM.isPluginEnabled("WorldGuard") && SafeZones.SSPlugins.contains("worldguard")) {
 			try {
 				WorldGuardPlugin wg = (WorldGuardPlugin) PM.getPlugin("WorldGuard");
 				Map<String, ProtectedRegion> rm = wg.getRegionManager(player.getWorld()).getRegions();
@@ -216,7 +210,7 @@ public class TRSafeZone {
 		if (Util.hasBypass(p, "safezone")) return "";
 		
 		PluginManager PM = tekkitrestrict.getInstance().getServer().getPluginManager();
-		if (PM.isPluginEnabled("Towny") && depends.contains("towny")) {
+		if (PM.isPluginEnabled("Towny") && SafeZones.SSPlugins.contains("towny")) {
 			/*
 			 * com.palmergames.bukkit.towny.Towny tapp =
 			 * (com.palmergames.bukkit
@@ -243,7 +237,7 @@ public class TRSafeZone {
 			}
 		}
 		// tekkitrestrict.log.info("deb");
-		if (PM.isPluginEnabled("Factions") && depends.contains("factions")) {
+		if (PM.isPluginEnabled("Factions") && SafeZones.SSPlugins.contains("factions")) {
 			// if(!com.massivecraft.factions.listeners.FactionsPlayerListener.canPlayerUseBlock(p,
 			// p.getWorld().getHighestBlockAt(p.getLocation()), true)){
 			// Location cccc =
@@ -272,7 +266,7 @@ public class TRSafeZone {
 			}
 		}
 
-		if (PM.isPluginEnabled("PreciousStones") && depends.contains("preciousstones")) {
+		if (PM.isPluginEnabled("PreciousStones") && SafeZones.SSPlugins.contains("preciousstones")) {
 			net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones ps = (net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones) PM.getPlugin("PreciousStones");
 			Block fblock = p.getWorld().getBlockAt(p.getLocation());
 			
@@ -291,7 +285,7 @@ public class TRSafeZone {
 			}
 		}
 
-		if (PM.isPluginEnabled("GriefPrevention") && depends.contains("griefprevention")) {
+		if (PM.isPluginEnabled("GriefPrevention") && SafeZones.SSPlugins.contains("griefprevention")) {
 			GriefPrevention pl = (GriefPrevention) PM.getPlugin("GriefPrevention");
 			Claim claim = pl.dataStore.getClaimAt(p.getLocation(), false, null);
 			if (claim != null) {
@@ -360,12 +354,12 @@ public class TRSafeZone {
 	}
 
 	public static void setFly(PlayerMoveEvent e) {
-		if (SSDisableFly) {
+		if (SafeZones.SSDisableFly) {
 			Player player = e.getPlayer();
 			if (inSafeZone(player)) {
 				// ground player
 				TRNoHack.groundPlayer(player);
-				player.sendMessage("[TRSafeZone] You may not fly in safezones!");
+				player.sendMessage(ChatColor.RED + "[TRSafeZone] You may not fly in safezones!");
 			}
 		}
 	}

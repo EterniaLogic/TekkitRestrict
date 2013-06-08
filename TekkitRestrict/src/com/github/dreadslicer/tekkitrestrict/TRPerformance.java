@@ -13,10 +13,10 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 public class TRPerformance {
-	public static void reload() {
-		ServerThreads = tekkitrestrict.config.getInt("ServerThreads");
-		MaxTicks = tekkitrestrict.config.getInt("MaxTicks");
-	}
+	//public static void reload() {
+	//	ServerThreads = tekkitrestrict.config.getInt("ServerThreads");
+	//	MaxTicks = tekkitrestrict.config.getInt("MaxTicks");
+	//}
 
 	public static void getThreadLag(CommandSender sender) {
 		// java.lang.management.ThreadInfo ti = new ThreadInfo(null, 0, ti,
@@ -106,13 +106,13 @@ public class TRPerformance {
 		}
 	}
 
-	public static double getThreadTimeRatio() {
-		return new Double(MaxTicks) / new Double(ServerThreads);
-	}
+	//public static double getThreadTimeRatio() {
+	//	return new Double(MaxTicks) / new Double(ServerThreads);
+	//}
 
-	public static int ServerThreads, MaxTicks;
-	public static int x, z;
-	public static net.minecraft.server.Chunk chunk;
-	public static net.minecraft.server.WorldServer wo;
-	public static boolean didInit = false;
+	//public static int ServerThreads, MaxTicks;
+	//public static int x, z;
+	//public static net.minecraft.server.Chunk chunk;
+	//public static net.minecraft.server.WorldServer wo;
+	//public static boolean didInit = false;
 }
