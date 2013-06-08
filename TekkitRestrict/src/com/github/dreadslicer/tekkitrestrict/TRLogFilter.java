@@ -36,19 +36,19 @@ private static boolean disabled = false;
 	public static void disable(){
 		disabled = true;
 		essentials = null;
-		chat.close();
+		//chat.close();
 		chat = null;
-		login.close();
+		//login.close();
 		login = null;
-		command.close();
+		//command.close();
 		command = null;
-		info.close();
+		//info.close();
 		info = null;
-		spawnitem.close();
+		//spawnitem.close();
 		spawnitem = null;
-		privatechat.close();
+		//privatechat.close();
 		privatechat = null;
-		banskicks.close();
+		//banskicks.close();
 		banskicks = null;
 	}
 	
