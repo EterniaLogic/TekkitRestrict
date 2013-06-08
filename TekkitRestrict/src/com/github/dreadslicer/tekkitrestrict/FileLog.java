@@ -17,10 +17,53 @@ public class FileLog {
 	private int day = 0;
 	private int counter = 0;
 	private static HashMap<String, FileLog> Logs = new HashMap<String, FileLog>();
+	private boolean alternate;
 	
+	@SuppressWarnings("deprecation")
+	public FileLog(String type, boolean alternate){
+		this.alternate = alternate;
+		String sep = File.separator;
+		if (type == null) type = "null";
+		this.type = type;
+		Date curdate = new Date(System.currentTimeMillis());
+		this.day = curdate.getDay();
+		DateFormat formatter = new SimpleDateFormat("dd-MM-yy");
+		this.date = formatter.format(curdate);
+		
+		File log;
+		File folder;
+		if (!alternate){
+			log = new File("."+sep+TRConfigCache.LogFilter.logLocation+sep+type+sep+date+".log");
+			folder = new File("."+sep+TRConfigCache.LogFilter.logLocation+sep+type+sep);
+		} else {
+			log = new File("plugins"+sep+"tekkitrestrict"+sep+"log"+sep+type+sep+date+".log");
+			folder = new File("plugins"+sep+"tekkitrestrict"+sep+"log"+sep+type+sep);
+		}
+
+		if (!folder.exists()) folder.mkdirs();
+		
+		if (!log.exists()){
+			try {
+				log.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		try {
+			//out = new BufferedWriter(new FileWriter(log,true));
+			out = new BufferedWriter(new FileWriter(log, true));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		Logs.put(type, this);
+	}
 	
 	@SuppressWarnings("deprecation")
 	public FileLog(String type){
+		this.alternate = false;
 		String sep = File.separator;
 		if (type == null) type = "null";
 		this.type = type;
@@ -31,7 +74,7 @@ public class FileLog {
 		
 		File log = new File("."+sep+TRConfigCache.LogFilter.logLocation+sep+type+sep+date+".log");
 		File folder = new File("."+sep+TRConfigCache.LogFilter.logLocation+sep+type+sep);
-		if (!folder.exists()) folder.mkdir();
+		if (!folder.exists()) folder.mkdirs();
 		
 		if (!log.exists()){
 			try {
@@ -60,6 +103,13 @@ public class FileLog {
 		FileLog tbr = Logs.get(type);
 		if (type == null) type = "null";
 		if (tbr == null) return new FileLog(type);
+		return tbr;
+	}
+	
+	public static FileLog getLogOrMake(String type, boolean alternate){
+		FileLog tbr = Logs.get(type);
+		if (type == null) type = "null";
+		if (tbr == null) return new FileLog(type, alternate);
 		return tbr;
 	}
 	
@@ -101,6 +151,14 @@ public class FileLog {
 		return true;
 	}
 	
+	public static void closeAll(){
+		for (FileLog filelog : Logs.values()){
+			if (!filelog.close()){
+				tekkitrestrict.log.warning("Unable to close all logs. Some might not save properly.");
+			}
+		}
+	}
+	
 	@SuppressWarnings("deprecation")
 	public void changeDate(){
 		Date curdate = new Date(System.currentTimeMillis());
@@ -116,8 +174,16 @@ public class FileLog {
 		DateFormat formatter = new SimpleDateFormat("dd-MM-yy");
 		this.date = formatter.format(curdate);
 		
-		File log = new File("."+sep+TRConfigCache.LogFilter.logLocation+sep+type+sep+date+".log");
-		File folder = new File("."+sep+TRConfigCache.LogFilter.logLocation+sep+type+sep);
+		File log;
+		File folder;
+		if (!alternate){
+			log = new File("."+sep+TRConfigCache.LogFilter.logLocation+sep+type+sep+date+".log");
+			folder = new File("."+sep+TRConfigCache.LogFilter.logLocation+sep+type+sep);
+		} else {
+			log = new File("plugins"+sep+"tekkitrestrict"+sep+"log"+sep+type+sep+date+".log");
+			folder = new File("plugins"+sep+"tekkitrestrict"+sep+"log"+sep+type+sep);
+		}
+		
 		if (!folder.exists()){
 			folder.mkdir();
 		}

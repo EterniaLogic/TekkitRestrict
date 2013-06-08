@@ -81,12 +81,10 @@ public class TRNoDupe {
 				try {
 					TRNoDupe_BagCache.expire(cache);
 					event.setCancelled(true);
-					player.kickPlayer("[TRDupe] you have a Black Hole Band in your [" + cache.inBagColor + "] Alchemy Bag! Please remove it NOW!");
+					player.kickPlayer("[TRDupe] you have a " + cache.dupeItem + " in your [" + cache.inBagColor + "] Alchemy Bag!");
 
-					
-					TRLogger.Log("Dupe", player.getName() + " [" + cache.inBagColor + " bag] attempted to dupe with the " + cache.dupeItem + "!");
-					TRLogger.broadcastDupe(player.getName(), "the Alchemy Bag and " + cache.dupeItem, "alc");
-				} catch (Exception err) {
+					Log.Dupe("a " + cache.inBagColor + " Alchemy Bag and a " + cache.dupeItem, "alc", player.getName());
+				} catch (Exception ex) {
 				}
 			}
 		}

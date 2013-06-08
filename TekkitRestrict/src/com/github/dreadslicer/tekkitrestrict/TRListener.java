@@ -463,19 +463,15 @@ public class TRListener implements Listener {
 
 				// if(showDupesOnConsole)
 				// tekkitrestrict.log.info(player.getName()+" ["+cache.inBagColor+" bag] attempted to dupe with the "+cache.dupeItem+"!");
-				// TRLogger.Log("Dupe",
-				// player.getName()+" ["+cache.inBagColor+" bag] attempted to dupe with the "+cache.dupeItem+"!");
-				// TRLogger.broadcastDupe(player.getName(),
-				// "the Alchemy Bag and "+cache.dupeItem);
+				// TRLogger.Log("Dupe", player.getName()+" ["+cache.inBagColor+" bag] attempted to dupe with the "+cache.dupeItem+"!");
+				// TRLogger.broadcastDupe(player.getName(), "the Alchemy Bag and "+cache.dupeItem);
 
 				Integer tick = PickupTick.get(player);
 				if (tick != null) {
 					if (tick >= 40) {
-						TRLogger.Log("Dupe", player.getName() + " [" + cache.inBagColor + " bag] attempted to pick up (dupe) with the "
-								+ cache.dupeItem + "!");
 						// player.sendMessage("You may not pick that up while a "+cache.dupeItem+" is in your ["+cache.inBagColor+" bag]");
 						player.kickPlayer("[TRDupe] A " + cache.dupeItem + " has been removed from your [" + cache.inBagColor + "] Alchemy Bag!");
-						TRLogger.broadcastDupe(player.getName(), "the Alchemy Bag and " + cache.dupeItem, "alc");
+						Log.Dupe("a "+ cache.inBagColor + " Alchemy Bag and " + cache.dupeItem, "alc", player.getName());
 
 						// remove the BHB / Void ring!!!
 						cache.removeAlc();

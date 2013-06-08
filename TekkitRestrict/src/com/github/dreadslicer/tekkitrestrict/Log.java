@@ -20,8 +20,8 @@ public class Log {
 		new CustomLevel("Notice", 801);
 		new CustomLevel("Command", 802);
 		new CustomLevel("Debug", 803);
-		new CustomLevel("TEDupe", 804);
-		new CustomLevel("TEHack", 805);
+		new CustomLevel("TRDupe", 804);
+		new CustomLevel("TRHack", 805);
 	}
 	static void deinit(){
 		McLogger = null;
@@ -139,9 +139,9 @@ public class Log {
 		str = str.replace("&d", ChatColor.LIGHT_PURPLE + "");
 		str = str.replace("&e", ChatColor.YELLOW + "");
 		str = str.replace("&f", ChatColor.WHITE + "");
-		str = str.replaceAll("&k", ChatColor.MAGIC + "");
+		str = str.replace("&k", ChatColor.MAGIC + "");
 		str = str.replace("&l", ChatColor.BOLD + "");
-		str = str.replaceAll("&m", ChatColor.STRIKETHROUGH + "");
+		str = str.replace("&m", ChatColor.STRIKETHROUGH + "");
 		str = str.replace("&n", ChatColor.UNDERLINE + "");
 		str = str.replace("&o", ChatColor.ITALIC + "");
 		str = str.replace("&r", ChatColor.RESET + "");

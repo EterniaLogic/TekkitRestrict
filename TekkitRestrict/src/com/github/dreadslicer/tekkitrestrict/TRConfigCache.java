@@ -62,7 +62,7 @@ public class TRConfigCache {
 	}
 	
 	public static class ChunkUnloader {
-		public static int maxChunks = 2000, maxRadii = 256;
-		public static boolean enabled = false;
+		public static int maxChunks, maxRadii;
+		public static boolean enabled;
 	}
 }

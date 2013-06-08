@@ -91,7 +91,7 @@ public class tekkitrestrict extends JavaPlugin {
 		
 		// ///////////
 
-		
+		Log.init();
 		log.info("SQLite loaded!");
 	}
 
@@ -234,6 +234,7 @@ public class tekkitrestrict extends JavaPlugin {
 		//}
 
 		TRLogFilter.disable();
+		Log.deinit();
 		log.info("TekkitRestrict v " + getDescription().getVersion()+ " disabled!");
 	}
 
