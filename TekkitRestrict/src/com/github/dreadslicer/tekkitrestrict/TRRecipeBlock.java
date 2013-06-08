@@ -71,7 +71,6 @@ public class TRRecipeBlock {
 		return status;
 	}
 
-	@SuppressWarnings("unchecked")
 	public static boolean blockRecipeForge(int id, int data) {
 		boolean status = false;
 		// loop through recipes...

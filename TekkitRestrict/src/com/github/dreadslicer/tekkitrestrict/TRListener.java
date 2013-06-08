@@ -361,28 +361,15 @@ public class TRListener implements Listener {
 		// we want to stop non-players from being activated here.
 		
 		if (event.getWhoClicked() != null) {
-			// Determine if this inventory click is a dupe action:
-			// Perf: 13-27-(9+14x)
-			try {
-				TRNoDupe.handleDupes(event);
-			} catch (Exception e) {
-				TRLogger.Log("debug", "Error! [TRNoDupe] : " + e.getMessage());
-				for(StackTraceElement eer:e.getStackTrace()){
-					TRLogger.Log("debug","    "+eer.toString()); 
-				}
-			}
-
 			try {
 				Player player = (Player) event.getWhoClicked();
 				EntityPlayer ep = ((CraftPlayer) player).getHandle();
 				if (ep.abilities.canInstantlyBuild) {
 					TRLimitedCreative.handleCreativeInvClick(event);
 				}
-			} catch (Exception e) {
-				TRLogger.Log("debug", "Error! [handleCreativeInv Listener] : " + e.getMessage());
-				for(StackTraceElement eer:e.getStackTrace()){
-					TRLogger.Log("debug","    "+eer.toString()); 
-				}
+			} catch (Exception ex) {
+				TRLogger.Log("debug", "Error! [handleCreativeInv Listener] : " + ex.getMessage());
+				Log.Exception(ex);
 			}
 			// Determine if they are crafting an uncraftable. Log EE
 			// Crafting.

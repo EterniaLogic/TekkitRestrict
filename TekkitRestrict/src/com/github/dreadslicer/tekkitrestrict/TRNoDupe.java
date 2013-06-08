@@ -5,23 +5,18 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 
 public class TRNoDupe {
-
 	@SuppressWarnings("unused")
 	private static boolean preventAlcDupe, preventRMDupe, preventTransmuteDupe,
 			preventTankCartDupe, preventTankCartGlitch;
-	public static int dupeAttempts = 0;
+
 	public static String lastPlayer = "";
 
 	public static void reload() {
 		preventAlcDupe = tekkitrestrict.config.getBoolean("PreventAlcDupe");
-		preventRMDupe = tekkitrestrict.config
-				.getBoolean("PreventRMFurnaceDupe");
-		preventTransmuteDupe = tekkitrestrict.config
-				.getBoolean("PreventTransmuteDupe");
-		preventTankCartDupe = tekkitrestrict.config
-				.getBoolean("PreventTankCartDupe");
-		preventTankCartGlitch = tekkitrestrict.config
-				.getBoolean("PreventTankCartGlitch");
+		preventRMDupe = tekkitrestrict.config.getBoolean("PreventRMFurnaceDupe");
+		preventTransmuteDupe = tekkitrestrict.config.getBoolean("PreventTransmuteDupe");
+		preventTankCartDupe = tekkitrestrict.config.getBoolean("PreventTankCartDupe");
+		preventTankCartGlitch = tekkitrestrict.config.getBoolean("PreventTankCartGlitch");
 	}
 
 	public static void handleDupes(InventoryClickEvent event) {
@@ -52,7 +47,6 @@ public class TRNoDupe {
 							TRLogger.Log("Dupe", player.getName()
 									+ " duped using a RM Furnace!");
 						}
-						dupeAttempts++;
 						TRLogger.broadcastDupe(player.getName(),
 								"the RM Furnace", "RMFurnace");
 					}
@@ -68,7 +62,6 @@ public class TRNoDupe {
 
 							TRLogger.Log("Dupe", player.getName()
 								+ " attempted to dupe using a Tank Cart!");
-							dupeAttempts++;
 							TRLogger.broadcastDupe(player.getName(),
 								"the Tank Cart", "TankCart");
 						}
@@ -113,7 +106,6 @@ public class TRNoDupe {
 							TRLogger.Log("Dupe", player.getName()
 									+ " attempted to transmute dupe!");
 						}
-						dupeAttempts++;
 						TRLogger.broadcastDupe(player.getName(),
 								"the Transmutation Table", "transmute");
 					}

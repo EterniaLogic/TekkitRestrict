@@ -8,9 +8,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 import com.github.dreadslicer.tekkitrestrict.Log;
+import com.github.dreadslicer.tekkitrestrict.TRConfigCache.MetricValues;
 import com.github.dreadslicer.tekkitrestrict.TRNoItem;
-import com.github.dreadslicer.tekkitrestrict.TRPermHandler;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Dupes;
+import com.github.dreadslicer.tekkitrestrict.Util;
 
 public class InventoryClickListener implements Listener {
 	static boolean doDupeCheck = false;
@@ -26,7 +27,7 @@ public class InventoryClickListener implements Listener {
 		{
 			id1 = event.getCurrentItem().getTypeId();
 			data1 = event.getCurrentItem().getDurability();
-			if (!TRPermHandler.hasPermission(player, "noitem", "bypass", "")) {
+			if (!Util.hasBypass(player, "noitem")) {
 				
 				if (TRNoItem.isItemBanned(player,
 						new com.github.dreadslicer.tekkitrestrict.ItemStack(id1, 0, data1))) {
@@ -53,6 +54,7 @@ public class InventoryClickListener implements Listener {
 					event.setCancelled(true);
 					player.sendMessage(ChatColor.DARK_RED + "You are not allowed to Shift+Click into a Red Matter Furnace from this slot!");
 					Log.Dupe("Red Matter Furnace", "RMFurnace", player.getName());
+					MetricValues.dupeAttempts++;
 				}
 			}
 		} else if (title.equals("tank cart")){
@@ -61,6 +63,7 @@ public class InventoryClickListener implements Listener {
 						event.setCancelled(true);
 						player.sendMessage(ChatColor.DARK_RED + "You are not allowed to Shift+Click into a Tank Cart from this slot!");
 						Log.Dupe("Tank Cart", "TankCart", player.getName());
+						MetricValues.dupeAttempts++;
 				}
 			} else if (slot <= 8){
 				if (event.isShiftClick() && Dupes.tankcartGlitch){
@@ -78,6 +81,7 @@ public class InventoryClickListener implements Listener {
 					event.setCancelled(true);
 					player.sendMessage(ChatColor.DARK_RED + "You are not allowed to Shift+Click any item out of the Tranmutation Table(t)!");
 					Log.Dupe("Transmution Tablet", "TransmutionTablet", player.getName());
+					MetricValues.dupeAttempts++;
 				}
 			}
 		} else if (title.equals("bag")){
@@ -88,10 +92,12 @@ public class InventoryClickListener implements Listener {
 					if (event.getCurrentItem().getTypeId() == 27532){
 						player.sendMessage(ChatColor.DARK_RED + "You are not allowed to put Black Hole Bands in an alchemy bag!");
 						Log.Dupe("Alchemy Bag + Black Hole Band", "AlchemicalBag", player.getName());
+						MetricValues.dupeAttempts++;
 					}
 					else if (event.getCurrentItem().getTypeId() == 27593){
 						player.sendMessage(ChatColor.DARK_RED + "You are not allowed to put Void Rings in an alchemy bag!");
 						Log.Dupe("Alchemy Bag + Void Ring", "AlchemicalBag", player.getName());
+						MetricValues.dupeAttempts++;
 					}
 				}
 			}
@@ -101,6 +107,7 @@ public class InventoryClickListener implements Listener {
 					event.setCancelled(true);
 					player.sendMessage(ChatColor.DARK_RED + "You are not allowed to put Harvest rings on a pedestal!");
 					Log.Dupe("Pedestal + Harvest Godess Band", "Pedestal", player.getName());
+					MetricValues.dupeAttempts++;
 				}
 			}
 		}

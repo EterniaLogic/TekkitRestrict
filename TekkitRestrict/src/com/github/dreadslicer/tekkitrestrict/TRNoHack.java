@@ -3,6 +3,10 @@ package com.github.dreadslicer.tekkitrestrict;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
+import com.github.dreadslicer.tekkitrestrict.listeners.NoHackFly;
+import com.github.dreadslicer.tekkitrestrict.listeners.NoHackForcefield;
+import com.github.dreadslicer.tekkitrestrict.listeners.NoHackSpeed;
+
 public class TRNoHack {
 	public static enum HackType {
 		fly, forcefield, speed
@@ -11,9 +15,7 @@ public class TRNoHack {
 	public static int hacks = 0;
 
 	public static void reload() {
-		TRHandleFly.reload();
-		TRNoHackForcefield.reload();
-		TRNoHackSpeed.reload();
+		//TRNoHackForcefield.reload();
 	}
 
 	/*public static void handleHack(Player player, HackType type) {
@@ -104,16 +106,16 @@ public class TRNoHack {
 	}
 
 	public static void clearMaps() {
-		TRNoHackSpeed.clearMaps();
-		TRHandleFly.clearMaps();
-		TRNoHackForcefield.clearMaps();
+		NoHackSpeed.clearMaps();
+		NoHackFly.clearMaps();
+		NoHackForcefield.clearMaps();
 	}
 
 	public static void playerLogout(Player player) {
 		// clears ALL lists for said player
-		TRNoHackSpeed.playerLogout(player);
-		TRHandleFly.playerLogout(player);
-		TRNoHackForcefield.playerLogout(player);
+		NoHackSpeed.playerLogout(player.getName());
+		NoHackFly.playerLogout(player.getName());
+		NoHackForcefield.playerLogout(player.getName());
 		TRLimitFly.setGrounded(player);
 	}
 }

@@ -22,7 +22,7 @@ public class NoHackForcefield implements Listener {
 		if (!(e.getDamager() instanceof Player)) return;
 
 		Player damager = (Player) e.getDamager();
-		//Ignore bypassers
+
 		if (Util.hasHackBypass(damager, "forcefield")) return;
 		
 		//Ignore rm sword and katar.

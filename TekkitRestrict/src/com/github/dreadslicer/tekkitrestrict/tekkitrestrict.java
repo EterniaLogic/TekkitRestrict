@@ -25,6 +25,7 @@ import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Global;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Hacks;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.LWC;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Listeners;
+import com.github.dreadslicer.tekkitrestrict.TRConfigCache.MetricValues;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.SafeZones;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Threads;
 import com.github.dreadslicer.tekkitrestrict.commands.TRCommandAlc;
@@ -181,7 +182,7 @@ public class tekkitrestrict extends JavaPlugin {
 				@Override
 				public int getValue() {
 					try {
-						return TRNoDupe.dupeAttempts;
+						return MetricValues.dupeAttempts;
 					} catch(Exception ex){
 						return 0;
 					}

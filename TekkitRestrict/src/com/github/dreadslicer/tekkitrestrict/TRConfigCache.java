@@ -54,4 +54,8 @@ public class TRConfigCache {
 		public static List<String> blocked;
 		public static LWCPlugin lwcPlugin;
 	}
+	
+	public static class MetricValues {
+		public static int dupeAttempts = 0;
+	}
 }
