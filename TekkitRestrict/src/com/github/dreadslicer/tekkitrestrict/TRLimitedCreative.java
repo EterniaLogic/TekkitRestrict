@@ -20,12 +20,12 @@ public class TRLimitedCreative {
 				if (!invname.equals("container.inventory")) {
 					// player.sendRawMessage("[TRLimitedCreative] You may not interact with other inventories");
 					player.sendMessage(ChatColor.RED + "[TRLimitedCreative] You may not interact with other inventories");
-					// event.setCancelled(true);
-					if (event.getCurrentItem() != null) {
-						event.setCurrentItem(null);
-						player.getInventory().addItem(player.getItemOnCursor());
-						player.setItemOnCursor(null);
-					}
+					event.setCancelled(true);
+					//if (event.getCurrentItem() != null) {
+					//	event.setCurrentItem(null);
+					//	player.getInventory().addItem(player.getItemOnCursor());
+					//	player.setItemOnCursor(null);
+					//}
 					return;
 				}
 			}
@@ -37,9 +37,10 @@ public class TRLimitedCreative {
 				if (TRNoItem.isCreativeItemBanned(player,
 								new com.github.dreadslicer.tekkitrestrict.ItemStack(ccc.getTypeId(), 0, ccc.getData().getData()))) {
 					player.sendMessage(ChatColor.RED + "[TRLimitedCreative] You cannot obtain/modify this item type!");
-					event.setCurrentItem(null);
-					player.getInventory().addItem(player.getItemOnCursor());
-					player.setItemOnCursor(null);
+					event.setCancelled(true);
+					//event.setCurrentItem(null);
+					//player.getInventory().addItem(player.getItemOnCursor());
+					//player.setItemOnCursor(null);
 					return;
 				}
 				

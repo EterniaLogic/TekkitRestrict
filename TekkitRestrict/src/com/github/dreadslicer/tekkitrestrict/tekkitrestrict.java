@@ -234,6 +234,7 @@ public class tekkitrestrict extends JavaPlugin {
 		//}
 
 		TRLogFilter.disable();
+		FileLog.closeAll();
 		Log.deinit();
 		log.info("TekkitRestrict v " + getDescription().getVersion()+ " disabled!");
 	}
