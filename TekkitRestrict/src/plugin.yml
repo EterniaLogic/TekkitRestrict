@@ -151,16 +151,6 @@ permissions:
         default: op
         children:
             tekkitrestrict.emc: true
-    tekkitrestrict.emc:
-        description: 
-        default: op
-        children:
-            tekkitrestrict.: true
-    tekkitrestrict.emc:
-        description: 
-        default: op
-        children:
-            tekkitrestrict.: true
 
 commands:
    tekkitrestrict:
