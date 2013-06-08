@@ -2,18 +2,15 @@ package com.github.dreadslicer.tekkitrestrict;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
 
 import net.minecraft.server.EntityPlayer;
-import net.minecraft.server.IProgressUpdate;
 import net.minecraft.server.WorldServer;
 
 import org.bukkit.Chunk;
 import org.bukkit.Location;
-import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.craftbukkit.CraftChunk;
 
 public class TRChunkUnloader {
 	private static int maxChunks = 2000, maxRadii = 256;
@@ -26,95 +23,97 @@ public class TRChunkUnloader {
 	}
 
 	public static void unloadSChunks() {
+		if (!enabled) return;
 		try {
-			if (enabled) {
-				// TRChunkRunner cr = new TRChunkRunner();
-				Server server = tekkitrestrict.getInstance().getServer();
-				int tot = getTotalChunks();
-				for (int j = 0; j < server.getWorlds().size(); j++) {
-					World wo = server.getWorlds().get(j); // Get World
-					final WorldServer ws = ((CraftWorld) wo).getHandle();
-					Chunk[] cc = wo.getLoadedChunks(); // Get chunks from
-					
-					/*Future<String> returnFuture = server.getScheduler().callSyncMethod(tekkitrestrict.getInstance(), new Callable<String>() {
-					   public String call() {
-						   ws.chunkProviderServer.saveChunks(true, new ss());
-						   return "";
-					   }
-					});*/
+			// TRChunkRunner cr = new TRChunkRunner();
+			
+			int tot = getTotalChunks();
+			if (tot < maxChunks) return; //If the max chunk amount isn't reached, do nothing.
+			
+			List<World> worlds = tekkitrestrict.getInstance().getServer().getWorlds();
+			
+			for (World world : worlds) {
+				final WorldServer ws = ((CraftWorld) world).getHandle();
+				Chunk[] loadedChunks = world.getLoadedChunks(); // Get chunks from
+				
+				/*Future<String> returnFuture = server.getScheduler().callSyncMethod(tekkitrestrict.getInstance(), new Callable<String>() {
+				   public String call() {
+					   ws.chunkProviderServer.saveChunks(true, new ss());
+					   return "";
+				   }
+				});*/
 
-					// loop through chunks
-					for (int k = 0; k < cc.length; k++) {
-						Chunk c = cc[k]; // get chunk from the chunks from
-											// CraftWorld
-						// Convert chunk to minecraft server chunk
-						net.minecraft.server.Chunk ccc = ((org.bukkit.craftbukkit.CraftChunk) c)
-								.getHandle();
+				for (Chunk chunk : loadedChunks) { //For every loaded chunk
+					// Convert chunk to minecraft server chunk
+					net.minecraft.server.Chunk mcChunk = ((CraftChunk) chunk).getHandle();
 
-						// Check for maximum chunks.
-						if (!isChunkInUse(ws, c.getX(), c.getZ(), maxRadii)) {
-							if (tot > maxChunks) {
-								// cr.chunks.add(new Object[]{ccc,ws});
-								// wo.unloadChunk(x, z, true, false);
-								// WorldServer world =
-								// ((org.bukkit.craftbukkit.CraftWorld)wo).getHandle();
-								//MinecraftServer ms = ((org.bukkit.craftbukkit.CraftServer)tekkitrestrict.getInstance().getServer()).getHandle().server;
-								int x = ccc.x;
-								int z = ccc.z;
-								synchronized(ccc){ccc.removeEntities();}
-								synchronized(ws){ws.chunkProviderServer.saveChunk(ccc);}
-								synchronized(ws){ws.chunkProviderServer.saveChunkNOP(ccc);}
-								synchronized(ws.chunkProviderServer.unloadQueue){ws.chunkProviderServer.unloadQueue.remove(x, z);}
-								synchronized(ws.chunkProviderServer.chunks){ws.chunkProviderServer.chunks.remove(x, z);}
-								synchronized(ws.chunkProviderServer.chunkList){ws.chunkProviderServer.chunkList.remove(ccc);}
-								// tekkitrestrict.log.info("chunkunload "+x+","+z);
-								tot--;
-							}
+					// Check for maximum chunks.
+					if (!isChunkInUse(ws, chunk.getX(), chunk.getZ(), maxRadii)) {
+						if (tot > maxChunks) {
+							// cr.chunks.add(new Object[]{ccc,ws});
+							// wo.unloadChunk(x, z, true, false);
+							// WorldServer world =
+							// ((org.bukkit.craftbukkit.CraftWorld)wo).getHandle();
+							//MinecraftServer ms = ((org.bukkit.craftbukkit.CraftServer)tekkitrestrict.getInstance().getServer()).getHandle().server;
+							int x = mcChunk.x;
+							int z = mcChunk.z;
+							synchronized(mcChunk){mcChunk.removeEntities();}
+							synchronized(ws){ws.chunkProviderServer.saveChunk(mcChunk);}
+							synchronized(ws){ws.chunkProviderServer.saveChunkNOP(mcChunk);}
+							synchronized(ws.chunkProviderServer.unloadQueue){ws.chunkProviderServer.unloadQueue.remove(x, z);}
+							synchronized(ws.chunkProviderServer.chunks){ws.chunkProviderServer.chunks.remove(x, z);}
+							synchronized(ws.chunkProviderServer.chunkList){ws.chunkProviderServer.chunkList.remove(mcChunk);}
+							// tekkitrestrict.log.info("chunkunload "+x+","+z);
+							tot--;
 						}
 					}
-					// tekkitrestrict.getInstance().getServer().getScheduler().
-					// scheduleSyncDelayedTask(tekkitrestrict.getInstance(), cr,
-					
-
 				}
-				// cr.run();
+				//IMPORTANT Bukkit also has a chunk.unload method.
+				
+				// tekkitrestrict.getInstance().getServer().getScheduler().
+				// scheduleSyncDelayedTask(tekkitrestrict.getInstance(), cr,
+				
+
 			}
+			// cr.run();
 		} catch (Exception eee) {
-			TRLogger.Log("debug",
-					"Chunk Unloader[1] Error! " + eee.getMessage());
+			TRLogger.Log("debug", "Chunk Unloader[1] Error! " + eee.getMessage());
 		}
 	}
 
+	/**
+	 * Gets total chunks from each world's chunkProviderServer
+	 * @return The number of chunks loaded
+	 */
 	private static int getTotalChunks() {
-		// gets total chunks from each world's chunkProviderServer
-		Server server = tekkitrestrict.getInstance().getServer();
+		List<World> worlds = tekkitrestrict.getInstance().getServer().getWorlds();
 		int r = 0;
-		for (int j = 0; j < server.getWorlds().size(); j++) {
-			World wo = server.getWorlds().get(j); // Get World
-			WorldServer ws = ((CraftWorld) wo).getHandle();
+		for (World world : worlds){
+			WorldServer ws = ((CraftWorld) world).getHandle();
 			r += ws.chunkProviderServer.chunkList.size();
 		}
 		return r;
 	}
 
-	private static boolean isChunkInUse(net.minecraft.server.WorldServer world,
-			int x, int z, int dist) {
+	/**
+	 * @return If there are currently players near that chunk.
+	 */
+	private static boolean isChunkInUse(WorldServer world, int x, int z, int dist) {
 		// Get All players
-		Server server = tekkitrestrict.getInstance().getServer();
-		List<EntityPlayer> arr$ = new LinkedList<EntityPlayer>();
-		for (int j = 0; j < server.getWorlds().size(); j++) {
-			World wo = server.getWorlds().get(j); // Get World
-			WorldServer ws = ((CraftWorld) wo).getHandle();
-			for (int k = 0; k < ws.players.size(); k++) {
-				arr$.add((EntityPlayer) ws.players.get(k));
+		List<World> worlds = tekkitrestrict.getInstance().getServer().getWorlds();
+		LinkedList<EntityPlayer> arr$ = new LinkedList<EntityPlayer>();
+		for (World wo : worlds) { //For each world
+			WorldServer ws = ((CraftWorld) wo).getHandle(); //Get the worldserver
+			for (Object player : ws.players){ //For each player on that worldserver
+				arr$.add((EntityPlayer) player); //Add to the arr$
 			}
 		}
+		//TODO Isn't it better to use server.getOnlinePlayers()?
+		
 		// loop through said players
-		for (int i$ = 0; i$ < arr$.size(); i$++) {
-			EntityPlayer player = arr$.get(i$);
+		for(EntityPlayer player : arr$){
 			// get location of player
-			Location loc = new Location(player.world.getWorld(), player.locX,
-					player.locY, player.locZ);
+			Location loc = new Location(player.world.getWorld(), player.locX, player.locY, player.locZ);
 			// determine if location is OK.
 			if (loc.getWorld() == world.chunkProviderServer.world.getWorld()
 					&& Math.abs(loc.getBlockX() - (x << 4)) <= dist
@@ -126,7 +125,7 @@ public class TRChunkUnloader {
 		arr$.clear();
 		return false;
 	}
-	private static class ss implements IProgressUpdate{
+	/*private static class ss implements IProgressUpdate{
 
 		@Override
 		public void a(String s) {
@@ -146,5 +145,5 @@ public class TRChunkUnloader {
 			
 		}
 		
-	}
+	}*/
 }

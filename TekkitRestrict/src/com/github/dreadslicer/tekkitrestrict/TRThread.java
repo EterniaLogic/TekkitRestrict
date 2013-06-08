@@ -14,8 +14,10 @@ import java.util.concurrent.Executors;
 import net.minecraft.server.Item;
 import net.minecraft.server.NBTTagCompound;
 import net.minecraft.server.TileEntity;
+import net.minecraft.server.WorldServer;
 
 import org.bukkit.Chunk;
+import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -28,6 +30,7 @@ import org.bukkit.inventory.PlayerInventory;
 import com.github.dreadslicer.tekkitrestrict.lib.TRCharge;
 
 import ee.EEBase;
+import eloraam.logic.TileLogicPointer;
 
 public class TRThread {
 	public saveThread st = new saveThread();
@@ -69,8 +72,7 @@ public class TRThread {
 }
 
 class TGemArmorDisabler extends Thread {
-	List<Player> bypassers = Collections
-			.synchronizedList(new LinkedList<Player>());
+	List<Player> bypassers = Collections.synchronizedList(new LinkedList<Player>());
 	int TSpeed;
 	boolean Movement, Offensive;
 
@@ -85,8 +87,7 @@ class TGemArmorDisabler extends Thread {
 				} catch (InterruptedException e) {
 				}
 			} catch (Exception e) {
-				TRLogger.Log("debug",
-						"Error: [GemArmor thread] " + e.getMessage());
+				TRLogger.Log("debug", "Error: [GemArmor thread] " + e.getMessage());
 				for(StackTraceElement eer:e.getStackTrace()){
 					TRLogger.Log("debug","    "+eer.toString()); 
 				}
@@ -157,10 +158,8 @@ class TGemArmorDisabler extends Thread {
 	}
 
 	public void reload() {
-		this.Offensive = tekkitrestrict.config
-				.getBoolean("AllowGemArmorOffensive");
-		this.Movement = tekkitrestrict.config
-				.getBoolean("AllowGemArmorDefensive");
+		this.Offensive = tekkitrestrict.config.getBoolean("AllowGemArmorOffensive");
+		this.Movement = tekkitrestrict.config.getBoolean("AllowGemArmorDefensive");
 		this.TSpeed = tekkitrestrict.config.getInt("GemArmorDThread");
 		reloadBypassers();
 	}
@@ -171,12 +170,12 @@ class TGemArmorDisabler extends Thread {
 		// boolean SSDisableGemArmor =
 		// tekkitrestrict.config.getBoolean("SSDisableGemArmor");
 
-		for (int i = 0; i < ps.length; i++) {
+		for (Player player : ps) {
 			// boolean abypass = tekkitrestrict.p erm.h as(ps[i],
 			// "tekkitrestrict.abypass");
 			// boolean SSbypass = tekkitrestrict.p erm.h as(ps[i],
 			// "tekkitrestrict.safezone.bypass");
-			boolean abypass = TRPermHandler.hasPermission(ps[i], "abypass", "", "");
+			boolean abypass = TRPermHandler.hasPermission(player, "abypass", "", "");
 			/*
 			 * boolean SSbypass =
 			 * tekkitrestrict.hasPermission(ps[i],"tekkitrestrict.safezone.bypass"
@@ -184,9 +183,8 @@ class TGemArmorDisabler extends Thread {
 			 * safezone bypass to disable this. if(SSDisableGemArmor){
 			 * if(SSbypass && abypass){ bypassers.add(ps[i]); } } } else
 			 */
-			if (abypass) {
-				bypassers.add(ps[i]);
-			}
+			if (abypass) bypassers.add(player);
+			
 		}
 	}
 }
@@ -792,6 +790,7 @@ class TWorldScrubber extends Thread {
 	int TSpeed;
 	boolean RMDB, UseRPTimer;
 	double time;
+	double ticktime;
 	int toid;
 
 	@Override
@@ -822,61 +821,59 @@ class TWorldScrubber extends Thread {
 	private void doWScrub() {
 		try {
 			TRChunkUnloader.unloadSChunks();
-		} catch (Exception e) {
+		} catch (Exception ex) {
 		}
-		if (RMDB || UseRPTimer) {
-			int currentChunkCount = 0;
+		
+		if (!RMDB && !UseRPTimer) return;
+		
+		Server server = tekkitrestrict.getInstance().getServer();
+		if (UseRPTimer){
+			if (!server.getPluginManager().isPluginEnabled("mod_RedPowerLogic")) {
+				UseRPTimer = false;
+				if (!RMDB) return; //If both options are now false, nothing else has to be done.
+			}
+		}
+		int currentChunkCount = 0;
 
-			List<World> wo = tekkitrestrict.getInstance().getServer().getWorlds();
-			for (int j = 0; j < wo.size(); j++) {
-				World g = wo.get(j);
+		List<World> worlds = server.getWorlds();
+		for (World bukkitWorld : worlds) {
+			WorldServer worldServer = ((CraftWorld) bukkitWorld).getHandle();
 
-				net.minecraft.server.WorldServer wo1 = ((CraftWorld) g).getHandle();
-
-				// TileLogic tilelogic = (TileLogic)CoreLib.getTileEntity(g, x,
-				// y, z, eloraam/logic/TileLogic);
-				Chunk[] cc = g.getLoadedChunks();
-				currentChunkCount += cc.length;
-				// loop through all of the blocks in the chunk...
-				for (int k = 0; k < cc.length; k++) {
-					Chunk c = cc[k];
-
-					if (this.RMDB) {
-						for (int x = 0; x < 16; x++) {
-							for (int z = 0; z < 16; z++) {
-								for (int y = 0; y < 256; y++) {
-									// so... yeah.
-									Block bl = c.getBlock(x, y, z);
-									if (TRNoItem.isBlockDisabled(bl)) {
-										bl.setTypeId(toid);
-									}
+			// TileLogic tilelogic = (TileLogic)CoreLib.getTileEntity(g, x,
+			// y, z, eloraam/logic/TileLogic);
+			Chunk[] loadedChunks = bukkitWorld.getLoadedChunks();
+			currentChunkCount += loadedChunks.length;
+			// loop through all of the blocks in the chunk...
+			for (Chunk c : loadedChunks) {
+				if (RMDB) {
+					for (int x = 0; x < 16; x++) {
+						for (int z = 0; z < 16; z++) {
+							for (int y = 0; y < 256; y++) {
+								// so... yeah.
+								Block bl = c.getBlock(x, y, z);
+								if (TRNoItem.isBlockDisabled(bl)) {
+									bl.setTypeId(toid);
 								}
 							}
 						}
 					}
+				}
 
-					if (UseRPTimer) {
-						if (tekkitrestrict.getInstance().getServer().getPluginManager().isPluginEnabled("mod_RedPowerLogic")) {
-							try {
-								BlockState[] ggg = c.getTileEntities();
-								for (BlockState gg : ggg) {
-									TileEntity te = wo1.getTileEntity(
-											gg.getX(), gg.getY(), gg.getZ());
-									if (te instanceof eloraam.logic.TileLogicPointer) {
-										eloraam.logic.TileLogicPointer timer = (eloraam.logic.TileLogicPointer) te;
+				if (UseRPTimer) {
+					try {
+						BlockState[] tileEntities = c.getTileEntities();
+						for (BlockState gg : tileEntities) {
+							TileEntity te = worldServer.getTileEntity(gg.getX(), gg.getY(), gg.getZ());
+							if (te instanceof TileLogicPointer) {
+								TileLogicPointer timer = (TileLogicPointer) te;
 
-										double ticktime = time * 20;
-										if (timer.GetInterval() < ticktime) {
-											timer.SetInterval(new Double(
-													ticktime).longValue());
-										}
-									}
+								if (timer.GetInterval() < ticktime) {
+									timer.SetInterval((long) ticktime);
 								}
-							} catch (Exception EER) {
-								// EER.printStackTrace();
-								TRLogger.Log("debug", "RPTimerError: " + EER.getMessage());
 							}
 						}
+					} catch (Exception EER) {
+						TRLogger.Log("debug", "RPTimerError: " + EER.getMessage());
 					}
 				}
 			}
@@ -885,11 +882,11 @@ class TWorldScrubber extends Thread {
 
 	public void reload() {
 		this.TSpeed = tekkitrestrict.config.getInt("WorldCleanerThread");
-		this.RMDB = tekkitrestrict.config
-				.getBoolean("RemoveDisabledItemBlocks");
+		this.RMDB = tekkitrestrict.config.getBoolean("RemoveDisabledItemBlocks");
 		this.toid = tekkitrestrict.config.getInt("ChangeDisabledItemsIntoId");
 		this.UseRPTimer = tekkitrestrict.config.getBoolean("UseAutoRPTimer");
-		this.time = tekkitrestrict.config.getDouble("RPTimerMin");
+		this.time = tekkitrestrict.config.getDouble("RPTimerMin", 0.2);
+		this.ticktime = time * 20;
 	}
 }
 
