@@ -17,12 +17,10 @@ public class TRLimitedCreative {
 		if (event.isCancelled()) return;
 		
 		try {
-			if (!TRPermHandler.hasPermission(player, "creative", "bypass",
-					"")) {
+			if (!Util.hasBypass(player, "creative")) {
 				event.getView().getTopInventory().getSize();
 
-				String invname = event.getView().getTopInventory()
-						.getName();
+				String invname = event.getView().getTopInventory().getName();
 				if (BlockInteract) {
 					if (invname != "container.inventory") {
 						// player.sendRawMessage("[TRLimitedCreative] You may not interact with other inventories");

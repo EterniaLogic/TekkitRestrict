@@ -213,7 +213,7 @@ public class TRSafeZone {
 	public static String getSafeZone(Player p) {
 		if (!tekkitrestrict.config.getBoolean("UseSafeZones")) return "";
 		
-		if (TRPermHandler.hasPermission(p, "safezone", "bypass", "")) return "";
+		if (Util.hasBypass(p, "safezone")) return "";
 		
 		PluginManager PM = tekkitrestrict.getInstance().getServer().getPluginManager();
 		if (PM.isPluginEnabled("Towny") && depends.contains("towny")) {

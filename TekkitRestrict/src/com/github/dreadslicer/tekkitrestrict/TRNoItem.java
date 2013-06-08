@@ -69,7 +69,7 @@ public class TRNoItem {
 	}
 	
 	public static boolean isTypeBanned(String Type, List<TRCacheItem> tlist, List<String> indices, Player p, int id, short data) {
-		if (TRPermHandler.hasPermission(p, Type, "bypass", "")) return false;
+		if (Util.hasBypass(p, Type)) return false;
 
 		/*
 		 * TRCacheItem ci = TRCacheItem.getPermCacheItem(p, Type, id, 0);
@@ -107,7 +107,7 @@ public class TRNoItem {
 
 	public static boolean isTypeBanned(String Type, List<TRCacheItem> tlist, List<String> indices, Player p, ItemStack e) {
 		// tekkitrestrict.log.info("itb1");
-		if (!TRPermHandler.hasPermission(p, Type, "bypass", "")) {
+		if (!Util.hasBypass(p, Type)) {
 			int id = e.id;
 			int data = e.data;
 

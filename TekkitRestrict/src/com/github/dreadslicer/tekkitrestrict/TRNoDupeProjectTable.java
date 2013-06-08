@@ -11,7 +11,7 @@ public class TRNoDupeProjectTable {
 	private static Map<String,String> UsedTables = new ConcurrentHashMap<String, String>(); //loc, player
 	private static Map<String,String> PlayerUsed = new ConcurrentHashMap<String, String>(); //player, loc
 	public static void checkTable(org.bukkit.event.player.PlayerInteractEvent e){
-		if (!TRPermHandler.hasPermission(e.getPlayer(), "dupe", "bypass", "")) {
+		if (!Util.hasBypass(e.getPlayer(), "dupe", "projecttable")) {
 			Block blk = e.getClickedBlock();
 			Player p = e.getPlayer();
 			if(blk != null){
@@ -22,7 +22,7 @@ public class TRNoDupeProjectTable {
 						String usingPlayer = UsedTables.get(locstr);
 						if(!p.getName().toLowerCase().equals(usingPlayer.toLowerCase())){
 							e.setCancelled(true);
-							p.sendRawMessage("[TRDupe] Somebody else is using this project table!");
+							p.sendMessage("[TRDupe] Somebody else is using this project table!");
 							return;
 						}
 					}

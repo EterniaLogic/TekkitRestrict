@@ -74,7 +74,7 @@ public class TRLimitFly {
 	}
 
 	public static void willGround(Player p) {
-		if (!TRPermHandler.hasPermission(p, "flylimit", "bypass", "")) {
+		if (!Util.hasBypass(p, "flylimit")) {
 			for (int i = 0; i < isFlying.size(); i++) {
 				Player cc = isFlying.get(i);
 				boolean isNull = playerTimes.get(cc) == null;

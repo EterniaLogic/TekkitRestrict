@@ -28,8 +28,7 @@ public class TRLimitBlock {
 	private int expire = -1;
 	public String player = "";
 	public boolean isModified = true; // default limiters will get saved.
-	public boolean ignoreAll = false; // used for people who have the limit
-										// bypass.
+	public boolean ignoreAll = false; // used for people who have the limit bypass.
 	public List<TRLimit> itemlimits = Collections.synchronizedList(new LinkedList<TRLimit>());
 
 	public void clearLimits() {
@@ -208,9 +207,7 @@ public class TRLimitBlock {
 
 				// see if they have a bypass... (For this world)
 
-				if (TRPermHandler.hasPermission(p, "limit", "bypass", "")) {
-					// don't really do anything lol.
-				} else {
+				if (!Util.hasBypass(p, "limit")) {
 					// This player does not have a bypass =(
 					// add data
 					String blockdata = dbin.getString("blockdata");

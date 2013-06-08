@@ -29,13 +29,12 @@ public class TRNoDupe {
 		Player player = (Player) event.getWhoClicked();
 		int slot = event.getSlot();
 
-		String title = event.getView().getTopInventory().getTitle()
-				.toLowerCase();
+		String title = event.getView().getTopInventory().getTitle().toLowerCase();
 		
 		
 		//tekkitrestrict.log.info("t0-"+title+"-"+slot+"-"+event.isShiftClick());
 		// RMDupe Slot35
-		if (!TRPermHandler.hasPermission(player, "dupe", "bypass", "")) {
+		if (!Util.hasBypass(player, "dupe")) {
 			// tekkitrestrict.log.info("t0-"+title+"-");
 			if (title.equals("rm furnace")) {
 				// tekkitrestrict.log.info("t1");

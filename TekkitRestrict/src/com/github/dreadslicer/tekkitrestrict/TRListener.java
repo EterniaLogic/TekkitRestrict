@@ -166,14 +166,13 @@ public class TRListener implements Listener {
 			if (UseBlockLimit) {
 				TRLimitBlock il = TRLimitBlock.getLimiter(player);
 				if (!il.checkLimit(e)) {
-					if (!TRPermHandler.hasPermission(player, "limiter", "bypass", "")) {
+					if (!Util.hasBypass(player, "limiter")) { //TODO tr.bypass.limiter or tr.bypass.limit
 						player.sendMessage("[TRItemLimiter] You cannot place down any more of that block!");
 						e.setCancelled(true);
 						if (te1 instanceof TileCovered) {
 							TileCovered tc = (TileCovered) te1;
 							for (int i = 0; i < 6; i++) {
-								if (tc.getCover(i) != -1
-										&& tc.getCover(i) == data) {
+								if (tc.getCover(i) != -1 && tc.getCover(i) == data) {
 									tc.tryRemoveCover(i);
 								}
 							}
@@ -228,18 +227,16 @@ public class TRListener implements Listener {
 		try {
 			EntityPlayer ep = ((CraftPlayer) player).getHandle();
 			if (ep.abilities.canInstantlyBuild) {
-				if (!TRPermHandler.hasPermission(player, "creative", "bypass", "")) {
+				if (!Util.hasBypass(player, "creative")) {
 					/*Item ccr = event.getItemDrop();
 					ItemStack ccc = ccr.getItemStack();*/
 					event.setCancelled(true);
 					player.sendMessage("[TRLimitedCreative] You cannot drop items!");
 				}
 			}
-		} catch(Exception e){
-			TRLogger.Log("debug", "Error! [TRLimitedCreative Drop Listener] : " + e.getMessage());
-			for(StackTraceElement eer:e.getStackTrace()){
-				TRLogger.Log("debug","    "+eer.toString()); 
-			}
+		} catch(Exception ex){
+			TRLogger.Log("debug", "Error! [TRLimitedCreative Drop Listener] : " + ex.getMessage());
+			Log.Exception(ex);
 		}
 	}
 
@@ -403,7 +400,7 @@ public class TRListener implements Listener {
 		ItemStack currentItem = event.getCurrentItem();
 		if (currentItem == null) return;
 		
-		if (!TRPermHandler.hasPermission(player, "noitem", "bypass", "")) {
+		if (!Util.hasBypass(player, "noitem")) {
 			
 			if (TRNoItem.isItemBanned(player,
 					new com.github.dreadslicer.tekkitrestrict.ItemStack(currentItem.getTypeId(), 0, currentItem.getDurability()))) {

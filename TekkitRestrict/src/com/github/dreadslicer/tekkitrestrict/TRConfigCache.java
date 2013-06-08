@@ -3,6 +3,8 @@ package com.github.dreadslicer.tekkitrestrict;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.griefcraft.lwc.LWCPlugin;
+
 public class TRConfigCache {
 	public static class Global {
 		public static boolean kickFromConsole, debug;
@@ -46,5 +48,10 @@ public class TRConfigCache {
 		public static boolean RMDB, UseRPTimer;
 		public static int ChangeDisabledItemsIntoId;
 		public static int RPTickTime;
+	}
+	
+	public static class LWC {
+		public static List<String> blocked;
+		public static LWCPlugin lwcPlugin;
 	}
 }

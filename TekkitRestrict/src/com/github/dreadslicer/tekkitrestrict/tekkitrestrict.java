@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,6 +23,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Dupes;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Global;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Hacks;
+import com.github.dreadslicer.tekkitrestrict.TRConfigCache.LWC;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Listeners;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.SafeZones;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Threads;
@@ -309,7 +311,9 @@ public class tekkitrestrict extends JavaPlugin {
 		Threads.UseRPTimer = config.getBoolean("UseAutoRPTimer", false);
 		Threads.ChangeDisabledItemsIntoId = config.getInt("ChangeDisabledItemsIntoId", 3);
 		Threads.RPTickTime = (int) Math.round(config.getDouble("RPTimerMin", 0.2) * 20);
-		
+		List<String> lwcprevent = config.getStringList("LWCPreventNearLocked");
+		if (lwcprevent == null) LWC.blocked = Collections.synchronizedList(new LinkedList<String>());
+		else LWC.blocked = Collections.synchronizedList(lwcprevent);
 		
 		SafeZones.allowNormalUser = config.getBoolean("SSAllowNormalUserToHaveSafeZones", true);
 	}
@@ -457,7 +461,6 @@ public class tekkitrestrict extends JavaPlugin {
 		TRNoHack.reload();
 		TRLimitFly.reload();
 		TRNoDupe.reload(); // branches out
-		TRLWCProtect.reload();
 		TRSafeZone.reload();
 		TRLimitedCreative.reload();
 		TREMCSet.reload();

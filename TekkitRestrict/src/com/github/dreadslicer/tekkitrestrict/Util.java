@@ -8,6 +8,9 @@ import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Hacks;
 import com.github.dreadslicer.tekkitrestrict.TRNoHack.HackType;
 
 public class Util {
+	public static boolean hasBypass(Player player, String type){
+		return player.hasPermission("tekkitrestrict.bypass."+type);
+	}
 	public static boolean hasBypass(Player player, String type, String sub){
 		if (sub == null) return player.hasPermission("tekkitrestrict.bypass."+type);
 		return player.hasPermission("tekkitrestrict.bypass."+type+"."+sub);
