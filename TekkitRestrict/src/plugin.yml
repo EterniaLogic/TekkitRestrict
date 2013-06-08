@@ -7,45 +7,65 @@ permissions:
     tekkitrestrict.bypass.*:
         description: Allows access to TekkitRestrict Admin commands
         children:
-            tekkitrestrict.safezone.bypass: true
-            tekkitrestrict.creative.bypass: true
-            tekkitrestrict.dupe.bypass: true
-            tekkitrestrict.noitem.bypass: true
-            tekkitrestrict.limiter.bypass: true
-            tekkitrestrict.craftblock.bypass: true
-            tekkitrestrict.hack.bypass: true
-            tekkitrestrict.lwc.bypass: true
-            tekkitrestrict.flylimit.bypass: true
+            tekkitrestrict.bypass.safezone: true
+            tekkitrestrict.bypass.creative: true
+            tekkitrestrict.bypass.dupe: true
+            tekkitrestrict.bypass.noitem: true
+            tekkitrestrict.bypass.limiter: true
+            tekkitrestrict.bypass.craftblock: true
+            tekkitrestrict.bypass.hack: true
+            tekkitrestrict.bypass.lwc: true
+            tekkitrestrict.bypass.flylimit: true
     tekkitrestrict.noitem.*:
         description: removes the ability to GET "*" by item ID. (Valid 111, datavalue 1111.11, range 111-222, MOD (ic2, ee2, redpower))
     tekkitrestrict.craftblock.*:
         description: removes the ability to craft "*" by item ID. (Valid 111, datavalue 1111.11, range 111-222, MOD (ic2, ee2, redpower))
-    tekkitrestrict.noitem.bypass:
+    tekkitrestrict.bypass.noitem:
         description: Allows the use of all items as described in noitem. 
     tekkitrestrict.limit.*:
         description: removes the ability to craft or GET "*" by item ID. (Valid 111, datavalue 1111.11, range 111-222, MOD (ic2, ee2, redpower))   
-    tekkitrestrict.limit.bypass:
+    tekkitrestrict.bypass.limit:
         description: removes item limiter.
     tekkitrestrict.openalc:
         description: adds the ability to use /alc [player] [bagcolor].
         default: op
     tekkitrestrict.creative.*:
         description: Disables the use of certain defined items
-    tekkitrestrict.creative.bypass:
+    tekkitrestrict.bypass.creative:
         description: Enables the use of any block in creative. 
-    tekkitrestrict.safezone.bypass:
+    tekkitrestrict.bypass.safezone:
         description:  Enables somebody to bypass all safezone.
-    tekkitrestrict.hack.bypass:
+    tekkitrestrict.bypass.hack:
         description:  Enables somebody to bypass no oil derrick preventers.
-    tekkitrestrict.dupe.bypass:
+    tekkitrestrict.bypass.hack.fly:
+        description:  Enables somebody to bypass the anti-fly hack.
+    tekkitrestrict.bypass.hack.forcefield:
+        description:  Enables somebody to bypass the anti-forcefield hack.
+    tekkitrestrict.bypass.hack.speed:
+        description:  Enables somebody to bypass the anti-speed hack.
+    
+    tekkitrestrict.bypass.dupe:
         description:  Enables somebody to bypass the anti-dupe.
-    tekkitrestrict.limiter.bypass:
+    tekkitrestrict.bypass.dupe.alcbag:
+        description:  Enables somebody to bypass the anti-dupe for alchemy bags.
+    tekkitrestrict.bypass.dupe.projecttable:
+        description:  Enables somebody to bypass the anti-dupe for project tables
+    tekkitrestrict.bypass.dupe.rmfurnace:
+        description:  Enables somebody to bypass the anti-dupe for rm furnaces.
+    tekkitrestrict.bypass.dupe.tankcart:
+        description:  Enables somebody to bypass the anti-dupe for tank carts.
+    tekkitrestrict.bypass.dupe.transtablet:
+        description:  Enables somebody to bypass the anti-dupe for the transmution tablet.
+    tekkitrestrict.bypass.dupe.pedestal:
+        description:  Enables somebody to bypass the anti-dupe for the pedestal emc generator.
+    
+    tekkitrestrict.bypass.limiter:
         description:  Enables somebody to have no block limits.
-    tekkitrestrict.craftblock.bypass:
+    tekkitrestrict.bypass.craftblock:
         description:  Enables somebody to craft ANY item.
-    tekkitrestrict.lwc.bypass:
+    tekkitrestrict.bypass.lwc:
         description:  Enables somebody to bypass LWC attached protections.
-    tekkitrestrict.flylimit.bypass:
+    tekkitrestrict.bypass.flylimit:
         description:  Bypass global flight time limit
     
     tekkitrestrict.notify.hack:

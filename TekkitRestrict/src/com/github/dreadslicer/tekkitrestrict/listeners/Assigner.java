@@ -16,7 +16,6 @@ public class Assigner {
 	public static void assign(tekkitrestrict plugin){
 		PluginManager PM = plugin.getServer().getPluginManager();
 		PM.registerEvents(new TRListener(), plugin);
-		PM.registerEvents(new CraftListener(), plugin);
 		
 		PM.registerEvents(new InventoryClickListener(), plugin);
 		if (tekkitrestrict.config.getBoolean("PreventAlcDupe", true) ||

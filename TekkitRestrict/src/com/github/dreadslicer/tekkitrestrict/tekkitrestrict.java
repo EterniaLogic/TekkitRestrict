@@ -227,7 +227,7 @@ public class tekkitrestrict extends JavaPlugin {
 		ttt.worldScrubThread.interrupt();
 		ttt.saveThread.interrupt();
 		
-		try { Thread.sleep(4000); } catch (InterruptedException e) {} //Sleep for 4 seconds to allow the savethread to save.
+		try { Thread.sleep(2000); } catch (InterruptedException e) {} //Sleep for 2 seconds to allow the savethread to save.
 		//try {
 		//	TRThread.originalEUEnd(); (Currently does nothing)
 		//} catch (Exception ex) {

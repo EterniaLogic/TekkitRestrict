@@ -4,14 +4,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.TileEntity;
 import net.minecraft.server.WorldServer;
 
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -169,7 +167,7 @@ public class TRListener implements Listener {
 				TRLimitBlock il = TRLimitBlock.getLimiter(player);
 				if (!il.checkLimit(e)) {
 					if (!Util.hasBypass(player, "limiter")) { //TODO tr.bypass.limiter or tr.bypass.limit
-						player.sendMessage("[TRItemLimiter] You cannot place down any more of that block!");
+						player.sendMessage(ChatColor.RED + "[TRItemLimiter] You cannot place down any more of that block!");
 						e.setCancelled(true);
 						if (te1 instanceof TileCovered) {
 							TileCovered tc = (TileCovered) te1;
@@ -195,7 +193,7 @@ public class TRListener implements Listener {
 			com.github.dreadslicer.tekkitrestrict.ItemStack cc = new com.github.dreadslicer.tekkitrestrict.ItemStack(id, 0, data);
 			if (TRNoItem.isItemBanned(player, cc)) {
 				// tekkitrestrict.log.info(cc.id+":"+cc.getData());
-				player.sendMessage("[TRItemDisabler] You cannot place down this type of block!");
+				player.sendMessage(ChatColor.RED + "[TRItemDisabler] You cannot place down this type of block!");
 				e.setCancelled(true);
 				if (te1 instanceof TileCovered) {
 					TileCovered tc = (TileCovered) te1;
@@ -227,13 +225,14 @@ public class TRListener implements Listener {
 		}
 		
 		try {
-			EntityPlayer ep = ((CraftPlayer) player).getHandle();
-			if (ep.abilities.canInstantlyBuild) {
+			//EntityPlayer ep = ((CraftPlayer) player).getHandle();
+			//if (ep.abilities.canInstantlyBuild) {
+			if (player.getGameMode() == GameMode.CREATIVE){
 				if (!Util.hasBypass(player, "creative")) {
 					/*Item ccr = event.getItemDrop();
 					ItemStack ccc = ccr.getItemStack();*/
 					event.setCancelled(true);
-					player.sendMessage("[TRLimitedCreative] You cannot drop items!");
+					player.sendMessage(ChatColor.RED + "[TRLimitedCreative] You cannot drop items!");
 				}
 			}
 		} catch(Exception ex){
@@ -395,7 +394,7 @@ public class TRListener implements Listener {
 			
 		if (TRNoItem.isItemBanned(player,
 				new com.github.dreadslicer.tekkitrestrict.ItemStack(currentItem.getTypeId(), 0, currentItem.getDurability()))) {
-			player.sendMessage("[TRItemDisabler] You cannot obtain/modify this Item type!");
+			player.sendMessage(ChatColor.RED + "[TRItemDisabler] You cannot obtain/modify this Item type!");
 			event.setCancelled(true);
 		}
 		
