@@ -360,26 +360,27 @@ public class TRListener implements Listener {
 	public void eventInventoryClick(InventoryClickEvent event) {
 		// we want to stop non-players from being activated here.
 		
-		if (event.getWhoClicked() != null) {
-			try {
-				Player player = (Player) event.getWhoClicked();
-				EntityPlayer ep = ((CraftPlayer) player).getHandle();
-				if (ep.abilities.canInstantlyBuild) {
-					TRLimitedCreative.handleCreativeInvClick(event);
-				}
-			} catch (Exception ex) {
-				TRLogger.Log("debug", "Error! [handleCreativeInv Listener] : " + ex.getMessage());
-				Log.Exception(ex);
+		if (event.getWhoClicked() == null) return;
+		try {
+			Player player = (Player) event.getWhoClicked();
+			EntityPlayer ep = ((CraftPlayer) player).getHandle();
+			if (ep.abilities.canInstantlyBuild) {
+				TRLimitedCreative.handleCreativeInvClick(event);
 			}
-			// Determine if they are crafting an uncraftable. Log EE
-			// Crafting.
-			// Perf: [0]
-			try {
-				handleCraftBlock(event);
-			} catch (Exception e) {
-				TRLogger.Log("debug", "Error! [TRhandleCraftBlock] : " + e.getMessage());
-			}
+		} catch (Exception ex) {
+			TRLogger.Log("debug", "Error! [handleCreativeInv Listener] : " + ex.getMessage());
+			Log.Exception(ex);
 		}
+		// Determine if they are crafting an uncraftable. Log EE
+		// Crafting.
+		// Perf: [0]
+		try {
+			handleCraftBlock(event);
+		} catch (Exception ex) {
+			TRLogger.Log("debug", "Error! [TRhandleCraftBlock] : " + ex.getMessage());
+			Log.Exception(ex);
+		}
+		
 	}
 
 	private void handleCraftBlock(InventoryClickEvent event) {
@@ -387,14 +388,14 @@ public class TRListener implements Listener {
 		ItemStack currentItem = event.getCurrentItem();
 		if (currentItem == null) return;
 		
-		if (!Util.hasBypass(player, "noitem")) {
+		if (Util.hasBypass(player, "noitem")) return;
 			
-			if (TRNoItem.isItemBanned(player,
-					new com.github.dreadslicer.tekkitrestrict.ItemStack(currentItem.getTypeId(), 0, currentItem.getDurability()))) {
-				player.sendMessage("[TRItemDisabler] You cannot obtain/modify this Item type!");
-				event.setCancelled(true);
-			}
+		if (TRNoItem.isItemBanned(player,
+				new com.github.dreadslicer.tekkitrestrict.ItemStack(currentItem.getTypeId(), 0, currentItem.getDurability()))) {
+			player.sendMessage("[TRItemDisabler] You cannot obtain/modify this Item type!");
+			event.setCancelled(true);
 		}
+		
 	}
 
 	// ////////////////END INVClicks //////////////////////////
@@ -407,7 +408,7 @@ public class TRListener implements Listener {
 		if (tekkitrestrict.config.getBoolean("UseItemLimiter") && tekkitrestrict.config.getBoolean("UseItemLimiter")) {
 			try {TRLimitBlock.setExpire(player.getName());}catch(Exception eee){}
 			try {TRNoHack.playerLogout(player);}catch(Exception eee){}
-			try{TRNoDupeProjectTable.playerUnuse(player.getName());}catch(Exception eee){}
+			try {TRNoDupeProjectTable.playerUnuse(player.getName());}catch(Exception eee){}
 		}
 	}
 
@@ -419,7 +420,7 @@ public class TRListener implements Listener {
 		if (tekkitrestrict.config.getBoolean("UseItemLimiter") && tekkitrestrict.config.getBoolean("UseItemLimiter")) {
 			try {TRLimitBlock.setExpire(player.getName());}catch(Exception eee){}
 			try {TRNoHack.playerLogout(player);}catch(Exception eee){}
-			try{TRNoDupeProjectTable.playerUnuse(player.getName());}catch(Exception eee){}
+			try {TRNoDupeProjectTable.playerUnuse(player.getName());}catch(Exception eee){}
 		}
 	}
 
@@ -486,11 +487,9 @@ public class TRListener implements Listener {
 					PickupTick.put(player, 1);
 				
 			}
-		} catch (Exception ee) {
-			TRLogger.Log("debug", "Error! [TRNoDupePickup] : " + ee.getMessage());
-			for(StackTraceElement eer:ee.getStackTrace()){
-				TRLogger.Log("debug","    "+eer.toString()); 
-			}
+		} catch (Exception ex) {
+			TRLogger.Log("debug", "Error! [TRNoDupePickup] : " + ex.getMessage());
+			Log.Exception(ex);
 		}
 	}
 }
