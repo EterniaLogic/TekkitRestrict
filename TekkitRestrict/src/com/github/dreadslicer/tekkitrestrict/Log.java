@@ -112,6 +112,9 @@ public class Log {
 		String message = playername + " tried to glitch using a " + type + ".";
 		McLogger.log(Level.parse("TEDupe"), message);
 	}
+	/**
+	 * For each stackTrace element, it will write it to the debug log.
+	 */
 	public static void Exception(Exception ex){
 		for (StackTraceElement element : ex.getStackTrace()) {
 			TRLogger.Log("debug", "     " + element.toString());

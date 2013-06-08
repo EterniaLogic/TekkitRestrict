@@ -27,240 +27,211 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.PlayerInventory;
 
+import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Threads;
 import com.github.dreadslicer.tekkitrestrict.lib.TRCharge;
 
 import ee.EEBase;
+import ee.ItemEECharged;
 import eloraam.logic.TileLogicPointer;
 
 public class TRThread {
-	public saveThread st = new saveThread();
-	public DisableItemThread ls = new DisableItemThread();
-	public TWorldScrubber at = new TWorldScrubber();
-	public TGemArmorDisabler t3 = new TGemArmorDisabler();
-	public TEntityRemover t4 = new TEntityRemover();
+	/** Thread will trigger again if interrupted. */
+	public TSaveThread saveThread = new TSaveThread();
+	/** Thread will NOT trigger again if interrupted. */
+	public DisableItemThread disableItemThread = new DisableItemThread();
+	/** Thread will NOT trigger again if interrupted. */
+	public TWorldScrubber worldScrubThread = new TWorldScrubber();
+	/** Thread will NOT trigger again if interrupted. */
+	public TGemArmorDisabler gemArmorThread = new TGemArmorDisabler();
+	/** Thread will NOT trigger again if interrupted. */
+	public TEntityRemover entityRemoveThread = new TEntityRemover();
 	private static TRThread instance;
 
 	public TRThread() {
 		instance = this;
 	}
 
+	/** Give a name to all threads and then start them. */
 	public void init() {
-
-		st.setName("TekkitRestrict_SaveThread");
-		ls.setName("TekkitRestrict_InventorySearchThread");
-		at.setName("TekkitRestrict_BlockScrubberThread");
-		t3.setName("TekkitRestrict_GemArmorThread");
-		t4.setName("TekkitRestrict_EntityRemoverThread");
-		st.start();
-		ls.start();
-		at.start();
-		t3.start();
-		t4.start();
+		saveThread.setName("TekkitRestrict_SaveThread");
+		disableItemThread.setName("TekkitRestrict_InventorySearchThread");
+		worldScrubThread.setName("TekkitRestrict_BlockScrubberThread");
+		gemArmorThread.setName("TekkitRestrict_GemArmorThread");
+		entityRemoveThread.setName("TekkitRestrict_EntityRemoverThread");
+		saveThread.start();
+		disableItemThread.start();
+		worldScrubThread.start();
+		gemArmorThread.start();
+		entityRemoveThread.start();
 	}
 
 	public static void reload() {
 		// reloads the variables in each thread...
-		instance.at.reload();
-		instance.ls.reload();
-		instance.t3.reload();
-		instance.t4.reload();
+		instance.disableItemThread.reload();
 	}
 
 	public static void originalEUEnd() {
-		instance.ls.originalEUEnd();
+		instance.disableItemThread.originalEUEnd();
 	}
 }
 
 class TGemArmorDisabler extends Thread {
-	List<Player> bypassers = Collections.synchronizedList(new LinkedList<Player>());
-	int TSpeed;
-	boolean Movement, Offensive;
+	//List<Player> bypassers = Collections.synchronizedList(new LinkedList<Player>());
 
 	@Override
 	public void run() {
-		boolean done = false;
-		while (!done) {
+		int errors = 0;
+		while (true) {
 			try {
+				if (!tekkitrestrict.EEEnabled){
+					tekkitrestrict.log.warning("The GemArmorDisabler thread has stopped because EE is disabled.");
+					break; //If ee is disabled, stop the thread.
+				}
 				GemArmorDisabler();
-				try {
-					Thread.sleep(TSpeed);
-				} catch (InterruptedException e) {
+			} catch (Exception ex) {
+				errors++;
+				TRLogger.Log("debug", "Error: [GemArmor thread] " + ex.getMessage());
+				Log.Exception(ex);
+				
+				if (errors > 100){
+					tekkitrestrict.log.warning("The GemArmorDisabler thread has errord for more than 100 time now. It will now be disabled.");
+					break;
 				}
-			} catch (Exception e) {
-				TRLogger.Log("debug", "Error: [GemArmor thread] " + e.getMessage());
-				for(StackTraceElement eer:e.getStackTrace()){
-					TRLogger.Log("debug","    "+eer.toString()); 
-				}
+			}
+			
+			try {
+				Thread.sleep(Threads.gemArmorSpeed);
+			} catch (InterruptedException e) {
+				if (tekkitrestrict.disable) break; //If plugin is disabling, then stop the thread. The gemarmor thread shouldn't trigger again.
 			}
 		}
 	}
 
 	private void GemArmorDisabler() {
-		if (tekkitrestrict.EEEnabled) {
-			// ee.EEBase.getInstance();
-			try {
-				// tekkitrestrict.getInstance();
-
-				// tekkitrestrict.log.info("Bypassers: "+bypassers.size());
-				// apply "Treatment"
-				if (!Movement) {
-					synchronized (EEBase.playerArmorMovementToggle) {
-						/*
-						 * for(Object
-						 * xu:EEBase.playerArmorMovementToggle.keySet()){
-						 * EntityHuman hu = (EntityHuman)xu;
-						 * EEBase.playerArmorMovementToggle.put(hu, false); }
-						 */
-						EEBase.playerArmorMovementToggle.clear();
-					}
+		//TODO Change this one day
+		try {
+			if (!Threads.GAMovement) {
+				synchronized (EEBase.playerArmorMovementToggle) {
 					/*
-					 * Set ks = EEBase.playerArmorMovementToggle.keySet();
-					 * Iterator ki = ks.iterator();
-					 * 
-					 * while(ki.hasNext()){ net.minecraft.server.EntityHuman H =
-					 * (net.minecraft.server.EntityHuman)ki.next();
-					 * 
-					 * if(!bypassers.contains(tr.getServer().getPlayer(H.name))){
-					 * EEBase.playerArmorMovementToggle.remove(H);
-					 * tr.getServer().getPlayer(H.name).sendRawMessage("<?>"); }
-					 * }
+					 * for(Object
+					 * xu:EEBase.playerArmorMovementToggle.keySet()){
+					 * EntityHuman hu = (EntityHuman)xu;
+					 * EEBase.playerArmorMovementToggle.put(hu, false); }
 					 */
+					EEBase.playerArmorMovementToggle.clear();
 				}
-				if (!Offensive) {
-					synchronized (EEBase.playerArmorOffensiveToggle) {
-						
-						 /*for(Object xu:EEBase.playerArmorOffensiveToggle.keySet()){
-							 EntityHuman hu = (EntityHuman)xu;
-							 EEBase.playerArmorOffensiveToggle.put(hu, false); 
-						 }*/
-						
-						EEBase.playerArmorOffensiveToggle.clear();
-					}
-					/*
-					 * Set ks1 = EEBase.playerArmorOffensiveToggle.keySet();
-					 * Iterator ki1 = ks1.iterator();
-					 * 
-					 * while(ki1.hasNext()){ net.minecraft.server.EntityHuman H
-					 * = (net.minecraft.server.EntityHuman)ki1.next(); //boolean
-					 * val =
-					 * ((Boolean)EEBase.playerArmorOffensiveToggle.get(H)).
-					 * booleanValue();
-					 * if(!bypassers.contains(tr.getServer().getPlayer
-					 * (H.name))){ EEBase.playerArmorMovementToggle.remove(H);
-					 * tr.getServer().getPlayer(H.name).sendRawMessage("<?>"); }
-					 * }
-					 */
-				}
-			} catch (Exception E) {
-
+				/*
+				 * Set ks = EEBase.playerArmorMovementToggle.keySet();
+				 * Iterator ki = ks.iterator();
+				 * 
+				 * while(ki.hasNext()){ net.minecraft.server.EntityHuman H =
+				 * (net.minecraft.server.EntityHuman)ki.next();
+				 * 
+				 * if(!bypassers.contains(tr.getServer().getPlayer(H.name))){
+				 * EEBase.playerArmorMovementToggle.remove(H);
+				 * tr.getServer().getPlayer(H.name).sendRawMessage("<?>"); }
+				 * }
+				 */
 			}
-		}
+			
+			if (!Threads.GAOffensive) {
+				synchronized (EEBase.playerArmorOffensiveToggle) {
+					
+					 /*for(Object xu:EEBase.playerArmorOffensiveToggle.keySet()){
+						 EntityHuman hu = (EntityHuman)xu;
+						 EEBase.playerArmorOffensiveToggle.put(hu, false); 
+					 }*/
+					
+					EEBase.playerArmorOffensiveToggle.clear();
+				}
+				/*
+				 * Set ks1 = EEBase.playerArmorOffensiveToggle.keySet();
+				 * Iterator ki1 = ks1.iterator();
+				 * 
+				 * while(ki1.hasNext()){ net.minecraft.server.EntityHuman H
+				 * = (net.minecraft.server.EntityHuman)ki1.next(); //boolean
+				 * val =
+				 * ((Boolean)EEBase.playerArmorOffensiveToggle.get(H)).
+				 * booleanValue();
+				 * if(!bypassers.contains(tr.getServer().getPlayer
+				 * (H.name))){ EEBase.playerArmorMovementToggle.remove(H);
+				 * tr.getServer().getPlayer(H.name).sendRawMessage("<?>"); }
+				 * }
+				 */
+			}
+		} catch (Exception ex) {}
 	}
-
-	public void reload() {
-		this.Offensive = tekkitrestrict.config.getBoolean("AllowGemArmorOffensive");
-		this.Movement = tekkitrestrict.config.getBoolean("AllowGemArmorDefensive");
-		this.TSpeed = tekkitrestrict.config.getInt("GemArmorDThread");
-		reloadBypassers();
-	}
-
+	/*
 	private void reloadBypassers() {
-		bypassers.clear();
-		Player[] ps = tekkitrestrict.getInstance().getServer().getOnlinePlayers();
+		//bypassers.clear();
+		//Player[] ps = tekkitrestrict.getInstance().getServer().getOnlinePlayers();
 		// boolean SSDisableGemArmor =
 		// tekkitrestrict.config.getBoolean("SSDisableGemArmor");
 
-		for (Player player : ps) {
+		//for (Player player : ps) {
 			// boolean abypass = tekkitrestrict.p erm.h as(ps[i],
 			// "tekkitrestrict.abypass");
 			// boolean SSbypass = tekkitrestrict.p erm.h as(ps[i],
 			// "tekkitrestrict.safezone.bypass");
-			boolean abypass = TRPermHandler.hasPermission(player, "abypass", "", "");
-			/*
+			//boolean abypass = TRPermHandler.hasPermission(player, "abypass", "", "");
+			
 			 * boolean SSbypass =
 			 * tekkitrestrict.hasPermission(ps[i],"tekkitrestrict.safezone.bypass"
 			 * ); if(safeZone.inSafeZone(ps[i])){ //we now HAVE to have a
 			 * safezone bypass to disable this. if(SSDisableGemArmor){
 			 * if(SSbypass && abypass){ bypassers.add(ps[i]); } } } else
-			 */
-			if (abypass) bypassers.add(player);
+			 
+			//if (abypass) bypassers.add(player);
 			
-		}
-	}
+		//}
+	}*/
 }
 
 class TEntityRemover extends Thread {
-	boolean SSDisableEntities;
-	int TSpeed;
-
 	@Override
 	public void run() {
-		boolean done = false;
-		while (!done) {
+		while (true) {
 			try {
 				disableEntities();
-				try {
-					Thread.sleep(TSpeed);
-				} catch (InterruptedException e) {
-				}
-			} catch (Exception e) {
-				TRLogger.Log("debug",
-						"Error: [Entity thread] " + e.getMessage());
-				for(StackTraceElement eer:e.getStackTrace()){
-					TRLogger.Log("debug","    "+eer.toString()); 
-				}
+			} catch (Exception ex) {
+				TRLogger.Log("debug", "Error: [Entity thread] " + ex.getMessage());
+				Log.Exception(ex);
+			}
+			
+			try {
+				Thread.sleep(Threads.SSEntityRemoverSpeed);
+			} catch (InterruptedException e) {
+				if (tekkitrestrict.disable) break; //If plugin is disabling, then stop the thread. The EntityRemoveThread shouldn't trigger again.
 			}
 		}
 	}
 
 	private void disableEntities() {
-		if (this.SSDisableEntities) {
+		if (!Threads.SSDisableEntities) return;
 
-			// search through all of the entities
-			List<World> wlist = tekkitrestrict.getInstance().getServer().getWorlds();
+		// search through all of the entities
+		List<World> worlds = tekkitrestrict.getInstance().getServer().getWorlds();
 
-			for (int i = 0; i < wlist.size(); i++) {
-				net.minecraft.server.World wo = ((CraftWorld) wlist.get(i)).getHandle();
-				// synchronize with the world thread...
-
-				//FIXME foreach?
-				for (int j = 0; j < wo.entityList.size(); j++) { // loop through
-																	// entities
-					// synchronized(wo){
-					// synchronize...
-					// try { wo.wait(); } catch (InterruptedException e2) {}
-
-					net.minecraft.server.Entity e1 = (net.minecraft.server.Entity) wo.entityList
-							.get(j);
-					Entity e = e1.getBukkitEntity();
-					if (TRSafeZone.inXYZSafeZone(e.getLocation(), e.getWorld().getName())) {
-						if (!(e instanceof Player) && !(e instanceof org.bukkit.entity.Item)) {
-							e.remove();
-						}
-					}
-					// wo.notify();
-					// }
+		//TODO entitylist might be changing while this is being done.
+		for (World world : worlds) {
+			net.minecraft.server.World wo = ((CraftWorld) world).getHandle();
+			
+			for (Object e1 : wo.entityList) { // loop through entities
+				Entity e = ((net.minecraft.server.Entity) e1).getBukkitEntity();
+				if (e instanceof Player || e instanceof org.bukkit.entity.Item) continue;
+				if (TRSafeZone.inXYZSafeZone(e.getLocation(), e.getWorld().getName())) {
+					e.remove();
 				}
 			}
-			wlist.clear();
 		}
-	}
-
-	public void reload() {
-		this.TSpeed = tekkitrestrict.config.getInt("SSEntityRemoverThread");
-		this.SSDisableEntities = tekkitrestrict.config
-				.getBoolean("SSDisableEntities");
 	}
 }
 
 class DisableItemThread extends Thread {
-	private int TSpeed, toid;
 	//private boolean throttle;
-	private boolean SSDechargeEE, SSDisableArcane;
 	private List<TRCacheItem> SSDecharged = Collections.synchronizedList(new LinkedList<TRCacheItem>());
-	private List<TRCharge> MCharges = Collections
-			.synchronizedList(new LinkedList<TRCharge>()), maxEU = Collections
-			.synchronizedList(new LinkedList<TRCharge>());
+	private List<TRCharge> MCharges = Collections.synchronizedList(new LinkedList<TRCharge>()),
+						   maxEU = Collections.synchronizedList(new LinkedList<TRCharge>());
 	private List<TRCharge> originalEU = Collections.synchronizedList(new LinkedList<TRCharge>());
 	private List<String> MChargeStr = Collections
 			.synchronizedList(new LinkedList<String>()),
@@ -271,10 +242,7 @@ class DisableItemThread extends Thread {
 	ExecutorService exe = Executors.newCachedThreadPool();
 	@Override
 	public void run() {
-		// loop forever, unless told to stop...
-		boolean done = false;
-
-		while (!done) {
+		while (true) {
 			try {
 				// Disabled Items remover
 				// if (UseNoItem) {
@@ -293,21 +261,20 @@ class DisableItemThread extends Thread {
 						} else {*/
 							disableItems(pp);
 						//}
-					} catch (Exception e) {
-						TRLogger.Log("debug", "Error: [ItemDisabler[1] thread] " + e.getMessage());
-						for(StackTraceElement eer:e.getStackTrace()){
-							TRLogger.Log("debug","    "+eer.toString()); 
-						}
+					} catch (Exception ex) {
+						TRLogger.Log("debug", "Error: [ItemDisabler[1] thread] " + ex.getMessage());
+						Log.Exception(ex);
 					}
 				}
-				// }
-
-				try {
-					Thread.sleep(TSpeed);
-				} catch (InterruptedException e) {
-				}
-			} catch (Exception e) {
-				TRLogger.Log("debug", "Error: [ItemDisabler thread] " + e.getMessage());
+			} catch (Exception ex) {
+				TRLogger.Log("debug", "Error: [ItemDisabler thread] " + ex.getMessage());
+				Log.Exception(ex);
+			}
+			
+			try {
+				Thread.sleep(Threads.inventorySpeed);
+			} catch (InterruptedException e) {
+				if (tekkitrestrict.disable) break; //If plugin is disabling, then stop the thread. The disableItemsThread should not trigger again. (As all players will be gone on shutdown)
 			}
 		}
 	}
@@ -331,300 +298,249 @@ class DisableItemThread extends Thread {
 						}
 					}
 				}
-			} catch (Exception e) {
-				TRLogger.Log(
-						"debug",
-						"Error: [Inventory thread] DisableCursorItem "
-								+ e.getMessage());
-				for(StackTraceElement ee:e.getStackTrace()){
-					TRLogger.Log("debug","    "+ee.toString()); 
-				}
+			} catch (Exception ex) {
+				TRLogger.Log("debug", "Error: [Inventory thread] DisableCursorItem " + ex.getMessage());
+				Log.Exception(ex);
 			}*/
 			// //////////// NORMAL INVENTORY
 			boolean changed = false;
 			for (int i = 0; i < st1.length; i++) {
 				try {
-					// org.bukkit.inventory.ItemStack str = st1[i];
-					if (st1[i] != null) {
+					if (st1[i] == null) continue;
 
-						ItemStack ee = new ItemStack(st1[i].getTypeId(),
-								st1[i].getAmount(), st1[i].getData().getData());
-						net.minecraft.server.ItemStack var1 = ((CraftItemStack) st1[i]).getHandle();
+					ItemStack ee = new ItemStack(st1[i].getTypeId(), st1[i].getAmount(), st1[i].getData().getData());//TODO change to .getDurability()?
+					net.minecraft.server.ItemStack mcItemStack = ((CraftItemStack) st1[i]).getHandle();
 
-						// tekkitrestrict.log.info("heh1");
-						// //// BAN THE ITEM
-						if (TRNoItem.isItemBanned(player, ee) || TRNoItem.isCreativeItemBanned(player, ee)) {
-							st1[i] = new org.bukkit.inventory.ItemStack(toid, 1);
-							changed = true;
-						}
+					// //// BAN THE ITEM
+					if (TRNoItem.isItemBanned(player, ee) || TRNoItem.isCreativeItemBanned(player, ee)) {
+						st1[i] = new org.bukkit.inventory.ItemStack(Threads.ChangeDisabledItemsIntoId, 1);
+						changed = true;
+					}
 
-						// //// HANDLE DECHARGE / MAXCHARGE (EE / IC2)
-						if (!changed) {
+					// //// HANDLE DECHARGE / MAXCHARGE (EE / IC2)
+					if (changed) continue;
+					
+					try {
+						String tstr = st1[i].getTypeId() + "";// +":"+st1[i].getData();
+
+						if (tekkitrestrict.EEEnabled) {
 							try {
-								String tstr = st1[i].getTypeId() + "";// +":"+st1[i].getData();
+								int m = MChargeStr.indexOf(tstr);
+								if (m != -1) {
+									TRCharge g = MCharges.get(m);
+									if (g.id == st1[i].getTypeId()) {
+										if (mcItemStack.getItem() instanceof ee.ItemEECharged) {
+											ItemEECharged eer = (ItemEECharged) mcItemStack.getItem();
+											double maxEE = eer.getMaxCharge();
+											double per = maxEE / 100.000;
+											int setMax = (new Double(per * g.maxcharge)).intValue();
 
-								if (tekkitrestrict.EEEnabled) {
-									try {
-										int m = MChargeStr.indexOf(tstr);
-										if (m != -1) {
-											TRCharge g = MCharges.get(m);
-											if (g.id == st1[i].getTypeId()) {
-												if (var1.getItem() instanceof ee.ItemEECharged) {
-													ee.ItemEECharged eer = (ee.ItemEECharged) var1.getItem();
-													double maxEE = eer.getMaxCharge();
-													double per = maxEE / 100.000;
-													int setMax = (new Double(per * g.maxcharge)).intValue();
-													// tekkitrestrict.log.info("Keptcha");
-													short chargeGoal = getShort(st1[i], "chargeGoal");
-													short chargeLevel = getShort(st1[i], "chargeLevel");
-													short chargeTicks = getShort(st1[i], "chargeTicks");
-													if (chargeGoal > setMax || chargeLevel > setMax) {
-														setShort(st1[i], "chargeLevel", setMax);
-														setShort(st1[i], "chargeGoal", setMax);
-														// var1.setData(setMax);
-														var1.setData(var1.i() - (setMax * 10 + chargeTicks << (eer.canActivate2() ? 2 :
-															((int) (eer.canActivate() ? 1 :
-																0)))));
-														changed = true;
-													}
-												}
-											}
-										}
-									} catch (Exception ex) {
-										TRLogger.Log("debug", "Error: [MaxCharge thread] " + ex.getMessage());
-										for(StackTraceElement ae:ex.getStackTrace()){
-											TRLogger.Log("debug","    "+ae.toString()); 
-										}
-									}
-								}
-
-								if (maxEUStr.contains(tstr)) {
-									try {
-										TRCharge s = maxEU.get(maxEUStr.indexOf(tstr));
-										Item si = var1.getItem();
-										NBTTagCompound nbttagcompound = StackUtil.getOrCreateNbtData(var1);
-										if (si instanceof ItemArmorElectric) {
-											ItemArmorElectric ci = (ItemArmorElectric) si;
-											if (ci.maxCharge != s.maxcharge || ci.transferLimit != s.chargerate) {
-												this.addOriginalEU(ci.id, ci.maxCharge, ci.transferLimit, var1);
-												// tekkitrestrict.log.info(ci.maxCharge+" dur: "+var1.i()+" mc: "+ci.getMaxCharge());
-												double charge = nbttagcompound.getInt("charge");
-												Double newcharge = (new Double(charge) * new Double(s.maxcharge))
-														/ new Double(ci.maxCharge);
-												// tekkitrestrict.log.info("charge: "+charge+" newcharge: "+newcharge);
-												ci.maxCharge = s.maxcharge;
-												ci.transferLimit = s.chargerate;
-												nbttagcompound.setInt("charge", newcharge.intValue());
-
-												ElectricItem.charge(var1, 10, 9999, true, false);
-												/*
-												 * if (var1.i() > 2)
-												 * var1.setData(1 +
-												 * ((s.maxcharge - newcharge) *
-												 * (var1.i() - 2)) /
-												 * s.maxcharge); else
-												 * var1.setData(0);
-												 */
-												changed = true;
-											}
-										} else if (si instanceof ItemElectricTool) {
-											ItemElectricTool ci = (ItemElectricTool) si;
-											if (ci.maxCharge != s.maxcharge || ci.transferLimit != s.chargerate) {
-												this.addOriginalEU(ci.id, ci.maxCharge, ci.transferLimit, var1);
-												// tekkitrestrict.log.info(ci.maxCharge+" dur: "+var1.i()+" mc: "+ci.getMaxCharge());
-												double charge = nbttagcompound.getInt("charge");
-												Double newcharge = (new Double(charge) * new Double(s.maxcharge))
-														/ new Double(ci.maxCharge);
-												// tekkitrestrict.log.info("charge: "+charge+" newcharge: "+newcharge);
-												ci.maxCharge = s.maxcharge;
-												ci.transferLimit = s.chargerate;
-												nbttagcompound.setInt("charge", newcharge.intValue());
-
-												ElectricItem.charge(var1, 10, 9999, true, false);
-												/*
-												 * if (var1.i() > 2)
-												 * var1.setData(1 +
-												 * ((s.maxcharge - newcharge) *
-												 * (var1.i() - 2)) /
-												 * s.maxcharge); else
-												 * var1.setData(0);
-												 */
-												changed = true;
-											}
-										} else if (si instanceof ElectricItem) {
-											ElectricItem ci = (ElectricItem) si;
-											if (ci.maxCharge != s.maxcharge || ci.transferLimit != s.chargerate) {
-												this.addOriginalEU(ci.id, ci.maxCharge, ci.transferLimit, var1);
-												// tekkitrestrict.log.info(ci.maxCharge+" dur: "+var1.i()+" mc: "+ci.getMaxCharge());
-												double charge = nbttagcompound.getInt("charge");
-												Double newcharge = (new Double(charge) * new Double(s.maxcharge))
-														/ new Double(ci.maxCharge);
-												// tekkitrestrict.log.info("charge: "+charge+" newcharge: "+newcharge);
-												ci.maxCharge = s.maxcharge;
-												ci.transferLimit = s.chargerate;
-												nbttagcompound.setInt("charge", newcharge.intValue());
-
-												ElectricItem.charge(var1, 10, 9999, true, false);
-												/*
-												 * if (var1.i() > 2)
-												 * var1.setData(1 +
-												 * ((s.maxcharge - newcharge) *
-												 * (var1.i() - 2)) /
-												 * s.maxcharge); else
-												 * var1.setData(0);
-												 */
+											short chargeGoal = getShort(st1[i], "chargeGoal");
+											short chargeLevel = getShort(st1[i], "chargeLevel");
+											short chargeTicks = getShort(st1[i], "chargeTicks");
+											if (chargeGoal > setMax || chargeLevel > setMax) {
+												setShort(st1[i], "chargeLevel", setMax);
+												setShort(st1[i], "chargeGoal", setMax);
+												// var1.setData(setMax);
+												mcItemStack.setData(mcItemStack.i() - (setMax * 10 + chargeTicks << (eer.canActivate2() ? 2 :
+													((int) (eer.canActivate() ? 1 :
+														0)))));
 												changed = true;
 											}
 										}
-										/*
-										 * if (itemstack.i() > 2)
-										 * itemstack.setData(1 +
-										 * ((ielectricitem1.getMaxCharge() - k)
-										 * * (itemstack .i() - 2)) /
-										 * ielectricitem1.getMaxCharge()); else
-										 * itemstack.setData(0);
-										 */
-									} catch (Exception e) {
-										TRLogger.Log("debug", "Error: [Decharger[7] thread] " + e.getMessage());
-										for(StackTraceElement eer:e.getStackTrace()){
-											TRLogger.Log("debug","    "+eer.toString()); 
-										}
 									}
 								}
-
-								if (TRSafeZone.inSafeZone(player) && !TRPermHandler.hasPermission(player, "safezone", "bypass", "")) {
-									//tekkitrestrict.log.info("in SS");
-									try {
-										if (SSDisableArcane) {
-											if (st1[i] != null) {
-												if (st1[i].getTypeId() == 27584
-														&& (var1.getData() != 6 || !getString(st1[i], "mode").equals("earth"))) {
-													setString(st1[i], "mode", "earth");
-													var1.setData(6);
-												}
-											}
-										}
-									} catch (Exception ex) {
-										TRLogger.Log("debug", "SSDisableArcane[2] Error! " + ex.getMessage());
-									}
-									if (SSDechargeEE) {
-										int m = SSDechargedStr.indexOf(tstr);
-										if (m != -1) {
-											try {
-												TRCacheItem g = SSDecharged.get(m);
-												if (g.id == st1[i].getTypeId()) {
-													if (var1.getItem() instanceof ee.ItemEECharged) {
-														//ee.ItemEECharged eer = (ee.ItemEECharged) var1
-														//		.getItem();
-														if (st1[i].getTypeId() == g.id &&
-															(getShort(st1[i], "chargeGoal") > 0 || getShort(st1[i], "chargeLevel") > 0)) {
-
-															setShort(st1[i], "chargeLevel", 0);
-															setShort(st1[i], "chargeGoal", 0);
-															var1.setData(200);
-															changed = true;
-															// cx.tag = new
-															// NBTTagCompound();
-															// setShort(cx,
-															// "chargeLevel",
-															// 0);
-														}
-													}
-												}
-											} catch (Exception ex) {
-												TRLogger.Log("debug", "SSDisableItem[9] Error! " + ex.getMessage());
-												for(StackTraceElement eer:ex.getStackTrace()){
-													TRLogger.Log("debug","    "+eer.toString()); 
-												}
-											}
-										}
-									}
-								}
-							} catch (Exception e) {
-								TRLogger.Log("debug", "Error: [Decharger[6] thread] " + e.getMessage());
-								for(StackTraceElement eer:e.getStackTrace()){
-									TRLogger.Log("debug","    "+eer.toString()); 
-								}
+							} catch (Exception ex) {
+								TRLogger.Log("debug", "Error: [MaxCharge thread] " + ex.getMessage());
+								Log.Exception(ex);
 							}
 						}
+
+						if (maxEUStr.contains(tstr)) {
+							try {
+								TRCharge s = maxEU.get(maxEUStr.indexOf(tstr));
+								Item si = mcItemStack.getItem();
+								NBTTagCompound nbttagcompound = StackUtil.getOrCreateNbtData(mcItemStack);
+								if (si instanceof ItemArmorElectric) {
+									ItemArmorElectric ci = (ItemArmorElectric) si;
+									if (ci.maxCharge != s.maxcharge || ci.transferLimit != s.chargerate) {
+										this.addOriginalEU(ci.id, ci.maxCharge, ci.transferLimit, mcItemStack);
+										// tekkitrestrict.log.info(ci.maxCharge+" dur: "+var1.i()+" mc: "+ci.getMaxCharge());
+										double charge = nbttagcompound.getInt("charge");
+										Double newcharge = (new Double(charge) * new Double(s.maxcharge))
+												/ new Double(ci.maxCharge);
+										// tekkitrestrict.log.info("charge: "+charge+" newcharge: "+newcharge);
+										ci.maxCharge = s.maxcharge;
+										ci.transferLimit = s.chargerate;
+										nbttagcompound.setInt("charge", newcharge.intValue());
+
+										ElectricItem.charge(mcItemStack, 10, 9999, true, false);
+										/*
+										 * if (var1.i() > 2)
+										 * var1.setData(1 +
+										 * ((s.maxcharge - newcharge) *
+										 * (var1.i() - 2)) /
+										 * s.maxcharge); else
+										 * var1.setData(0);
+										 */
+										changed = true;
+									}
+								} else if (si instanceof ItemElectricTool) {
+									ItemElectricTool ci = (ItemElectricTool) si;
+									if (ci.maxCharge != s.maxcharge || ci.transferLimit != s.chargerate) {
+										this.addOriginalEU(ci.id, ci.maxCharge, ci.transferLimit, mcItemStack);
+										// tekkitrestrict.log.info(ci.maxCharge+" dur: "+var1.i()+" mc: "+ci.getMaxCharge());
+										double charge = nbttagcompound.getInt("charge");
+										Double newcharge = (new Double(charge) * new Double(s.maxcharge))
+												/ new Double(ci.maxCharge);
+										// tekkitrestrict.log.info("charge: "+charge+" newcharge: "+newcharge);
+										ci.maxCharge = s.maxcharge;
+										ci.transferLimit = s.chargerate;
+										nbttagcompound.setInt("charge", newcharge.intValue());
+
+										ElectricItem.charge(mcItemStack, 10, 9999, true, false);
+										/*
+										 * if (var1.i() > 2)
+										 * var1.setData(1 +
+										 * ((s.maxcharge - newcharge) *
+										 * (var1.i() - 2)) /
+										 * s.maxcharge); else
+										 * var1.setData(0);
+										 */
+										changed = true;
+									}
+								} else if (si instanceof ElectricItem) {
+									ElectricItem ci = (ElectricItem) si;
+									if (ci.maxCharge != s.maxcharge || ci.transferLimit != s.chargerate) {
+										this.addOriginalEU(ci.id, ci.maxCharge, ci.transferLimit, mcItemStack);
+										// tekkitrestrict.log.info(ci.maxCharge+" dur: "+var1.i()+" mc: "+ci.getMaxCharge());
+										double charge = nbttagcompound.getInt("charge");
+										Double newcharge = (new Double(charge) * new Double(s.maxcharge))
+												/ new Double(ci.maxCharge);
+										// tekkitrestrict.log.info("charge: "+charge+" newcharge: "+newcharge);
+										ci.maxCharge = s.maxcharge;
+										ci.transferLimit = s.chargerate;
+										nbttagcompound.setInt("charge", newcharge.intValue());
+
+										ElectricItem.charge(mcItemStack, 10, 9999, true, false);
+										/*
+										 * if (var1.i() > 2)
+										 * var1.setData(1 +
+										 * ((s.maxcharge - newcharge) *
+										 * (var1.i() - 2)) /
+										 * s.maxcharge); else
+										 * var1.setData(0);
+										 */
+										changed = true;
+									}
+								}
+								/*
+								 * if (itemstack.i() > 2)
+								 * itemstack.setData(1 +
+								 * ((ielectricitem1.getMaxCharge() - k)
+								 * * (itemstack .i() - 2)) /
+								 * ielectricitem1.getMaxCharge()); else
+								 * itemstack.setData(0);
+								 */
+							} catch (Exception ex) {
+								TRLogger.Log("debug", "Error: [Decharger[7] thread] " + ex.getMessage());
+								Log.Exception(ex);
+							}
+						}
+
+						if (TRSafeZone.inSafeZone(player) &&
+							!Util.hasPermission(player, "safezone.bypass") &&
+							!Util.hasBypass(player, "safezone", null)) {
+							//tekkitrestrict.log.info("in SS");
+							try {
+								if (Threads.SSDisableArcane) {
+									if (st1[i].getTypeId() == 27584 && (mcItemStack.getData() != 6 || !getString(st1[i], "mode").equals("earth"))) {
+										setString(st1[i], "mode", "earth");
+										mcItemStack.setData(6);
+									}
+								}
+							} catch (Exception ex) {
+								TRLogger.Log("debug", "SSDisableArcane[2] Error! " + ex.getMessage());
+								Log.Exception(ex);
+							}
+							
+							if (!Threads.SSDechargeEE) continue;
+							int m = SSDechargedStr.indexOf(tstr);
+							if (m == -1) continue;
+							try {
+								TRCacheItem g = SSDecharged.get(m);
+								if (g.id != st1[i].getTypeId()) continue;
+								
+								if (!(mcItemStack.getItem() instanceof ItemEECharged)) continue;
+								if (st1[i].getTypeId() == g.id &&
+									(getShort(st1[i], "chargeGoal") > 0 || getShort(st1[i], "chargeLevel") > 0)) {
+
+									setShort(st1[i], "chargeLevel", 0);
+									setShort(st1[i], "chargeGoal", 0);
+									mcItemStack.setData(200);
+									changed = true;
+								}
+							} catch (Exception ex) {
+								TRLogger.Log("debug", "SSDisableItem[9] Error! " + ex.getMessage());
+								Log.Exception(ex);
+							}
+						}
+					} catch (Exception ex) {
+						TRLogger.Log("debug", "Error: [Decharger[6] thread] " + ex.getMessage());
+						Log.Exception(ex);
 					}
-				} catch (Exception e) {
+				} catch (Exception ex) {
 					TRLogger.Log("debug", "Error: [ItemDisabler[16] thread] ");
-					for (StackTraceElement ee : e.getStackTrace()) {
-						TRLogger.Log("debug", "  " + ee.toString());
-					}
-					// e.printStackTrace();
+					Log.Exception(ex);
 				}
 				//Thread.sleep(3);
-			}
+			} //End of first for loop
+			
+			
 			// //////////// ARMOR INVENTORY
 			boolean changed1 = false;
 			for (int i = 0; i < st2.length; i++) {
 				try {
 					org.bukkit.inventory.ItemStack str = st2[i];
-					// net.minecraft.server.ItemStack mre =
-					// ((org.bukkit.craftbukkit.inventory.CraftItemStack)str).getHandle();
-					// player.sendRawMessage(str.getTypeId()+":"+str.getData().getData()+" | "+str.getData()+" ");
-					// String.valueOf(noItem.getInstance().isItemBanned(player,
-					// mre)));
-					ItemStack ee = new ItemStack(str.getTypeId(),
-							str.getAmount(), str.getData().getData());
+
+					ItemStack ee = new ItemStack(str.getTypeId(), str.getAmount(), str.getData().getData());
 					if (TRNoItem.isItemBanned(player, ee) || TRNoItem.isCreativeItemBanned(player, ee)) {
 						// this item is banned/disabled for this player!!!
-						// proceed to remove it.
-						st2[i] = new org.bukkit.inventory.ItemStack(toid, 1);
+						st2[i] = new org.bukkit.inventory.ItemStack(Threads.ChangeDisabledItemsIntoId, 1); //proceed to remove it.
 						changed1 = true;
 					}
-				} catch (Exception e) {
-
-				}
+				} catch (Exception ex) {}
 				Thread.sleep(3);
 			}
+			
 			// place new inventory back.
-			if (changed) {
-				inv.setContents(st1);
-			}
-			if (changed1) {
-				inv.setArmorContents(st2);
-			}
-		} catch (Exception e) {
-			TRLogger.Log("debug", "Error: [ItemDisabler[2] thread] " + e.getMessage());
-			for(StackTraceElement eer:e.getStackTrace()){
-				TRLogger.Log("debug","    "+eer.toString()); 
-			}
+			//TODO Probably not needed as st1 and st2 are references to the players inventory.
+			if (changed) inv.setContents(st1);
+			if (changed1) inv.setArmorContents(st2);
+			
+		} catch (Exception ex) {
+			TRLogger.Log("debug", "Error: [ItemDisabler[2] thread] " + ex.getMessage());
+			Log.Exception(ex);
 		}
 	}
 
 	public void reload() {
-		if (this.SSDecharged != null) {
-			this.SSDecharged.clear();
-		}
-		if (this.SSDechargedStr != null) {
-			this.SSDechargedStr.clear();
-		}
-		if (this.MCharges != null) {
-			this.MCharges.clear();
-		}
-		if (this.MChargeStr != null) {
-			this.MChargeStr.clear();
-		}
-		if (this.maxEU != null) {
-			this.maxEU.clear();
-		}
-		if (this.maxEUStr != null) {
-			this.maxEUStr.clear();
-		}
-
-		this.TSpeed = tekkitrestrict.config.getInt("InventoryThread");
+		if (this.SSDecharged != null) this.SSDecharged.clear();
+		
+		if (this.SSDechargedStr != null) this.SSDechargedStr.clear();
+		
+		if (this.MCharges != null) this.MCharges.clear();
+		
+		if (this.MChargeStr != null) this.MChargeStr.clear();
+		
+		if (this.maxEU != null) this.maxEU.clear();
+		
+		if (this.maxEUStr != null) this.maxEUStr.clear();
+		
 		//this.UseNoItem = tekkitrestrict.config.getBoolean("UseNoItem");
-		this.toid = tekkitrestrict.config.getInt("ChangeDisabledItemsIntoId");
-		this.SSDechargeEE = tekkitrestrict.config.getBoolean("SSDechargeEE");
-		this.SSDisableArcane = tekkitrestrict.config
-				.getBoolean("SSDisableRingOfArcana");
 		//this.throttle = tekkitrestrict.config
 		//		.getBoolean("ThrottleInventoryThread");
-		List<String> MaxCharges = tekkitrestrict.config
-				.getStringList("MaxCharge");
+		List<String> MaxCharges = tekkitrestrict.config.getStringList("MaxCharge");
 		List<String> sstr = tekkitrestrict.config.getStringList("DechargeInSS");
 
 		for (String s : sstr) {
@@ -741,192 +657,169 @@ class DisableItemThread extends Thread {
 		 */
 	}
 
-	public short getShort(org.bukkit.inventory.ItemStack varx, String var2) {
-		net.minecraft.server.ItemStack var1 = ((org.bukkit.craftbukkit.inventory.CraftItemStack) varx)
-				.getHandle();
-		if (var1.tag == null) {
-			var1.setTag(new NBTTagCompound());
-		}
-		if (!var1.tag.hasKey(var2)) {
-			setShort(varx, var2, 0);
-		}
-		return var1.tag.getShort(var2);
+	/**
+	 * Gets the short value for the given key.<br>
+	 * If the item doesn't have a tag it will add one.<br>
+	 * If the item doesn't have a value for the specified key it will make it and set it to 0.
+	 */
+	public short getShort(org.bukkit.inventory.ItemStack bukkitItemStack, String key) {
+		net.minecraft.server.ItemStack var1 = ((CraftItemStack) bukkitItemStack).getHandle();
+		if (var1.tag == null) var1.setTag(new NBTTagCompound());
+		
+		if (!var1.tag.hasKey(key)) setShort(bukkitItemStack, key, 0);
+		
+		return var1.tag.getShort(key);
 	}
+	/**
+	 * Sets a short value from the given key.<br>
+	 * If the item doesn't have a tag it will add one.
+	 */
 
-	public void setShort(org.bukkit.inventory.ItemStack varx, String var2,
-			int var3) {
-		net.minecraft.server.ItemStack var1 = ((org.bukkit.craftbukkit.inventory.CraftItemStack) varx)
-				.getHandle();
-		if (var1.tag == null) {
-			var1.setTag(new NBTTagCompound());
-		}
-		var1.tag.setShort(var2, (short) var3);
+	public void setShort(org.bukkit.inventory.ItemStack bukkitItemStack, String key, int value) {
+		net.minecraft.server.ItemStack var1 = ((CraftItemStack) bukkitItemStack).getHandle();
+		if (var1.tag == null) var1.setTag(new NBTTagCompound());
+		
+		var1.tag.setShort(key, (short) value);
 	}
+	/**
+	 * Gets the string value for the given key.<br>
+	 * If the item doesn't have a tag it will add one.<br>
+	 * If the item doesn't have a value for the specified key it will make it and set it to "".
+	 */
 
-	public String getString(org.bukkit.inventory.ItemStack varx, String var2) {
-		net.minecraft.server.ItemStack var1 = ((org.bukkit.craftbukkit.inventory.CraftItemStack) varx)
-				.getHandle();
-		if (var1.tag == null) {
-			var1.setTag(new NBTTagCompound());
-		}
-		if (!var1.tag.hasKey(var2)) {
-			setString(varx, var2, "");
-		}
-		return var1.tag.getString(var2);
+	public String getString(org.bukkit.inventory.ItemStack bukkitItemStack, String key) {
+		net.minecraft.server.ItemStack var1 = ((CraftItemStack) bukkitItemStack).getHandle();
+		if (var1.tag == null) var1.setTag(new NBTTagCompound());
+		
+		if (!var1.tag.hasKey(key)) setString(bukkitItemStack, key, "");
+		
+		return var1.tag.getString(key);
 	}
+	/**
+	 * Sets the string value for the given key.<br>
+	 * If the item doesn't have a tag it will add one.
+	 */
 
-	public void setString(org.bukkit.inventory.ItemStack varx, String var2,
-			String var3) {
-		net.minecraft.server.ItemStack var1 = ((org.bukkit.craftbukkit.inventory.CraftItemStack) varx)
-				.getHandle();
-		if (var1.tag == null) {
-			var1.setTag(new NBTTagCompound());
-		}
-		var1.tag.setString(var2, var3);
+	public void setString(org.bukkit.inventory.ItemStack bukkitItemStack, String key, String value) {
+		net.minecraft.server.ItemStack var1 = ((CraftItemStack) bukkitItemStack).getHandle();
+		if (var1.tag == null) var1.setTag(new NBTTagCompound());
+		
+		var1.tag.setString(key, value);
 	}
 }
 
 class TWorldScrubber extends Thread {
-	int TSpeed;
-	boolean RMDB, UseRPTimer;
-	double time;
-	double ticktime;
-	int toid;
-
 	@Override
 	public void run() {
-		// loop forever, unless told to stop...
-		boolean done = false;
-		while (!done) {
-
-			// Disabled Items remover
+		while (true) {
 			try {
 				doWScrub();
-			} catch (Exception e) {
-				TRLogger.Log("debug",
-						"Error: [WorldScrubber thread] " + e.getMessage());
-				for(StackTraceElement eer:e.getStackTrace()){
-					TRLogger.Log("debug","    "+eer.toString()); 
-				}
+			} catch (Exception ex) {
+				TRLogger.Log("debug", "Error: [WorldScrubber thread] " + ex.getMessage());
+				Log.Exception(ex);
 			}
 
 			try {
-				Thread.sleep(TSpeed);
-			} catch (InterruptedException e) {
+				Thread.sleep(Threads.worldCleanerSpeed);
+			} catch (InterruptedException ex) {
+				if (tekkitrestrict.disable) break; //If plugin is disabling, then stop the thread. The WorldScrubber thread shouldn't trigger again.
 			}
 		}
 	}
 
-	@SuppressWarnings("unused")
+	/**
+	 * Runs TRChunkUnloader.unloadSChunks().<br>
+	 * Then if UseRPTimer or RemoveDisabledBlocks is turned on, it will execute those features.
+	 */
 	private void doWScrub() {
 		try {
 			TRChunkUnloader.unloadSChunks();
+			sleep(20000);
+			//Sleep for 20 seconds to make it less likely that chunks are still being unloaded when it starts
+			//the Remove disabled blocks and Redpower checks
 		} catch (Exception ex) {
 		}
 		
-		if (!RMDB && !UseRPTimer) return;
+		if (!Threads.RMDB && !Threads.UseRPTimer) return;
 		
 		Server server = tekkitrestrict.getInstance().getServer();
-		if (UseRPTimer){
+		if (Threads.UseRPTimer){
 			if (!server.getPluginManager().isPluginEnabled("mod_RedPowerLogic")) {
-				UseRPTimer = false;
-				if (!RMDB) return; //If both options are now false, nothing else has to be done.
+				Threads.UseRPTimer = false;
+				if (!Threads.RMDB) return; //If both options are now false, nothing else has to be done.
 			}
 		}
-		int currentChunkCount = 0;
-
+		//int currentChunkCount = 0;
+		
 		List<World> worlds = server.getWorlds();
-		for (World bukkitWorld : worlds) {
+		for (World bukkitWorld : worlds) { //For each world
 			WorldServer worldServer = ((CraftWorld) bukkitWorld).getHandle();
 
-			// TileLogic tilelogic = (TileLogic)CoreLib.getTileEntity(g, x,
-			// y, z, eloraam/logic/TileLogic);
 			Chunk[] loadedChunks = bukkitWorld.getLoadedChunks();
-			currentChunkCount += loadedChunks.length;
-			// loop through all of the blocks in the chunk...
-			for (Chunk c : loadedChunks) {
-				if (RMDB) {
+			//currentChunkCount += loadedChunks.length;
+			
+			for (Chunk c : loadedChunks) { //For each loaded chunk
+				if (Threads.RMDB) { // loop through all of the blocks in the chunk...
 					for (int x = 0; x < 16; x++) {
 						for (int z = 0; z < 16; z++) {
 							for (int y = 0; y < 256; y++) {
 								// so... yeah.
 								Block bl = c.getBlock(x, y, z);
 								if (TRNoItem.isBlockDisabled(bl)) {
-									bl.setTypeId(toid);
+									bl.setTypeId(Threads.ChangeDisabledItemsIntoId);
 								}
 							}
 						}
 					}
 				}
 
-				if (UseRPTimer) {
-					try {
-						BlockState[] tileEntities = c.getTileEntities();
-						for (BlockState gg : tileEntities) {
-							TileEntity te = worldServer.getTileEntity(gg.getX(), gg.getY(), gg.getZ());
-							if (te instanceof TileLogicPointer) {
-								TileLogicPointer timer = (TileLogicPointer) te;
+				if (!Threads.UseRPTimer) continue;
+				
+				try {
+					BlockState[] tileEntities = c.getTileEntities();
+					for (BlockState gg : tileEntities) {
+						TileEntity te = worldServer.getTileEntity(gg.getX(), gg.getY(), gg.getZ());
+						if (te instanceof TileLogicPointer) {
+							TileLogicPointer timer = (TileLogicPointer) te;
 
-								if (timer.GetInterval() < ticktime) {
-									timer.SetInterval((long) ticktime);
-								}
+							if (timer.GetInterval() < Threads.RPTickTime) {
+								timer.SetInterval(Threads.RPTickTime);
 							}
 						}
-					} catch (Exception EER) {
-						TRLogger.Log("debug", "RPTimerError: " + EER.getMessage());
 					}
+				} catch (Exception EER) {
+					TRLogger.Log("debug", "RPTimerError: " + EER.getMessage());
 				}
 			}
 		}
 	}
-
-	public void reload() {
-		this.TSpeed = tekkitrestrict.config.getInt("WorldCleanerThread");
-		this.RMDB = tekkitrestrict.config.getBoolean("RemoveDisabledItemBlocks");
-		this.toid = tekkitrestrict.config.getInt("ChangeDisabledItemsIntoId");
-		this.UseRPTimer = tekkitrestrict.config.getBoolean("UseAutoRPTimer");
-		this.time = tekkitrestrict.config.getDouble("RPTimerMin", 0.2);
-		this.ticktime = time * 20;
-	}
 }
 
-class saveThread extends Thread {
+class TSaveThread extends Thread {
 	@Override
 	public void run() {
-		boolean done = false;
-		while (!done) {
+		while (true) {
 			// runs save functions for both safezones and itemlimiter
 			try {
 				TRLimitBlock.saveLimiters();
-			} catch (Exception E) {
-			}
+			} catch (Exception ex) {}
+			
 			try {
 				TRSafeZone.save();
-			} catch (Exception E) {
-			}
+			} catch (Exception ex) {}
 
-			// TRThread.reload();
 			TRLogger.saveLogs();
 			TRNoHack.clearMaps();
 			try{TRLimitBlock.manageData();}
-			catch(Exception e){
-				TRLogger.Log("debug", "ManageData AutoSavethread Error: "+e.getMessage());
-				for(StackTraceElement eer:e.getStackTrace()){
-					TRLogger.Log("debug","    "+eer.toString()); 
-				}
+			catch(Exception ex){
+				TRLogger.Log("debug", "ManageData AutoSavethread Error: "+ex.getMessage());
+				Log.Exception(ex);
 			}
-			/*
-			 * List<World> wog =
-			 * tekkitrestrict.getInstance().getServer().getWorlds(); for(int i =
-			 * 0;i<wog.size();i++){ World wo = wog.get(i); wo.save(); }
-			 */
-			// tekkitrestrict.log.info("Saved!");
 
 			try {
-				Thread.sleep(tekkitrestrict.config
-						.getInt("AutoSaveThreadSpeed"));
-			} catch (InterruptedException e) {
-			}
+				if (tekkitrestrict.disable) break; //If plugin is disabling, then stop the thread. The savethread triggers again if interrupted.
+				Thread.sleep(Threads.saveSpeed);
+			} catch (InterruptedException e) {}
 		}
 	}
 }

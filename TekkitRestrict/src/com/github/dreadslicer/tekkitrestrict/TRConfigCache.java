@@ -38,4 +38,13 @@ public class TRConfigCache {
 		public static boolean logConsole;
 		public static String logLocation;
 	}
+	
+	public static class Threads {
+		public static int saveSpeed, worldCleanerSpeed, inventorySpeed, SSEntityRemoverSpeed, gemArmorSpeed;
+		public static boolean GAMovement, GAOffensive;
+		public static boolean SSDisableEntities, SSDechargeEE, SSDisableArcane;
+		public static boolean RMDB, UseRPTimer;
+		public static int ChangeDisabledItemsIntoId;
+		public static int RPTickTime;
+	}
 }

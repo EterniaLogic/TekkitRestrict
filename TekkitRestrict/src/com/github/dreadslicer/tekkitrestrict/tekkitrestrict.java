@@ -14,6 +14,8 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
+import net.minecraft.server.RedPowerLogic;
+
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -22,6 +24,7 @@ import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Global;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Hacks;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Listeners;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.SafeZones;
+import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Threads;
 import com.github.dreadslicer.tekkitrestrict.commands.TRCommandAlc;
 import com.github.dreadslicer.tekkitrestrict.commands.TRCommandTPIC;
 import com.github.dreadslicer.tekkitrestrict.commands.TRCommandTR;
@@ -36,7 +39,11 @@ public class tekkitrestrict extends JavaPlugin {
 	
 	public static Logger log;
 	public static TRFileConfiguration config;
-	public static boolean EEEnabled = false, disable = false;
+	public static boolean EEEnabled = false;
+	/**
+	 * Indicates if tekkitrestrict is disabling. Threads use this to check if they should stop.
+	 */
+	public static boolean disable = false;
 	public static final double version = 1.15;
 	public static Object perm = null;
 	public static TRSQLDB db;
@@ -46,30 +53,28 @@ public class tekkitrestrict extends JavaPlugin {
 	private static TRThread ttt = null;
 	public static List<YamlConfiguration> configList = new LinkedList<YamlConfiguration>();
 
-	// pre-load the sqlite
 	@Override
 	public void onLoad() {
 		instance = this;
 		log = this.getLogger();
 		
-		loadSqlite();
+		loadSqlite(); //pre-load the sqlite
 		initSqlite();
 
 		this.saveDefaultConfig();
 
-		config = this.getConfigx(); // load the configuration file
-
-		// set minimum interval for logic timers...
+		config = this.getConfigx(); //Load the configuration files
+		loadConfigCache();
+		
 		try {
-			double g = tekkitrestrict.config.getDouble("RPTimerMin");
-			double ticks = g * 20.0;
-			net.minecraft.server.RedPowerLogic.minInterval = (int) Math.round(ticks);
+			int ticks = (int) Math.round(config.getDouble("RPTimerMin", 0.2) * 20);
+			RedPowerLogic.minInterval = ticks; // set minimum interval for logic timers...
 		} catch (Exception e) {
 			log.warning("Setting the RedPower Timer failed.");
 		}
 
 		// ///////////
-		loadConfigCache();
+		
 		
 		if (config.getBoolean("UseLogFilter", true)){
 			Enumeration<String> cc = LogManager.getLogManager().getLoggerNames();
@@ -121,7 +126,7 @@ public class tekkitrestrict extends JavaPlugin {
 		// Initiate noItem, Time-thread and our event listener
 		try {
 			reload(); // load em up!
-			ttt.init();
+			ttt.init(); //Start up all threads
 
 			initHeartBeat();
 		} catch (Exception e) {
@@ -210,22 +215,20 @@ public class tekkitrestrict extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-		// turn off our uber awesome mod stuffs:
-		try {
-			TRLimitBlock.saveLimiters();
-		} catch (Exception E) {
-		}
-		try {
-			TRSafeZone.save();
-		} catch (Exception E) {
-		}
-
-		try {
-			TRThread.originalEUEnd();
-		} catch (Exception E) {
-		}
-
 		disable = true;
+		
+		ttt.disableItemThread.interrupt();
+		ttt.entityRemoveThread.interrupt();
+		ttt.gemArmorThread.interrupt();
+		ttt.worldScrubThread.interrupt();
+		ttt.saveThread.interrupt();
+		
+		try { Thread.sleep(4000); } catch (InterruptedException e) {} //Sleep for 4 seconds to allow the savethread to save.
+		//try {
+		//	TRThread.originalEUEnd(); (Currently does nothing)
+		//} catch (Exception ex) {
+		//}
+
 		TRLogFilter.disable();
 		log.info("TekkitRestrict v " + getDescription().getVersion()+ " disabled!");
 	}
@@ -288,6 +291,25 @@ public class tekkitrestrict extends JavaPlugin {
 		TRConfigCache.LogFilter.replaceList = config.getStringList("LogFilter");
 		TRConfigCache.LogFilter.logConsole = config.getBoolean("LogConsole", true);
 		TRConfigCache.LogFilter.logLocation = config.getString("LogLocation", "log");
+		
+		Threads.gemArmorSpeed = config.getInt("GemArmorDThread");
+		Threads.inventorySpeed = config.getInt("InventoryThread");
+		Threads.saveSpeed = config.getInt("AutoSaveThreadSpeed");
+		Threads.SSEntityRemoverSpeed = config.getInt("SSEntityRemoverThread");
+		Threads.worldCleanerSpeed = config.getInt("WorldCleanerThread");
+		
+		Threads.GAMovement = config.getBoolean("AllowGemArmorDefensive", true);
+		Threads.GAOffensive = config.getBoolean("AllowGemArmorOffensive", false);
+		
+		Threads.SSDisableEntities = config.getBoolean("SSDisableEntities", false);
+		Threads.SSDechargeEE = config.getBoolean("SSDechargeEE", true);
+		Threads.SSDisableArcane = config.getBoolean("SSDisableRingOfArcana");
+		
+		Threads.RMDB = config.getBoolean("RemoveDisabledItemBlocks", false);
+		Threads.UseRPTimer = config.getBoolean("UseAutoRPTimer", false);
+		Threads.ChangeDisabledItemsIntoId = config.getInt("ChangeDisabledItemsIntoId", 3);
+		Threads.RPTickTime = (int) Math.round(config.getDouble("RPTimerMin", 0.2) * 20);
+		
 		
 		SafeZones.allowNormalUser = config.getBoolean("SSAllowNormalUserToHaveSafeZones", true);
 	}
@@ -421,6 +443,7 @@ public class tekkitrestrict extends JavaPlugin {
 	public void reload() {
 		this.reloadConfig();		
 		config = this.getConfigx();
+		loadConfigCache();
 		TRNoItem.clear(); //TRNI
 		TRCacheItem.reload();
 		TRNoItem.reload(); //TRNI2
