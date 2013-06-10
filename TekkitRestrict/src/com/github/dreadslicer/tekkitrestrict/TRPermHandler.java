@@ -84,38 +84,40 @@ public class TRPermHandler {
 	public static int getPermNumeral(Player p, String permBase, int id, int data) {
 		int r = -1;
 		String perms[] = getPermissions(p, permBase);
-		String negPerms[] = getPermissions(p, (new StringBuilder("-")).append(permBase).toString());
+		//String negPerms[] = getPermissions(p, (new StringBuilder("-")).append(permBase).toString());
+		String negPerms[] = getPermissions(p, "-"+permBase);
 		for (int i = 0; i < negPerms.length; i++) {
-			String gp[] = negPerms[i].replace('.', ';').split(";");
+			String gp[] = negPerms[i].replace('.', ';').split(";");//tekkitrestrict;limiter
 			String gs[] = permBase.replace('.', ';').split(";");
-			if (gp.length >= 2
-					&& gs.length >= 2
-					&& gp[1] != null
-					&& gs[1] != null
-					&& gp[1].equals(gs[1])
-					&& TRNoItem.isInRanged(gp.length != 5 ? (new StringBuilder(
-							String.valueOf(gp[2]))).append(":-10").toString()
-							: (new StringBuilder(String.valueOf(gp[2])))
-									.append(":").append(gp[3]).toString(), id,
-							data)) {
-				return -1;
+			if (gp.length < 2 || gs.length < 2) continue;
+			if (gp[1] == null || gs[1] == null) continue;
+			if (!gp[1].equals(gs[1])) continue;
+			if (gp.length != 5){
+				if (TRNoItem.isInRanged(gp[2]+":-10", id, data)) return -1;
+			} else {
+				if (TRNoItem.isInRanged(gp[2]+":"+gp[3], id, data)) return -1;
 			}
+			
+			//if (TRNoItem.isInRanged((gp.length != 5 ? (gp[2]+":-10") : (gp[2]+":"+gp[3])), id, data)) {
+			//	return -1;
+			//}
+			//if (TRNoItem.isInRanged(gp.length != 5 ? (new StringBuilder(gp[2])).append(":-10").toString()
+			//: (new StringBuilder(gp[2])).append(":").append(gp[3]).toString(), id, data)) {
+			//return -1;
+			//}
 		}
 
 		for (int i = 0; i < perms.length; i++) {
 			String gp[] = perms[i].replace('.', ';').split(";");
 			String gs[] = permBase.replace('.', ';').split(";");
-			if (gp.length >= 2
-					&& gs.length >= 2
-					&& gp[1] != null
-					&& gs[1] != null
-					&& gp[1].equals(gs[1])
-					&& TRNoItem.isInRanged(gp.length != 5 ? gp[2]
-							: (new StringBuilder(String.valueOf(gp[2])))
-									.append(":").append(gp[3]).toString(), id,
+			if (gp.length < 2 || gs.length < 2) continue;
+			if (gp[1] == null || gs[1] == null) continue;
+			if (!gp[1].equals(gs[1])) continue;
+			
+			if (TRNoItem.isInRanged(gp.length != 5 ? gp[2]
+							: (new StringBuilder(gp[2])).append(":").append(gp[3]).toString(), id,
 							data)) {
-				return Integer.valueOf(gp.length != 5 ? gp[3] : gp[4])
-						.intValue();
+				return Integer.valueOf(gp.length != 5 ? gp[3] : gp[4]).intValue();
 			}
 		}
 

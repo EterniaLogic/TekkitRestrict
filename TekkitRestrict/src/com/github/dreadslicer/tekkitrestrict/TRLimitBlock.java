@@ -51,8 +51,7 @@ public class TRLimitBlock {
 			}
 			
 			if (TLimit == -1) {
-				TLimit = TRPermHandler.getPermNumeral(pl, "limiter",
-						thisid, thisdata);
+				TLimit = TRPermHandler.getPermNumeral(pl, "limiter", thisid, thisdata);
 			}
 		}
 		 //tekkitrestrict.log.info("TLimit - "+TLimit);
@@ -507,8 +506,7 @@ public class TRLimitBlock {
 		for (String ir : ccl) {
 			try {
 				String[] g = ir.split(" ");
-				TRCacheItem.processItemString("limiter", "afsd90ujpj", g[0],
-						Integer.valueOf(g[1]));
+				TRCacheItem.processItemString("limiter", "afsd90ujpj", g[0], Integer.valueOf(g[1]));
 				/*
 				 * ItemStack[] ar = TRNoItem.getRangedItemValues(g[0]); int
 				 * limit = Integer.valueOf(g[1]); for (ItemStack iss : ar) {

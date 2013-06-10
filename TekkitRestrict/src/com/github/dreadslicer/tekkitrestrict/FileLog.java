@@ -7,8 +7,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class FileLog {
 	private BufferedWriter out;
@@ -16,7 +17,7 @@ public class FileLog {
 	private String date = "";
 	private int day = 0;
 	private int counter = 0;
-	private static HashMap<String, FileLog> Logs = new HashMap<String, FileLog>();
+	private static ConcurrentHashMap<String, FileLog> Logs = new ConcurrentHashMap<String, FileLog>();
 	private boolean alternate;
 	
 	@SuppressWarnings("deprecation")
@@ -33,10 +34,10 @@ public class FileLog {
 		File log;
 		File folder;
 		if (!alternate){
-			log = new File("."+sep+TRConfigCache.LogFilter.logLocation+sep+type+sep+date+".log");
+			log = new File("."+sep+TRConfigCache.LogFilter.logLocation+sep+type+sep+type+"-"+date+".log");
 			folder = new File("."+sep+TRConfigCache.LogFilter.logLocation+sep+type+sep);
 		} else {
-			log = new File("plugins"+sep+"tekkitrestrict"+sep+"log"+sep+type+sep+date+".log");
+			log = new File("plugins"+sep+"tekkitrestrict"+sep+"log"+sep+type+sep+type+"-"+date+".log");
 			folder = new File("plugins"+sep+"tekkitrestrict"+sep+"log"+sep+type+sep);
 		}
 
@@ -72,7 +73,7 @@ public class FileLog {
 		DateFormat formatter = new SimpleDateFormat("dd-MM-yy");
 		this.date = formatter.format(curdate);
 		
-		File log = new File("."+sep+TRConfigCache.LogFilter.logLocation+sep+type+sep+date+".log");
+		File log = new File("."+sep+TRConfigCache.LogFilter.logLocation+sep+type+sep+type+"-"+date+".log");
 		File folder = new File("."+sep+TRConfigCache.LogFilter.logLocation+sep+type+sep);
 		if (!folder.exists()) folder.mkdirs();
 		
@@ -100,8 +101,8 @@ public class FileLog {
 	}
 	
 	public static FileLog getLogOrMake(String type){
-		FileLog tbr = Logs.get(type);
 		if (type == null) type = "null";
+		FileLog tbr = Logs.get(type);
 		if (tbr == null) return new FileLog(type);
 		return tbr;
 	}
@@ -152,11 +153,13 @@ public class FileLog {
 	}
 	
 	public static void closeAll(){
-		for (FileLog filelog : Logs.values()){
+		Collection<FileLog> allLogs = Logs.values();
+		for (FileLog filelog : allLogs){
 			if (!filelog.close()){
 				tekkitrestrict.log.warning("Unable to close all logs. Some might not save properly.");
 			}
 		}
+		Logs = null;
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -177,10 +180,10 @@ public class FileLog {
 		File log;
 		File folder;
 		if (!alternate){
-			log = new File("."+sep+TRConfigCache.LogFilter.logLocation+sep+type+sep+date+".log");
+			log = new File("."+sep+TRConfigCache.LogFilter.logLocation+sep+type+sep+type+"-"+date+".log");
 			folder = new File("."+sep+TRConfigCache.LogFilter.logLocation+sep+type+sep);
 		} else {
-			log = new File("plugins"+sep+"tekkitrestrict"+sep+"log"+sep+type+sep+date+".log");
+			log = new File("plugins"+sep+"tekkitrestrict"+sep+"log"+sep+type+sep+type+"-"+date+".log");
 			folder = new File("plugins"+sep+"tekkitrestrict"+sep+"log"+sep+type+sep);
 		}
 		

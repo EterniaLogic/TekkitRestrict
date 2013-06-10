@@ -29,28 +29,27 @@ public class TRCacheItem {
 
 	// cacheTypes is used for exclusive types and is returned through
 
-	protected TRCacheItem() {
-	}
+	protected TRCacheItem() {}
 
 	public int id = -1;
 	public int data;
 	public String cacher = "";
 	private int Data1 = -1;
 	private Object Data2 = -1;
+	private short newdata;
 
 	public int getData() {
 		return data;
 	}
 
-	public com.github.dreadslicer.tekkitrestrict.ItemStack getTRItemStack(
-			int amount) {
-		return new com.github.dreadslicer.tekkitrestrict.ItemStack(id, amount,
-				data);
+	public com.github.dreadslicer.tekkitrestrict.ItemStack getTRItemStack(int amount) {
+		return new com.github.dreadslicer.tekkitrestrict.ItemStack(id, amount, data);
 	}
 
 	public org.bukkit.inventory.ItemStack getBukkitItemStack(int amount) {
-		return new org.bukkit.inventory.ItemStack(id, amount, (short) 0,
-				(byte) data);
+		org.bukkit.inventory.ItemStack test = new org.bukkit.inventory.ItemStack(id, amount, newdata);
+		return new org.bukkit.inventory.ItemStack(id, amount, (short) 0, (byte) data);
+		
 	}
 
 	public net.minecraft.server.ItemStack getMCItemStack(int amount) {
@@ -66,10 +65,6 @@ public class TRCacheItem {
 	}
 
 	public void setIntData(int x) {
-		/*
-		 * for(StackTraceElement ee:Thread.currentThread().getStackTrace()){
-		 * tekkitrestrict.log.info("    "+ee.toString()); }
-		 */
 		Data1 = x;
 	}
 
@@ -77,20 +72,30 @@ public class TRCacheItem {
 		Data2 = x;
 	}
 
+	/**
+	 * @return True if:<br>
+	 * <ul>
+	 * <li>this.id == -11</li>
+	 * <li>this.id == id AND this.data == data</li>
+	 * <li>this.id == id AND this.data == -10 AND data == 0</li>
+	 * </ul>
+	 */
 	public boolean compare(int id, int data) {
 		boolean isAllDataTypes = (this.data == -10 && data == 0);
 		boolean isALL = (this.id == -11);
 		return isALL || (((this.id == id) && (this.data == data || isAllDataTypes)));
 	}
 
+	/** Compare this CacheObject with the given itemstack, by using {@link #compare(int, int)} */
+	@Deprecated
 	public boolean compare(ItemStack iss) {
 		return compare(iss.id, iss.data);
 	}
 
-	
+	/** @return A string representation of this Cache Item: "id:data" */
+	@Override
 	public String toString() {
-		return (new StringBuilder()).append(id).append(":")
-				.append(data).toString();
+		return (new StringBuilder()).append(id).append(":").append(data).toString();
 	}
 	
 	@Override
@@ -103,9 +108,6 @@ public class TRCacheItem {
 		tci.setObjectData(this.getObjectData());
 		return tci;
 	}
-	
-	
-	// noitem;cake
 
 	public static void reload() {
 		clearCache();
@@ -118,14 +120,11 @@ public class TRCacheItem {
 		}
 
 		// pre-load variables
-		ConfigurationSection cs = tekkitrestrict.config
-				.getConfigurationSection("MicroPermissions");
+		ConfigurationSection cs = tekkitrestrict.config.getConfigurationSection("MicroPermissions");
 		if (cs != null) {
 			ConfigurationSection cNoItem = cs.getConfigurationSection("NoItem");
-			ConfigurationSection cBlockLimiter = cs
-					.getConfigurationSection("BlockLimiter");
-			ConfigurationSection cLimitedCreative = cs
-					.getConfigurationSection("LimitedCreative");
+			ConfigurationSection cBlockLimiter = cs.getConfigurationSection("BlockLimiter");
+			ConfigurationSection cLimitedCreative = cs.getConfigurationSection("LimitedCreative");
 			if (cNoItem != null) {
 				pstring("noitem", cNoItem);
 			}
@@ -139,29 +138,28 @@ public class TRCacheItem {
 	}
 
 	private static void pstring(String permType, ConfigurationSection cs) {
-		Set<String> cc = cs.getKeys(true);
-		Iterator<String> cit = cc.iterator();
-		while (cit.hasNext()) {
+		Set<String> keys = cs.getKeys(true);
+		Iterator<String> keyIterator = keys.iterator();
+		while (keyIterator.hasNext()) {
 			try {
-				String k = cit.next().toLowerCase();
-				String d = cs.getString(k);
+				String key = keyIterator.next().toLowerCase();
+				String value = cs.getString(key);
 				//tekkitrestrict.log.info(k+" - "+d);
+				if (value == null || value.equals("")) continue;
+				
 				int i = -1;
-				if (d != null && d != "") {
-					if (d.contains(" ")) {
-						try {
-							String[] c = d.split(" ");
-							i = Integer.parseInt(c[1]);
-							d = c[0];
-						} catch (Exception e) {
-						}
+				if (value.contains(" ")) {
+					try {
+						String[] c = value.split(" ");
+						i = Integer.parseInt(c[1]);
+						value = c[0];
+					} catch (Exception e) {
 					}
-					List<TRCacheItem> j = TRCacheItem.processMultiString(
-							permType, k, d, i);
-					 //tekkitrestrict.log.info(permType+"."+k+" - "+d+" - s"+j.size()+" "+i);
-					for (Object c1 : j) {
-						if (c1 instanceof TRCacheItem) {
-						}
+				}
+				List<TRCacheItem> j = TRCacheItem.processMultiString(permType, key, value, i);
+				 //tekkitrestrict.log.info(permType+"."+k+" - "+d+" - s"+j.size()+" "+i);
+				for (Object c1 : j) {
+					if (c1 instanceof TRCacheItem) {
 					}
 				}
 			} catch (Exception e) {
@@ -200,8 +198,7 @@ public class TRCacheItem {
 		return addCacheList(key, list);
 	}
 
-	public static List<TRCacheItem> addCacheList(String key,
-			List<TRCacheItem> list) {
+	public static List<TRCacheItem> addCacheList(String key, List<TRCacheItem> list) {
 		List<TRCacheItem> m = cacheMods.get(key.toLowerCase());
 		if (m != null) {
 			if (m.contains(key.toLowerCase())) {
@@ -224,11 +221,12 @@ public class TRCacheItem {
 	}
 
 	/**
-	 * @param player
-	 * @param permType
-	 * @param id
-	 * @param data
-	 * @return null if id = 0 or player has bypass permission.
+	 * @return Null if:
+	 * <ul>
+	 * <li>id = 0</li>
+	 * <li>Player has bypass permission.</li>
+	 * <li></li>
+	 *  </ul>
 	 */
 	public static TRCacheItem getPermCacheItem(Player player, String permType, int id, int data) {
 		if (id == 0 || player.hasPermission("tekkitrestrict.bypass."+permType)) {
@@ -236,10 +234,8 @@ public class TRCacheItem {
 		}
 		
 		Set<String> l = cachePermTypes.get(permType.toLowerCase());
-		if (l == null) {
-			l = new HashSet<String>();
-		}
-		// else tekkitrestrict.log.info("has "+permType);
+		if (l == null) l = new HashSet<String>();
+		
 		Iterator<String> itt = l.iterator();
 		while (itt.hasNext()) {
 			String type = itt.next();
@@ -270,8 +266,7 @@ public class TRCacheItem {
 		return null;
 	}
 
-	public static boolean hasCacheItem(String permType, String type, int id,
-			int data) {
+	public static boolean hasCacheItem(String permType, String type, int id, int data) {
 		return hasCacheItem(permType+";"+type,id,data);
 	}
 	
@@ -295,8 +290,7 @@ public class TRCacheItem {
 		return false;
 	}
 
-	public static TRCacheItem getCacheItem(String permType, String type,
-			int id, int data) {
+	public static TRCacheItem getCacheItem(String permType, String type, int id, int data) {
 		String keybase = permType + ";" + type + "=" + id + ":";
 		String key = keybase + data;
 		String key0 = keybase + "0";
@@ -329,6 +323,9 @@ public class TRCacheItem {
 
 	// used for reloads...
 	public static List<TRCacheItem> processItemString(String type, String item, int data2) {
+		//type = noitem;key
+		//item = value
+		//data2 = -1 || c[1]
 		String itemx = item.replace(":-", ":=");
 		// converts a variable string into a list of data.
 		List<TRCacheItem> tci = new LinkedList<TRCacheItem>();
@@ -339,8 +336,12 @@ public class TRCacheItem {
 				itemx = itemx.split(":")[0];
 			}
 			String[] t = itemx.split("-");
-			int from = Integer.parseInt(t[0]);
-			int to = Integer.parseInt(t[1]);
+			int from = 0, to = 0;
+			try {
+				from = Integer.parseInt(t[0]);
+				to = Integer.parseInt(t[1]);
+			} catch (NumberFormatException ex){
+			}
 
 			for (int i = from; i <= to; i++) {
 				try {
@@ -351,10 +352,15 @@ public class TRCacheItem {
 			}
 		} else if (itemx.contains(":")) { // A single item with a datatype
 			String[] t = itemx.split(":");
-			int id = Integer.parseInt(t[0]);
-			int data = Integer.parseInt(t[1].replace('=', '-'));
-			if (t[1].equals("0")) {
-				data = -10;// tekkitrestrict.log.info(id+":::"+data);}
+			int id = 0, data = 0;
+			try {
+				id = Integer.parseInt(t[0]);
+				data = Integer.parseInt(t[1].replace('=', '-'));
+			} catch (NumberFormatException ex){
+			}
+			
+			if (t[1].equals("0")) { //If :0, then :-10
+				data = -10;
 			}
 			try {
 				tci.add(cacheItem(type, id, data, data2));
@@ -441,6 +447,9 @@ public class TRCacheItem {
 		return m;
 	}
 
+	/**
+	 * add an item to the cache with cacher: "type=id:data"
+	 */
 	public static TRCacheItem cacheItem(String type, int id, int data, int numdata) {
 		String key = type + "=" + id + ":" + data;
 		TRCacheItem m = cache.get(key.toLowerCase());
@@ -459,8 +468,7 @@ public class TRCacheItem {
 		return m;
 	}
 
-	public static TRCacheItem cacheItem(String type, int id, int data,
-			Object objdata) {
+	public static TRCacheItem cacheItem(String type, int id, int data, Object objdata) {
 		String key = type + "=" + id + ":" + data;
 		TRCacheItem m = cache.get(key.toLowerCase());
 		if (m == null) {
@@ -483,11 +491,13 @@ public class TRCacheItem {
 		return cacheItem("", id, data); // caches a null-string type.
 	}
 
+	/**
+	 * Adds the given type to the Set in cachePermTypes.get(ptype)<br>
+	 * It creates one if it doesn't exist yet.
+	 */
 	private static void cpermtype(String ptype, String type) {
 		Set<String> l = cachePermTypes.get(ptype.toLowerCase());
-		if (l == null) {
-			l = new HashSet<String>();
-		}
+		if (l == null) l = new HashSet<String>();
 		l.add(type.toLowerCase());
 
 		synchronized (cachePermTypes) {
@@ -501,14 +511,12 @@ public class TRCacheItem {
 		return processMultiString(permType + ";" + type, ins, -1);
 	}
 
-	public static List<TRCacheItem> processMultiString(String permType,
-			String type, String ins, int data2) {
+	public static List<TRCacheItem> processMultiString(String permType, String type, String ins, int data2) {
 		cpermtype(permType, type);
 		return processMultiString(permType + ";" + type, ins, data2);
 	}
 
-	public static List<TRCacheItem> processMultiString(String type, String ins,
-			int data2) {
+	public static List<TRCacheItem> processMultiString(String type, String ins, int data2) {
 		if (ins.contains(";")) {
 			String[] rs = ins.split(";");
 			List<TRCacheItem> l = new LinkedList<TRCacheItem>();

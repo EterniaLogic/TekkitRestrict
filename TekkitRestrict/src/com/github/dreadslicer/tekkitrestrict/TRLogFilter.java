@@ -13,11 +13,8 @@ import com.earth2me.essentials.Essentials;
 public class TRLogFilter implements Filter {
 private static boolean disabled = false;
 	
-	//private static boolean SplitCSEnabled = Config.Standard.getBoolean("Log.Split.CaseSensitive.Enabled");
 	//private static List<String> SplitCI = new LinkedList<String>();
-	//private static List<String> SplitCS = new LinkedList<String>();
 	//private static List<String> SplitCIPlayer = new LinkedList<String>();
-	//private static List<String> SplitCSPlayer = new LinkedList<String>();
 	
 	private static Plugin essentials = Bukkit.getServer().getPluginManager().getPlugin("Essentials");
 	
@@ -26,29 +23,17 @@ private static boolean disabled = false;
 	public TRLogFilter(){
 		chat = new FileLog("Chat");
 		info = new FileLog("Info");
-		login = new FileLog("Login");
-		command = new FileLog("Command");
-		spawnitem = new FileLog("SpawnItem");
-		privatechat = new FileLog("PrivateChat");
-		banskicks = new FileLog("BansKicks");
 	}
 	
 	public static void disable(){
 		disabled = true;
 		essentials = null;
-		//chat.close();
 		chat = null;
-		//login.close();
 		login = null;
-		//command.close();
 		command = null;
-		//info.close();
 		info = null;
-		//spawnitem.close();
 		spawnitem = null;
-		//privatechat.close();
 		privatechat = null;
-		//banskicks.close();
 		banskicks = null;
 	}
 	
@@ -60,6 +45,7 @@ private static boolean disabled = false;
 		}
 	}*/
 	
+	/** @return If the message contains the name of the given player. It also checks nicknames if essentials is enabled. */
 	private boolean containsPlayer(Player player, String message){
 		message = message.toLowerCase();
 		if (message.contains(player.getName().toLowerCase())) return true;
@@ -100,41 +86,37 @@ private static boolean disabled = false;
 		}
 	}
 	
+	/** @return Whether string b contains string needle. */
 	private boolean c(String b, String needle){
 		return b.contains(needle);
 	}
 	
 	private void SplitLog(LogRecord record, String a, String b){
 		try {
-		boolean cc = true;
-		boolean LogSplitOccuredM = false, LogSplitOccuredP = false;
-		if (c(b, " disconnected: ") || c(b, " lost connection for an unknown reason.") || c(b, "logged in with")
-		 || c(b, "joined with: [") || c(b, "sending serverside check to"))
+		//boolean LogSplitOccuredM = false, LogSplitOccuredP = false;
+		if (c(b, " disconnected: ") || c(b, "logged in with") || c(b, "joined with: [") || c(b, "sending serverside check to")){
+			if (login == null) login = FileLog.getLogOrMake("Login");
 			login.log(a);
-		else if (c(b, "player_command") || record.getLevel() == Level.parse("Command")) {
+		} else if (c(b, "player_command") || record.getLevel() == Level.parse("Command")) {
+			if (command == null) command = FileLog.getLogOrMake("Command");
 			command.log(a);
-			if (c(b, "/i ") || c(b, "/give "))
+			
+			if (c(b, "/i ") || c(b, "/give ") || c(b, "/more ") || c(b, "/unlimited ")){
+				if (spawnitem == null) spawnitem = FileLog.getLogOrMake("SpawnItem");
 				spawnitem.log(a);
-			
-			else if (c(b, "/msg ") || c(b, "/emsg ") || c(b, "/m ") || c(b, "/tell ") || c(b, "/etell ") || c(b, "/whisper ") || c(b, "/ewhisper "))
+			} else if (c(b, "/msg ") || c(b, "/emsg ") || c(b, "/m ") || c(b, "/tell ") || c(b, "/etell ") || c(b, "/whisper ") || c(b, "/ewhisper ") ||
+					   c(b, "/r ") || c(b, "/er ") || c(b, "/reply ") || c(b, "/ereply ") || c(b, "/mail ") || c(b, "/email ")) {
+				if (privatechat == null) privatechat = FileLog.getLogOrMake("PrivateChat");
 				privatechat.log(a);
-			else if (c(b, "/r ") || c(b, "/er ") || c(b, "/reply ") || c(b, "/ereply "))
-				privatechat.log(a);
-			else if (c(b, "/mail ") || c(b, "/email "))
-				privatechat.log(a);
-			
-			else if (c(b, "/kick ") || c(b, "/ekick ") || c(b, "/bmkick "))
+			} else if (c(b, "/kick ") || c(b, "/ekick ") || c(b, "/bmkick ") ||
+					   c(b, "/ban ") || c(b, "/eban ") || c(b, "/bmban ") ||
+					   c(b, "/tempban ") || c(b, "/etempban ") || c(b, "/bmtempban ") ||
+					   c(b, "/banip ") || c(b, "/ebanip ") || c(b, "/bmbanip ") ||
+					   c(b, "/unban ") || c(b, "/eunban ") || c(b, "/bmunban ") || c(b, "/pardon ") || c(b, "/epardon ") ||
+					   c(b, "/unbanip ") || c(b, "/eunbanip ") || c(b, "/bmunbanip ") || c(b, "/pardonip ") || c(b, "/epardonip ")){
+				if (banskicks == null) banskicks = FileLog.getLogOrMake("BansKicks");
 				banskicks.log(a);
-			else if (c(b, "/ban ") || c(b, "/eban ") || c(b, "/bmban "))
-				banskicks.log(a);
-			else if (c(b, "/tempban ") || c(b, "/etempban ") || c(b, "/bmtempban "))
-				banskicks.log(a);
-			else if (c(b, "/banip ") || c(b, "/ebanip ") || c(b, "/bmbanip "))
-				banskicks.log(a);
-			else if (c(b, "/unban ") || c(b, "/eunban ") || c(b, "/bmunban ") || c(b, "/pardon ") || c(b, "/epardon "))
-				banskicks.log(a);
-			else if (c(b, "/unbanip ") || c(b, "/eunbanip ") || c(b, "/bmunbanip ") || c(b, "/pardonip ") || c(b, "/epardonip "))
-				banskicks.log(a);
+			}
 		} else {
 			
 			/*
@@ -148,21 +130,25 @@ private static boolean disabled = false;
 				}
 			}*/
 			
-			if (LogSplitOccuredM) return;
+			//if (LogSplitOccuredM) return;
 				
 			Player[] players = Bukkit.getOnlinePlayers();
 			for (Player current : players) {
 				if (!containsPlayer(current, b)) continue;
 				
 				if (b.contains("[34;1mgiving")) {
+					if (spawnitem == null) spawnitem = FileLog.getLogOrMake("SpawnItem");
 					spawnitem.log("[CONSOLE] " + a);
-					break;
+					return;
 				} else if ((b.contains("giving " + current.getName().toLowerCase())
 						|| b.contains("giving " + current.getDisplayName().toLowerCase())
 						|| b.contains("giving " + current.getPlayerListName().toLowerCase())) && b.contains(" of ")) {
+					if (spawnitem == null) spawnitem = FileLog.getLogOrMake("SpawnItem");
 					spawnitem.log("[NEI] " + a);
-					break;					
+					return;					
 				} else {
+					chat.log(a);
+					return;
 					/*
 					for (String c : TRConfigCache.LogFilter.Split.FilterOutWithPlayer) {
 						String[] LogSplit = c.split(";~;");
@@ -176,17 +162,17 @@ private static boolean disabled = false;
 							FileLog.getLogOrMake(LogSplitLoc).log("[" + record.getLevel().getName() + "] " + a);
 							LogSplitOccuredP=true;
 						}
-					}*/
+					}
 					
 					if (!LogSplitOccuredP) {
 						chat.log(a);
 						break;
 					} else {
 						LogSplitOccuredP=false;
-					}
+					}*/
 				}
 			}
-			if (cc) info.log("[" + record.getLevel().getName() + "] " + a);
+			info.log("[" + record.getLevel().getName() + "] " + a);
 		}
 		} catch (Exception ex){
 			disabled = true;

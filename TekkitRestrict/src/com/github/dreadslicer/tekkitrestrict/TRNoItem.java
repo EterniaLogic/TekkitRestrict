@@ -52,23 +52,29 @@ public class TRNoItem {
 		return false;
 	}
 
+	@Deprecated
 	public static boolean isCreativeItemBanned(Player p, ItemStack e) {
-		net.minecraft.server.EntityPlayer ep = ((org.bukkit.craftbukkit.entity.CraftPlayer) p)
-				.getHandle();
-		return (useNoCreative && ep.abilities.canInstantlyBuild) ? isTypeBanned(
-				"creative", DisabledCreativeItems, DisabledCreativeStr, p, e)
-				: false;
+		return useNoCreative ? isTypeBanned("creative", DisabledCreativeItems, DisabledCreativeStr, p, e) : false;
+	}
+	
+	public static boolean isCreativeItemBanned(Player p, int id, int data) {
+		return useNoCreative ? isTypeBanned("creative", DisabledCreativeItems, DisabledCreativeStr, p, id, data) : false;
 	}
 
-	public static boolean isItemBanned(Player p, int e) {
-		return useNoItem ? isItemBanned(p, new ItemStack(e, 1, 0)) : false;
+	public static boolean isItemBanned(Player p, int id) {
+		return useNoItem ? isItemBanned(p, id, 0) : false;
 	}
 
+	@Deprecated
 	public static boolean isItemBanned(Player p, ItemStack e) {
 		return useNoItem ? isTypeBanned("noitem", DisabledItems, DisabledItemsStr, p, e) : false;
 	}
 	
-	public static boolean isTypeBanned(String Type, List<TRCacheItem> tlist, List<String> indices, Player p, int id, short data) {
+	public static boolean isItemBanned(Player p, int id, int data) {
+		return useNoItem ? isTypeBanned("noitem", DisabledItems, DisabledItemsStr, p, id, data) : false;
+	}
+	
+	public static boolean isTypeBanned(String Type, List<TRCacheItem> tlist, List<String> indices, Player p, int id, int data) {
 		if (Util.hasBypass(p, Type)) return false;
 
 		/*
@@ -91,7 +97,7 @@ public class TRNoItem {
 					List<TRCacheItem> mi = modItemDat.get(g);
 					for(TRCacheItem c:mi){
 						if (c == null) continue;
-						if(c.compare(id, data)) return true;
+						if (c.compare(id, data)) return true;
 					}
 				}
 			}
@@ -105,59 +111,51 @@ public class TRNoItem {
 		return false;
 	}
 
+	@Deprecated
 	public static boolean isTypeBanned(String Type, List<TRCacheItem> tlist, List<String> indices, Player p, ItemStack e) {
-		// tekkitrestrict.log.info("itb1");
-		if (!Util.hasBypass(p, Type)) {
-			int id = e.id;
-			int data = e.data;
+		if (Util.hasBypass(p, Type)) return false;
+		
+		int id = e.id;
+		int data = e.data;
 
-			// tekkitrestrict.log.info("from");
-			/*
-			 * TRCacheItem ci = TRCacheItem.getPermCacheItem(p, Type, id, 0);
-			 * if(ci != null) return true;
-			 */
-			TRCacheItem ci1 = TRCacheItem.getPermCacheItem(p, Type, id, data);
-			if (ci1 != null) {
-				return true;
-			}
-			
-			if(Type.equals("creative") && e.id == 35){
-				//tekkitrestrict.log.info(p+" - "+Type+" - "+id+" - "+data);
-				/*for(StackTraceElement ee:Thread.currentThread().getStackTrace()){
-					tekkitrestrict.log.info("      "+ee.toString());
-				}*/
-			}
+		/*
+		 * TRCacheItem ci = TRCacheItem.getPermCacheItem(p, Type, id, 0);
+		 * if(ci != null) return true;
+		 */
+		TRCacheItem ci1 = TRCacheItem.getPermCacheItem(p, Type, id, data);
+		if (ci1 != null) return true;
+		
+		//if(Type.equals("creative") && e.id == 35){
+			//tekkitrestrict.log.info(p+" - "+Type+" - "+id+" - "+data);
+			/*for(StackTraceElement ee:Thread.currentThread().getStackTrace()){
+				tekkitrestrict.log.info("      "+ee.toString());
+			}*/
+		//}
 
-			if (TRPermHandler.hasPermission(p, Type, id + "", data + "")) {
-				return true;
-			} else if (TRPermHandler.hasPermission(p, Type, id + "", "")) {
-				return true;
-			} else {
+		if (TRPermHandler.hasPermission(p, Type, id + "", data + ""))
+			return true;
+		else if (TRPermHandler.hasPermission(p, Type, id + "", ""))
+			return true;
+		else {
 
-				Iterator<String> keys = modItemDat.keySet().iterator();
-				while (keys.hasNext()) {
-					String g = keys.next();
-					if (TRPermHandler.hasPermission(p, Type, g, "")) {
-						List<TRCacheItem> mi = modItemDat.get(g);
-						for(TRCacheItem c:mi){
-							if (c != null) {
-								if(c.compare(e)){
-									return true;
-								}
-							}
-						}
-					}
-				}
-			}
-			if (tlist != null) {
-				for (int i = 0; i < tlist.size(); i++) {
-					TRCacheItem cc = tlist.get(i);
-					if (cc.compare(e)) {
-						return true;
+			Iterator<String> keys = modItemDat.keySet().iterator();
+			while (keys.hasNext()) {
+				String g = keys.next();
+				if (TRPermHandler.hasPermission(p, Type, g, "")) {
+					List<TRCacheItem> mi = modItemDat.get(g);
+					for(TRCacheItem c:mi){
+						if (c == null) continue;
+						if (c.compare(id, data)) return true;
 					}
 				}
 			}
 		}
+		if (tlist != null) {
+			for (TRCacheItem cc : tlist){
+				if (cc.compare(id, data)) return true;
+			}
+		}
+		
 		return false;
 
 		/*

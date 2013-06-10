@@ -6,24 +6,26 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.logging.Logger;
 
-import lib.PatPeter.SQLibrary.SQLite;
+import com.github.dreadslicer.tekkitrestrict.database.SQLite;
 
 public class TRSQLDB {
-	private SQLite db=null;
+	private SQLite db = null;
 	private ExecutorService s = Executors.newFixedThreadPool(5);
-	//private Queue<String> qs = new ConcurrentLinkedQueue<String>();
-	public TRSQLDB(Logger log, String schema, String Table, String file){
-		db = new SQLite(log, schema, Table, file);
+	
+	public TRSQLDB(String name, String location){
+		db = new SQLite(name, location);
 	}
 	
-	ResultSet prev = null;
-	public ResultSet query(String ins) throws SQLException{
-		if(prev != null){
-			if(!prev.isClosed())
-				prev.close();
-		}
+	public ResultSet query(String query) throws SQLException{
+		return db.query(query);
+	}
+	
+	//ResultSet prev = null;
+	public ResultSet query_future(String ins) throws SQLException{
+		//if(prev != null && !prev.isClosed()){
+		//	prev.close();
+		//}
 		dbCall dc = new dbCall();
 		dc.tocall = ins;
 		@SuppressWarnings({ "unused", "unchecked" })

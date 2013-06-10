@@ -13,7 +13,7 @@ public class TRBans {
 	 * @return
 	 */
 	public static boolean isItemBanned(Player player, String permType, int id, short data){
-		if (id == 0 || Util.hasPermission(player, "bypass." + permType)) {
+		if (id == 0 || Util.hasBypass(player, permType)) {
 			return false;
 		}
 		
@@ -23,7 +23,7 @@ public class TRBans {
 		if (TRPermHandler.hasPermission(player, permType, id + "", "*")) return true; //tekkitrestrict.noitem.10.*
 		
 		String group = Util.inGroup(id);
-		if (!group.equals("")){
+		if (group != null){
 			if (Util.hasPermission(player, permType + "." + group)) return true;
 		}
 		

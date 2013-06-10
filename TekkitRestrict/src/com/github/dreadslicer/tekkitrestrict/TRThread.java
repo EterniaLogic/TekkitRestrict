@@ -308,11 +308,12 @@ class DisableItemThread extends Thread {
 				try {
 					if (st1[i] == null) continue;
 
-					ItemStack ee = new ItemStack(st1[i].getTypeId(), st1[i].getAmount(), st1[i].getData().getData());//TODO change to .getDurability()?
 					net.minecraft.server.ItemStack mcItemStack = ((CraftItemStack) st1[i]).getHandle();
 
 					// //// BAN THE ITEM
-					if (TRNoItem.isItemBanned(player, ee) || TRNoItem.isCreativeItemBanned(player, ee)) {
+					int id = st1[i].getTypeId();
+					int data = st1[i].getData().getData();//TODO change to .getDurability()?
+					if (TRNoItem.isItemBanned(player, id, data) || TRNoItem.isCreativeItemBanned(player, id, data)) {
 						st1[i] = new org.bukkit.inventory.ItemStack(Threads.ChangeDisabledItemsIntoId, 1);
 						changed = true;
 					}
@@ -502,9 +503,9 @@ class DisableItemThread extends Thread {
 			for (int i = 0; i < st2.length; i++) {
 				try {
 					org.bukkit.inventory.ItemStack str = st2[i];
-
-					ItemStack ee = new ItemStack(str.getTypeId(), str.getAmount(), str.getData().getData());
-					if (TRNoItem.isItemBanned(player, ee) || TRNoItem.isCreativeItemBanned(player, ee)) {
+					int id = str.getTypeId();
+					int data = str.getData().getData();
+					if (TRNoItem.isItemBanned(player, id, data) || TRNoItem.isCreativeItemBanned(player, id, data)) {
 						// this item is banned/disabled for this player!!!
 						st2[i] = new org.bukkit.inventory.ItemStack(Threads.ChangeDisabledItemsIntoId, 1); //proceed to remove it.
 						changed1 = true;

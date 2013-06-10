@@ -23,6 +23,7 @@ UseOpenAlc: true
 UseNoItem: true
 ShowDebugMessages: false
 KickFromConsole: false
+UseNewBannedItemsSystem: true
 
 
 ####SafeZones####

@@ -66,7 +66,7 @@ public class Util {
 		if (inRange(id, 26483, 26530)) return "balkonweaponmod";
 		if (id == 178 || id == 7493) return "enderchest";
 		if (id == 4095 || id == 214 || id == 7303 || id == 179) return "chunkloaders";
-		return "";
+		return null;
 	}
 	
 	public static boolean inRange(int id, int min, int max){

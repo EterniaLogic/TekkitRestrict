@@ -27,6 +27,7 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
+import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Global;
 import com.github.dreadslicer.tekkitrestrict.commands.TRCommandAlc;
 import com.github.dreadslicer.tekkitrestrict.lib.TRNoClick;
 
@@ -141,11 +142,8 @@ public class TRListener implements Listener {
 	public void onBlockPlace(BlockPlaceEvent e) {
 		// forget about basic types!
 		for (int eee : Exceptions) {
-			if (e.getBlock().getTypeId() == eee) {
-				return;
-			}
+			if (e.getBlock().getTypeId() == eee) return;
 		}
-		
 		
 		Player player = e.getPlayer();
 		if (player == null) {
@@ -190,8 +188,15 @@ public class TRListener implements Listener {
 					data = lastdata;
 				}
 			}
-			com.github.dreadslicer.tekkitrestrict.ItemStack cc = new com.github.dreadslicer.tekkitrestrict.ItemStack(id, 0, data);
-			if (TRNoItem.isItemBanned(player, cc)) {
+			boolean banned = false;
+			
+			if (Global.useNewBanSystem){
+				if (TRCacheItem2.isBanned(player, "noitem", id, data)) banned = true;
+			} else {
+				if (TRNoItem.isItemBanned(player, id, data)) banned = true;
+			}
+			
+			if (banned) {
 				// tekkitrestrict.log.info(cc.id+":"+cc.getData());
 				player.sendMessage(ChatColor.RED + "[TRItemDisabler] You cannot place down this type of block!");
 				e.setCancelled(true);
@@ -273,9 +278,7 @@ public class TRListener implements Listener {
 			if (player.getGameMode() == GameMode.CREATIVE) {
 				org.bukkit.inventory.ItemStack str = player.getItemInHand();
 				if (str != null) {
-					com.github.dreadslicer.tekkitrestrict.ItemStack ee = new com.github.dreadslicer.tekkitrestrict.ItemStack(
-							str.getTypeId(), str.getAmount(), str.getData().getData());
-					if (TRNoItem.isCreativeItemBanned(player, ee)) {
+					if (TRNoItem.isCreativeItemBanned(player, str.getTypeId(), str.getData().getData())) {
 						player.sendMessage(ChatColor.RED + "[TRLimitedCreative] You may not interact with this item.");
 						e.setCancelled(true);
 						player.setItemInHand(null);
@@ -373,8 +376,7 @@ public class TRListener implements Listener {
 			TRLogger.Log("debug", "Error! [handleCreativeInv Listener] : " + ex.getMessage());
 			Log.Exception(ex);
 		}
-		// Determine if they are crafting an uncraftable. Log EE
-		// Crafting.
+		// Determine if they are crafting an uncraftable. Log EE Crafting.
 		// Perf: [0]
 		try {
 			handleCraftBlock(event);
@@ -387,13 +389,20 @@ public class TRListener implements Listener {
 
 	private void handleCraftBlock(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
-		ItemStack currentItem = event.getCurrentItem();
-		if (currentItem == null) return;
+		ItemStack item = event.getCurrentItem();
+		if (item == null) return;
 		
 		if (Util.hasBypass(player, "noitem")) return;
-			
-		if (TRNoItem.isItemBanned(player,
-				new com.github.dreadslicer.tekkitrestrict.ItemStack(currentItem.getTypeId(), 0, currentItem.getDurability()))) {
+		
+		boolean banned = false;
+		
+		if (Global.useNewBanSystem){
+			if (TRCacheItem2.isBanned(player, "noitem", item.getTypeId(), item.getDurability())) banned = true;
+		} else {
+			if (TRNoItem.isItemBanned(player, item.getTypeId(), item.getDurability())) banned = true;
+		}
+		
+		if (banned) {
 			player.sendMessage(ChatColor.RED + "[TRItemDisabler] You cannot obtain/modify this Item type!");
 			event.setCancelled(true);
 		}

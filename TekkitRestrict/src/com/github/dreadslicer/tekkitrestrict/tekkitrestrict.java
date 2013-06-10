@@ -32,6 +32,7 @@ import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Threads;
 import com.github.dreadslicer.tekkitrestrict.commands.TRCommandAlc;
 import com.github.dreadslicer.tekkitrestrict.commands.TRCommandTPIC;
 import com.github.dreadslicer.tekkitrestrict.commands.TRCommandTR;
+import com.github.dreadslicer.tekkitrestrict.database.SQLite;
 import com.github.dreadslicer.tekkitrestrict.lib.TRFileConfiguration;
 import com.github.dreadslicer.tekkitrestrict.lib.YamlConfiguration;
 import com.github.dreadslicer.tekkitrestrict.listeners.Assigner;
@@ -48,14 +49,14 @@ public class tekkitrestrict extends JavaPlugin {
 	 * Indicates if tekkitrestrict is disabling. Threads use this to check if they should stop.
 	 */
 	public static boolean disable = false;
-	public static final double version = 1.15;
+	public static String version;
 	public static Object perm = null;
-	public static TRSQLDB db;
+	public static SQLite db;
 	private static tekkitrestrict instance;
 	public static ExecutorService basfo = Executors.newCachedThreadPool();
 	
 	private static TRThread ttt = null;
-	public static List<YamlConfiguration> configList = new LinkedList<YamlConfiguration>();
+	public static LinkedList<YamlConfiguration> configList = new LinkedList<YamlConfiguration>();
 
 	@Override
 	public void onLoad() {
@@ -162,14 +163,12 @@ public class tekkitrestrict extends JavaPlugin {
 						int size = 0;
 						List<String> ssr = tekkitrestrict.config.getStringList("RecipeBlock");
 						for (int i = 0; i < ssr.size(); i++) {
-							List<TRCacheItem> iss = TRCacheItem.processItemString(
-									"", ssr.get(i), -1);
+							List<TRCacheItem> iss = TRCacheItem.processItemString("", ssr.get(i), -1);
 							size += iss.size();
 						}
 						ssr = tekkitrestrict.config.getStringList("RecipeFurnaceBlock");
 						for (int i = 0; i < ssr.size(); i++) {
-							List<TRCacheItem> iss = TRCacheItem.processItemString(
-									"", ssr.get(i), -1);
+							List<TRCacheItem> iss = TRCacheItem.processItemString("", ssr.get(i), -1);
 							size += iss.size();
 						}
 						return size;
@@ -204,10 +203,10 @@ public class tekkitrestrict extends JavaPlugin {
 			// Failed to submit the stats :-(
 		}
 		
-		if (!("" + version).equals(getDescription().getVersion())){
-			Log.Debug("Version Mismatch!");
-		}
-		log.info("TekkitRestrict v " + getDescription().getVersion()+ " Enabled!");
+		if (Global.useNewBanSystem) TRCacheItem2.LoadNoItemConfig();
+		
+		version = getDescription().getVersion() + " Beta";//TODO remove before release
+		log.info("TekkitRestrict v " + version+ " Enabled!");
 		
 		/*
 		 * log.info("T: "+config.get("UseChunkUnloader").toString());
@@ -234,9 +233,10 @@ public class tekkitrestrict extends JavaPlugin {
 		//}
 
 		TRLogFilter.disable();
-		FileLog.closeAll();
 		Log.deinit();
-		log.info("TekkitRestrict v " + getDescription().getVersion()+ " disabled!");
+		FileLog.closeAll();
+		
+		log.info("TekkitRestrict v " + version + " disabled!");
 	}
 
 	public static tekkitrestrict getInstance() {
@@ -292,6 +292,8 @@ public class tekkitrestrict extends JavaPlugin {
 		
 		Global.debug = config.getBoolean("ShowDebugMessages", false);
 		Global.kickFromConsole = config.getBoolean("KickFromConsole", false);
+		Global.useNewBanSystem = config.getBoolean("UseNewBannedItemsSystem", true);
+		
 		Listeners.UseBlockLimit = config.getBoolean("UseItemLimiter", true);
 		Listeners.BlockCreativeContainer = config.getBoolean("LimitedCreativeNoContainer", true);
 		
@@ -317,9 +319,9 @@ public class tekkitrestrict extends JavaPlugin {
 		Threads.ChangeDisabledItemsIntoId = config.getInt("ChangeDisabledItemsIntoId", 3);
 		Threads.RPTickTime = (int) Math.round(config.getDouble("RPTimerMin", 0.2) * 20);
 		
-		List<String> lwcprevent = config.getStringList("LWCPreventNearLocked");
-		if (lwcprevent == null) LWC.blocked = Collections.synchronizedList(new LinkedList<String>());
-		else LWC.blocked = Collections.synchronizedList(lwcprevent);
+		LWC.blocked = config.getStringList("LWCPreventNearLocked");
+		if (LWC.blocked == null) LWC.blocked = Collections.synchronizedList(new LinkedList<String>());
+		else LWC.blocked = Collections.synchronizedList(LWC.blocked);
 		
 		SafeZones.allowNormalUser = config.getBoolean("SSAllowNormalUserToHaveSafeZones", true);
 		SafeZones.SSPlugins = config.getStringList("SSEnabledPlugins");
@@ -340,7 +342,7 @@ public class tekkitrestrict extends JavaPlugin {
 	}
 
 	private void loadSqlite() {
-		db = new TRSQLDB(null, "tr", "Data", this.getDataFolder().toString());
+		db = new SQLite("Data", this.getDataFolder().getPath());
 		db.open();
 	}
 
@@ -348,7 +350,7 @@ public class tekkitrestrict extends JavaPlugin {
 		//determine if Data.db is older.
 		Double ver = new Double(this.getDescription().getVersion());
 		ResultSet prev = null;
-		List<List<String>> srvals = null,limvals=null;
+		LinkedList<LinkedList<String>> srvals = null, limvals=null;
 		try{
 			//Version select
 			ResultSet rs = db.query("SELECT version FROM tr_dbversion");
@@ -401,7 +403,7 @@ public class tekkitrestrict extends JavaPlugin {
 					+ "'name' TEXT," + "'mode' INT," + "'data' TEXT,"
 					+ "'world' TEXT); ");
 			if(srvals != null){
-				for(List<String> sr:srvals){
+				for(LinkedList<String> sr:srvals){
 					String tadd = "";
 					for(String l:sr) tadd+=","+l;
 					//tadd = tadd.replace("null", "''");
@@ -417,7 +419,7 @@ public class tekkitrestrict extends JavaPlugin {
 					+ "'id' INTEGER PRIMARY KEY AUTOINCREMENT,"
 					+ "'player' TEXT," + "'blockdata' TEXT);");
 			if(limvals != null){
-				for(List<String> sr:limvals){
+				for(LinkedList<String> sr:limvals){
 					String tadd = "";
 					for(String l:sr) tadd+=","+l;
 					//tadd = tadd.replace("null", "''");
@@ -430,30 +432,23 @@ public class tekkitrestrict extends JavaPlugin {
 		}
 	}
 
-	private List<List<String>> getTableVals(String table) throws SQLException{
-		/*ResultSet rs1 = db.query("SELECT COUNT(*) FROM `"+table+"`");
-		int c = 0;
-		if(rs1 != null){
-			if(rs1.next()){
-				c=rs1.getInt(1);
-			}
-		}
-		rs1.close();*/
+	private LinkedList<LinkedList<String>> getTableVals(String table) throws SQLException {
 		ResultSet rs = db.query("SELECT * FROM `"+table+"`");
-		List<List<String>> ls = new LinkedList<List<String>>();
-		if (rs == null) return ls;
+		LinkedList<LinkedList<String>> values = new LinkedList<LinkedList<String>>();
+		if (rs == null) return values;
 		while(rs.next()) {
-			List<String> j = new LinkedList<String>();
-			
-			for(int i=1;i<=100;i++){
-				//tekkitrestrict.log.info("++ "+rs.getNString(i));
-				try{j.add(rs.getString(i));}catch(Exception e){}
+			LinkedList<String> j = new LinkedList<String>();
+			for(int i=1;i<=1000;i++){
+				try {
+					j.add(rs.getString(i));
+				} catch (Exception e){
+					break;
+				}
 			}
-			//tekkitrestrict.log.info("t: "+j.size());
-			ls.add(j);
+			values.add(j);
 		}
 		rs.close();
-		return ls;
+		return values;
 	}
 	
 	public void reload() {
