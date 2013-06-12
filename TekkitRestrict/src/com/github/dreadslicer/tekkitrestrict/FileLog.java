@@ -7,9 +7,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
 import java.util.Date;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
 
 public class FileLog {
 	private BufferedWriter out;
@@ -17,7 +16,7 @@ public class FileLog {
 	private String date = "";
 	private int day = 0;
 	private int counter = 0;
-	private static ConcurrentHashMap<String, FileLog> Logs = new ConcurrentHashMap<String, FileLog>();
+	private static HashMap<String, FileLog> Logs = new HashMap<String, FileLog>();
 	private boolean alternate;
 	
 	@SuppressWarnings("deprecation")
@@ -152,10 +151,20 @@ public class FileLog {
 		return true;
 	}
 	
+	private boolean closeNoRemove(){
+		try {
+			out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			Logs.remove(type);
+			return false;
+		}
+		return true;
+	}
+	
 	public static void closeAll(){
-		Collection<FileLog> allLogs = Logs.values();
-		for (FileLog filelog : allLogs){
-			if (!filelog.close()){
+		for (FileLog filelog : Logs.values()){
+			if (!filelog.closeNoRemove()){
 				tekkitrestrict.log.warning("Unable to close all logs. Some might not save properly.");
 			}
 		}
