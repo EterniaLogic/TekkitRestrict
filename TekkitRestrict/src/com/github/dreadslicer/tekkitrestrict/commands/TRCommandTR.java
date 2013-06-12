@@ -7,6 +7,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import net.h31ix.updater.Updater;
+import net.h31ix.updater.Updater.UpdateResult;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -186,6 +189,31 @@ public class TRCommandTR implements CommandExecutor {
 					tekkitrestrict.getInstance().reload();
 					send.msg("Tekkit Restrict Reloaded!");
 					return true;
+				}
+				
+				if (args[1].equals("update")) {
+					if (send.noPerm("admin.update")) return true;
+					
+					if (tekkitrestrict.updater == null){
+						send.msg(ChatColor.RED + "The update check is disabled in the config.");
+						return true;
+					}
+					
+					UpdateResult result = tekkitrestrict.updater.getResult();
+					if (result == UpdateResult.SUCCESS){
+						send.msg(ChatColor.GREEN + "TekkitRestrict will update on the next server start.");
+						return true;
+					} else if (result == UpdateResult.UPDATE_AVAILABLE){
+						send.msg(ChatColor.GREEN + "TekkitRestrict will now start downloading version " + tekkitrestrict.updater.getLatestVersionString() + ".");
+						tekkitrestrict.getInstance().Update();
+						return true;
+					} else if (result == UpdateResult.NO_UPDATE){
+						send.msg(ChatColor.YELLOW + "There is no update available for TekkitRestrict.");
+						return true;
+					} else {
+						send.msg(ChatColor.RED + "An error occured when trying to check for a new version.");
+						return true;
+					}
 				}
 				
 				if (args[1].equals("threadlag")) {

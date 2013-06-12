@@ -24,6 +24,9 @@ UseNoItem: true
 ShowDebugMessages: false
 KickFromConsole: false
 UseNewBannedItemsSystem: true
+CheckForUpdateOnStartup: true
+Auto-Update: true
+UpdateToDevelopmentVersions: false
 
 
 ####SafeZones####

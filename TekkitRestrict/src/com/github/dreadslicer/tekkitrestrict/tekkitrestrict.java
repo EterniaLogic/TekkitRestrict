@@ -15,6 +15,8 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
+import net.h31ix.updater.Updater;
+import net.h31ix.updater.Updater.UpdateResult;
 import net.minecraft.server.RedPowerLogic;
 
 import org.bukkit.plugin.PluginManager;
@@ -52,6 +54,7 @@ public class tekkitrestrict extends JavaPlugin {
 	public static String version;
 	public static Object perm = null;
 	public static SQLite db;
+	public static Updater updater = null;
 	private static tekkitrestrict instance;
 	public static ExecutorService basfo = Executors.newCachedThreadPool();
 	
@@ -206,6 +209,14 @@ public class tekkitrestrict extends JavaPlugin {
 		if (Global.useNewBanSystem) TRCacheItem2.LoadNoItemConfig();
 		
 		version = getDescription().getVersion() + " Beta";//TODO remove before release
+		
+		if (config.getBoolean("Auto-Update", true)){
+			updater = new Updater(this, "tekkit-restrict", this.getFile(), Updater.UpdateType.DEFAULT, true);
+		} else if (config.getBoolean("CheckForUpdateOnStartup", true)){
+				updater = new Updater(this, "tekkit-restrict", this.getFile(), Updater.UpdateType.NO_DOWNLOAD, true);
+				if (updater.getResult() == UpdateResult.UPDATE_AVAILABLE) log.info("There is an update available: " + updater.getLatestVersionString() + ". Use /tr admin update ingame to update.");
+		}
+		
 		log.info("TekkitRestrict v " + version+ " Enabled!");
 		
 		/*
@@ -563,5 +574,9 @@ public class tekkitrestrict extends JavaPlugin {
 		} catch (Exception e) {
 		}
 		log.setLevel(ll);
+	}
+	
+	public void Update(){
+		updater = new Updater(this, "tekkit-restrict", this.getFile(), Updater.UpdateType.DEFAULT, true);
 	}
 }
