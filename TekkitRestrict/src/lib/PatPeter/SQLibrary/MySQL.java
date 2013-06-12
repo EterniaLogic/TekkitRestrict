@@ -23,8 +23,7 @@ public class MySQL extends Database {
 	private String password = "";
 	private String database = "minecraft";
 
-	public MySQL(Logger log, String prefix, String hostname, String portnmbr,
-			String database, String username, String password) {
+	public MySQL(Logger log, String prefix, String hostname, String portnmbr, String database, String username, String password) {
 		super(log, prefix, "[MySQL] ");
 		this.hostname = hostname;
 		this.portnmbr = portnmbr;
@@ -36,34 +35,32 @@ public class MySQL extends Database {
 	@Override
 	protected boolean initialize() {
 		try {
-			Class.forName("com.mysql.jdbc.Driver"); // Check that server's Java
-													// has MySQL support.
+			Class.forName("com.mysql.jdbc.Driver");
 			return true;
 		} catch (ClassNotFoundException e) {
-			this.writeError("Class Not Found Exception: " + e.getMessage()
-					+ ".", true);
+			this.writeError("MySQL driver class missing: " + e.getMessage() + ".", true);
 			return false;
 		}
 	}
 
 	@Override
 	public Connection open() {
-		if (initialize()) {
-			String url = "";
-			try {
-				url = "jdbc:mysql://" + this.hostname + ":" + this.portnmbr
-						+ "/" + this.database;
-				// return DriverManager.getConnection(url, this.username,
-				// this.password);
-				this.connection = DriverManager.getConnection(url,
-						this.username, this.password);
-			} catch (SQLException e) {
-				this.writeError(url, true);
-				this.writeError(
-						"Could not be resolved because of an SQL Exception: "
-								+ e.getMessage() + ".", true);
-			}
+		if (!initialize()) return null;
+		String url = "";
+		try {
+			url = "jdbc:mysql://" + this.hostname + ":" + this.portnmbr
+					+ "/" + this.database;
+			// return DriverManager.getConnection(url, this.username,
+			// this.password);
+			this.connection = DriverManager.getConnection(url,
+					this.username, this.password);
+		} catch (SQLException e) {
+			this.writeError(url, true);
+			this.writeError(
+					"Could not be resolved because of an SQL Exception: "
+							+ e.getMessage() + ".", true);
 		}
+		
 		return null;
 	}
 

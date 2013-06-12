@@ -1,7 +1,3 @@
-/*
- * Date Created: 2012-03-11 14:20
- * @author <a href="http://forums.bukkit.org/members/jertocvil.18552/">jertocvil</a>
- */
 package lib.PatPeter.SQLibrary;
 
 import java.util.logging.Level;
