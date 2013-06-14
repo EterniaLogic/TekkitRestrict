@@ -106,8 +106,10 @@ public class tekkitrestrict extends JavaPlugin {
 		Assigner.assign(this); //Register the required listeners
 		
 		new TRLogger();
+		
 		TRSafeZone.init();
-		TRLimitFly.init();
+		if (config.getBoolean("LimitFlightTime", false)) TRLimitFly.init();
+		
 		TRLimitBlock.init();
 		TRNoDupe_BagCache.init();
 
@@ -236,7 +238,7 @@ public class tekkitrestrict extends JavaPlugin {
 		ttt.gemArmorThread.interrupt();
 		ttt.worldScrubThread.interrupt();
 		ttt.saveThread.interrupt();
-		
+		TRLimitFly.stop();
 		try { Thread.sleep(2000); } catch (InterruptedException e) {} //Sleep for 2 seconds to allow the savethread to save.
 		//try {
 		//	TRThread.originalEUEnd(); (Currently does nothing)
@@ -303,7 +305,7 @@ public class tekkitrestrict extends JavaPlugin {
 		
 		Global.debug = config.getBoolean("ShowDebugMessages", false);
 		Global.kickFromConsole = config.getBoolean("KickFromConsole", false);
-		Global.useNewBanSystem = config.getBoolean("UseNewBannedItemsSystem", true);
+		Global.useNewBanSystem = config.getBoolean("UseNewBannedItemsSystem", false);
 		
 		Listeners.UseBlockLimit = config.getBoolean("UseItemLimiter", true);
 		Listeners.BlockCreativeContainer = config.getBoolean("LimitedCreativeNoContainer", true);

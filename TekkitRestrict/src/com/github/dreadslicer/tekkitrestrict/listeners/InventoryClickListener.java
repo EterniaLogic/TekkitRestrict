@@ -93,7 +93,7 @@ public class InventoryClickListener implements Listener {
 				}
 			}
 		} else if (title.equals("bag")){
-			if (Dupes.alcBag && (id1 == 27532 || id1 == 27593 || id2 == 27532 || id2 == 27593)) //||
+			if (Dupes.alcBag && (id1 == 27532 || id1 == 27593 || id2 == 27532 || id2 == 27593))
 			{
 				if (!player.hasPermission("tekkitrestrict.bypass.dupe.alcbag")){
 					event.setCancelled(true);

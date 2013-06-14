@@ -14,12 +14,13 @@ import com.griefcraft.model.Permission;
 import com.griefcraft.model.Protection;
 
 public class TRLWCProtect {
-	public static void checkLWC(BlockPlaceEvent event) {
+	/** @return False if the event was cancelled. */
+	public static boolean checkLWCAllowed(BlockPlaceEvent event) {
+		Player player = event.getPlayer();
 		// link up with LWC!
-		if (Util.hasBypass(event.getPlayer(), "lwc")) return;
+		if (Util.hasBypass(player, "lwc")) return true;
 		
 		Block block = event.getBlock();
-		Player player = event.getPlayer();
 		boolean istype = false;
 		// tekkitrestrict.log.info(b.getTypeId()+":"+b.getData());
 		for (int i = 0; i < TRConfigCache.LWC.blocked.size(); i++) {
@@ -33,33 +34,36 @@ public class TRLWCProtect {
 			}
 		}
 		
+		if (!istype) return true;
+		
 		if (TRConfigCache.LWC.lwcPlugin == null){
 			PluginManager PM = tekkitrestrict.getInstance().getServer().getPluginManager();
 			if (PM.isPluginEnabled("LWC")) TRConfigCache.LWC.lwcPlugin = (LWCPlugin) PM.getPlugin("LWC");
 		}
 		
-		if (istype && TRConfigCache.LWC.lwcPlugin != null) {
-			LWC LWC = TRConfigCache.LWC.lwcPlugin.getLWC();
-			String playername = player.getName().toLowerCase();
-			for (BlockFace bf : BlockFace.values()) {
-				Protection prot = LWC.getProtectionCache().getProtection(block.getRelative(bf));
-				if (prot == null) continue;
-				
-				boolean hasAccess = false;
+		if (TRConfigCache.LWC.lwcPlugin == null) return true;
+		
+		LWC LWC = TRConfigCache.LWC.lwcPlugin.getLWC();
+		String playername = player.getName().toLowerCase();
+		for (BlockFace bf : BlockFace.values()) {
+			Protection prot = LWC.getProtectionCache().getProtection(block.getRelative(bf));
+			if (prot == null) continue;
+			
+			boolean hasAccess = false;
 
-				for (Permission pe : prot.getPermissions()) {
-					if (pe.getName().toLowerCase().equals(playername)){
-						hasAccess = true;
-						break;
-					}
-				}
-
-				if (!prot.isOwner(player) && !hasAccess) {
-					player.sendMessage("You are not allowed to place this here!");
-					event.setCancelled(true);
-					return;
+			for (Permission pe : prot.getPermissions()) {
+				if (pe.getName().toLowerCase().equals(playername)){
+					hasAccess = true;
+					break;
 				}
 			}
+
+			if (!prot.isOwner(player) && !hasAccess) {
+				player.sendMessage("You are not allowed to place this here!");
+				event.setCancelled(true);
+				return false;
+			}
 		}
+		return true;
 	}
 }

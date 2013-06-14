@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import net.h31ix.updater.Updater;
 import net.h31ix.updater.Updater.UpdateResult;
 
 import org.bukkit.Bukkit;

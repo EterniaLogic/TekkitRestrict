@@ -6,6 +6,7 @@
 ####################################################################
 
 #Limit fly time using rings and jet packs in minutes
+LimitFlightTime: false
 FlyLimitDailyMinutes: 99999999999
 
 ####Global EE Options####

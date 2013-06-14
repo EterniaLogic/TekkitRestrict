@@ -28,6 +28,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Global;
+import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Listeners;
 import com.github.dreadslicer.tekkitrestrict.commands.TRCommandAlc;
 import com.github.dreadslicer.tekkitrestrict.lib.TRNoClick;
 
@@ -152,7 +153,7 @@ public class TRListener implements Listener {
 		}
 		
 		try {
-			TRLWCProtect.checkLWC(e);
+			if (!TRLWCProtect.checkLWCAllowed(e)) return;
 
 			Block block = e.getBlock();
 			int id = block.getTypeId();
@@ -181,7 +182,6 @@ public class TRListener implements Listener {
 			}
 
 			if (te1 != null && data == 0) {
-
 				if (te1 instanceof TileCovered) {
 					// TileCovered tc = (TileCovered)te1;
 					// tekkitrestrict.log.info("ar "+lastdata);
@@ -264,97 +264,63 @@ public class TRListener implements Listener {
 			TRLogger.Log("debug", "Error: [ListenInteract TRNoClick] " + ex.getMessage());
 		}
 		
-		try {
-			TRNoDupeProjectTable.checkTable(e);
-		} catch(Exception ex){}
+		if (TRNoDupeProjectTable.tableUseNotAllowed(e.getClickedBlock(), player)){
+			e.setCancelled(true);
+			player.sendMessage(ChatColor.RED + "Someone else is already using this project table!");
+		}
 
 		try {
-			// if(e.getAction() == Action.RIGHT_CLICK_BLOCK ||
-			// e.getAction() == Action.RIGHT_CLICK_AIR){
-
-			
-			//EntityPlayer ep = ((CraftPlayer) player).getHandle();
-			//if (ep.abilities.canInstantlyBuild) {
 			if (player.getGameMode() == GameMode.CREATIVE) {
-				org.bukkit.inventory.ItemStack str = player.getItemInHand();
+				ItemStack str = player.getItemInHand();
 				if (str != null) {
-					if (TRNoItem.isCreativeItemBanned(player, str.getTypeId(), str.getData().getData())) {
+					if (TRNoItem.isCreativeItemBanned(player, str.getTypeId(), str.getDurability())) {
 						player.sendMessage(ChatColor.RED + "[TRLimitedCreative] You may not interact with this item.");
 						e.setCancelled(true);
 						player.setItemInHand(null);
 					}
 				}
 			}
-			// }
 		} catch (Exception ex) {
 			TRLogger.Log("debug", "Error: [ListenInteract TRLimitedCreative] " + ex.getMessage());
 		}
 
-		if (!e.isCancelled()) itemLogUse(e);
+		if (!e.isCancelled() && tekkitrestrict.EEEnabled) itemLogUse(player, e.getAction());
 		
 	}
 
-	private void itemLogUse(PlayerInteractEvent e) {
-		try {
-			Player p = e.getPlayer();
-			int x = p.getLocation().getBlockX();
-			int y = p.getLocation().getBlockY();
-			int z = p.getLocation().getBlockZ();
-			if (tekkitrestrict.EEEnabled) { // may spare us usage.
-				// log for EE stuffs.
-				ItemStack a = e.getPlayer().getItemInHand();
-				// net.minecraft.server.ItemStack aae =
-				// ((org.bukkit.craftbukkit.inventory.CraftItemStack)a).getHandle();
-				int id = a.getTypeId();
-				if (inRange(id, 27530, 27531)) {
-					TRLogger.Log("EEAmulet", "[" + p.getName() + "]["
-							+ p.getWorld().getName() + "-" + x + "," + y + ","
-							+ z + "] used (" + id + ")`" + EENames.get(id)
-							+ "`");
-				} else if (inRange(id, 27532, 27534) || id == 27536
-						|| id == 27537 || id == 27574 || id == 27584
-						|| id == 27593) {
-					TRLogger.Log("EERing", "[" + p.getName() + "]["
-							+ p.getWorld().getName() + "-" + x + "," + y + ","
-							+ z + "] used (" + id + ")`" + EENames.get(id)
-							+ "`");
-				} else if (e.getAction() != Action.LEFT_CLICK_AIR
-						&& e.getAction() != Action.LEFT_CLICK_BLOCK) {
-					if (inRange(id, 27543, 27548) || id == 27555) {
-						TRLogger.Log("EEDmTool",
-								"[" + p.getName() + "]["
-										+ p.getWorld().getName() + "-" + x
-										+ "," + y + "," + z + "] used (" + id
-										+ ")`" + EENames.get(id) + "`");
-					} else if (inRange(id, 27564, 27573)) {
-						TRLogger.Log("EERmTool",
-								"[" + p.getName() + "]["
-										+ p.getWorld().getName() + "-" + x
-										+ "," + y + "," + z + "] used (" + id
-										+ ")`" + EENames.get(id) + "`");
-					}
-				} else if (id == 27527 || id == 27556 || id == 27535) {
-					TRLogger.Log("EEDestructive", "[" + p.getName() + "]["
-							+ p.getWorld().getName() + "-" + x + "," + y + ","
-							+ z + "] used (" + id + ")`" + EENames.get(id)
-							+ "`");
-				} else if (id == 27538 || id == 27553 || id == 27562
-						|| id == 27583 || id == 27585 || id == 27592) {
-					TRLogger.Log("EEMisc", "[" + p.getName() + "]["
-							+ p.getWorld().getName() + "-" + x + "," + y + ","
-							+ z + "] used (" + id + ")`" + EENames.get(id)
-							+ "`");
-				}
-			}
-		} catch (Exception e1) {
-		}
+	/** Log EE tools. */
+	private void itemLogUse(Player player, Action action) {
+		ItemStack a = player.getItemInHand();
+		if (a == null) return;
+
+		int id = a.getTypeId();
+		
+		if (inRange(id, 27530, 27531))
+			logUse("EEAmulet", player, id);
+		else if (inRange(id, 27532, 27534) || id == 27536 || id == 27537 || id == 27574 || id == 27584 || id == 27593)
+			logUse("EERing", player, id);
+		else if (inRange(id, 27543, 27548) || id == 27555){
+			if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)
+				logUse("EEDmTool", player, id);
+		} else if (inRange(id, 27564, 27573)){
+			if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)
+				logUse("EERmTool", player, id);
+		} else if (id == 27527 || id == 27556 || id == 27535)
+			logUse("EEDestructive", player, id);
+		else if (id == 27538 || id == 27553 || id == 27562 || id == 27583 || id == 27585 || id == 27592)
+			logUse("EEMisc", player, id);
+	}
+	
+	private void logUse(String logname, Player player, int id){
+		int x = player.getLocation().getBlockX();
+		int y = player.getLocation().getBlockY();
+		int z = player.getLocation().getBlockZ();
+		TRLogger.Log(logname, "[" + player.getName() + "][" + player.getWorld().getName() +
+				" - " + x + "," + y + "," + z + "] used (" + id + ") `" + EENames.get(id) + "`");
 	}
 
 	private boolean inRange(int stack, int from, int to) {
-		if (stack >= from && stack <= to) {
-			return true;
-		}
-		return false;
+		return (stack >= from && stack <= to);
 	}
 
 	// /////////// END INTERACT /////////////
@@ -363,19 +329,17 @@ public class TRListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void eventInventoryClick(InventoryClickEvent event) {
 		if (event.getWhoClicked() == null) return;
+		
+		Player player = (Player) event.getWhoClicked();
+		
 		try {
-			Player player = (Player) event.getWhoClicked();
 			if (player.getGameMode() == GameMode.CREATIVE)
 				TRLimitedCreative.handleCreativeInvClick(event);
-			
-			//EntityPlayer ep = ((CraftPlayer) player).getHandle();
-			//if (ep.abilities.canInstantlyBuild) {
-			//TRLimitedCreative.handleCreativeInvClick(event);
-			//}
 		} catch (Exception ex) {
 			TRLogger.Log("debug", "Error! [handleCreativeInv Listener] : " + ex.getMessage());
 			Log.Exception(ex);
 		}
+		
 		// Determine if they are crafting an uncraftable. Log EE Crafting.
 		// Perf: [0]
 		try {
@@ -415,11 +379,14 @@ public class TRListener implements Listener {
 	public void onPlayerQuit(PlayerQuitEvent e) {
 		//IMPORTANT assigner
 		Player player = e.getPlayer();
+		if (player == null) return;
+		
 		TRCommandAlc.setPlayerInv(player);
-		if (tekkitrestrict.config.getBoolean("UseItemLimiter") && tekkitrestrict.config.getBoolean("UseItemLimiter")) {
+		TRNoHack.playerLogout(player);
+		TRNoDupeProjectTable.playerUnuse(player.getName());
+		
+		if (Listeners.UseBlockLimit) {
 			try {TRLimitBlock.setExpire(player.getName());}catch(Exception eee){}
-			try {TRNoHack.playerLogout(player);}catch(Exception eee){}
-			try {TRNoDupeProjectTable.playerUnuse(player.getName());}catch(Exception eee){}
 		}
 	}
 
@@ -427,11 +394,14 @@ public class TRListener implements Listener {
 	public void onPlayerKick(PlayerKickEvent e) {
 		//IMPORTANT assigner
 		Player player = e.getPlayer();
+		if (player == null) return;
+		
 		TRCommandAlc.setPlayerInv(player);
-		if (tekkitrestrict.config.getBoolean("UseItemLimiter") && tekkitrestrict.config.getBoolean("UseItemLimiter")) {
+		TRNoHack.playerLogout(player);
+		TRNoDupeProjectTable.playerUnuse(player.getName());
+		
+		if (Listeners.UseBlockLimit) {
 			try {TRLimitBlock.setExpire(player.getName());}catch(Exception eee){}
-			try {TRNoHack.playerLogout(player);}catch(Exception eee){}
-			try {TRNoDupeProjectTable.playerUnuse(player.getName());}catch(Exception eee){}
 		}
 	}
 
@@ -439,7 +409,7 @@ public class TRListener implements Listener {
 	public void onPlayerLogin(PlayerJoinEvent e) {
 		Player player = e.getPlayer();
 		try {
-			if (tekkitrestrict.config.getBoolean("UseItemLimiter") && tekkitrestrict.config.getBoolean("UseItemLimiter")) {
+			if (Listeners.UseBlockLimit) {
 				TRLimitBlock.removeExpire(player.getName());
 				TRLimitBlock.getLimiter(player);
 			}
