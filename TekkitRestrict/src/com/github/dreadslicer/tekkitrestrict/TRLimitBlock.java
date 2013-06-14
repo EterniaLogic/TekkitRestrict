@@ -356,15 +356,14 @@ public class TRLimitBlock {
 		}
 
 		try {
-			if (blockdata != "") {
-				tekkitrestrict.db
-						.query("INSERT OR REPLACE INTO `tr_limiter` (`id`,`player`,`blockdata`) VALUES ("
-								+ estID
-								+ ",'"
-								+ player
-								+ "','"
-								+ blockdata
-								+ "')");
+			if (!blockdata.equals("")) {
+				tekkitrestrict.db.query("INSERT OR REPLACE INTO `tr_limiter` (`id`,`player`,`blockdata`) VALUES ("
+										+ estID
+										+ ",'"
+										+ player
+										+ "','"
+										+ blockdata
+										+ "')");
 			}
 		} catch (Exception E) {
 		}
@@ -380,15 +379,14 @@ public class TRLimitBlock {
 			if (cw != null) {
 				l = new Location(cw, Integer.valueOf(lac[1]),
 						Integer.valueOf(lac[2]), Integer.valueOf(lac[3]));
-				// tekkitrestrict.log.info("CCC"+l);
 			}
 		}
 
 		return l;
 	}
 
+	/** load all of the block:player pairs from db. */
 	public static void init() {
-		// load all of the block:player pairs from db.
 		ResultSet dbin = null;
 		try {
 			dbin = tekkitrestrict.db.query("SELECT * FROM `tr_limiter` LIMIT 0,9999999");
@@ -414,7 +412,7 @@ public class TRLimitBlock {
 										loc.getWorld().getName() + ":"
 												+ loc.getBlockX() + ":"
 												+ loc.getBlockY() + ":"
-												+ loc.getBlockZ(), player.toLowerCase());
+												+ loc.getBlockZ(), player);
 							}
 						}
 					} else {
@@ -424,7 +422,7 @@ public class TRLimitBlock {
 						for (Location loc : blks) {
 							allBlockOwners.put(loc.getWorld().getName() + ":"
 									+ loc.getBlockX() + ":" + loc.getBlockY()
-									+ ":" + loc.getBlockZ(), player.toLowerCase());
+									+ ":" + loc.getBlockZ(), player);
 						}
 					}
 				}
