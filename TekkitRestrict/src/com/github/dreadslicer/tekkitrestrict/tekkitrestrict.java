@@ -209,7 +209,7 @@ public class tekkitrestrict extends JavaPlugin {
 		
 		if (Global.useNewBanSystem) TRCacheItem2.LoadNoItemConfig();
 		
-		version = getDescription().getVersion() + " Beta";//TODO remove before release
+		version = getDescription().getVersion() + " Beta 2";//TODO remove before release
 		
 		if (config.getBoolean("Auto-Update", true)){
 			updater = new Updater(this, "tekkit-restrict", this.getFile(), Updater.UpdateType.DEFAULT, true);
