@@ -17,6 +17,7 @@ import net.minecraft.server.TileEntity;
 import net.minecraft.server.WorldServer;
 
 import org.bukkit.Chunk;
+import org.bukkit.GameMode;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -26,6 +27,7 @@ import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.ItemStack;
 
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Threads;
 import com.github.dreadslicer.tekkitrestrict.lib.TRCharge;
@@ -282,8 +284,8 @@ class DisableItemThread extends Thread {
 	private void disableItems(Player player) {
 		try {
 			PlayerInventory inv = player.getInventory();
-			org.bukkit.inventory.ItemStack[] st1 = inv.getContents();
-			org.bukkit.inventory.ItemStack[] st2 = inv.getArmorContents();
+			ItemStack[] st1 = inv.getContents();
+			ItemStack[] st2 = inv.getArmorContents();
 
 			/*try {
 				if (player.getItemOnCursor() != null) {
@@ -313,8 +315,17 @@ class DisableItemThread extends Thread {
 					// //// BAN THE ITEM
 					int id = st1[i].getTypeId();
 					int data = st1[i].getData().getData();//TODO change to .getDurability()?
-					if (TRNoItem.isItemBanned(player, id, data) || TRNoItem.isCreativeItemBanned(player, id, data)) {
-						st1[i] = new org.bukkit.inventory.ItemStack(Threads.ChangeDisabledItemsIntoId, 1);
+					boolean banned = false;
+					if (TRConfigCache.Global.useNewBanSystem){
+						if (TRCacheItem2.isBanned(player, "noitem", id, data)) banned = true;
+						else if (player.getGameMode() == GameMode.CREATIVE && TRCacheItem2.isBanned(player, "creative", id, data)) banned = true;
+					} else {
+						if (TRNoItem.isItemBanned(player, id, data)) banned = true;
+						else if (player.getGameMode() == GameMode.CREATIVE && TRNoItem.isCreativeItemBanned(player, id, data)) banned = true;
+					}
+					
+					if (banned) {
+						st1[i] = new ItemStack(Threads.ChangeDisabledItemsIntoId, 1);
 						changed = true;
 					}
 
@@ -330,7 +341,7 @@ class DisableItemThread extends Thread {
 								if (m != -1) {
 									TRCharge g = MCharges.get(m);
 									if (g.id == st1[i].getTypeId()) {
-										if (mcItemStack.getItem() instanceof ee.ItemEECharged) {
+										if (mcItemStack.getItem() instanceof ItemEECharged) {
 											ItemEECharged eer = (ItemEECharged) mcItemStack.getItem();
 											double maxEE = eer.getMaxCharge();
 											double per = maxEE / 100.000;
@@ -502,12 +513,21 @@ class DisableItemThread extends Thread {
 			boolean changed1 = false;
 			for (int i = 0; i < st2.length; i++) {
 				try {
-					org.bukkit.inventory.ItemStack str = st2[i];
+					ItemStack str = st2[i];
 					int id = str.getTypeId();
 					int data = str.getData().getData();
-					if (TRNoItem.isItemBanned(player, id, data) || TRNoItem.isCreativeItemBanned(player, id, data)) {
+					boolean banned = false;
+					if (TRConfigCache.Global.useNewBanSystem){
+						if (TRCacheItem2.isBanned(player, "noitem", id, data)) banned = true;
+						else if (player.getGameMode() == GameMode.CREATIVE && TRCacheItem2.isBanned(player, "creative", id, data)) banned = true;
+					} else {
+						if (TRNoItem.isItemBanned(player, id, data)) banned = true;
+						else if (player.getGameMode() == GameMode.CREATIVE && TRNoItem.isCreativeItemBanned(player, id, data)) banned = true;
+					}
+					
+					if (banned) {
 						// this item is banned/disabled for this player!!!
-						st2[i] = new org.bukkit.inventory.ItemStack(Threads.ChangeDisabledItemsIntoId, 1); //proceed to remove it.
+						st2[i] = new ItemStack(Threads.ChangeDisabledItemsIntoId, 1); //proceed to remove it.
 						changed1 = true;
 					}
 				} catch (Exception ex) {}
@@ -558,8 +578,7 @@ class DisableItemThread extends Thread {
 				String[] sseu = s.split(" ");
 				int eu = Integer.parseInt(sseu[1]);
 				int chrate = Integer.parseInt(sseu[2]);
-				List<TRCacheItem> iss = TRCacheItem.processItemString("",
-						sseu[0], -1);
+				List<TRCacheItem> iss = TRCacheItem.processItemString("", sseu[0], -1);
 				for (TRCacheItem iss1 : iss) {
 					TRCharge gg = new TRCharge();
 					gg.id = iss1.id;
@@ -580,8 +599,7 @@ class DisableItemThread extends Thread {
 				String[] sscharge = Charge.split(" ");
 				int max = Integer.parseInt(sscharge[1]);
 				// ItemStack[] gs = TRNoItem.getRangedItemValues(sscharge[0]);
-				List<TRCacheItem> iss = TRCacheItem.processItemString("",
-						sscharge[0], -1);
+				List<TRCacheItem> iss = TRCacheItem.processItemString("", sscharge[0], -1);
 				for (TRCacheItem isr : iss) {
 					TRCharge gg = new TRCharge();
 					gg.id = isr.id;
@@ -663,7 +681,7 @@ class DisableItemThread extends Thread {
 	 * If the item doesn't have a tag it will add one.<br>
 	 * If the item doesn't have a value for the specified key it will make it and set it to 0.
 	 */
-	public short getShort(org.bukkit.inventory.ItemStack bukkitItemStack, String key) {
+	public short getShort(ItemStack bukkitItemStack, String key) {
 		net.minecraft.server.ItemStack var1 = ((CraftItemStack) bukkitItemStack).getHandle();
 		if (var1.tag == null) var1.setTag(new NBTTagCompound());
 		
@@ -676,7 +694,7 @@ class DisableItemThread extends Thread {
 	 * If the item doesn't have a tag it will add one.
 	 */
 
-	public void setShort(org.bukkit.inventory.ItemStack bukkitItemStack, String key, int value) {
+	public void setShort(ItemStack bukkitItemStack, String key, int value) {
 		net.minecraft.server.ItemStack var1 = ((CraftItemStack) bukkitItemStack).getHandle();
 		if (var1.tag == null) var1.setTag(new NBTTagCompound());
 		
@@ -688,7 +706,7 @@ class DisableItemThread extends Thread {
 	 * If the item doesn't have a value for the specified key it will make it and set it to "".
 	 */
 
-	public String getString(org.bukkit.inventory.ItemStack bukkitItemStack, String key) {
+	public String getString(ItemStack bukkitItemStack, String key) {
 		net.minecraft.server.ItemStack var1 = ((CraftItemStack) bukkitItemStack).getHandle();
 		if (var1.tag == null) var1.setTag(new NBTTagCompound());
 		
@@ -701,7 +719,7 @@ class DisableItemThread extends Thread {
 	 * If the item doesn't have a tag it will add one.
 	 */
 
-	public void setString(org.bukkit.inventory.ItemStack bukkitItemStack, String key, String value) {
+	public void setString(ItemStack bukkitItemStack, String key, String value) {
 		net.minecraft.server.ItemStack var1 = ((CraftItemStack) bukkitItemStack).getHandle();
 		if (var1.tag == null) var1.setTag(new NBTTagCompound());
 		
