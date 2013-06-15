@@ -5,10 +5,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.bukkit.ChatColor;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 
 import com.github.dreadslicer.tekkitrestrict.TRCacheItem;
+import com.github.dreadslicer.tekkitrestrict.TRLogger;
 import com.github.dreadslicer.tekkitrestrict.TRNoItem;
 import com.github.dreadslicer.tekkitrestrict.TRSafeZone;
 import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
@@ -19,7 +23,7 @@ public class TRNoClick {
 	public boolean air = true, block = true, usesafezone = false, useB = false, insafezone = false;
 	public String clicktype, msg = ""; // left / right
 
-	public boolean compare(Player player, org.bukkit.block.Block bl, org.bukkit.inventory.ItemStack iss, Action e) {
+	public boolean compare(Player player, Block bl, ItemStack iss, Action e) {
 		boolean r = false;
 		// tekkitrestrict.log.info("action: "+e.toString());
 		if (this.useB) {
@@ -116,23 +120,26 @@ public class TRNoClick {
 		}
 	}
 
-	public static void compareAll(org.bukkit.event.player.PlayerInteractEvent e) {
-		Player player = e.getPlayer();
-		for (TRNoClick cia : disableClickItemActions) {
-			if (cia.compare(player, e.getClickedBlock(), player.getItemInHand(), e.getAction())) {
-				if (!cia.msg.equals("")) {
-					player.sendMessage(ChatColor.RED + cia.msg);
-				} else {
-					// tekkitrestrict.log.info(cia.id+"|"+cia.data+" - "+cia.clicktype);
-					String t = cia.clicktype == "both" ? "" : " " + cia.clicktype;
-					String a = (cia.air && !cia.block) ? " in the air" : ((cia.block && !cia.air) ? " on blocks" : "");
-					String s = (cia.insafezone && cia.usesafezone) ? " inside a safezone." : ".";
-					player.sendMessage(ChatColor.RED + "Sorry, but" + t + " clicking with this item" + a + " is disabled" + s);
+	public static boolean compareAll(PlayerInteractEvent e) {
+		try {
+			Player player = e.getPlayer();
+			for (TRNoClick cia : disableClickItemActions) {
+				if (cia.compare(player, e.getClickedBlock(), player.getItemInHand(), e.getAction())) {
+					if (!cia.msg.equals("")) {
+						player.sendMessage(ChatColor.RED + cia.msg);
+					} else {
+						// tekkitrestrict.log.info(cia.id+"|"+cia.data+" - "+cia.clicktype);
+						String t = cia.clicktype == "both" ? "" : " " + cia.clicktype;
+						String a = (cia.air && !cia.block) ? " in the air" : ((cia.block && !cia.air) ? " on blocks" : "");
+						String s = (cia.insafezone && cia.usesafezone) ? " inside a safezone." : ".";
+						player.sendMessage(ChatColor.RED + "Sorry, but" + t + " clicking with this item" + a + " is disabled" + s);
+					}
+					return true;
 				}
-				e.setCancelled(true);
-				return;
 			}
+		} catch (Exception ex){
+			TRLogger.Log("debug", "Error: [ListenInteract TRNoClick] " + ex.getMessage());
 		}
-
+		return false;
 	}
 }

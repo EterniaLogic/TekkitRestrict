@@ -30,11 +30,6 @@ LogDMTools: true
 LogRMTools: true
 LogEEMisc: true
 LogEEDestructive: true
-LogEECrafting: true
-
-#--- Commands
-LogOpenAlc: true
-
 
 ###########################################################################
 #Filter out your logs! All you have to do is enter a bit of the text of that

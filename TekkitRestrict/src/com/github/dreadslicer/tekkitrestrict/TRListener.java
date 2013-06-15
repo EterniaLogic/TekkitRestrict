@@ -246,45 +246,59 @@ public class TRListener implements Listener {
 	}
 
 	// /////// START INTERACT //////////////
-	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void onPlayerInteract(PlayerInteractEvent e) {
 		Player player = e.getPlayer();
 		if (player == null) return;
 		
-		// determine if this is Buildcraft or RedPower... Then exempt.
-		String pname = player.getName().toLowerCase();
+		String pname = player.getName().toLowerCase(); // determine if this is Buildcraft or RedPower... Then exempt.
 		if (pname.equals("[buildcraft]") || pname.equals("[redpower]")) return;
+		
 		// lets do this based on a white-listed approach.
 		// First, lets loop through the DisableClick list to stop clicks.
 		// Perf: 8x
-		try {
-			TRNoClick.compareAll(e);
-		} catch (Exception ex) {
-			TRLogger.Log("debug", "Error: [ListenInteract TRNoClick] " + ex.getMessage());
-		}
-		
-		if (TRNoDupeProjectTable.tableUseNotAllowed(e.getClickedBlock(), player)){
+		if (TRNoClick.compareAll(e)){
 			e.setCancelled(true);
-			player.sendMessage(ChatColor.RED + "Someone else is already using this project table!");
+			return;
 		}
 
-		try {
-			if (player.getGameMode() == GameMode.CREATIVE) {
-				ItemStack str = player.getItemInHand();
-				if (str != null) {
-					if (TRNoItem.isCreativeItemBanned(player, str.getTypeId(), str.getDurability())) {
-						player.sendMessage(ChatColor.RED + "[TRLimitedCreative] You may not interact with this item.");
-						e.setCancelled(true);
-						player.setItemInHand(null);
+		if (TRNoDupeProjectTable.tableUseNotAllowed(e.getClickedBlock(), player)){
+			player.sendMessage(ChatColor.RED + "Someone else is already using this project table!");
+			e.setCancelled(true);
+			return;
+		}
+
+		if (player.getGameMode() == GameMode.CREATIVE) {
+			ItemStack str = player.getItemInHand();
+			if (str != null) {
+				boolean banned = false;
+				try {
+					if (Global.useNewBanSystem){
+						if (TRCacheItem2.isBanned(player, "creative", str.getTypeId(), str.getDurability())) banned = true;
+					} else {
+						if (TRNoItem.isCreativeItemBanned(player, str.getTypeId(), str.getDurability())) banned = true;
 					}
+				} catch (Exception ex) {
+					TRLogger.Log("debug", "Error: [ListenInteract TRLimitedCreative] " + ex.getMessage());
+				}
+				
+				if (banned) {
+					player.sendMessage(ChatColor.RED + "[TRLimitedCreative] You may not interact with this item.");
+					e.setCancelled(true);
+					player.setItemInHand(null);
 				}
 			}
-		} catch (Exception ex) {
-			TRLogger.Log("debug", "Error: [ListenInteract TRLimitedCreative] " + ex.getMessage());
 		}
-
-		if (!e.isCancelled() && tekkitrestrict.EEEnabled) itemLogUse(player, e.getAction());
+	}
+	
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onInteractEvent2(PlayerInteractEvent event){
+		if (!tekkitrestrict.EEEnabled) return;
 		
+		Player player = event.getPlayer();
+		if (player == null) return;
+		
+		itemLogUse(player, event.getAction());
 	}
 
 	/** Log EE tools. */
