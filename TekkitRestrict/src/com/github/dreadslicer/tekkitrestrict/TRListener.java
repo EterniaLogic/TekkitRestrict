@@ -43,8 +43,6 @@ public class TRListener implements Listener {
 			11, 12, 13, 17, 24, 35, 44, 98, 142 };
 
 	public TRListener() {
-
-		// gah, this took forever to plug in...
 		EENames.put(27526, "Philosopher Stone");
 		EENames.put(27527, "Destruction Catalyst");
 		EENames.put(27528, "Iron Band");
@@ -211,37 +209,38 @@ public class TRListener implements Listener {
 			}
 			lastdata = e.getBlock().getData();
 		} catch(Exception ex){
-			tekkitrestrict.log.warning("A minor exception occured in tekkitrestrict. Please give the developer the following information: ");
+			tekkitrestrict.log.warning("A exception occured in tekkitrestrict. Please give the developer the following information: ");
 			tekkitrestrict.log.warning(" - onBlockPlace, " + ex.getMessage());
 		}
 		
 	}
 
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void onDropItem(PlayerDropItemEvent event) {
 		Player player = event.getPlayer();
 		if (player == null) return;
+		
 		try {
-			TRNoDupe.handleDropDupes(event);
+			TRNoDupe_BagCache cache;
+			if ((cache = TRNoDupe_BagCache.check(player)) != null) {
+				if (cache.hasBHBInBag) {
+					cache.expire();
+					event.setCancelled(true);
+					player.kickPlayer("[TRDupe] you have a " + cache.dupeItem + " in your [" + cache.inBagColor + "] Alchemy Bag!");
+					Log.Dupe("a " + cache.inBagColor + " Alchemy Bag and a " + cache.dupeItem, "alc", player.getName());
+					return;
+				}
+			}
 		} catch (Exception ex) {
-			tekkitrestrict.log.warning("A minor exception occured in tekkitrestrict. Please give the developer the following information: ");
+			tekkitrestrict.log.warning("A exception occured in tekkitrestrict. Please give the developer the following information: ");
 			tekkitrestrict.log.warning(" - onDropItem, handleDropDupes");
 		}
 		
-		try {
-			//EntityPlayer ep = ((CraftPlayer) player).getHandle();
-			//if (ep.abilities.canInstantlyBuild) {
-			if (player.getGameMode() == GameMode.CREATIVE){
-				if (!Util.hasBypass(player, "creative")) {
-					/*Item ccr = event.getItemDrop();
-					ItemStack ccc = ccr.getItemStack();*/
-					event.setCancelled(true);
-					player.sendMessage(ChatColor.RED + "[TRLimitedCreative] You cannot drop items!");
-				}
+		if (player.getGameMode() == GameMode.CREATIVE){
+			if (!Util.hasBypass(player, "creative")) {
+				event.setCancelled(true);
+				player.sendMessage(ChatColor.RED + "[TRLimitedCreative] You cannot drop items!");
 			}
-		} catch(Exception ex){
-			TRLogger.Log("debug", "Error! [TRLimitedCreative Drop Listener] : " + ex.getMessage());
-			Log.Exception(ex);
 		}
 	}
 
@@ -286,6 +285,7 @@ public class TRListener implements Listener {
 					player.sendMessage(ChatColor.RED + "[TRLimitedCreative] You may not interact with this item.");
 					e.setCancelled(true);
 					player.setItemInHand(null);
+					return;
 				}
 			}
 		}
@@ -343,33 +343,27 @@ public class TRListener implements Listener {
 	public void eventInventoryClick(InventoryClickEvent event) {
 		if (event.getWhoClicked() == null) return;
 		
-		Player player = (Player) event.getWhoClicked();
-		
 		try {
-			if (player.getGameMode() == GameMode.CREATIVE)
-				TRLimitedCreative.handleCreativeInvClick(event);
+			if (TRLimitedCreative.handleCreativeInvClick(event)) return;
 		} catch (Exception ex) {
-			TRLogger.Log("debug", "Error! [handleCreativeInv Listener] : " + ex.getMessage());
+			TRLogger.Log("debug", "Error! [handleCreativeInvClick] : " + ex.getMessage());
 			Log.Exception(ex);
 		}
-		
-		// Determine if they are crafting an uncraftable. Log EE Crafting.
-		// Perf: [0]
 		try {
-			handleCraftBlock(event);
+			// Determine if they are crafting a banned item.
+			if (handleCraftBlock(event)) return;
 		} catch (Exception ex) {
 			TRLogger.Log("debug", "Error! [TRhandleCraftBlock] : " + ex.getMessage());
 			Log.Exception(ex);
 		}
-		
 	}
 
-	private void handleCraftBlock(InventoryClickEvent event) {
+	private boolean handleCraftBlock(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
 		ItemStack item = event.getCurrentItem();
-		if (item == null) return;
+		if (item == null) return false;
 		
-		if (Util.hasBypass(player, "noitem")) return;
+		if (Util.hasBypass(player, "noitem")) return false;
 		
 		boolean banned = false;
 		
@@ -382,7 +376,9 @@ public class TRListener implements Listener {
 		if (banned) {
 			player.sendMessage(ChatColor.RED + "[TRItemDisabler] You cannot obtain/modify this Item type!");
 			event.setCancelled(true);
+			return true;
 		}
+		return false;
 		
 	}
 
@@ -426,7 +422,7 @@ public class TRListener implements Listener {
 				TRLimitBlock.removeExpire(player.getName());
 				TRLimitBlock.getLimiter(player);
 			}
-		} catch(Exception e1){}
+		} catch(Exception ex){}
 	}
 
 	@EventHandler
