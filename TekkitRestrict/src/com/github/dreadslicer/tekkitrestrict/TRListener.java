@@ -130,7 +130,6 @@ public class TRListener implements Listener {
 		instance.LogEEMisc = tekkitrestrict.config.getBoolean("LogEEMisc");
 		
 		TRNoClick.reload();
-		TRNoDupe_BagCache.reload();
 	}
 
 	public static TRListener getInstance() {
@@ -414,9 +413,6 @@ public class TRListener implements Listener {
 				TRLimitBlock.getLimiter(player);
 			}
 		} catch(Exception e1){}
-		
-		//try{TRPermHandler.testPerms(player);}catch(Exception e1){}
-		try{TRNoDupe_BagCache.setCheck(player);}catch(Exception e1){}
 	}
 
 	@EventHandler

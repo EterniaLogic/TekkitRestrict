@@ -79,7 +79,7 @@ public class TRNoDupe {
 		if ((cache = TRNoDupe_BagCache.check(player)) != null) {
 			if (cache.hasBHBInBag) {
 				try {
-					TRNoDupe_BagCache.expire(cache);
+					cache.expire();
 					event.setCancelled(true);
 					player.kickPlayer("[TRDupe] you have a " + cache.dupeItem + " in your [" + cache.inBagColor + "] Alchemy Bag!");
 

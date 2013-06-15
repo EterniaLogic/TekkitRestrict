@@ -111,7 +111,6 @@ public class tekkitrestrict extends JavaPlugin {
 		if (config.getBoolean("LimitFlightTime", false)) TRLimitFly.init();
 		
 		TRLimitBlock.init();
-		TRNoDupe_BagCache.init();
 
 		getCommand("tekkitrestrict").setExecutor(new TRCommandTR());
 		getCommand("openalc").setExecutor(new TRCommandAlc());
@@ -238,7 +237,9 @@ public class tekkitrestrict extends JavaPlugin {
 		ttt.gemArmorThread.interrupt();
 		ttt.worldScrubThread.interrupt();
 		ttt.saveThread.interrupt();
+		ttt.bagCacheThread.interrupt();
 		TRLimitFly.stop();
+		
 		try { Thread.sleep(2000); } catch (InterruptedException e) {} //Sleep for 2 seconds to allow the savethread to save.
 		//try {
 		//	TRThread.originalEUEnd(); (Currently does nothing)

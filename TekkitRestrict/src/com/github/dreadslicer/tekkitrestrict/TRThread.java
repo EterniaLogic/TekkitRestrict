@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import net.minecraft.server.EntityHuman;
 import net.minecraft.server.Item;
 import net.minecraft.server.NBTTagCompound;
 import net.minecraft.server.TileEntity;
@@ -23,16 +24,21 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.ItemStack;
 
+import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Dupes;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Threads;
+import com.github.dreadslicer.tekkitrestrict.commands.TRCommandAlc;
 import com.github.dreadslicer.tekkitrestrict.lib.TRCharge;
 
+import ee.AlchemyBagData;
 import ee.EEBase;
+import ee.ItemAlchemyBag;
 import ee.ItemEECharged;
 import eloraam.logic.TileLogicPointer;
 
@@ -47,6 +53,7 @@ public class TRThread {
 	public TGemArmorDisabler gemArmorThread = new TGemArmorDisabler();
 	/** Thread will NOT trigger again if interrupted. */
 	public TEntityRemover entityRemoveThread = new TEntityRemover();
+	public TRBagCacheThread bagCacheThread = new TRBagCacheThread();
 	private static TRThread instance;
 
 	public TRThread() {
@@ -60,20 +67,99 @@ public class TRThread {
 		worldScrubThread.setName("TekkitRestrict_BlockScrubberThread");
 		gemArmorThread.setName("TekkitRestrict_GemArmorThread");
 		entityRemoveThread.setName("TekkitRestrict_EntityRemoverThread");
+		bagCacheThread.setName("TekkitRestrict_BagCacheThread");
 		saveThread.start();
 		disableItemThread.start();
 		worldScrubThread.start();
 		gemArmorThread.start();
 		entityRemoveThread.start();
+		if (tekkitrestrict.EEEnabled && Dupes.alcBag) bagCacheThread.start();
 	}
 
 	public static void reload() {
 		// reloads the variables in each thread...
 		instance.disableItemThread.reload();
+		if (tekkitrestrict.EEEnabled && Dupes.alcBag && !instance.bagCacheThread.isAlive()) instance.bagCacheThread.start();
 	}
 
 	public static void originalEUEnd() {
 		instance.disableItemThread.originalEUEnd();
+	}
+}
+
+class TRBagCacheThread extends Thread {
+	@Override
+	public void run(){
+		while (true) {
+			// We want to loop through all of their alchemy bags HERE.
+			// This function will also clean up the ones with non-players.
+
+			// loop through all of teh players
+			Player[] players = tekkitrestrict.getInstance().getServer().getOnlinePlayers();
+			for (int i = 0; i < players.length; i++) {
+				try {
+					setCheck(players[i]); // checks and sets the vars.
+				} catch (Exception e) {
+				}
+			}
+
+			// remove offline players!
+			int to = TRNoDupe_BagCache.watchers.size();
+			for (int i = 0; i < to; i++) {
+				try {
+					TRNoDupe_BagCache cc = TRNoDupe_BagCache.watchers.get(i);
+					if (!cc.isOnline()) {
+						TRNoDupe_BagCache.watchers.remove(i);
+						to--;
+						i--;
+					}
+				} catch (Exception e) {
+				}
+			}
+
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				if (tekkitrestrict.disable) break;
+			}
+		}
+	}
+	
+	public static void setCheck(Player player) {
+		if (Util.hasBypass(player, "dupe", "alcbag")) return;
+		
+		for (int i = 0; i < 16; i++) {
+			try {
+				EntityHuman H = ((CraftPlayer) player).getHandle();
+				AlchemyBagData ABD = ItemAlchemyBag.getBagData(i, H, H.world);
+				// ok, now we search!
+				net.minecraft.server.ItemStack[] iss = ABD.items;
+
+				for (int j = 0; j < iss.length; j++) {
+					if (iss[j] == null) continue;
+					if (iss[j].id != 27532 && iss[j].id != 27593) continue;
+					if (!player.isOnline()) return;
+					
+					// they are attempting to dupe?
+					
+					TRNoDupe_BagCache cache = TRNoDupe_BagCache.watchers.get(player);
+					if (cache == null) cache = new TRNoDupe_BagCache();
+
+					cache.player = player;
+					cache.inBagColor = TRCommandAlc.getColor(i);
+					cache.dupeItem = (iss[j].id == 27532) ? "Black Hole Band" : "Void Ring";
+					cache.hasBHBInBag = true;
+					// tekkitrestrict.log.info("has in bag!");
+					TRNoDupe_BagCache.watchers.put(player, cache);
+					// player.kickPlayer("[TRDupe] you have a Black Hole Band in your ["+Color+"] Alchemy Bag! Please remove it NOW!");
+
+					// lastPlayer = player.getName();
+					
+				}
+			} catch (Exception ex) {
+				// This alc bag does not exist
+			}
+		}
 	}
 }
 
@@ -345,7 +431,7 @@ class DisableItemThread extends Thread {
 											ItemEECharged eer = (ItemEECharged) mcItemStack.getItem();
 											double maxEE = eer.getMaxCharge();
 											double per = maxEE / 100.000;
-											int setMax = (new Double(per * g.maxcharge)).intValue();
+											int setMax = (int) (per * g.maxcharge);
 
 											short chargeGoal = getShort(st1[i], "chargeGoal");
 											short chargeLevel = getShort(st1[i], "chargeLevel");
@@ -379,12 +465,11 @@ class DisableItemThread extends Thread {
 										this.addOriginalEU(ci.id, ci.maxCharge, ci.transferLimit, mcItemStack);
 										// tekkitrestrict.log.info(ci.maxCharge+" dur: "+var1.i()+" mc: "+ci.getMaxCharge());
 										double charge = nbttagcompound.getInt("charge");
-										Double newcharge = (new Double(charge) * new Double(s.maxcharge))
-												/ new Double(ci.maxCharge);
+										double newcharge = (charge * s.maxcharge) / ci.maxCharge;
 										// tekkitrestrict.log.info("charge: "+charge+" newcharge: "+newcharge);
 										ci.maxCharge = s.maxcharge;
 										ci.transferLimit = s.chargerate;
-										nbttagcompound.setInt("charge", newcharge.intValue());
+										nbttagcompound.setInt("charge", (int) newcharge);
 
 										ElectricItem.charge(mcItemStack, 10, 9999, true, false);
 										/*
@@ -403,12 +488,11 @@ class DisableItemThread extends Thread {
 										this.addOriginalEU(ci.id, ci.maxCharge, ci.transferLimit, mcItemStack);
 										// tekkitrestrict.log.info(ci.maxCharge+" dur: "+var1.i()+" mc: "+ci.getMaxCharge());
 										double charge = nbttagcompound.getInt("charge");
-										Double newcharge = (new Double(charge) * new Double(s.maxcharge))
-												/ new Double(ci.maxCharge);
+										double newcharge = (charge * s.maxcharge) / ci.maxCharge;
 										// tekkitrestrict.log.info("charge: "+charge+" newcharge: "+newcharge);
 										ci.maxCharge = s.maxcharge;
 										ci.transferLimit = s.chargerate;
-										nbttagcompound.setInt("charge", newcharge.intValue());
+										nbttagcompound.setInt("charge", (int) newcharge);
 
 										ElectricItem.charge(mcItemStack, 10, 9999, true, false);
 										/*
@@ -427,12 +511,11 @@ class DisableItemThread extends Thread {
 										this.addOriginalEU(ci.id, ci.maxCharge, ci.transferLimit, mcItemStack);
 										// tekkitrestrict.log.info(ci.maxCharge+" dur: "+var1.i()+" mc: "+ci.getMaxCharge());
 										double charge = nbttagcompound.getInt("charge");
-										Double newcharge = (new Double(charge) * new Double(s.maxcharge))
-												/ new Double(ci.maxCharge);
+										double newcharge = (charge * s.maxcharge) / ci.maxCharge;
 										// tekkitrestrict.log.info("charge: "+charge+" newcharge: "+newcharge);
 										ci.maxCharge = s.maxcharge;
 										ci.transferLimit = s.chargerate;
-										nbttagcompound.setInt("charge", newcharge.intValue());
+										nbttagcompound.setInt("charge", (int) newcharge);
 
 										ElectricItem.charge(mcItemStack, 10, 9999, true, false);
 										/*
