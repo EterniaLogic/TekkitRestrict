@@ -16,6 +16,7 @@ public class Assigner {
 	public static void assign(tekkitrestrict plugin){
 		PluginManager PM = plugin.getServer().getPluginManager();
 		PM.registerEvents(new TRListener(), plugin);
+		PM.registerEvents(new QuitListener(), plugin);
 		
 		PM.registerEvents(new InventoryClickListener(), plugin);
 		if (tekkitrestrict.config.getBoolean("PreventAlcDupe", true) ||
@@ -29,8 +30,10 @@ public class Assigner {
 		if (tekkitrestrict.config.getBoolean("PreventTeleportDupe", true))
 			PM.registerEvents(new TeleportListener(), plugin);
 		
-		if (Listeners.UseBlockLimit)
+		if (Listeners.UseBlockLimit){
 			PM.registerEvents(new BlockBreakListener(), plugin);
+			PM.registerEvents(new LoginListener(), plugin);
+		}
 		
 		if (Hacks.forcefield)
 			PM.registerEvents(new NoHackForcefield(), plugin);

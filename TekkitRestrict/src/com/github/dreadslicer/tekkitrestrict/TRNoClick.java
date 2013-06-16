@@ -1,4 +1,4 @@
-package com.github.dreadslicer.tekkitrestrict.lib;
+package com.github.dreadslicer.tekkitrestrict;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -11,11 +11,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.github.dreadslicer.tekkitrestrict.TRCacheItem;
-import com.github.dreadslicer.tekkitrestrict.TRLogger;
-import com.github.dreadslicer.tekkitrestrict.TRNoItem;
-import com.github.dreadslicer.tekkitrestrict.TRSafeZone;
-import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
 
 public class TRNoClick {
 	//TODO possibly change this to my method

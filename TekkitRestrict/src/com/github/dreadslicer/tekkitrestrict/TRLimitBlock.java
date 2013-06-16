@@ -19,7 +19,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 
-import com.github.dreadslicer.tekkitrestrict.lib.TRLimit;
 
 public class TRLimitBlock {
 	private static List<TRLimitBlock> limiters = Collections.synchronizedList(new LinkedList<TRLimitBlock>());
@@ -161,7 +160,10 @@ public class TRLimitBlock {
 
 	// static members.
 
-	/** See {@link #getLimiter(String)} */
+	/**
+	 * See {@link #getLimiter(String)}
+	 * @deprecated Use getLimiter(String) instead.
+	*/
 	public static TRLimitBlock getLimiter(Player player) {
 		return getLimiter(player.getName());
 	}
@@ -191,7 +193,7 @@ public class TRLimitBlock {
 
 				// see if they have a bypass... (For this world)
 
-				if (!Util.hasBypass(p, "limit")) {
+				if (!Util.hasBypass(p, "limiter")) {
 					// This player does not have a bypass =(
 					// add data
 					String blockdata = dbin.getString("blockdata");
@@ -528,9 +530,7 @@ public class TRLimitBlock {
 		int z = bloc.getBlockZ();
 		String pl = allBlockOwners.get(bloc.getWorld().getName() + ":" + x
 				+ ":" + y + ":" + z);
-		if (pl != null) {
-			return pl;
-		}
+		if (pl != null) return pl;
 		return null;
 	}
 }

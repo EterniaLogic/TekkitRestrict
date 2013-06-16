@@ -21,6 +21,7 @@ import org.bukkit.plugin.PluginManager;
 import com.github.dreadslicer.tekkitrestrict.Log;
 import com.github.dreadslicer.tekkitrestrict.Send;
 import com.github.dreadslicer.tekkitrestrict.TRCacheItem;
+import com.github.dreadslicer.tekkitrestrict.TRLimit;
 import com.github.dreadslicer.tekkitrestrict.TRLimitBlock;
 import com.github.dreadslicer.tekkitrestrict.TRLogger;
 import com.github.dreadslicer.tekkitrestrict.TRNoItem;
@@ -28,7 +29,6 @@ import com.github.dreadslicer.tekkitrestrict.TRPerformance;
 import com.github.dreadslicer.tekkitrestrict.TRSafeZone;
 import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
 import com.github.dreadslicer.tekkitrestrict.TRSafeZone.SafeZoneCreate;
-import com.github.dreadslicer.tekkitrestrict.lib.TRLimit;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 

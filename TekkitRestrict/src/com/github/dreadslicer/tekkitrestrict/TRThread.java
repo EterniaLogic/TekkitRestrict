@@ -34,7 +34,6 @@ import org.bukkit.inventory.ItemStack;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Dupes;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Threads;
 import com.github.dreadslicer.tekkitrestrict.commands.TRCommandAlc;
-import com.github.dreadslicer.tekkitrestrict.lib.TRCharge;
 
 import ee.AlchemyBagData;
 import ee.EEBase;
@@ -543,9 +542,7 @@ class DisableItemThread extends Thread {
 							}
 						}
 
-						if (TRSafeZone.inSafeZone(player) &&
-							!Util.hasPermission(player, "safezone.bypass") &&
-							!Util.hasBypass(player, "safezone", null)) {
+						if (TRSafeZone.inSafeZone(player) && !Util.hasBypass(player, "safezone")) {
 							//tekkitrestrict.log.info("in SS");
 							try {
 								if (Threads.SSDisableArcane) {

@@ -21,18 +21,21 @@ public class TRLWCProtect {
 		if (Util.hasBypass(player, "lwc")) return true;
 		
 		Block block = event.getBlock();
+		int id = block.getTypeId();
+		byte data = block.getData();
+		
 		boolean istype = false;
 		// tekkitrestrict.log.info(b.getTypeId()+":"+b.getData());
-		for (int i = 0; i < TRConfigCache.LWC.blocked.size(); i++) {
-			List<TRCacheItem> iss = TRCacheItem.processItemString("", TRConfigCache.LWC.blocked.get(i), -1);
-			for (TRCacheItem ist : iss) {
-				if (ist.compare(block.getTypeId(), block.getData())) {
-					istype = true;
-					i = TRConfigCache.LWC.blocked.size() + 1;
-					break;
+		blockedloop:
+			for (int i = 0; i < TRConfigCache.LWC.blocked.size(); i++) {
+				List<TRCacheItem> iss = TRCacheItem.processItemString("", TRConfigCache.LWC.blocked.get(i), -1);
+				for (TRCacheItem ist : iss) {
+					if (ist.compare(id, data)) {
+						istype = true;
+						break blockedloop;
+					}
 				}
 			}
-		}
 		
 		if (!istype) return true;
 		
@@ -45,25 +48,21 @@ public class TRLWCProtect {
 		
 		LWC LWC = TRConfigCache.LWC.lwcPlugin.getLWC();
 		String playername = player.getName().toLowerCase();
-		for (BlockFace bf : BlockFace.values()) {
-			Protection prot = LWC.getProtectionCache().getProtection(block.getRelative(bf));
-			if (prot == null) continue;
-			
-			boolean hasAccess = false;
-
-			for (Permission pe : prot.getPermissions()) {
-				if (pe.getName().toLowerCase().equals(playername)){
-					hasAccess = true;
-					break;
+		
+		outerloop:
+			for (BlockFace bf : BlockFace.values()) {
+				Protection prot = LWC.getProtectionCache().getProtection(block.getRelative(bf));
+				if (prot == null) continue;
+				if (prot.isOwner(player)) continue;
+				
+				for (Permission pe : prot.getPermissions()) {
+					if (pe.getName().toLowerCase().equals(playername)) continue outerloop;
 				}
-			}
-
-			if (!prot.isOwner(player) && !hasAccess) {
+	
 				player.sendMessage("You are not allowed to place this here!");
 				event.setCancelled(true);
 				return false;
 			}
-		}
 		return true;
 	}
 }

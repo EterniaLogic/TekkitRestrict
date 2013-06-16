@@ -21,16 +21,11 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Global;
-import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Listeners;
 import com.github.dreadslicer.tekkitrestrict.commands.TRCommandAlc;
-import com.github.dreadslicer.tekkitrestrict.lib.TRNoClick;
 
 import eloraam.core.TileCovered;
 
@@ -39,8 +34,7 @@ public class TRListener implements Listener {
 	boolean SSInnvincible, UseBlockLimit;
 	boolean LogAmulets, LogRings, LogDMTools, LogRMTools, LogEEMisc;
 	private Map<Integer, String> EENames = Collections.synchronizedMap(new HashMap<Integer, String>());
-	private int[] Exceptions = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
-			11, 12, 13, 17, 24, 35, 44, 98, 142 };
+	//private int[] Exceptions = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 17, 24, 35, 44, 98, 142 };
 
 	public TRListener() {
 		EENames.put(27526, "Philosopher Stone");
@@ -136,33 +130,36 @@ public class TRListener implements Listener {
 	
 	int lastdata = 0;
 
-	@EventHandler
+	/** @return <b>True</b> if id < 14 or id = 17, 24, 35, 44, 98 or 142. <b>False</b> otherwise. */
+	private boolean Exempt(int id){
+		return (id < 14 || id == 17 || id == 24 || id == 35 || id == 44 || id == 98 || id == 142);
+	}
+	
+	@EventHandler(ignoreCancelled = true)
 	public void onBlockPlace(BlockPlaceEvent e) {
-		// forget about basic types!
-		for (int eee : Exceptions) {
-			if (e.getBlock().getTypeId() == eee) return;
-		}
+		Block block = e.getBlock();
+		int id = block.getTypeId();
+		if (Exempt(id)) return;
 		
 		Player player = e.getPlayer();
+		
 		if (player == null) {
-			lastdata = e.getBlock().getData();
+			lastdata = block.getData();
 			return;
 		}
 		
 		try {
 			if (!TRLWCProtect.checkLWCAllowed(e)) return;
 
-			Block block = e.getBlock();
-			int id = block.getTypeId();
 			int data = block.getData();
 			WorldServer ws = ((CraftWorld) block.getWorld()).getHandle();
 			
 			TileEntity te1 = ws.getTileEntity(block.getX(), block.getY(), block.getZ());
 
 			if (UseBlockLimit) {
-				TRLimitBlock il = TRLimitBlock.getLimiter(player);
+				TRLimitBlock il = TRLimitBlock.getLimiter(player.getName());
 				if (!il.checkLimit(e)) {
-					if (!Util.hasBypass(player, "limiter")) { //TODO tr.bypass.limiter or tr.bypass.limit
+					if (!Util.hasBypass(player, "limiter")) {
 						player.sendMessage(ChatColor.RED + "[TRItemLimiter] You cannot place down any more of that block!");
 						e.setCancelled(true);
 						if (te1 instanceof TileCovered) {
@@ -220,6 +217,14 @@ public class TRListener implements Listener {
 		Player player = event.getPlayer();
 		if (player == null) return;
 		
+		if (player.getGameMode() == GameMode.CREATIVE){
+			if (!Util.hasBypass(player, "creative")) {
+				event.setCancelled(true);
+				player.sendMessage(ChatColor.RED + "[TRLimitedCreative] You cannot drop items!");
+				return;
+			}
+		}
+		
 		try {
 			TRNoDupe_BagCache cache;
 			if ((cache = TRNoDupe_BagCache.check(player)) != null) {
@@ -234,13 +239,6 @@ public class TRListener implements Listener {
 		} catch (Exception ex) {
 			tekkitrestrict.log.warning("A exception occured in tekkitrestrict. Please give the developer the following information: ");
 			tekkitrestrict.log.warning(" - onDropItem, handleDropDupes");
-		}
-		
-		if (player.getGameMode() == GameMode.CREATIVE){
-			if (!Util.hasBypass(player, "creative")) {
-				event.setCancelled(true);
-				player.sendMessage(ChatColor.RED + "[TRLimitedCreative] You cannot drop items!");
-			}
 		}
 	}
 
@@ -385,47 +383,6 @@ public class TRListener implements Listener {
 	// ////////////////END INVClicks //////////////////////////
 
 	@EventHandler
-	public void onPlayerQuit(PlayerQuitEvent e) {
-		//IMPORTANT assigner
-		Player player = e.getPlayer();
-		if (player == null) return;
-		
-		TRCommandAlc.setPlayerInv(player);
-		TRNoHack.playerLogout(player);
-		TRNoDupeProjectTable.playerUnuse(player.getName());
-		
-		if (Listeners.UseBlockLimit) {
-			try {TRLimitBlock.setExpire(player.getName());}catch(Exception eee){}
-		}
-	}
-
-	@EventHandler
-	public void onPlayerKick(PlayerKickEvent e) {
-		//IMPORTANT assigner
-		Player player = e.getPlayer();
-		if (player == null) return;
-		
-		TRCommandAlc.setPlayerInv(player);
-		TRNoHack.playerLogout(player);
-		TRNoDupeProjectTable.playerUnuse(player.getName());
-		
-		if (Listeners.UseBlockLimit) {
-			try {TRLimitBlock.setExpire(player.getName());}catch(Exception eee){}
-		}
-	}
-
-	@EventHandler
-	public void onPlayerLogin(PlayerJoinEvent e) {
-		Player player = e.getPlayer();
-		try {
-			if (Listeners.UseBlockLimit) {
-				TRLimitBlock.removeExpire(player.getName());
-				TRLimitBlock.getLimiter(player);
-			}
-		} catch(Exception ex){}
-	}
-
-	@EventHandler
 	public void onInventoryCloseEvent(InventoryCloseEvent e) {
 		try {
 			TRNoDupeProjectTable.playerUnuse(e.getPlayer().getName());
@@ -433,7 +390,7 @@ public class TRListener implements Listener {
 		TRCommandAlc.setPlayerInv2((Player) e.getPlayer());
 	}
 
-	private Map<Player, Integer> PickupTick = Collections.synchronizedMap(new HashMap<Player, Integer>());
+	private Map<String, Integer> PickupTick = Collections.synchronizedMap(new HashMap<String, Integer>());
 
 	@EventHandler
 	public void onPlayerPickupEvent(PlayerPickupItemEvent e) {
@@ -449,8 +406,8 @@ public class TRListener implements Listener {
 				// tekkitrestrict.log.info(player.getName()+" ["+cache.inBagColor+" bag] attempted to dupe with the "+cache.dupeItem+"!");
 				// TRLogger.Log("Dupe", player.getName()+" ["+cache.inBagColor+" bag] attempted to dupe with the "+cache.dupeItem+"!");
 				// TRLogger.broadcastDupe(player.getName(), "the Alchemy Bag and "+cache.dupeItem);
-
-				Integer tick = PickupTick.get(player);
+				String playerName = player.getName();
+				Integer tick = PickupTick.get(playerName);
 				if (tick != null) {
 					if (tick >= 40) {
 						// player.sendMessage("You may not pick that up while a "+cache.dupeItem+" is in your ["+cache.inBagColor+" bag]");
@@ -459,12 +416,12 @@ public class TRListener implements Listener {
 
 						// remove the BHB / Void ring!!!
 						cache.removeAlc();
-						PickupTick.put(player, 1);
+						PickupTick.put(playerName, 1);
 					} else {
-						PickupTick.put(player, tick + 1);
+						PickupTick.put(playerName, tick + 1);
 					}
 				} else
-					PickupTick.put(player, 1);
+					PickupTick.put(playerName, 1);
 				
 			}
 		} catch (Exception ex) {

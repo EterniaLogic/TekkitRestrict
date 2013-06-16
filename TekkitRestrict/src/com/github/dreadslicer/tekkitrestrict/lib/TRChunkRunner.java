@@ -1,11 +1,11 @@
 package com.github.dreadslicer.tekkitrestrict.lib;
 
-import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import com.github.dreadslicer.tekkitrestrict.TRLogger;
 
 public class TRChunkRunner implements Runnable {
-	public Queue<Object[]> chunks = new java.util.concurrent.LinkedBlockingQueue<Object[]>();
+	public LinkedBlockingQueue<Object[]> chunks = new LinkedBlockingQueue<Object[]>();
 
 	@Override
 	public void run() {
@@ -32,8 +32,7 @@ public class TRChunkRunner implements Runnable {
 				 */
 			} catch (Exception e) {
 				e.printStackTrace();
-				TRLogger.Log("debug",
-						"Chunk Unloader[2] Error! " + e.getMessage());
+				TRLogger.Log("debug", "Chunk Unloader[2] Error! " + e.getMessage());
 			}
 			ccx = chunks.poll();
 		}
