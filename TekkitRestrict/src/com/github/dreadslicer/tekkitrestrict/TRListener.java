@@ -135,6 +135,7 @@ public class TRListener implements Listener {
 		return (id < 14 || id == 17 || id == 24 || id == 35 || id == 44 || id == 98 || id == 142);
 	}
 	
+	public static boolean errorBlockPlace = false;
 	@EventHandler(ignoreCancelled = true)
 	public void onBlockPlace(BlockPlaceEvent e) {
 		Block block = e.getBlock();
@@ -206,12 +207,18 @@ public class TRListener implements Listener {
 			}
 			lastdata = e.getBlock().getData();
 		} catch(Exception ex){
-			tekkitrestrict.log.warning("A exception occured in tekkitrestrict. Please give the developer the following information: ");
-			tekkitrestrict.log.warning(" - onBlockPlace, " + ex.getMessage());
+			if (!errorBlockPlace){
+				tekkitrestrict.log.warning("A exception occured in tekkitrestrict. Please give the developer the following information: ");
+				tekkitrestrict.log.warning("(This error is only logged once) Error: [onBlockPlace] " + ex.getMessage());
+				errorBlockPlace = true;
+			}
+			TRLogger.Log("debug", "Error: [onBlockPlace] " + ex.getMessage());
+			Log.Exception(ex);
 		}
 		
 	}
 
+	public static boolean errorDrop = false;
 	@EventHandler(ignoreCancelled = true)
 	public void onDropItem(PlayerDropItemEvent event) {
 		Player player = event.getPlayer();
@@ -237,11 +244,17 @@ public class TRListener implements Listener {
 				}
 			}
 		} catch (Exception ex) {
-			tekkitrestrict.log.warning("A exception occured in tekkitrestrict. Please give the developer the following information: ");
-			tekkitrestrict.log.warning(" - onDropItem, handleDropDupes");
+			if (!errorDrop){
+				tekkitrestrict.log.warning("A exception occured in tekkitrestrict. Please give the developer the following information: ");
+				tekkitrestrict.log.warning("(This error is only logged once) Error: [onDropItem, handleDropDupes] " + ex.getMessage());
+				errorDrop = true;
+			}
+			TRLogger.Log("debug", "Error: [onDropItem, handleDropDupes] " + ex.getMessage());
+			Log.Exception(ex);
 		}
 	}
 
+	public static boolean errorInteract = false;
 	// /////// START INTERACT //////////////
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void onPlayerInteract(PlayerInteractEvent e) {
@@ -276,6 +289,12 @@ public class TRListener implements Listener {
 						if (TRNoItem.isCreativeItemBanned(player, str.getTypeId(), str.getDurability())) banned = true;
 					}
 				} catch (Exception ex) {
+					if (!errorInteract){
+						tekkitrestrict.log.warning("A exception occured in tekkitrestrict. Please give the developer the following information: ");
+						tekkitrestrict.log.warning("(This error is only logged once) Error: [ListenInteract TRLimitedCreative] " + ex.getMessage());
+						errorInteract = true;
+					}
+					Log.Exception(ex);
 					TRLogger.Log("debug", "Error: [ListenInteract TRLimitedCreative] " + ex.getMessage());
 				}
 				
@@ -337,6 +356,7 @@ public class TRListener implements Listener {
 	// /////////// END INTERACT /////////////
 
 	// /////////// START INVClicks/////////////
+	public static boolean errorCreativeClick, errorCraft;
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void eventInventoryClick(InventoryClickEvent event) {
 		if (event.getWhoClicked() == null) return;
@@ -344,6 +364,11 @@ public class TRListener implements Listener {
 		try {
 			if (TRLimitedCreative.handleCreativeInvClick(event)) return;
 		} catch (Exception ex) {
+			if (!errorCreativeClick){
+				tekkitrestrict.log.warning("A exception occured in tekkitrestrict. Please give the developer the following information: ");
+				tekkitrestrict.log.warning("(This error is only logged once) Error: [handleCreativeInvClick] " + ex.getMessage());
+				errorCreativeClick = true;
+			}
 			TRLogger.Log("debug", "Error! [handleCreativeInvClick] : " + ex.getMessage());
 			Log.Exception(ex);
 		}
@@ -351,6 +376,11 @@ public class TRListener implements Listener {
 			// Determine if they are crafting a banned item.
 			if (handleCraftBlock(event)) return;
 		} catch (Exception ex) {
+			if (!errorCraft){
+				tekkitrestrict.log.warning("A exception occured in tekkitrestrict. Please give the developer the following information: ");
+				tekkitrestrict.log.warning("(This error is only logged once) Error: [TRhandleCraftBlock] " + ex.getMessage());
+				errorCraft = true;
+			}
 			TRLogger.Log("debug", "Error! [TRhandleCraftBlock] : " + ex.getMessage());
 			Log.Exception(ex);
 		}
@@ -384,10 +414,11 @@ public class TRListener implements Listener {
 
 	@EventHandler
 	public void onInventoryCloseEvent(InventoryCloseEvent e) {
-		try {
-			TRNoDupeProjectTable.playerUnuse(e.getPlayer().getName());
-		} catch(Exception ex){}
-		TRCommandAlc.setPlayerInv2((Player) e.getPlayer());
+		Player player = (Player) e.getPlayer();
+		if (player == null) return;
+		
+		TRNoDupeProjectTable.playerUnuse(player.getName());
+		TRCommandAlc.setPlayerInv2(player);
 	}
 
 	private Map<String, Integer> PickupTick = Collections.synchronizedMap(new HashMap<String, Integer>());

@@ -115,6 +115,7 @@ public class TRNoClick {
 		}
 	}
 
+	public static boolean errorLogged = false;
 	public static boolean compareAll(PlayerInteractEvent e) {
 		try {
 			Player player = e.getPlayer();
@@ -133,6 +134,10 @@ public class TRNoClick {
 				}
 			}
 		} catch (Exception ex){
+			if (!errorLogged){
+				tekkitrestrict.log.warning("Error: [ListenInteract TRNoClick] " + ex.getMessage());
+				errorLogged = true;
+			}
 			TRLogger.Log("debug", "Error: [ListenInteract TRNoClick] " + ex.getMessage());
 		}
 		return false;
