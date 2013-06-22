@@ -293,7 +293,7 @@ public class TRCommandTR implements CommandExecutor {
 						}
 						String name = TRSafeZone.getSafeZone(target);
 						if (!name.equals(""))
-							send.msg(ChatColor.BLUE + target.getName() + " is currently in the safezone " + name + ".");
+							send.msg(ChatColor.BLUE + target.getName() + " is currently in the " + name + ".");
 						else
 							send.msg(ChatColor.BLUE + target.getName() + " is currently " + ChatColor.RED + "not" + ChatColor.BLUE + " in a safezone.");
 						

@@ -6,6 +6,7 @@ import ic2.common.ItemElectricTool;
 import ic2.common.StackUtil;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -362,20 +363,27 @@ class TEntityRemover extends Thread {
 	private void disableEntities() {
 		if (!Threads.SSDisableEntities) return;
 
-		// search through all of the entities
 		List<World> worlds = tekkitrestrict.getInstance().getServer().getWorlds();
 
-		//TODO entitylist might be changing while this is being done.
 		for (World world : worlds) {
-			net.minecraft.server.World wo = ((CraftWorld) world).getHandle();
-			
-			for (Object e1 : wo.entityList) { // loop through entities
-				Entity e = ((net.minecraft.server.Entity) e1).getBukkitEntity();
+			Iterator<Entity> entities = world.getEntities().iterator();
+			while (entities.hasNext()){
+				Entity e = entities.next();
 				if (e instanceof Player || e instanceof org.bukkit.entity.Item) continue;
-				if (TRSafeZone.inXYZSafeZone(e.getLocation(), e.getWorld().getName())) {
+				if (TRSafeZone.inXYZSafeZone(e.getLocation())) {
 					e.remove();
 				}
 			}
+			
+			//net.minecraft.server.World wo = ((CraftWorld) world).getHandle();
+			//Iterator<net.minecraft.server.Entity> entities = wo.entityList.iterator();
+			//while (entities.hasNext()){
+			//	Entity e = entities.next().getBukkitEntity();
+			//	if (e instanceof Player || e instanceof org.bukkit.entity.Item) continue;
+			//	if (TRSafeZone.inXYZSafeZone(e.getLocation(), e.getWorld().getName())) {
+			//		e.remove();
+			//	}
+			//}
 		}
 	}
 }

@@ -85,7 +85,6 @@ public class TRLogger {
 	}
 	
 	public static void saveLogs() {
-		
 		if (!LogIsEnabled) return;
 		for (String current : logMessages.keySet()){
 			FileLog filelog = FileLog.getLogOrMake(current, true);

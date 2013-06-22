@@ -29,18 +29,6 @@ Auto-Update: true
 UpdateToDevelopmentVersions: false
 
 
-####SafeZones####
-UseSafeZones: true
-SSDisableAllItems: true
-#SSDisableGemArmor: true
-SSDisableEntities: true
-SSDechargeEE: true
-SSDisableRingOfArcana: true
-SSEnabledPlugins: ["griefprevention","factions","towny","preciousstones"]
-SSDisableFlying: false
-SSAllowNormalUserToHaveSafeZones: true
-
-
 
 ######################################
 ######################################

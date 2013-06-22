@@ -25,8 +25,8 @@ public class TRPermHandler {
 	private static RegisteredServiceProvider<net.milkbowl.vault.permission.Permission> v;
 	public static boolean hasPermission(Player p, String type, String node1, String node2) {
 		try {
-			String n1 = node1 != "" ? "." + node1 : "";
-			String n2 = node2 != "" ? "." + node2 : "";
+			String n1 = !node1.equals("") ? "." + node1 : "";
+			String n2 = !node2.equals("") ? "." + node2 : "";
 			String perm = "tekkitrestrict." + type + n1 + n2;
 
 			PluginManager pm = Bukkit.getPluginManager();
@@ -194,7 +194,7 @@ public class TRPermHandler {
 		Map<String, String[]> sssrr = pu.getAllPermissions();
 		for (Iterator<String> iterator = sssrr.keySet().iterator(); iterator.hasNext();) {
 			String ssworld = iterator.next();
-			if (ssworld == null || ssworld == "null") {
+			if (ssworld == null || ssworld.equals("null")) {
 				String as1[];
 				int k1 = (as1 = sssrr.get(ssworld)).length;
 				for (int j1 = 0; j1 < k1; j1++) {

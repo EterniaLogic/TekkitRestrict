@@ -125,7 +125,7 @@ public class TRNoClick {
 						player.sendMessage(ChatColor.RED + cia.msg);
 					} else {
 						// tekkitrestrict.log.info(cia.id+"|"+cia.data+" - "+cia.clicktype);
-						String t = cia.clicktype == "both" ? "" : " " + cia.clicktype;
+						String t = cia.clicktype.equals("both") ? "" : " " + cia.clicktype;
 						String a = (cia.air && !cia.block) ? " in the air" : ((cia.block && !cia.air) ? " on blocks" : "");
 						String s = (cia.insafezone && cia.usesafezone) ? " inside a safezone." : ".";
 						player.sendMessage(ChatColor.RED + "Sorry, but" + t + " clicking with this item" + a + " is disabled" + s);

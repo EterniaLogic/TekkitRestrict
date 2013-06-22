@@ -3,6 +3,7 @@ package com.github.dreadslicer.tekkitrestrict;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -10,27 +11,31 @@ import java.util.Map;
 import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import net.sacredlabyrinth.Phaed.PreciousStones.FieldFlag;
+import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
 import net.sacredlabyrinth.Phaed.PreciousStones.vectors.Field;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.SafeZones;
+import com.github.dreadslicer.tekkitrestrict.TRConfigCache.SafeZones.SSGPMode;
+import com.massivecraft.factions.Board;
+import com.massivecraft.factions.Conf;
+import com.massivecraft.factions.FLocation;
+import com.massivecraft.factions.FPlayer;
+import com.massivecraft.factions.FPlayers;
+import com.massivecraft.factions.Faction;
 import com.massivecraft.factions.struct.FPerm;
-import com.palmergames.bukkit.towny.object.PlayerCache.TownBlockStatus;
-import com.palmergames.bukkit.towny.object.WorldCoord;
+import com.palmergames.bukkit.towny.object.TownyPermission;
+import com.palmergames.bukkit.towny.utils.PlayerCacheUtil;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 public class TRSafeZone {
-	public TRSafeZone() {}
-	
 	public static enum SafeZoneCreate {
 		Success, AlreadyExists, RegionNotFound, PluginNotFound, Unknown, SafeZonesDisabled;
 	}
@@ -138,7 +143,7 @@ public class TRSafeZone {
 		return false;
 	}
 	public static SafeZoneCreate addSafeZone(Player player, String pluginName, String name){
-		if (!tekkitrestrict.config.getBoolean("UseSafeZones")) return SafeZoneCreate.SafeZonesDisabled;
+		if (!SafeZones.UseSafeZones) return SafeZoneCreate.SafeZonesDisabled;
 		
 		name = name.toLowerCase();
 		
@@ -198,121 +203,145 @@ public class TRSafeZone {
 	}
 	
 	public static boolean inSafeZone(Player p) {
-		if (!tekkitrestrict.config.getBoolean("UseSafeZones")) return false;
+		if (!SafeZones.UseSafeZones) return false;
 		
-		return getSafeZone(p) != "";
+		return !getSafeZone(p).equals("");
 	}
 
-	@SuppressWarnings("deprecation")
 	public static String getSafeZone(Player p) {
-		if (!tekkitrestrict.config.getBoolean("UseSafeZones")) return "";
+		if (!SafeZones.UseSafeZones) return "";
 		
 		if (Util.hasBypass(p, "safezone")) return "";
 		
 		PluginManager PM = tekkitrestrict.getInstance().getServer().getPluginManager();
-		if (PM.isPluginEnabled("Towny") && SafeZones.SSPlugins.contains("towny")) {
-			/*
-			 * com.palmergames.bukkit.towny.Towny tapp =
-			 * (com.palmergames.bukkit
-			 * .towny.Towny)tekkitrestrict.getInstance
-			 * ().getServer().getPluginManager().getPlugin("Towny");
-			 * com.palmergames.bukkit.towny.object.PlayerCache c =
-			 * tapp.getCache(p);
-			 * if(!tapp.getTownyUniverse().isWilderness(p.getWorld
-			 * ().getHighestBlockAt(p.getLocation()))){ return "towny";
-			 * }
-			 */
-			Block cb = p.getWorld().getHighestBlockAt(p.getLocation());
-			boolean hasperm = com.palmergames.bukkit.towny.utils.PlayerCacheUtil
-					.getCachePermission(
-							p,
-							p.getLocation(),
-							cb.getTypeId(),
-							com.palmergames.bukkit.towny.object.TownyPermission.ActionType.DESTROY);
-			@SuppressWarnings("unused")
-			TownBlockStatus tbs = com.palmergames.bukkit.towny.utils.PlayerCacheUtil.getTownBlockStatus(p, WorldCoord.parseWorldCoord(p.getLocation()));
-			//boolean ls = tbs != TownBlockStatus.UNCLAIMED_ZONE && tbs != TownBlockStatus.WARZONE && tbs != TownBlockStatus.UNKOWN;
-			if (!hasperm) {
-				// tekkitrestrict.log.info("towny");
-				return "towny+";
-			}
-		}
-		// tekkitrestrict.log.info("deb");
-		if (PM.isPluginEnabled("Factions") && SafeZones.SSPlugins.contains("factions")) {
-			// if(!com.massivecraft.factions.listeners.FactionsPlayerListener.canPlayerUseBlock(p,
-			// p.getWorld().getHighestBlockAt(p.getLocation()), true)){
-			// Location cccc =
-			// p.getWorld().getHighestBlockAt(p.getLocation()).getLocation();
+		if (!allowedInGriefPreventionSafeZone(p, PM)) return "GriefPrevention Safezone Claim owned by: " + lastGPClaim;
+		if (!allowedInTownySafeZone(p, PM)) return "Towny Safezone";
+		if (!allowedInFactionsSafeZone(p, PM)) return "Safezone Faction: " + lastFaction;
+		if (!allowedInPreciousStonesSafeZone(p, PM)) return "PreciousStones SafeZone Field: " + lastPS;
 
-			com.massivecraft.factions.FLocation ccc = new com.massivecraft.factions.FLocation(
-					p.getPlayer());
-			com.massivecraft.factions.Faction f = com.massivecraft.factions.Board
-					.getFactionAt(ccc);
-			String name = p.getPlayer().getName();
-
-			com.massivecraft.factions.FPlayer me = com.massivecraft.factions.FPlayers.i
-					.get(name);
-			if (!com.massivecraft.factions.Conf.playersWhoBypassAllProtection
-					.contains(name)) {
-				/*if (me.getFaction() != null && f != null && !me.hasAdminMode()) {
-					if ((me.getFaction().getTag() != f.getTag())
-							&& !f.isNone()) {
-						// tekkitrestrict.log.info("factions");
-						
-					}
-				}*/
-				if (!FPerm.BUILD.has(me, ccc)){
-					return "factions+" + f.getTag();
-				}
-			}
-		}
-
-		if (PM.isPluginEnabled("PreciousStones") && SafeZones.SSPlugins.contains("preciousstones")) {
-			net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones ps = (net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones) PM.getPlugin("PreciousStones");
-			Block fblock = p.getWorld().getBlockAt(p.getLocation());
-			
-			
-			Field field = ps.getForceFieldManager().getEnabledSourceField(fblock.getLocation(), FieldFlag.CUBOID);
-			//tekkitrestrict.log.info("a");
-			if (field != null) {
-				//tekkitrestrict.log.info("b");
-				boolean allowed = ps.getForceFieldManager().isApplyToAllowed(field, p.getName());
-				if (!allowed || field.hasFlag(FieldFlag.APPLY_TO_ALL)) {
-					//if (field.getSettings().canGrief(fblock.getTypeId()))
-						//return;
-					//tekkitrestrict.log.info("c");
-					return "preciousstones";
-				}
-			}
-		}
-
-		if (PM.isPluginEnabled("GriefPrevention") && SafeZones.SSPlugins.contains("griefprevention")) {
-			GriefPrevention pl = (GriefPrevention) PM.getPlugin("GriefPrevention");
-			Claim claim = pl.dataStore.getClaimAt(p.getLocation(), false, null);
-			if (claim != null) {
-				if (!SafeZones.allowNormalUser) {
-					if (!claim.isAdminClaim()) return "";
-				}
-				if (claim.managers.contains("[tekkitrestrict]")) return "griefprevention";
-				
-				String noAccessReason = claim.allowAccess(p);
-				if (noAccessReason != null) {
-					return "griefprevention";
-				}
-			}
-		}
-
-		return getXYZSafeZone(p.getLocation(), p.getWorld().getName());
+		return getSafeZoneByLocation(p.getLocation());
 	}
 
-	public static boolean inXYZSafeZone(Location l, String world) {
-		if (!tekkitrestrict.config.getBoolean("UseSafeZones")) return false;
+	/**
+	 * Uses {@link #getSafeZoneByLocation(Location)}
+	 */
+	public static boolean inXYZSafeZone(Location loc) {
+		if (!SafeZones.UseSafeZones) return false;
 		
-		return getXYZSafeZone(l, world) != "";
+		return !getSafeZoneByLocation(loc).equals("");
+	}
+	
+	/**
+	 * Note: Does not check if safezones are disabled.<br>
+	 * Note: Does not check for bypass permission (tekkitrestrict.bypass.safezone)
+	 * @return If the given player is allowed in the Towny safezone he is in. <br>(All towny zones are safezones by default).
+	 */
+	public static boolean allowedInTownySafeZone(Player p, PluginManager PM){
+		if (!SafeZones.UseTowny || !PM.isPluginEnabled("Towny")) return true;
+		
+		Block cb = p.getWorld().getHighestBlockAt(p.getLocation());
+		boolean hasperm = PlayerCacheUtil.getCachePermission(p, p.getLocation(), cb.getTypeId(), (byte) 0, TownyPermission.ActionType.DESTROY);
+		//TownBlockStatus tbs = PlayerCacheUtil.getTownBlockStatus(p, WorldCoord.parseWorldCoord(p.getLocation()));
+		//boolean ls = tbs != TownBlockStatus.UNCLAIMED_ZONE && tbs != TownBlockStatus.WARZONE && tbs != TownBlockStatus.UNKOWN;
+		return hasperm;
+	}
+	
+	private static String lastFaction = "";
+	/**
+	 * Note: Does not check if safezones are disabled.<br>
+	 * Note: Does not check for bypass permission (tekkitrestrict.bypass.safezone)
+	 * @return If the given player is allowed in the Factions safezone he is in. <br>(All faction zones are safezones if enabled).
+	 */
+	public static boolean allowedInFactionsSafeZone(Player p, PluginManager PM){
+		//TODO Check if Factions has an option to add flags.
+		if (!SafeZones.UseFactions || !PM.isPluginEnabled("Factions")) return true;
+		String name = p.getName();
+		
+		FPlayer fplayer = FPlayers.i.get(name);
+		if (Conf.playersWhoBypassAllProtection.contains(name)) return true;
+		
+		FLocation ccc = new FLocation(p);
+		Faction f = Board.getFactionAt(ccc);
+		if (f != null) lastFaction = f.getTag();
+		if (!FPerm.BUILD.has(fplayer, ccc)) return false;
+		
+		return true;
+	}
+	
+	private static String lastPS = "";
+	/**
+	 * Note: Does not check if safezones are disabled.<br>
+	 * Note: Does not check for bypass permission (tekkitrestrict.bypass.safezone)
+	 * @return If the given player is allowed in the PreciousStones safezone he is in. <br>(All PS zones are safezones if enabled).
+	 */
+	public static boolean allowedInPreciousStonesSafeZone(Player p, PluginManager PM){
+		//TODO Check if PS has an option to add flags.
+		if (!SafeZones.UsePS || !PM.isPluginEnabled("PreciousStones")) return true;
+		PreciousStones ps = (PreciousStones) PM.getPlugin("PreciousStones");
+		Block fblock = p.getWorld().getBlockAt(p.getLocation());
+		
+		Field field = ps.getForceFieldManager().getEnabledSourceField(fblock.getLocation(), FieldFlag.CUBOID);
+
+		if (field == null) return true;
+		lastPS = field.getName();
+
+		boolean allowed = ps.getForceFieldManager().isApplyToAllowed(field, p.getName());
+		if (!allowed || field.hasFlag(FieldFlag.APPLY_TO_ALL)) return false;
+		
+		return true;
 	}
 
-	// main
-	public static String getXYZSafeZone(Location l, String world) {
+	private static String lastGPClaim = "";
+	/**
+	 * Note: Does not check if safezones are disabled.<br>
+	 * Note: Does not check for bypass permission (tekkitrestrict.bypass.safezone)
+	 * @return If the given player is allowed in the GriefPrevention claim he is in.<br>
+	 * If this player isn't in a GriefPrevention claim or if the claim isn't a safezone, this will return true.
+	 */
+	public static boolean allowedInGriefPreventionSafeZone(Player p, PluginManager PM){
+		if (!SafeZones.UseGP || !PM.isPluginEnabled("GriefPrevention")) return true; //If plugin disabled or not used for SafeZones, return true. (allowed)
+		
+		GriefPrevention pl = (GriefPrevention) PM.getPlugin("GriefPrevention");
+		Claim claim = pl.dataStore.getClaimAt(p.getLocation(), false, null);
+		if (claim == null) return true; //If no claim here, return true. (allowed)
+		lastGPClaim = claim.ownerName;
+		
+		String name = p.getName().toLowerCase();
+		if (claim.ownerName.equalsIgnoreCase(name)) return true; //If owner of claim, return true. (allowed)
+		
+		//Admin
+		if (SafeZones.GPMode == SSGPMode.Admin){
+			if (!claim.isAdminClaim()) return true; //Not an admin claim, so it cannot be a SafeZone in ADMIN mode: return true. (allowed)
+			return p.hasPermission("griefprevention.adminclaims"); //If the player is a GPAdmin, return true. (allowed) Else return false. (not allowed)
+		}
+		
+		//SpecificAdmin
+		if (SafeZones.GPMode == SSGPMode.SpecificAdmin){
+			if (!claim.isAdminClaim()) return true; //Not an admin claim, so it cannot be a SafeZone in ADMIN mode: return true. (allowed)
+			if (p.hasPermission("griefprevention.adminclaims")) return true; //If the player is a GPAdmin, return true. (allowed) Else return false. (not allowed)
+			return !claim.managers.contains("[tekkitrestrict]"); //If it contains [tekkitrestrict], then it returns false. (not allowed) Else return true. (allowed)
+		}
+		
+		//Specific
+		if (SafeZones.GPMode == SSGPMode.Specific){
+			if (!claim.managers.contains("[tekkitrestrict]")) return true; //If it is not a safezone, return true. (allowed)
+		}
+		
+		//All
+		Iterator<String> managers = claim.managers.iterator();
+		while (managers.hasNext()){
+			if (managers.next().equalsIgnoreCase(name)) return true; //If manager of claim, return true. (allowed)
+		}
+		
+		return false; //Otherwise return false. (not allowed)
+	}
+	
+	
+	/**
+	 * @return A string with information about the type of safezone and its name/owner.
+	 */
+	public static String getSafeZoneByLocation(Location loc) {
+		if (!SafeZones.UseSafeZones) return "";
 		String r = "";
 		// ResultSet rs =
 		// tekkitrestrict.db.query("SELECT * FROM `tr_safezones` WHERE `world` = '"+world+"'");
@@ -325,36 +354,94 @@ public class TRSafeZone {
 		 * double z = l.getZ(); boolean it = x >= x1 && x < x2 + 1 && y >= y1 &&
 		 * y < y2 + 1 && z >= z1 && z < z2 + 1; if(it){ return rs.name; } } } }
 		 */
-		if (!tekkitrestrict.config.getBoolean("UseSafeZones")) return "";
+		
+		PluginManager PM = tekkitrestrict.getInstance().getServer().getPluginManager();
+		boolean WGEnabled = PM.isPluginEnabled("WorldGuard"), GPEnabled = PM.isPluginEnabled("GriefPrevention");
+		//if (!SafeZones.UseWG || !PM.isPluginEnabled("WorldGuard")) return "";
 		
 		for (int i = 0; i < zones.size(); i++) {
 			TRSafeZone a = zones.get(i);
-			if (a.mode == 0) {
+			if (a.mode == 0){
 				// do nothing... (for now)
-			} else if (a.mode == 1) { // WorldGuard!
-				// determine whether in WG region or not...
-				// com.sk89q.worldguard.protection.regions.ProtectedRegion
-				Plugin plugin = tekkitrestrict.getInstance().getServer().getPluginManager().getPlugin("WorldGuard");
-				try {
-					// WorldGuard may not be loaded
-					if (plugin != null && (plugin instanceof WorldGuardPlugin)) {
-						WorldGuardPlugin WGB = (WorldGuardPlugin) plugin;
-						ProtectedRegion PR = WGB.getRegionManager(
-										tekkitrestrict.getInstance().getServer().getWorld(a.world)).getRegion(a.name);
-						if (PR.contains(l.getBlockX(), l.getBlockY(), l.getBlockZ())) {
-							return a.name;
-						}
-					}
-				} catch (Exception E) {
-					//E.printStackTrace();
-				}
+				continue;
+			}
+			
+			if (a.mode == 1){ //WorldGuard
+				if (!WGEnabled || !SafeZones.UseWG) continue;
+				r = getWGRegion(a, loc, PM);
+				if (!r.equals("")) return "WorldGuard Safezone Region: " + r;
+				continue;
+			}
+			
+			if (a.mode == 4){ //GriefPrevention
+				if (!GPEnabled || !SafeZones.UseGP) continue;
+				r = getGPRegion(a, loc, PM);
+				if (!r.equals("")) return "GriefPrevention Safezone Claim owned by: " + r;
+				continue;
 			}
 		}
 		return r;
 		
 	}
+	
+	/**
+	 * Gets a WorldGuard SafeZone at the given location.<br>
+	 * <b>Note: Doesn't check if WorldGuard is enabled.</b>
+	 */
+	public static String getWGRegion(TRSafeZone a, Location loc, PluginManager PM){
+		WorldGuardPlugin WGB = (WorldGuardPlugin) PM.getPlugin("WorldGuard");
+		try {
+			// WorldGuard may not be loaded
+			World world = tekkitrestrict.getInstance().getServer().getWorld(a.world);
+			if (world == null) world = loc.getWorld();
+			ProtectedRegion PR = WGB.getRegionManager(world).getRegion(a.name);
+			if (PR.contains(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ())) {
+				return a.name;
+			}
+		} catch (Exception ex) {
+		}
+		return "";
+	}
+	
+	/**
+	 * Gets a GriefPrevention SafeZone at the given location.<br>
+	 * <b>Note: Doesn't check if WorldGuard is enabled.</b>
+	 */
+	public static String getGPRegion(TRSafeZone a, Location l, PluginManager PM){
+		GriefPrevention pl = (GriefPrevention) PM.getPlugin("GriefPrevention");
+		Claim claim = pl.dataStore.getClaimAt(l, false, null);
+		if (claim == null) return ""; //No claim here.
+		
+		//Admin
+		if (SafeZones.GPMode == SSGPMode.Admin){
+			if (!claim.isAdminClaim()) return ""; //Not an admin claim, so it cannot be a SafeZone in ADMIN mode.
+			return claim.getOwnerName();
+		}
+		
+		//All
+		else if (SafeZones.GPMode == SSGPMode.All){
+			return claim.getOwnerName();
+		}
+		
+		//SpecificAdmin
+		else if (SafeZones.GPMode == SSGPMode.SpecificAdmin){
+			if (!claim.isAdminClaim()) return ""; //Not an admin claim, so it cannot be a SafeZone in ADMIN mode.
+			if (!claim.managers.contains("[tekkitrestrict]")) return ""; //Not SafeZone
+			return claim.getOwnerName();
+		}
+		
+		//Specific
+		else if (SafeZones.GPMode == SSGPMode.Specific){
+			if (!claim.managers.contains("[tekkitrestrict]")) return ""; //Not SafeZone
+			return claim.getOwnerName();
+		}
+		
+		//There shouldn't be any more possible cases.
+		return claim.getOwnerName();
+	}
 
-	public static void setFly(PlayerMoveEvent e) {
+	//Unused.
+	/*public static void setFly(PlayerMoveEvent e) {
 		if (SafeZones.SSDisableFly) {
 			Player player = e.getPlayer();
 			if (inSafeZone(player)) {
@@ -363,5 +450,5 @@ public class TRSafeZone {
 				player.sendMessage(ChatColor.RED + "[TRSafeZone] You may not fly in safezones!");
 			}
 		}
-	}
+	}*/
 }

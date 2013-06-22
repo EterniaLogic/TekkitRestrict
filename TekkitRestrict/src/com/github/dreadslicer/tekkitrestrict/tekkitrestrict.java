@@ -41,7 +41,7 @@ import com.github.dreadslicer.tekkitrestrict.listeners.Assigner;
 
 public class tekkitrestrict extends JavaPlugin {
 	public enum ConfigFile {
-		General, Advanced, ModModifications, DisableClick, DisableItems, Hack, LimitedCreative, Logging, TPreformance, MicroPermissions;
+		General, Advanced, ModModifications, DisableClick, DisableItems, Hack, LimitedCreative, Logging, TPreformance, MicroPermissions, SafeZones;
 	}
 	
 	public static Logger log;
@@ -323,9 +323,9 @@ public class tekkitrestrict extends JavaPlugin {
 		Threads.GAMovement = config.getBoolean("AllowGemArmorDefensive", true);
 		Threads.GAOffensive = config.getBoolean("AllowGemArmorOffensive", false);
 		
-		Threads.SSDisableEntities = config.getBoolean("SSDisableEntities", false);
-		Threads.SSDechargeEE = config.getBoolean("SSDechargeEE", true);
-		Threads.SSDisableArcane = config.getBoolean("SSDisableRingOfArcana");
+		Threads.SSDisableEntities = config.getBoolean("InSafeZones.DisableEntities", false);
+		Threads.SSDechargeEE = config.getBoolean("InSafeZones.DechargeEE", true);
+		Threads.SSDisableArcane = config.getBoolean("InSafeZones.DisableRingOfArcana");
 		
 		Threads.RMDB = config.getBoolean("RemoveDisabledItemBlocks", false);
 		Threads.UseRPTimer = config.getBoolean("UseAutoRPTimer", false);
@@ -336,9 +336,18 @@ public class tekkitrestrict extends JavaPlugin {
 		if (LWC.blocked == null) LWC.blocked = Collections.synchronizedList(new LinkedList<String>());
 		else LWC.blocked = Collections.synchronizedList(LWC.blocked);
 		
-		SafeZones.allowNormalUser = config.getBoolean("SSAllowNormalUserToHaveSafeZones", true);
-		SafeZones.SSPlugins = config.getStringList("SSEnabledPlugins");
-		SafeZones.SSDisableFly = config.getBoolean("SSDisableFlying", false);
+		SafeZones.UseSafeZones = config.getBoolean("UseSafeZones", true);
+		SafeZones.UseFactions = config.getBoolean("SSEnabledPlugins.Factions", true);
+		SafeZones.UseGP = config.getBoolean("SSEnabledPlugins.GriefPrevention", true);
+		SafeZones.UsePS = config.getBoolean("SSEnabledPlugins.PreciousStones", true);
+		SafeZones.UseTowny = config.getBoolean("SSEnabledPlugins.Towny", true);
+		SafeZones.UseWG = config.getBoolean("SSEnabledPlugins.WorldGuard", true);
+		SafeZones.GPMode = SafeZones.SSGPMode.parse(config.getString("GriefPreventionSafeZoneMethod", "admin"));
+		
+		//SafeZones.SSPlugins = config.getStringList("SSEnabledPlugins");
+		//SafeZones.SSDisableFly = config.getBoolean("SSDisableFlying", false);
+		//SafeZones.allGPClaimsAreSafezone = config.getBoolean("AllGriefPreventionClaimsAreSafezones", false);
+		//SafeZones.allowNormalUser = config.getBoolean("SSAllowNormalUsersToHaveSafeZones", true);
 		
 		ChunkUnloader.enabled = config.getBoolean("UseChunkUnloader", false);
 		ChunkUnloader.maxChunks = config.getInt("MaxChunks", 3000);
@@ -510,6 +519,7 @@ public class tekkitrestrict extends JavaPlugin {
 		configList.add(reloadc("Logging.config.yml"));
 		configList.add(reloadc("TPerformance.config.yml"));
 		configList.add(reloadc("MicroPermissions.config.yml"));
+		configList.add(reloadc("SafeZones.config.yml"));
 	}
 
 	private YamlConfiguration reloadc(String loc) {

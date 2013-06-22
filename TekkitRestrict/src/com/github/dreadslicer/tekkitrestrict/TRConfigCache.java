@@ -26,9 +26,29 @@ public class TRConfigCache {
 	}
 	
 	public static class SafeZones {
-		public static boolean allowNormalUser;
-		public static boolean SSDisableFly;
+		public static enum SSGPMode {
+			All, Admin, Specific, SpecificAdmin;
+			
+			public static SSGPMode parse(String input){
+				input = input.toLowerCase();
+				if (input.equals("all")) return SSGPMode.All;
+				if (input.equals("admin")) return SSGPMode.Admin;
+				if (input.equals("specific")) return SSGPMode.Specific;
+				if (input.equals("specificadmin")) return SSGPMode.SpecificAdmin;
+				return SSGPMode.Admin;
+			}
+			
+			public boolean isAdmin(){
+				if (this == SSGPMode.Admin || this == SSGPMode.SpecificAdmin) return true;
+				return false;
+			}
+		}
+		
+		//public static boolean SSDisableFly;
+		public static boolean UseSafeZones;
 		public static List<String> SSPlugins;
+		public static boolean UseGP, UseTowny, UsePS, UseFactions, UseWG;
+		public static SSGPMode GPMode = SSGPMode.Admin;
 	}
 	
 	public static class Listeners {
