@@ -116,6 +116,6 @@ public class TRNoHack {
 		NoHackSpeed.playerLogout(player.getName());
 		NoHackFly.playerLogout(player.getName());
 		NoHackForcefield.playerLogout(player.getName());
-		TRLimitFly.setGrounded(player);
+		//TRLimitFlyThread.setGrounded(player);
 	}
 }

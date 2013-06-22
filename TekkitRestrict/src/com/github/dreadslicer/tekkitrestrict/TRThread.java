@@ -8,6 +8,7 @@ import ic2.common.StackUtil;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -53,6 +54,7 @@ public class TRThread {
 	/** Thread will NOT trigger again if interrupted. */
 	public TEntityRemover entityRemoveThread = new TEntityRemover();
 	public TRBagCacheThread bagCacheThread = new TRBagCacheThread();
+	public TRLimitFlyThread limitFlyThread = new TRLimitFlyThread();
 	private static TRThread instance;
 
 	public TRThread() {
@@ -67,11 +69,14 @@ public class TRThread {
 		gemArmorThread.setName("TekkitRestrict_GemArmorThread");
 		entityRemoveThread.setName("TekkitRestrict_EntityRemoverThread");
 		bagCacheThread.setName("TekkitRestrict_BagCacheThread");
+		limitFlyThread.setName("TekkitRestrict_LimitFlyThread_Unused");
 		saveThread.start();
 		disableItemThread.start();
 		worldScrubThread.start();
 		gemArmorThread.start();
 		entityRemoveThread.start();
+		//if (tekkitrestrict.config.getBoolean("LimitFlightTime", false)) limitFlyThread.start();
+		
 		if (tekkitrestrict.EEEnabled && Dupes.alcBag) bagCacheThread.start();
 	}
 
@@ -83,6 +88,67 @@ public class TRThread {
 
 	public static void originalEUEnd() {
 		instance.disableItemThread.originalEUEnd();
+	}
+}
+
+class TRLimitFlyThread extends Thread {
+	private int reset = 0;
+	private static List<Player> isFlying = Collections.synchronizedList(new LinkedList<Player>());
+	private static ConcurrentHashMap<Player, Integer> playerTimes = new ConcurrentHashMap<Player, Integer>();
+	private static int groundTime = 99999999;
+	
+	@SuppressWarnings("unused")
+	@Override
+	public void run(){
+		if (true) return;
+		while (true){
+			try {
+				Thread.sleep(1000 * 60);
+			} catch (InterruptedException e) {
+				if (tekkitrestrict.disable) break;
+			}
+			// tekkitrestrict.log.info("flytick");
+			for (Player player : isFlying){
+				if (player == null) continue;
+				Integer time = playerTimes.get(player);
+				
+				if (time == null) time = 1;
+				else time = time + 1;
+				
+				playerTimes.put(player, time);
+			}
+
+			reset++; // will be 1 minute over 24 hours.
+			if (reset >= (60 * 24)) { // 1 hour * 24 = 24 hours
+				playerTimes.clear();
+				reset = 0;
+			}
+		}
+	}
+	
+	public static void setFly(Player player) {
+		if (!isFlying.contains(player)) isFlying.add(player);
+	}
+	
+	public static void setGrounded(Player player) {
+		isFlying.remove(player);
+	}
+	
+	@SuppressWarnings("unused")
+	private static void willGround(Player player) {
+		if (Util.hasBypass(player, "flylimit")) return;
+		Integer time = playerTimes.get(player);
+		if (time == null) return;
+		
+		if (time >= groundTime) {
+			TRNoHack.groundPlayer(player);
+			player.sendMessage("You have used up your flight time for today! (" + time + " Minutes)");
+			player.sendMessage("Please turn off your flight device.");
+		}
+	}
+	
+	public static void reload() {
+		groundTime = tekkitrestrict.config.getInt("FlyLimitDailyMinutes");
 	}
 }
 

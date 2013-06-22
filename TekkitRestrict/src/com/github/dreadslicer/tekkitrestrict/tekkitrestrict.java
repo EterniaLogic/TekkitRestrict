@@ -108,7 +108,6 @@ public class tekkitrestrict extends JavaPlugin {
 		new TRLogger();
 		
 		TRSafeZone.init();
-		if (config.getBoolean("LimitFlightTime", false)) TRLimitFly.init();
 		
 		TRLimitBlock.init();
 
@@ -238,7 +237,7 @@ public class tekkitrestrict extends JavaPlugin {
 		ttt.worldScrubThread.interrupt();
 		ttt.saveThread.interrupt();
 		ttt.bagCacheThread.interrupt();
-		TRLimitFly.stop();
+		ttt.limitFlyThread.interrupt();
 		
 		try { Thread.sleep(2000); } catch (InterruptedException e) {} //Sleep for 2 seconds to allow the savethread to save.
 		//try {
@@ -478,7 +477,7 @@ public class tekkitrestrict extends JavaPlugin {
 		TRLogger.reload();
 		TRRecipeBlock.reload();
 		TRNoHack.reload();
-		TRLimitFly.reload();
+		TRLimitFlyThread.reload();
 		TREMCSet.reload();
 		log.info("TekkitRestrict Reloaded!");
 	}
