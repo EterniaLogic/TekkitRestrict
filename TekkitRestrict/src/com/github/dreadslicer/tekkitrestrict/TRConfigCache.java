@@ -26,29 +26,30 @@ public class TRConfigCache {
 	}
 	
 	public static class SafeZones {
-		public static enum SSGPMode {
+		public static enum SSMode {
 			All, Admin, Specific, SpecificAdmin;
 			
-			public static SSGPMode parse(String input){
+			public static SSMode parse(String input){
 				input = input.toLowerCase();
-				if (input.equals("all")) return SSGPMode.All;
-				if (input.equals("admin")) return SSGPMode.Admin;
-				if (input.equals("specific")) return SSGPMode.Specific;
-				if (input.equals("specificadmin")) return SSGPMode.SpecificAdmin;
-				return SSGPMode.Admin;
+				if (input.equals("all")) return SSMode.All;
+				if (input.equals("admin")) return SSMode.Admin;
+				if (input.equals("specific")) return SSMode.Specific;
+				if (input.equals("specificadmin")) return SSMode.SpecificAdmin;
+				return SSMode.Admin;
 			}
 			
 			public boolean isAdmin(){
-				if (this == SSGPMode.Admin || this == SSGPMode.SpecificAdmin) return true;
+				if (this == SSMode.Admin || this == SSMode.SpecificAdmin) return true;
 				return false;
 			}
 		}
 		
 		//public static boolean SSDisableFly;
 		public static boolean UseSafeZones;
-		public static List<String> SSPlugins;
+		//public static List<String> SSPlugins;
 		public static boolean UseGP, UseTowny, UsePS, UseFactions, UseWG;
-		public static SSGPMode GPMode = SSGPMode.Admin;
+		public static SSMode GPMode = SSMode.Admin;
+		public static SSMode WGMode = SSMode.Specific;
 	}
 	
 	public static class Listeners {

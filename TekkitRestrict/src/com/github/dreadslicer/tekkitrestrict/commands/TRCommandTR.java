@@ -28,7 +28,7 @@ import com.github.dreadslicer.tekkitrestrict.TRNoItem;
 import com.github.dreadslicer.tekkitrestrict.TRPerformance;
 import com.github.dreadslicer.tekkitrestrict.TRSafeZone;
 import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
-import com.github.dreadslicer.tekkitrestrict.TRSafeZone.SafeZoneCreate;
+import com.github.dreadslicer.tekkitrestrict.api.SafeZones.SafeZoneCreate;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
@@ -311,22 +311,22 @@ public class TRCommandTR implements CommandExecutor {
 						
 						boolean found = false;
 						String name = null;
+						TRSafeZone zone = null;
 						for (int i = 0; i < TRSafeZone.zones.size(); i++) {
-							TRSafeZone zone = TRSafeZone.zones.get(i);
+							zone = TRSafeZone.zones.get(i);
 							name = zone.name;
 							if (!name.toLowerCase().equals(args[3])) continue;
 							found = true;
+						}
+						
+						if (found){
 							if (!TRSafeZone.removeSafeZone(zone)){
 								send.msg(ChatColor.RED + "Unable to remove the safezone. Was the claim already removed?");
 								return true;
 							}
 							
-							TRSafeZone.zones.remove(i);
 							send.msg(ChatColor.GREEN + "Safezone " + name + " removed.");
-							break;
-						}
-						
-						if (!found){
+						} else {
 							send.msg(ChatColor.RED + "Cannot find safezone " + args[3] + "!");
 							return true;
 						}
@@ -419,6 +419,8 @@ public class TRCommandTR implements CommandExecutor {
 							send.msg(ChatColor.RED + "There is no region at your current position!");
 						else if (response == SafeZoneCreate.PluginNotFound)
 							send.msg(ChatColor.RED + "Safezones are disabled for GriefPrevention claims.");
+						else if (response == SafeZoneCreate.NoPermission)
+							send.msg(ChatColor.RED + "You either have no permission to modify this claim or you are not allowed to make safezones.");
 						else if (response == SafeZoneCreate.Success)
 							send.msg(ChatColor.GREEN + "This claim is now a safezone!");
 						else 

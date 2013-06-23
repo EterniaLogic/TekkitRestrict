@@ -342,7 +342,8 @@ public class tekkitrestrict extends JavaPlugin {
 		SafeZones.UsePS = config.getBoolean("SSEnabledPlugins.PreciousStones", true);
 		SafeZones.UseTowny = config.getBoolean("SSEnabledPlugins.Towny", true);
 		SafeZones.UseWG = config.getBoolean("SSEnabledPlugins.WorldGuard", true);
-		SafeZones.GPMode = SafeZones.SSGPMode.parse(config.getString("GriefPreventionSafeZoneMethod", "admin"));
+		SafeZones.GPMode = SafeZones.SSMode.parse(config.getString("GriefPreventionSafeZoneMethod", "admin"));
+		SafeZones.WGMode = SafeZones.SSMode.parse(config.getString("WorldGuardSafeZoneMethod", "specific"));
 		
 		//SafeZones.SSPlugins = config.getStringList("SSEnabledPlugins");
 		//SafeZones.SSDisableFly = config.getBoolean("SSDisableFlying", false);

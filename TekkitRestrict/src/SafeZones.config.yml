@@ -59,4 +59,11 @@ SSEnabledPlugins:
 #                  claim.
 GriefPreventionSafeZoneMethod: "Admin"
 
+###################################################################################
+########################## WorldGuard Specific settings ###########################
+# WorldGuard SafeZone Method
+# Can be "All" or "Specific"
+# "All": All WorldGuard regions are SafeZones.
+# "Specific": You can specify per region if you want it to be a SafeZone. (Default)
+WorldGuardSafeZoneMethod: "Specific"
 
