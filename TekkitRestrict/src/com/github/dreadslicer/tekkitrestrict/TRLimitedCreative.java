@@ -3,7 +3,9 @@ package com.github.dreadslicer.tekkitrestrict;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCreativeEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Global;
@@ -11,6 +13,7 @@ import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Listeners;
 
 public class TRLimitedCreative {
 	public static boolean handleCreativeInvClick(InventoryClickEvent event) {
+		if (event.getAction() == InventoryAction.NOTHING) return false;
 		Player player = (Player) event.getWhoClicked();
 		if (player.getGameMode() == GameMode.CREATIVE) return false;
 		if (Util.hasBypass(player, "creative")) return false;
@@ -30,7 +33,7 @@ public class TRLimitedCreative {
 			TRLogger.Log("debug", "Error! [TRLimitedCreative ContainerCheck] : " + ex.getMessage());
 			Log.Exception(ex);
 		}
-		
+
 		try {
 			// determine of player attempted to pick an item up...
 			ItemStack ccc = event.getCurrentItem();
