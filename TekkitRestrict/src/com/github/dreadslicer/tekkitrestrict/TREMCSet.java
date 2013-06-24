@@ -4,11 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class TREMCSet {
-	private static List<String> configEMC;
+import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
 
+public class TREMCSet {
 	public static void reload() {
-		configEMC = tekkitrestrict.config.getStringList("SetEMC");
 		loadConfigEMC();
 	}
 	
@@ -37,6 +36,8 @@ public class TREMCSet {
 
 	private static void loadConfigEMC() {
 		if (!tekkitrestrict.EEEnabled) return;
+		
+		List<String> configEMC = tekkitrestrict.config.getStringList(ConfigFile.ModModifications, "SetEMC");
 		
 		for (String current : configEMC){
 			if (!current.contains(" ")){

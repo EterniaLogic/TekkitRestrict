@@ -1,6 +1,7 @@
 package com.github.dreadslicer.tekkitrestrict.commands;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
 
@@ -23,6 +24,7 @@ import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.event.CraftEventFactory;
 import org.bukkit.entity.Player;
 
+import com.github.dreadslicer.tekkitrestrict.Log;
 import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
 
 import ee.AlchemyBagData;
@@ -40,18 +42,22 @@ public class TRCommandAlc implements CommandExecutor {
 	 * Second string is the player that views the bag.
 	 */
 	public static HashMap<String, String> openAlc2 = new HashMap<String, String>();
+	public static ArrayList<String> openAlc3 = new ArrayList<String>();
 	//private static int counter = 0;
 	
 	//private static HashMap<String, Object[]> InvAlc = new java.util.HashMap<String, Object[]>();
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+		if (!cmd.getName().toLowerCase().equals("alc")){
+			Log.Debug("Please inform the developer that onCommand is acting strangely.");
+			return true;
+		}
+		
 		if (!(sender instanceof Player)){
 			sender.sendMessage(ChatColor.RED + "The console cannot use this command!");
 			return true;
 		}
-		
-		
 
 		if (!sender.hasPermission("tekkitrestrict.openalc")){
 			sender.sendMessage(ChatColor.RED + "You are not allowed to use this command!");
@@ -128,7 +134,8 @@ public class TRCommandAlc implements CommandExecutor {
 			HashMap<CraftPlayer, AlchemyBagData> temp = new HashMap<CraftPlayer, AlchemyBagData>();
 			temp.put((CraftPlayer) OPlayer, alcdata);
 			openAlc.put(name, temp);
-			openAlc2.put(OName, name);
+			if (Bukkit.getPlayerExact(OName) == null) openAlc2.put(OName, name);
+			else openAlc3.add(name);
 			String strcolor = getColor(color);
 			sender.sendMessage(ChatColor.GREEN + "Opened " + OName + "'s " + strcolor + " Alchemy Bag!");
 			sender.sendMessage(ChatColor.BLUE + "Close your inventory (twice) to restore your own inventory.");
@@ -141,109 +148,9 @@ public class TRCommandAlc implements CommandExecutor {
 			sender.sendMessage(ChatColor.RED + "An error has occured processing your command.");
 			tekkitrestrict.log.warning("Exception in OpenAlc : " + e.getMessage());
 		}
-		/*
-			try {
-				
-				
-				
-				if (args.length == 0) {
-					// String message =
-					message.add("Usage: /openalc [player] [color] color may be 0-15 OR 'white', ect.");
-				} else {
-					if (args[0] == "clear") {
-						// clears the changes done to the player's current
-						// inv.
-					} else {
-						if (player != null) {
-							if (args[1] == null) {
-								message.add("Color is not specified");
-							} else {
-								// save the player's current inv?
 
-								// now we can open the player's current
-								// alchemy
-								// bag!
-								EntityHuman H = ((org.bukkit.craftbukkit.entity.CraftPlayer) player)
-										.getHandle();
-								World W = ((org.bukkit.craftbukkit.CraftWorld) player
-										.getWorld()).getHandle();
-
-								try {
-									// set override for the TARGET player
-									// Player OPlayer =
-									// this.getServer().getOfflinePlayer(args[0]).getPlayer();
-									Player OPlayer = Playerz(player, args[0]);
-									EntityHuman OH = ((org.bukkit.craftbukkit.entity.CraftPlayer) OPlayer)
-											.getHandle();
-
-									int color = Integer
-											.parseInt(getColor(args[1]));
-									// modified from EntityHuman.openGui
-									try {
-										this.openGui((EntityPlayer) H,
-												(EntityPlayer) OH,
-												mod_EE.getInstance(), 56,
-												W, color, (int) H.locY,
-												(int) H.locZ);
-										// add this current player to the
-										// hashmap!
-										Object[] c = new Object[] {
-												player.getInventory()
-														.getContents(),
-												player.getInventory()
-														.getArmorContents() };
-										InvAlc.put(player.getName(), c);
-										TRLogger.Log("OpenAlc", "["
-												+ player.getName()
-												+ "] opened " + args[0]
-												+ "'s [" + getColor(color)
-												+ "] Alchemy Bag!");
-									} catch (Exception E) {
-										message.add("Error! Either "
-												+ player.getName()
-												+ " does not exist or "
-												+ args[1]
-												+ " does not exist");
-										message.add("    as either a color nor an initialized alchemy bag.");
-									}
-								} catch (Exception E1) {
-									message.add("Player: " + args[0]
-											+ " does not exist!");
-								}
-							}
-						}
-					}
-				}
-			} catch (Exception e) {
-				message.add("An error has occured processing your command.");
-				TRLogger.Log("debug", "TRCommandAlc Error: " + e.getMessage());
-				for (StackTraceElement ee : e.getStackTrace()) {
-					TRLogger.Log("debug", "     " + ee.toString());
-				}
-			}*/
 			return true;
 	}
-
-	/*public static void setPlayerInv(String name) {
-		try {
-			Object[] cc = InvAlc.get(name);
-			InvAlc.put(name, null);
-			if (cc != null) {
-				ItemStack[] MainInv = (ItemStack[]) cc[0];
-				ItemStack[] ArmorInv = (ItemStack[]) cc[1];
-
-				CraftPlayer ccr = (CraftPlayer) tekkitrestrict.getInstance()
-						.getServer().getPlayer(name);
-				org.bukkit.inventory.PlayerInventory pi = ccr.getInventory();
-
-				pi.setContents(MainInv);
-				pi.setArmorContents(ArmorInv);
-				ccr.updateInventory();
-			}
-		} catch (Exception ee) {
-			//ee.printStackTrace();
-		}
-	}*/
 
 	/** Called when a player logs off while having an inventory open. */
 	@SuppressWarnings("deprecation")
@@ -260,9 +167,6 @@ public class TRCommandAlc implements CommandExecutor {
 			for (AlchemyBagData current : data.values()) current.a();
 		} else return;
 		
-		//if (openAlc.isEmpty()) counter = 0;
-		//else counter--;
-		
 		player.updateInventory();
 	}
 	
@@ -272,26 +176,29 @@ public class TRCommandAlc implements CommandExecutor {
 		
 		String name = player.getName();
 		String viewer = openAlc2.remove(name);
+		String tbr = "";
 		
 		if (viewer != null){
-			player = Bukkit.getPlayer(viewer);
-			HashMap<CraftPlayer, AlchemyBagData> data = openAlc.remove(viewer);
-			
-			if (data != null){
-				for (CraftPlayer current : data.keySet()){
-					if (Bukkit.getPlayerExact(current.getName()) == null) current.saveData();
-				}
-				for (AlchemyBagData current : data.values()) current.a();
-				
-				player.openInventory(player.getInventory());
-				player.closeInventory();
-
-				player.sendMessage(ChatColor.BLUE + "Your own inventory was restored.");
-			}
-		} else return;
+			tbr = viewer;
+		} else {
+			if (openAlc3.remove(name)) tbr = name;
+			else return;
+		}
 		
-		//if (openAlc.isEmpty()) counter = 0;
-		//else counter--;
+		HashMap<CraftPlayer, AlchemyBagData> data = openAlc.remove(tbr);
+		
+		if (data != null){
+			for (CraftPlayer current : data.keySet()){
+				if (Bukkit.getPlayerExact(current.getName()) == null) current.saveData();
+			}
+			for (AlchemyBagData current : data.values()) current.a();
+			
+			player = Bukkit.getPlayer(tbr);
+			player.openInventory(player.getInventory());
+			player.closeInventory();
+
+			player.sendMessage(ChatColor.BLUE + "Your own inventory was restored.");
+		}
 	}
 	
 	/**
@@ -403,7 +310,7 @@ public class TRCommandAlc implements CommandExecutor {
 		//Otherwise search in the players folder fore the player.
 		File playerfolder = new File(Bukkit.getWorlds().get(0).getWorldFolder(), "players");
 
-		String playername = matchUser(playerfolder.listFiles(), name);//(Removed arrays.AsList)
+		String playername = matchUser(playerfolder.listFiles(), name);
 		if (playername == null) return null;
 		
 		try {
@@ -415,11 +322,7 @@ public class TRCommandAlc implements CommandExecutor {
 				target.loadData();
 				return target;
 			}
-			sender.sendMessage((new StringBuilder())
-								.append(ChatColor.RED)
-								.append("Player ")
-								.append(name)
-								.append(" can not be found!").toString());
+			sender.sendMessage(ChatColor.RED + "Player " + name + " can not be found!");
 		} catch (Exception e) {
 			sender.sendMessage("Error while retrieving offline player data!");
 			tekkitrestrict.log.warning("Exception in TRCommandAlc.Playerz: ");
@@ -450,62 +353,4 @@ public class TRCommandAlc implements CommandExecutor {
 		return found;
 	}
 
-	/*@SuppressWarnings("rawtypes")
-	public static String matchUser(Collection container, String search) {
-		String found = null;
-		if (search == null) {
-			return found;
-		}
-		String lowerSearch = search.toLowerCase();
-		int delta = 0x7fffffff;
-		Iterator iterator = container.iterator();
-		while (iterator.hasNext()) {
-			File file = (File) iterator.next();
-			String filename = file.getName();
-			String str = filename.substring(0, filename.length() - 4);
-			if (!str.toLowerCase().startsWith(lowerSearch)) {
-				continue;
-			}
-			int curDelta = str.length() - lowerSearch.length();
-			if (curDelta < delta) {
-				found = str;
-				delta = curDelta;
-			}
-			if (curDelta == 0) {
-				break;
-			}
-		}
-		return found;
-	}*/
-
-	/*public void openGui(EntityPlayer player, EntityPlayer TargetPlayer,
-			BaseMod mod, int ID, net.minecraft.server.World world, int x,
-			int y, int z) {
-		if (!(mod instanceof NetworkMod)) {
-			return;
-		}
-		IGuiHandler handler = MinecraftForge.getGuiHandler(mod);
-		if (handler != null) {
-			Container container = (Container) handler.getGuiElement(ID,
-					TargetPlayer, world, x, y, z);
-			if (container != null) {
-				container = org.bukkit.craftbukkit.event.CraftEventFactory
-						.callInventoryOpenEvent(player, container);
-				if (container != null) {
-					player.realGetNextWidowId();
-					player.H();
-
-					forge.packets.PacketOpenGUI pkt = new forge.packets.PacketOpenGUI(
-							player.getCurrentWindowIdField(),
-							MinecraftForge.getModID((NetworkMod) mod), ID, x,
-							y, z);
-					player.netServerHandler.sendPacket(pkt.getPacket());
-					player.activeContainer = container;
-					player.activeContainer.windowId = player
-							.getCurrentWindowIdField();
-					player.activeContainer.addSlotListener(player);
-				}
-			}
-		}
-	}*/
 }

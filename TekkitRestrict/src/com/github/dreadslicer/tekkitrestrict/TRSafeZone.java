@@ -22,8 +22,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.SafeZones;
-import com.github.dreadslicer.tekkitrestrict.TRConfigCache.SafeZones.SSMode;
 import com.github.dreadslicer.tekkitrestrict.api.SafeZones.SafeZoneCreate;
+import com.github.dreadslicer.tekkitrestrict.objects.TREnums.SSMode;
 import com.massivecraft.factions.Board;
 import com.massivecraft.factions.Conf;
 import com.massivecraft.factions.FLocation;

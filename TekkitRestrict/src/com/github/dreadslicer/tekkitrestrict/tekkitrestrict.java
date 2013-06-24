@@ -38,12 +38,10 @@ import com.github.dreadslicer.tekkitrestrict.database.SQLite;
 import com.github.dreadslicer.tekkitrestrict.lib.TRFileConfiguration;
 import com.github.dreadslicer.tekkitrestrict.lib.YamlConfiguration;
 import com.github.dreadslicer.tekkitrestrict.listeners.Assigner;
+import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
+import com.github.dreadslicer.tekkitrestrict.objects.TREnums.SSMode;
 
 public class tekkitrestrict extends JavaPlugin {
-	public enum ConfigFile {
-		General, Advanced, ModModifications, DisableClick, DisableItems, Hack, LimitedCreative, Logging, TPreformance, MicroPermissions, SafeZones;
-	}
-	
 	public static Logger log;
 	public static TRFileConfiguration config;
 	public static boolean EEEnabled = false;
@@ -149,6 +147,8 @@ public class tekkitrestrict extends JavaPlugin {
 			 * @Override public int getValue() { return TRSafeZone.zones.size();
 			 * } });
 			 */
+			
+			/*
 			g.addPlotter(new Metrics.Plotter("Hack attempts") {
 				@Override
 				public int getValue() {
@@ -158,7 +158,7 @@ public class tekkitrestrict extends JavaPlugin {
 						return 0;
 					}
 				}
-			});
+			});*/
 			g.addPlotter(new Metrics.Plotter("Recipe blocks") {
 				@Override
 				public int getValue() {
@@ -342,8 +342,8 @@ public class tekkitrestrict extends JavaPlugin {
 		SafeZones.UsePS = config.getBoolean("SSEnabledPlugins.PreciousStones", true);
 		SafeZones.UseTowny = config.getBoolean("SSEnabledPlugins.Towny", true);
 		SafeZones.UseWG = config.getBoolean("SSEnabledPlugins.WorldGuard", true);
-		SafeZones.GPMode = SafeZones.SSMode.parse(config.getString("GriefPreventionSafeZoneMethod", "admin"));
-		SafeZones.WGMode = SafeZones.SSMode.parse(config.getString("WorldGuardSafeZoneMethod", "specific"));
+		SafeZones.GPMode = SSMode.parse(config.getString("GriefPreventionSafeZoneMethod", "admin"));
+		SafeZones.WGMode = SSMode.parse(config.getString("WorldGuardSafeZoneMethod", "specific"));
 		
 		//SafeZones.SSPlugins = config.getStringList("SSEnabledPlugins");
 		//SafeZones.SSDisableFly = config.getBoolean("SSDisableFlying", false);
@@ -486,7 +486,6 @@ public class tekkitrestrict extends JavaPlugin {
 		TRLimitBlock.reload();
 		TRLogger.reload();
 		TRRecipeBlock.reload();
-		TRNoHack.reload();
 		TRLimitFlyThread.reload();
 		TREMCSet.reload();
 		log.info("TekkitRestrict Reloaded!");

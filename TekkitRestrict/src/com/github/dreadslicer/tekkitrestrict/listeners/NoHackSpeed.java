@@ -9,7 +9,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Hacks;
 import com.github.dreadslicer.tekkitrestrict.TRNoHack;
-import com.github.dreadslicer.tekkitrestrict.TRNoHack.HackType;
+import com.github.dreadslicer.tekkitrestrict.objects.TREnums.HackType;
 import com.github.dreadslicer.tekkitrestrict.Util;
 
 public class NoHackSpeed implements Listener{

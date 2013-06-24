@@ -7,8 +7,11 @@ import net.minecraft.server.CraftingManager;
 import net.minecraft.server.FurnaceRecipes;
 
 import org.bukkit.Bukkit;
+import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
+
+import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
 
 public class TRRecipeBlock {
 	public static void reload() {
@@ -17,7 +20,7 @@ public class TRRecipeBlock {
 
 	public static void blockConfigRecipes() {
 		// config
-		List<String> ssr = tekkitrestrict.config.getStringList("RecipeBlock");
+		List<String> ssr = tekkitrestrict.config.getStringList(ConfigFile.Advanced, "RecipeBlock");
 		for (String s : ssr) {
 			List<TRCacheItem> iss = TRCacheItem.processItemString("", s, -1);
 			for (TRCacheItem ir : iss) {
@@ -34,7 +37,7 @@ public class TRRecipeBlock {
 			}
 		}
 
-		ssr = tekkitrestrict.config.getStringList("RecipeFurnaceBlock");
+		ssr = tekkitrestrict.config.getStringList(ConfigFile.Advanced, "RecipeFurnaceBlock");
 		for (String s : ssr) {
 			List<TRCacheItem> iss = TRCacheItem.processItemString("", s, -1);
 			for (TRCacheItem ir : iss) {
@@ -49,8 +52,8 @@ public class TRRecipeBlock {
 
 	public static boolean blockRecipeVanilla(int id, int data) {
 		boolean status = false;
-		Iterator<org.bukkit.inventory.Recipe> recipes = Bukkit.recipeIterator();
-		org.bukkit.inventory.Recipe recipe;
+		Iterator<Recipe> recipes = Bukkit.recipeIterator();
+		Recipe recipe;
 
 		while (recipes.hasNext()) {
 			if ((recipe = recipes.next()) != null) {

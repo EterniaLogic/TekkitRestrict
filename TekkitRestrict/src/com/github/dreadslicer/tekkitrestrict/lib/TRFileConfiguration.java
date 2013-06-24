@@ -25,7 +25,7 @@ import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.representer.Representer;
 
 import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
-import com.github.dreadslicer.tekkitrestrict.tekkitrestrict.ConfigFile;
+import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
 
 @SuppressWarnings("rawtypes")
 public class TRFileConfiguration extends FileConfiguration {

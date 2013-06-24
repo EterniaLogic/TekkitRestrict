@@ -3,6 +3,7 @@ package com.github.dreadslicer.tekkitrestrict;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.github.dreadslicer.tekkitrestrict.objects.TREnums.SSMode;
 import com.griefcraft.lwc.LWCPlugin;
 
 public class TRConfigCache {
@@ -26,24 +27,6 @@ public class TRConfigCache {
 	}
 	
 	public static class SafeZones {
-		public static enum SSMode {
-			All, Admin, Specific, SpecificAdmin;
-			
-			public static SSMode parse(String input){
-				input = input.toLowerCase();
-				if (input.equals("all")) return SSMode.All;
-				if (input.equals("admin")) return SSMode.Admin;
-				if (input.equals("specific")) return SSMode.Specific;
-				if (input.equals("specificadmin")) return SSMode.SpecificAdmin;
-				return SSMode.Admin;
-			}
-			
-			public boolean isAdmin(){
-				if (this == SSMode.Admin || this == SSMode.SpecificAdmin) return true;
-				return false;
-			}
-		}
-		
 		//public static boolean SSDisableFly;
 		public static boolean UseSafeZones;
 		//public static List<String> SSPlugins;

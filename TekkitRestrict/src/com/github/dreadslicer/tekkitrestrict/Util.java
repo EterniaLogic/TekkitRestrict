@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Global;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Hacks;
-import com.github.dreadslicer.tekkitrestrict.TRNoHack.HackType;
+import com.github.dreadslicer.tekkitrestrict.objects.TREnums.HackType;
 
 public class Util {
 	public static boolean hasBypass(Player player, String type){

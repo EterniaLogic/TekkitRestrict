@@ -22,8 +22,8 @@ import org.bukkit.inventory.PlayerInventory;
 import com.github.dreadslicer.tekkitrestrict.Log;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Hacks;
 import com.github.dreadslicer.tekkitrestrict.TRNoHack;
-import com.github.dreadslicer.tekkitrestrict.TRNoHack.HackType;
 import com.github.dreadslicer.tekkitrestrict.Util;
+import com.github.dreadslicer.tekkitrestrict.objects.TREnums.HackType;
 
 public class NoHackFly implements Listener {
 	private static ConcurrentHashMap<String, Integer> tickTolerance = new ConcurrentHashMap<String, Integer>(),

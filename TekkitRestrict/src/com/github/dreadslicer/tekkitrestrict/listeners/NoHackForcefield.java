@@ -11,7 +11,7 @@ import org.bukkit.util.Vector;
 
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Hacks;
 import com.github.dreadslicer.tekkitrestrict.TRNoHack;
-import com.github.dreadslicer.tekkitrestrict.TRNoHack.HackType;
+import com.github.dreadslicer.tekkitrestrict.objects.TREnums.HackType;
 import com.github.dreadslicer.tekkitrestrict.Util;
 
 public class NoHackForcefield implements Listener {

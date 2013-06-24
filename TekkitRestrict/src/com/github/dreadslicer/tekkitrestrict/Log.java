@@ -28,29 +28,11 @@ public class Log {
 	}
 	
 	static Logger McLogger;
-	public static enum Outcome{
-		success("Success"), fail("Fail"), nopermission("No Permission");
-		private String string;
-		private Outcome(String string){
-			this.string = string;
-		}
-		public String toString(){
-			return string;
-		}
-	};
 	public static void Command(Command cmd, CommandSender sender, String allArgs) {
 		McLogger.log(Level.parse("Command"), sender.getName()+": /"+cmd.getName()+" "+allArgs);
 	}
 	public static void Command(String cmd, CommandSender sender, String allArgs) {
 		McLogger.log(Level.parse("Command"), sender.getName()+": /"+cmd+" "+allArgs);
-	}
-	public static void Command(Command cmd, CommandSender sender, String allArgs, Outcome outcome) {
-		if (outcome == Outcome.nopermission)
-			McLogger.log(Level.parse("Command"), sender.getName()+" was denied /"+cmd+" "+allArgs);
-		else if (outcome == Outcome.fail)
-			McLogger.log(Level.parse("Command"), sender.getName()+" failed /"+cmd+" "+allArgs);
-		else
-			McLogger.log(Level.parse("Command"), sender.getName()+": /"+cmd.getName()+" "+allArgs);
 	}
 	
 	public static class Load {

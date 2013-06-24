@@ -6,7 +6,7 @@ import java.util.TreeMap;
 
 import org.bukkit.entity.Player;
 
-import com.github.dreadslicer.tekkitrestrict.tekkitrestrict.ConfigFile;
+import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
 
 public class TRCacheItem2 {
 	public int id, data;
