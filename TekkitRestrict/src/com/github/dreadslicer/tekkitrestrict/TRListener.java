@@ -257,8 +257,8 @@ public class TRListener implements Listener {
 	public static boolean errorInteract = false;
 	// /////// START INTERACT //////////////
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-	public void onPlayerInteract(PlayerInteractEvent e) {
-		Player player = e.getPlayer();
+	public void onPlayerInteract(PlayerInteractEvent event) {
+		Player player = event.getPlayer();
 		if (player == null) return;
 		
 		String pname = player.getName().toLowerCase(); // determine if this is Buildcraft or RedPower... Then exempt.
@@ -267,14 +267,14 @@ public class TRListener implements Listener {
 		// lets do this based on a white-listed approach.
 		// First, lets loop through the DisableClick list to stop clicks.
 		// Perf: 8x
-		if (TRNoClick.compareAll(e)){
-			e.setCancelled(true);
+		if (TRNoClick.isDisabled(event)){
+			event.setCancelled(true);
 			return;
 		}
 
-		if (TRNoDupeProjectTable.tableUseNotAllowed(e.getClickedBlock(), player)){
+		if (TRNoDupeProjectTable.tableUseNotAllowed(event.getClickedBlock(), player)){
 			player.sendMessage(ChatColor.RED + "Someone else is already using this project table!");
-			e.setCancelled(true);
+			event.setCancelled(true);
 			return;
 		}
 
@@ -300,7 +300,7 @@ public class TRListener implements Listener {
 				
 				if (banned) {
 					player.sendMessage(ChatColor.RED + "[TRLimitedCreative] You may not interact with this item.");
-					e.setCancelled(true);
+					event.setCancelled(true);
 					player.setItemInHand(null);
 					return;
 				}

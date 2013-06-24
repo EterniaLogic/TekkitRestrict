@@ -11,112 +11,134 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
+import com.github.dreadslicer.tekkitrestrict.tekkitrestrict.ConfigFile;
+import com.github.dreadslicer.tekkitrestrict.objects.TREnums.TRClickType;
+
 
 public class TRNoClick {
-	//TODO possibly change this to my method
 	public int id, data;
-	public boolean air = true, block = true, usesafezone = false, useB = false, insafezone = false;
-	public String clicktype, msg = ""; // left / right
+	public boolean air = false, block = false, safezone = false, useB = false;
+	public String msg = ""; // left / right
+	public TRClickType type = TRClickType.Both;
 
-	public boolean compare(Player player, Block bl, ItemStack iss, Action e) {
-		boolean r = false;
-		// tekkitrestrict.log.info("action: "+e.toString());
+	public boolean compare(Player player, Block bl, ItemStack iss, Action action) {
 		if (this.useB) {
-			if (bl != null) { // on a block????
-				if (TRNoItem.equalSet(id, data, bl.getTypeId(), bl.getData())) { // correct id???
-					if (e == Action.RIGHT_CLICK_BLOCK || e == Action.RIGHT_CLICK_AIR) { // right click???
-						return true;
-					}
-				}
+			if (bl == null) return false;
+			if (TRNoItem.equalSet(id, data, bl.getTypeId(), bl.getData())) {
+				if (action == Action.RIGHT_CLICK_BLOCK || action == Action.RIGHT_CLICK_AIR) return true;
 			}
-		} else if (TRNoItem.equalSet(id, data, iss.getTypeId(), iss.getData().getData())) {
+		} else if (TRNoItem.equalSet(id, data, iss.getTypeId(), iss.getDurability())) {
 
-			insafezone = usesafezone ? TRSafeZone.inSafeZone(player) : true;
-
+			boolean insafezone = safezone ? TRSafeZone.inSafeZone(player) : true;
 			if (insafezone) {
-				// tekkitrestrict.log.info("l2");
-				if (clicktype.equals("both")) {
-					return true;
-				} else if (clicktype.equals("left")) {
-					if (e == Action.LEFT_CLICK_AIR && air) return true;
-					else if (e == Action.LEFT_CLICK_BLOCK && block) return true;
-				} else if (clicktype.equals("right")) {
-					if (e == Action.RIGHT_CLICK_AIR && air) return true;
-					else if (e == Action.RIGHT_CLICK_BLOCK && block) return true;
+				if (type.both()){
+					if (air && (action == Action.LEFT_CLICK_AIR || action == Action.RIGHT_CLICK_AIR)) return true;
+					if (block && (action == Action.LEFT_CLICK_BLOCK || action == Action.RIGHT_CLICK_BLOCK)) return true;
+				} else if (type.left()){
+					if (air && action == Action.LEFT_CLICK_AIR) return true;
+					if (block && action == Action.LEFT_CLICK_BLOCK) return true;
+				} else if (type.right()){
+					if (air && action == Action.RIGHT_CLICK_AIR) return true;
+					if (block && action == Action.RIGHT_CLICK_BLOCK) return true;
+				} else if (type.all()) {
+					if (air && (action == Action.LEFT_CLICK_AIR || action == Action.RIGHT_CLICK_AIR)) return true;
+					if (block && (action == Action.LEFT_CLICK_BLOCK || action == Action.RIGHT_CLICK_BLOCK)) return true;
+					if (action == Action.PHYSICAL) return true;
+				} else if (type.trample()){
+					if (action == Action.PHYSICAL) return true;
 				}
 			}
 		}
 
-		return r;
+		return false;
 	}
 
 	private static List<TRNoClick> disableClickItemActions = Collections.synchronizedList(new LinkedList<TRNoClick>());
-	private static List<String> DisableClicks = Collections.synchronizedList(new LinkedList<String>());
-
-	public static void reload() {
-		DisableClicks = Collections.synchronizedList(tekkitrestrict.config.getStringList("DisableClick"));
+	
+	public static void reload(){
 		disableClickItemActions.clear();
-		for (int i = 0; i < DisableClicks.size(); i++) {
-			String clickstring = DisableClicks.get(i);
-
-			// tekkitrestrict.log.info("c-"+clickstring);
-			if (clickstring.contains(" ")) {
-				String[] token = clickstring.split(" ");
-				if (token[0].equals("block")) {
-					List<TRCacheItem> iss = TRCacheItem.processItemString("", token[1], -1);
-					for (TRCacheItem ti : iss) {
-						TRNoClick cia = new TRNoClick();
-						cia.id = ti.id;
-						cia.data = ti.getData();
-						cia.msg = "You may not interact with this block.";
-						cia.useB = true;
-						disableClickItemActions.add(cia);
-					}
-				} else {
-					List<TRCacheItem> iss = TRCacheItem.processItemString("", token[0], -1);
-					for (TRCacheItem ti : iss) {
-						TRNoClick cia = new TRNoClick();
-						cia.id = ti.id;
-						cia.data = ti.getData();
-						// tekkitrestrict.log.info("c1"+cia.id+"|"+cia.data+" - "+cia.clicktype+" "+cia.air+" "+cia.block);
-
-						cia.clicktype = token[1].toLowerCase();
-						// 1234:20 right air
-						if (token.length >= 3) {
-							String token3 = token[2].toLowerCase();
-							if (token3.equals("air")) cia.block = false;
-							else if (token3.equals("block")) cia.air = false;
-							else if (token3.equals("safezone")) cia.usesafezone = true;
-							
-
-							if (token.length == 4) {
-								String token4 = token[3].toLowerCase();
-								if (token4.equals("safezone")) {
-									cia.usesafezone = true;
-								}
-							}
-						}
-
-						// tekkitrestrict.log.info(cia.id+"|"+cia.data+" - `"+cia.clicktype+"` "+cia.air+" "+cia.block);
-						disableClickItemActions.add(cia);
-					}
+		List<String> disableClicks = tekkitrestrict.config.getStringList(ConfigFile.DisableClick , "DisableClick");
+		for (String disableClick : disableClicks){
+			
+			String temp[] = disableClick.split(" ");
+			if (temp[0].equalsIgnoreCase("block")){
+				if (temp.length == 1){
+					Log.Config.Warning("You have an error in your DisableClick config: \"block\" is not a valid itemstring");
+					continue;
+				}
+				
+				List<TRCacheItem> iss = TRCacheItem.processItemString("", temp[1], -1);
+				for (TRCacheItem item : iss) {
+					TRNoClick noclick = new TRNoClick();
+					noclick.id = item.id;
+					noclick.data = item.data;
+					noclick.msg = "You may not interact with this block.";
+					noclick.useB = true;
+					disableClickItemActions.add(noclick);
 				}
 			} else {
-				List<TRCacheItem> iss = TRCacheItem.processItemString("", clickstring, -1);
-				for (TRCacheItem ti : iss) {
-					TRNoClick cia = new TRNoClick();
-					cia.id = ti.id;
-					cia.data = ti.getData();
-					cia.clicktype = "both";
-					// tekkitrestrict.log.info(cia.id+"|"+cia.data+" - "+cia.clicktype+" "+cia.air+" "+cia.block);
-					disableClickItemActions.add(cia);
+				//###########################################################################
+				//Id's and data
+				List<TRCacheItem> iss = TRCacheItem.processItemString("", temp[0], -1);
+				for (TRCacheItem item : iss){
+					TRNoClick noclick = new TRNoClick();
+					
+					noclick.id = item.id;
+					noclick.data = item.data;
+					
+					if (temp.length > 1){
+						for (int i=1;i<temp.length;i++){
+							String current = temp[i].toLowerCase();
+							
+							if (current.equals("left")) noclick.type = TRClickType.Left;
+							else if (current.equals("right")) noclick.type = TRClickType.Right;
+							else if (current.equals("both")) noclick.type = TRClickType.Both;
+							else if (current.equals("trample")) noclick.type = TRClickType.Trample;
+							else if (current.equals("all")) noclick.type = TRClickType.All;
+							else if (current.equals("air")) noclick.air = true;
+							else if (current.equals("block")) noclick.block = true;
+							else if (current.equals("safezone")) noclick.safezone = true;
+							else {
+								Log.Config.Warning("You have an error in your DisableClick config: Invalid clicktype \""+current+"\"");
+								Log.Config.Warning("Valid types: left, right, both, trample, all, air, block, safezone");
+								continue;
+							}
+						}
+					}
+					if (!noclick.type.trample() && !noclick.air && !noclick.block){
+						noclick.air = true;
+						noclick.block = true;
+					}
+					
+					String a = "";
+					if (noclick.air){
+						if (noclick.block) a = "";
+						else a = " in the air";
+					} else {
+						a = " on blocks";
+					}
+					
+					String s = noclick.safezone ? " inside a safezone." : ".";
+					
+					if (noclick.type.all() || noclick.type.both())
+						noclick.msg = "Sorry, but clicking with this item"+a+" is disabled" + s;
+					else if (noclick.type.left())
+						noclick.msg = "Sorry, but left-clicking with this item"+a+" is disabled" + s;
+					else if (noclick.type.right())
+						noclick.msg = "Sorry, but right-clicking with this item"+a+" is disabled" + s;
+					else if (noclick.type.trample())
+						noclick.msg = "Sorry, but trampling with this item in your hand is disabled" + s;
+					
+					disableClickItemActions.add(noclick);
 				}
+				//###########################################################################
+				
 			}
 		}
 	}
 
 	public static boolean errorLogged = false;
-	public static boolean compareAll(PlayerInteractEvent e) {
+	public static boolean isDisabled(PlayerInteractEvent e) {
 		try {
 			Player player = e.getPlayer();
 			for (TRNoClick cia : disableClickItemActions) {
@@ -125,9 +147,9 @@ public class TRNoClick {
 						player.sendMessage(ChatColor.RED + cia.msg);
 					} else {
 						// tekkitrestrict.log.info(cia.id+"|"+cia.data+" - "+cia.clicktype);
-						String t = cia.clicktype.equals("both") ? "" : " " + cia.clicktype;
+						String t = (cia.type.both() || cia.type.all()) ? "" : " " + cia.type.name();
 						String a = (cia.air && !cia.block) ? " in the air" : ((cia.block && !cia.air) ? " on blocks" : "");
-						String s = (cia.insafezone && cia.usesafezone) ? " inside a safezone." : ".";
+						String s = (cia.safezone) ? " inside a safezone." : ".";
 						player.sendMessage(ChatColor.RED + "Sorry, but" + t + " clicking with this item" + a + " is disabled" + s);
 					}
 					return true;

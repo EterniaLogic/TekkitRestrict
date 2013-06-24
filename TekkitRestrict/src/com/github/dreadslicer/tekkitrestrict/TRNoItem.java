@@ -335,12 +335,26 @@ public class TRNoItem {
 	}
 
 	public static boolean equalSet(int id1, int data1, int id2, int data2) {
-		boolean r = false;
-		boolean cct = (data1 == -10 && data2 == 0);
-		if (id1 == id2 && (data1 == 0 || data1 == data2 || cct)) {
-			r = true;
+		if (id1 != id2) return false;
+		if (data1 == 0 || data1 == data2 || (data1 == -10 && data2 == 0)) {
+			return true;
 		}
-		return r;
+		return false;
+	}
+	
+	/**
+	 * @param id1
+	 * @param data1
+	 * @param id2
+	 * @param data2
+	 * @return True if: id1 == id2 and data1 = -1 or data1 == data2
+	 */
+	public static boolean equalSet2(int id1, int data1, int id2, int data2) {
+		if (id1 != id2) return false;
+		if (data1 == -1 || data1 == data2) {
+			return true;
+		}
+		return false;
 	}
 
 	/*private static String[] modItems = new String[] { "ee=27520-27599;126-130",
