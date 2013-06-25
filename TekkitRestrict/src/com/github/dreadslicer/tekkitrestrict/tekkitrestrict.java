@@ -320,12 +320,12 @@ public class tekkitrestrict extends JavaPlugin {
 		Threads.SSEntityRemoverSpeed = config.getInt("SSEntityRemoverThread");
 		Threads.worldCleanerSpeed = config.getInt("WorldCleanerThread");
 		
-		Threads.GAMovement = config.getBoolean("AllowGemArmorDefensive", true);
-		Threads.GAOffensive = config.getBoolean("AllowGemArmorOffensive", false);
+		Threads.GAMovement = config.getBoolean(ConfigFile.ModModifications, "AllowGemArmorDefensive", true);
+		Threads.GAOffensive = config.getBoolean(ConfigFile.ModModifications, "AllowGemArmorOffensive", false);
 		
-		Threads.SSDisableEntities = config.getBoolean("InSafeZones.DisableEntities", false);
-		Threads.SSDechargeEE = config.getBoolean("InSafeZones.DechargeEE", true);
-		Threads.SSDisableArcane = config.getBoolean("InSafeZones.DisableRingOfArcana");
+		Threads.SSDisableEntities = config.getBoolean(ConfigFile.SafeZones, "InSafeZones.DisableEntities", false);
+		Threads.SSDechargeEE = config.getBoolean(ConfigFile.SafeZones, "InSafeZones.DechargeEE", true);
+		Threads.SSDisableArcane = config.getBoolean(ConfigFile.SafeZones, "InSafeZones.DisableRingOfArcana", true);
 		
 		Threads.RMDB = config.getBoolean("RemoveDisabledItemBlocks", false);
 		Threads.UseRPTimer = config.getBoolean("UseAutoRPTimer", false);

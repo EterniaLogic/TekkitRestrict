@@ -1,8 +1,12 @@
 package com.github.dreadslicer.tekkitrestrict.api;
 
+import java.util.List;
+
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import com.github.dreadslicer.tekkitrestrict.TRSafeZone;
+import com.github.dreadslicer.tekkitrestrict.objects.TREnums.SSPlugin;
 
 public class SafeZones {
 	public static enum SafeZoneCreate {
@@ -23,8 +27,23 @@ public class SafeZones {
 	}
 	//TODO add getSafeZonePlayerIsIn and add a cache with isPlayerInSafeZone
 	//to allow fast checks of both.
-	public static boolean isPlayerInSafeZone(Player player) {	
-		return TRSafeZone.inSafeZone(player);
+	/**
+	 * Uses {@link #getSafeZoneFor(Player)}.
+	 * @return If the player is in a safezone that applies to him.
+	 * @see #isSafeZoneFor(Player, List)
+	 */
+	public static boolean isSafeZoneFor(Player player) {
+		return !getSafeZoneFor(player).equals("");
+	}
+	
+	/**
+	 * Uses {@link #getSafeZoneFor(Player, List)}.<br>
+	 * Checks plugins in the specified order.
+	 * @return If the player is in a safezone that applies to him.
+	 * @see #isSafeZoneFor(Player)
+	 */
+	public static boolean isSafeZoneFor(Player player, List<SSPlugin> order) {
+		return !getSafeZoneFor(player, order).equals("");
 	}
 	
 	/**
@@ -46,6 +65,15 @@ public class SafeZones {
 	}
 	
 	/**
+	 * Removes a WorldGuard/GriefPrevention safezone from the database.<br>
+	 * Do not use this method in a loop. It will cause ConcurrentModificationExceptions.
+	 * @return True if the removal succeeded. False otherwise.
+	 */
+	public static boolean removeSafeZone(TRSafeZone zone){
+		return TRSafeZone.removeSafeZone(zone);
+	}
+	
+	/**
 	 * This checks if there is a Factions safezone at his location that applies to him.<br><br>
 	 * 
 	 * Note: Does not check if safezones are disabled.<br>
@@ -53,7 +81,7 @@ public class SafeZones {
 	 * @return <b>If the player is in a Factions Safezone that applies to him.</b><br>
 	 */
 	public static boolean isFactionsSafeZoneForPlayer(Player player){
-		return TRSafeZone.allowedInFactionsSafeZone(player);
+		return TRSafeZone.isFactionsSafeZoneFor(player);
 	}
 	
 	/**
@@ -64,7 +92,7 @@ public class SafeZones {
 	 * @return <b>If the player is in a PreciousStones Safezone that applies to him.</b><br>
 	 */
 	public static boolean isPreciousStonesSafeZoneForPlayer(Player player){
-		return TRSafeZone.allowedInPreciousStonesSafeZone(player);
+		return TRSafeZone.isPreciousStonesSafeZoneFor(player);
 	}
 	
 	/**
@@ -75,7 +103,7 @@ public class SafeZones {
 	 * @return <b>If the player is in a Towny Safezone that applies to him.</b><br>
 	 */
 	public static boolean isTownySafeZoneForPlayer(Player player){
-		return TRSafeZone.allowedInTownySafeZone(player);
+		return TRSafeZone.isTownySafeZoneFor(player);
 	}
 	
 	/**
@@ -86,6 +114,58 @@ public class SafeZones {
 	 * @return <b>If the player is in a GriefPrevention Safezone that applies to him.</b><br>
 	 */
 	public static boolean isGriefPreventionSafeZoneForPlayer(Player player){
-		return TRSafeZone.allowedInGriefPreventionSafeZone2(player);
+		return TRSafeZone.isGriefPreventionSafeZoneFor(player);
+	}
+	
+	/**
+	 * Searches for a WorldGuard safezone in the database for the given location.
+	 * If checkGP is true, it will also check for GriefPrevention Safezones.
+	 * @return "" if none is found. A message with more information about the safezone otherwise.
+	 */
+	public static String getSafeZoneByLocation(Location location, boolean checkGP){
+		return TRSafeZone.getSafeZoneByLocation(location, checkGP);
+	}
+	
+	/**
+	 * Get a safezone at the players current position that applies to him.<br>
+	 * First checks GriefPrevention, then WorldGuard, Towny, Factions and last PreciousStones.
+	 * @return "" If none is found/none applies. A string with information about the safezone otherwise.
+	 * @see #getSafeZoneFor(Player, List)
+	 */
+	public static String getSafeZoneFor(Player player){
+		if (isGriefPreventionSafeZoneForPlayer(player)) return "GriefPrevention Safezone Claim owned by: " + TRSafeZone.lastGPClaim;
+		
+		String r = getSafeZoneByLocation(player.getLocation(), false);
+		if (!r.equals("")) return r;
+		
+		if (isTownySafeZoneForPlayer(player)) return "Towny Safezone";
+		if (isFactionsSafeZoneForPlayer(player)) return "Safezone Faction: " + TRSafeZone.lastFaction;
+		if (isPreciousStonesSafeZoneForPlayer(player)) return "PreciousStones SafeZone Field: " + TRSafeZone.lastPS;
+		
+		return "";
+	}
+	
+	/**
+	 * Get a safezone at the players current position that applies to him.<br>
+	 * Checks in the order of the given list.
+	 * @return "" If none is found/none applies. A string with information about the safezone otherwise.
+	 * @see #getSafeZoneFor(Player)
+	 */
+	public static String getSafeZoneFor(Player player, List<SSPlugin> order){
+		for (SSPlugin current : order){
+			if (current.GP()){
+				if (isGriefPreventionSafeZoneForPlayer(player)) return "GriefPrevention Safezone Claim owned by: " + TRSafeZone.lastGPClaim;
+			} else if (current.WG()){
+				String r = getSafeZoneByLocation(player.getLocation(), false);
+				if (!r.equals("")) return r;
+			} else if (current.PS()){
+				if (isPreciousStonesSafeZoneForPlayer(player)) return "PreciousStones SafeZone Field: " + TRSafeZone.lastPS;
+			} else if (current.F()){
+				if (isFactionsSafeZoneForPlayer(player)) return "Safezone Faction: " + TRSafeZone.lastFaction;
+			} else if (current.T()){
+				if (isTownySafeZoneForPlayer(player)) return "Towny Safezone";
+			}
+		}
+		return "";
 	}
 }

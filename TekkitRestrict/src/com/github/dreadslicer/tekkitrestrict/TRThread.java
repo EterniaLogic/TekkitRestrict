@@ -5,6 +5,7 @@ import ic2.common.ItemArmorElectric;
 import ic2.common.ItemElectricTool;
 import ic2.common.StackUtil;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -261,18 +262,26 @@ class TGemArmorDisabler extends Thread {
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
 	private void GemArmorDisabler() {
 		//TODO Change this one day
 		try {
 			if (!Threads.GAMovement) {
 				synchronized (EEBase.playerArmorMovementToggle) {
-					/*
-					 * for(Object
-					 * xu:EEBase.playerArmorMovementToggle.keySet()){
-					 * EntityHuman hu = (EntityHuman)xu;
-					 * EEBase.playerArmorMovementToggle.put(hu, false); }
-					 */
-					EEBase.playerArmorMovementToggle.clear();
+					
+					Iterator it = EEBase.playerArmorMovementToggle.keySet().iterator();
+					ArrayList<EntityHuman> toremove = new ArrayList<EntityHuman>();
+					while (it.hasNext()){
+						EntityHuman human = (EntityHuman) it;
+						Player player = (Player) human.getBukkitEntity();
+						if (Util.hasBypass(player, "gemarmor.defensive")) continue;
+						toremove.add(human);
+					}
+					
+					for (EntityHuman current : toremove){
+						EEBase.playerArmorMovementToggle.remove(current);
+					}
+					//EEBase.playerArmorMovementToggle.clear();
 				}
 				/*
 				 * Set ks = EEBase.playerArmorMovementToggle.keySet();
@@ -290,13 +299,20 @@ class TGemArmorDisabler extends Thread {
 			
 			if (!Threads.GAOffensive) {
 				synchronized (EEBase.playerArmorOffensiveToggle) {
+					Iterator it = EEBase.playerArmorOffensiveToggle.keySet().iterator();
+					ArrayList<EntityHuman> toremove = new ArrayList<EntityHuman>();
+					while (it.hasNext()){
+						EntityHuman human = (EntityHuman) it;
+						Player player = (Player) human.getBukkitEntity();
+						if (Util.hasBypass(player, "gemarmor.offensive")) continue;
+						toremove.add(human);
+					}
 					
-					 /*for(Object xu:EEBase.playerArmorOffensiveToggle.keySet()){
-						 EntityHuman hu = (EntityHuman)xu;
-						 EEBase.playerArmorOffensiveToggle.put(hu, false); 
-					 }*/
+					for (EntityHuman current : toremove){
+						EEBase.playerArmorOffensiveToggle.remove(current);
+					}
 					
-					EEBase.playerArmorOffensiveToggle.clear();
+					//EEBase.playerArmorOffensiveToggle.clear();
 				}
 				/*
 				 * Set ks1 = EEBase.playerArmorOffensiveToggle.keySet();
@@ -393,7 +409,7 @@ class DisableItemThread extends Thread {
 	private List<TRCacheItem> SSDecharged = Collections.synchronizedList(new LinkedList<TRCacheItem>());
 	private List<TRCharge> MCharges = Collections.synchronizedList(new LinkedList<TRCharge>()),
 						   maxEU = Collections.synchronizedList(new LinkedList<TRCharge>());
-	private List<TRCharge> originalEU = Collections.synchronizedList(new LinkedList<TRCharge>());
+	//private List<TRCharge> originalEU = Collections.synchronizedList(new LinkedList<TRCharge>());
 	private List<String> MChargeStr = Collections
 			.synchronizedList(new LinkedList<String>()),
 			SSDechargedStr = Collections
@@ -616,7 +632,7 @@ class DisableItemThread extends Thread {
 							}
 						}
 
-						if (TRSafeZone.inSafeZone(player) && !Util.hasBypass(player, "safezone")) {
+						if (!Util.hasBypass(player, "safezone") && TRSafeZone.inSafeZone(player)) {
 							//tekkitrestrict.log.info("in SS");
 							try {
 								if (Threads.SSDisableArcane) {
@@ -768,12 +784,12 @@ class DisableItemThread extends Thread {
 	}
 
 	private void addOriginalEU(int id, int mcharge, int tlimit, Object store) {
-		TRCharge trcc = new TRCharge();
-		trcc.id = id;
-		trcc.maxcharge = mcharge;
-		trcc.chargerate = tlimit;
-		trcc.itemstack = store;
-		originalEU.add(trcc);
+		//TRCharge trcc = new TRCharge();
+		//trcc.id = id;
+		//trcc.maxcharge = mcharge;
+		//trcc.chargerate = tlimit;
+		//trcc.itemstack = store;
+		//originalEU.add(trcc);
 	}
 
 	public void originalEUEnd() {
@@ -882,10 +898,20 @@ class DisableItemThread extends Thread {
 }
 
 class TWorldScrubber extends Thread {
+	private boolean stillRunning = false;
+	private boolean logged = false;
 	@Override
 	public void run() {
 		while (true) {
 			try {
+				while (stillRunning){
+					sleep(1000); //While still running sleep 1 second to make it less likely that chunks are still being unloaded when it starts
+					//the Remove disabled blocks and Redpower checks
+					if (!logged){
+						logged = true;
+						Log.Config.Warning("Your WorldScrubber speed is too fast.");
+					}
+				}
 				doWScrub();
 			} catch (Exception ex) {
 				TRLogger.Log("debug", "Error: [WorldScrubber thread] " + ex.getMessage());
@@ -905,21 +931,26 @@ class TWorldScrubber extends Thread {
 	 * Then if UseRPTimer or RemoveDisabledBlocks is turned on, it will execute those features.
 	 */
 	private void doWScrub() {
+		stillRunning = true;
+		
 		try {
 			TRChunkUnloader.unloadSChunks();
-			sleep(20000);
-			//Sleep for 20 seconds to make it less likely that chunks are still being unloaded when it starts
-			//the Remove disabled blocks and Redpower checks
 		} catch (Exception ex) {
 		}
 		
-		if (!Threads.RMDB && !Threads.UseRPTimer) return;
+		if (!Threads.RMDB && !Threads.UseRPTimer){
+			stillRunning = false;
+			return;
+		}
 		
 		Server server = tekkitrestrict.getInstance().getServer();
 		if (Threads.UseRPTimer){
 			if (!server.getPluginManager().isPluginEnabled("mod_RedPowerLogic")) {
 				Threads.UseRPTimer = false;
-				if (!Threads.RMDB) return; //If both options are now false, nothing else has to be done.
+				if (!Threads.RMDB){
+					stillRunning = false;
+					return; //If both options are now false, nothing else has to be done.
+				}
 			}
 		}
 		//int currentChunkCount = 0;
@@ -965,6 +996,7 @@ class TWorldScrubber extends Thread {
 				}
 			}
 		}
+		stillRunning = false;
 	}
 }
 

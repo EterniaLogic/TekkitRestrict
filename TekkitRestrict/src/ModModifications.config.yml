@@ -11,7 +11,7 @@ FlyLimitDailyMinutes: 99999999999
 
 ####Global EE Options####
 AllowGemArmorOffensive: false
-AllowGemArmorDefensive: false
+AllowGemArmorDefensive: true
 
 # Limit RedPower timer's minimum time by seconds
 RPTimerMin: 1.1

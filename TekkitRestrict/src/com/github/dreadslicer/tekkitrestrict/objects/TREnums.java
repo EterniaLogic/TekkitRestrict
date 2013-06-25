@@ -35,4 +35,13 @@ public class TREnums {
 			return false;
 		}
 	}
+	
+	public enum SSPlugin {
+		GriefPrevention, WorldGuard, PreciousStones, Factions, Towny;
+		public boolean GP(){return (this == SSPlugin.GriefPrevention);}
+		public boolean WG(){return (this == SSPlugin.WorldGuard);}
+		public boolean PS(){return (this == SSPlugin.PreciousStones);}
+		public boolean F(){return (this == SSPlugin.Factions);}
+		public boolean T(){return (this == SSPlugin.Towny);}
+	}
 }
