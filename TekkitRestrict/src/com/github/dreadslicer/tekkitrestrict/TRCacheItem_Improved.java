@@ -23,7 +23,7 @@ public class TRCacheItem_Improved {
 	private static ConcurrentHashMap<String, List<TRCacheItem_Improved>> cacheMods = new ConcurrentHashMap<String, List<TRCacheItem_Improved>>();
 	private static ConcurrentHashMap<String, Set<String>> cachePermTypes = new ConcurrentHashMap<String, Set<String>>();
 	
-	private static ConcurrentHashMap<String, ConcurrentHashMap<String, TRCacheItem_Improved>> allCaches = new ConcurrentHashMap<String, ConcurrentHashMap<String, TRCacheItem_Improved>>();
+	//private static ConcurrentHashMap<String, ConcurrentHashMap<String, TRCacheItem_Improved>> allCaches = new ConcurrentHashMap<String, ConcurrentHashMap<String, TRCacheItem_Improved>>();
 	
 	private static String[] modItems = new String[] {
 		"ee=27520-27599;126-130",
