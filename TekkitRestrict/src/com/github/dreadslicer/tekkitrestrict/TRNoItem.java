@@ -52,11 +52,6 @@ public class TRNoItem {
 		return false;
 	}
 
-	@Deprecated
-	public static boolean isCreativeItemBanned(Player p, ItemStack e) {
-		return useNoCreative ? isTypeBanned("creative", DisabledCreativeItems, DisabledCreativeStr, p, e) : false;
-	}
-	
 	public static boolean isCreativeItemBanned(Player p, int id, int data) {
 		return useNoCreative ? isTypeBanned("creative", DisabledCreativeItems, DisabledCreativeStr, p, id, data) : false;
 	}
@@ -65,11 +60,6 @@ public class TRNoItem {
 		return useNoItem ? isItemBanned(p, id, 0) : false;
 	}
 
-	@Deprecated
-	public static boolean isItemBanned(Player p, ItemStack e) {
-		return useNoItem ? isTypeBanned("noitem", DisabledItems, DisabledItemsStr, p, e) : false;
-	}
-	
 	public static boolean isItemBanned(Player p, int id, int data) {
 		return useNoItem ? isTypeBanned("noitem", DisabledItems, DisabledItemsStr, p, id, data) : false;
 	}
@@ -112,7 +102,7 @@ public class TRNoItem {
 	}
 
 	@Deprecated
-	public static boolean isTypeBanned(String Type, List<TRCacheItem> tlist, List<String> indices, Player p, ItemStack e) {
+	public static boolean isTypeBanned(String Type, List<TRCacheItem> tlist, List<String> indices, Player p, TRItemStack e) {
 		if (Util.hasBypass(p, Type)) return false;
 		
 		int id = e.id;
@@ -234,31 +224,31 @@ public class TRNoItem {
 		return DisabledCreativeItems.size() + DisabledItems.size();
 	}
 
-	public static List<ItemStack> stack(List<ItemStack> l, String ins) {
+	public static List<TRItemStack> stack(List<TRItemStack> l, String ins) {
 		// separated by |
 		// tekkitrestrict.log.info("Stack-"+ins);
 		
 		 if (ins.contains(";")) { 
 			 String[] rs = ins.split(";"); 
 			 for (String re : rs) { 
-				 for (ItemStack g : gettRangedItemValues(re)) { //tekkitrestrict.log.info("Stack++"+g.id); 
+				 for (TRItemStack g : gettRangedItemValues(re)) { //tekkitrestrict.log.info("Stack++"+g.id); 
 					 l.add(g); 
 				 } 
 			 } 
 		 } else if(ins.length() > 0) { 
-			 for (ItemStack g : gettRangedItemValues(ins)) {
+			 for (TRItemStack g : gettRangedItemValues(ins)) {
 				 l.add(g); 
 			 } // l.add(new ItemStack(Integer.parseInt(ins), 1, 0)); 
 		 } 
 		 return l;
 	}
 
-	public static ItemStack[] gettRangedItemValues(String ins) {
+	public static TRItemStack[] gettRangedItemValues(String ins) {
 		String insx = ins.replace(":-", ":=");
 		// ranged values may start from 1-100
 		// they may also just be 1.
 		// They can also have a data value 1:4
-		List<ItemStack> r = new LinkedList<ItemStack>();
+		List<TRItemStack> r = new LinkedList<TRItemStack>();
 
 		/*List<ItemStack> tttx = modItemList.get(ins.toLowerCase());
 		if (tttx != null) {
@@ -279,7 +269,7 @@ public class TRNoItem {
 			int to = Integer.parseInt(t[1]);
 
 			for (int i = from; i <= to; i++) {
-				r.add(new ItemStack(i, 1, 0));
+				r.add(new TRItemStack(i, 1, 0));
 			}
 		} else if (insx.contains(":")) { // A single item with a datatype
 			String[] t = insx.split(":");
@@ -288,26 +278,26 @@ public class TRNoItem {
 			if (t[1].equals("0")) {
 				data = -10;// tekkitrestrict.log.info(id+":::"+data);}
 			}
-			ItemStack e = new ItemStack(id, 1, data);
+			TRItemStack e = new TRItemStack(id, 1, data);
 			r.add(e);
 			
 		} else { // Just a single item
 					// if(ins.contains(":")) ins = ins.split(":")[0];
 			try {
-				r.add(new ItemStack(Integer.parseInt(insx), 1, 0));
+				r.add(new TRItemStack(Integer.parseInt(insx), 1, 0));
 			} catch (Exception E) {
 			}
 		}
 
-		ItemStack[] isz = r.toArray(new ItemStack[0]);
+		TRItemStack[] isz = r.toArray(new TRItemStack[0]);
 		r.clear();
 		return isz;
 	}
 
 	public static boolean isInRanged(String ins, int id, int data) {
-		ItemStack[] range = gettRangedItemValues(ins);
+		TRItemStack[] range = gettRangedItemValues(ins);
 
-		for (ItemStack g : range) {
+		for (TRItemStack g : range) {
 			// tekkitrestrict.log.info("[getRangedItemValues] - "+g.id+":"+g.getData());
 			if (equalSet(g.id, g.data, id, data)) {
 				return true;
@@ -330,7 +320,7 @@ public class TRNoItem {
 		}
 	}
 
-	public static boolean equalSet(ItemStack is1, ItemStack is2) {
+	public static boolean equalSet(TRItemStack is1, TRItemStack is2) {
 		return equalSet(is1.id, is1.data, is2.id, is2.data);
 	}
 

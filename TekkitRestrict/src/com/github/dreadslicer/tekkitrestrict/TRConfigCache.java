@@ -61,10 +61,6 @@ public class TRConfigCache {
 		public static LWCPlugin lwcPlugin;
 	}
 	
-	public static class MetricValues {
-		public static int dupeAttempts = 0;
-	}
-	
 	public static class ChunkUnloader {
 		public static int maxChunks, maxRadii;
 		public static boolean enabled;

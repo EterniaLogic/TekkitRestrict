@@ -1,20 +1,17 @@
 package com.github.dreadslicer.tekkitrestrict;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
-@SuppressWarnings("unused")
-public class TRCacheItem {
+public class TRCacheItem_Improved {
 	// Pre-caches items into a range.
 	//private static Map<String, TRCacheItem> cache = Collections
 	//		.synchronizedMap(new HashMap<String, TRCacheItem>());
@@ -22,29 +19,46 @@ public class TRCacheItem {
 			.synchronizedMap(new HashMap<String, List<TRCacheItem>>());
 	private static Map<String, Set<String>> cachePermTypes = Collections
 			.synchronizedMap(new HashMap<String, Set<String>>());*/
-	private static Map<String, TRCacheItem> cache = new ConcurrentHashMap<String, TRCacheItem>();
-	private static Map<String, List<TRCacheItem>> cacheMods = new ConcurrentHashMap<String, List<TRCacheItem>>();
-	private static Map<String, Set<String>> cachePermTypes = new ConcurrentHashMap<String, Set<String>>();
+	private static ConcurrentHashMap<String, TRCacheItem_Improved> cache = new ConcurrentHashMap<String, TRCacheItem_Improved>();
+	private static ConcurrentHashMap<String, List<TRCacheItem_Improved>> cacheMods = new ConcurrentHashMap<String, List<TRCacheItem_Improved>>();
+	private static ConcurrentHashMap<String, Set<String>> cachePermTypes = new ConcurrentHashMap<String, Set<String>>();
 	
+	private static ConcurrentHashMap<String, ConcurrentHashMap<String, TRCacheItem_Improved>> allCaches = new ConcurrentHashMap<String, ConcurrentHashMap<String, TRCacheItem_Improved>>();
+	
+	private static String[] modItems = new String[] {
+		"ee=27520-27599;126-130",
+		"buildcraft=153-174;4056-4066;4298-4324",
+		"additionalpipes=4299-4305;179",
+		"industrialcraft=219-223;225-250;30171-30256",
+		"nuclearcontrol=192;31256-31260", "powerconverters=190",
+		"compactsolars=183", "chargingbench=187",
+		"advancedmachines=253-254;188-191", "redpowercore=136",
+		"redpowerlogic=138;1258-1328", "redpowercontrol=133-134;148",
+		"redpowermachine=137;150-151", "redpowerlighting=147",
+		"wirelessredstone=177;6358-6363;6406;6408-6412",
+		"mffs=253-254;11366-11374", "railcraft=206-215;7256-7316",
+		"tubestuffs=194", "ironchests=19727-19762;181",
+		"balkonweaponmod=26483-26530", "enderchest=178;7493",
+		"chunkloaders=4095;214;7303;179"
+	};
 
 	// cacheTypes is used for exclusive types and is returned through
 
-	protected TRCacheItem() {}
+	protected TRCacheItem_Improved() {}
 
 	public int id = -1;
 	public int data;
 	public String cacher = "";
 	private int Data1 = -1;
 	private Object Data2 = -1;
-	private short newdata;
+	//private short newdata;
 
 	public TRItemStack getTRItemStack(int amount) {
 		return new TRItemStack(id, amount, data);
 	}
 
-	public org.bukkit.inventory.ItemStack getBukkitItemStack(int amount) {
-		return new org.bukkit.inventory.ItemStack(id, amount, (short) 0, (byte) data);
-		
+	public ItemStack getBukkitItemStack(int amount) {
+		return new ItemStack(id, amount, (short) 0, (byte) data);
 	}
 
 	public net.minecraft.server.ItemStack getMCItemStack(int amount) {
@@ -68,7 +82,7 @@ public class TRCacheItem {
 	}
 
 	/**
-	 * Compare this CacheObject with the given id and data
+	 * Compare this CacheObject with the given id and data.
 	 * @return True if:<br>
 	 * <ul>
 	 * <li>this.id == -11</li>
@@ -90,7 +104,7 @@ public class TRCacheItem {
 	
 	@Override
 	public Object clone(){
-		TRCacheItem tci = new TRCacheItem();
+		TRCacheItem_Improved tci = new TRCacheItem_Improved();
 		tci.id = this.id;
 		tci.data = this.data;
 		tci.cacher = this.cacher;
@@ -99,13 +113,15 @@ public class TRCacheItem {
 		return tci;
 	}
 
+	
+	@SuppressWarnings("unused")
 	public static void reload() {
 		clearCache();
 		for (String s : modItems) {
 			if (s.contains("=")) {
 				String[] gg = s.split("=");
 				String mod = gg[0];
-				TRNoItem.aasdf(mod, addCacheList(mod, processModString("", mod, gg[1])));
+				//IMPORTANT PUT THIS BACK: TRNoItem.aasdf(mod, addCacheList(mod, processModString("", mod, gg[1])));
 			}
 		}
 
@@ -146,10 +162,10 @@ public class TRCacheItem {
 					} catch (Exception e) {
 					}
 				}
-				List<TRCacheItem> j = TRCacheItem.processMultiString(permType, key, value, i);
+				List<TRCacheItem_Improved> j = TRCacheItem_Improved.processMultiString(permType, key, value, i);
 				 //tekkitrestrict.log.info(permType+"."+k+" - "+d+" - s"+j.size()+" "+i);
 				for (Object c1 : j) {
-					if (c1 instanceof TRCacheItem) {
+					if (c1 instanceof TRCacheItem_Improved) {
 					}
 				}
 			} catch (Exception e) {
@@ -165,46 +181,45 @@ public class TRCacheItem {
 	 * hasItem(type+"="+id+":"+data); } public static boolean hasItem(String
 	 * key){ return cache.containsKey(key); }
 	 */
-	public static List<TRCacheItem> getCacheList(String permType, String type) {
+	public static List<TRCacheItem_Improved> getCacheList(String permType, String type) {
 		return getCacheList(permType + ";" + type);
 	}
 
-	public static List<TRCacheItem> getCacheList(String type) {
+	public static List<TRCacheItem_Improved> getCacheList(String type) {
 		//synchronized (cacheMods) {
 			return cacheMods.get(type.toLowerCase());
 		//}
 	}
 
-	public static List<TRCacheItem> setCacheList(String permType, String type,
-			int id, int data) {
-		List<TRCacheItem> l = new LinkedList<TRCacheItem>();
+	public static List<TRCacheItem_Improved> setCacheList(String permType, String type, int id, int data) {
+		List<TRCacheItem_Improved> l = new LinkedList<TRCacheItem_Improved>();
 		l.add(cacheItem(permType, type, id, data));
 		return addCacheList(permType, type, l);
 	}
 
-	public static List<TRCacheItem> addCacheList(String permType, String type,
-			List<TRCacheItem> list) {
+	public static List<TRCacheItem_Improved> addCacheList(String permType, String type, List<TRCacheItem_Improved> list) {
 		String key = permType + ";" + type;
 		return addCacheList(key, list);
 	}
 
-	public static List<TRCacheItem> addCacheList(String key, List<TRCacheItem> list) {
-		List<TRCacheItem> m = cacheMods.get(key.toLowerCase());
+	public static List<TRCacheItem_Improved> addCacheList(String key, List<TRCacheItem_Improved> list) {
+		key = key.toLowerCase();
+		List<TRCacheItem_Improved> m = cacheMods.get(key);
 		if (m != null) {
-			if (m.contains(key.toLowerCase())) {
+			if (m.contains(key)) {
 				return m;
 			} else {
 				m.addAll(list);
 				//synchronized (cacheMods) {
-					cacheMods.put(key.toLowerCase(), m);
+					cacheMods.put(key, m);
 					return m;
 				//}
 			}
 		} else {
-			m = new LinkedList<TRCacheItem>();
+			m = new LinkedList<TRCacheItem_Improved>();
 			m.addAll(list);
 			//synchronized (cacheMods) {
-				cacheMods.put(key.toLowerCase(), m);
+				cacheMods.put(key, m);
 				return m;
 			//}
 		}
@@ -218,7 +233,7 @@ public class TRCacheItem {
 	 * <li></li>
 	 *  </ul>
 	 */
-	public static TRCacheItem getPermCacheItem(Player player, String permType, int id, int data) {
+	public static TRCacheItem_Improved getPermCacheItem(Player player, String permType, int id, int data) {
 		if (id == 0 || player.hasPermission("tekkitrestrict.bypass."+permType)) {
 			return null;
 		}
@@ -234,7 +249,7 @@ public class TRCacheItem {
 			
 			if (hasALL || TRPermHandler.hasPermission(player, permType, type, "") || type.equals("afsd90ujpj")) {
 				boolean C = hasCacheItem(permType, type, 999999999, 999999999);
-				if(C || hasALL) return new TRCacheItem(); // has "*"
+				if(C || hasALL) return new TRCacheItem_Improved(); // has "*"
 				
 				boolean A = hasCacheItem(permType, type, id, data);
 				boolean B = hasCacheItem(permType, "afsd90ujpj", id, data);
@@ -262,30 +277,30 @@ public class TRCacheItem {
 	
 	public static boolean hasCacheItem(String type, int id, int data) {
 		//noitem;type=99999999:9999999
-		String keybase = type + "=" + id + ":";
-		String key = keybase + data;
-		String key0 = keybase + "0";
-		String key10 = keybase + "-10";
+		String keybase = type + "=" + id + ":";//noitem=10:
+		String key = keybase + data;//noitem=10:1
+		String key0 = keybase + "0";//noitem=10:0
+		String key10 = keybase + "-10";//noitem=10:-10
 		// tekkitrestrict.log.info(key);
-		if (data == 0 && cache.get(key10.toLowerCase()) != null) {
+		if (data == 0 && cache.get(key10.toLowerCase()) != null) { //If data = 0 and the cache contains noitem=10:-10
 			return true;
 		}
-		if (cache.get(key.toLowerCase()) != null) {
+		if (cache.get(key.toLowerCase()) != null) { //If the cache contains noitem=10:1
 			return true;
 		}
-		if (cache.get(key0.toLowerCase()) != null) {
+		if (cache.get(key0.toLowerCase()) != null) { //If the cache contains noitem=10:0
 			return true;
 		}
 
 		return false;
 	}
 
-	public static TRCacheItem getCacheItem(String permType, String type, int id, int data) {
+	public static TRCacheItem_Improved getCacheItem(String permType, String type, int id, int data) {
 		String keybase = permType + ";" + type + "=" + id + ":";
 		String key = keybase + data;
 		String key0 = keybase + "0";
 		String key10 = keybase + "-10";
-		TRCacheItem cii = null;
+		TRCacheItem_Improved cii = null;
 		if (data == 0 && (cii = cache.get(key10.toLowerCase())) != null) {
 			return cii;
 		}
@@ -299,26 +314,26 @@ public class TRCacheItem {
 		return null;
 	}
 
-	public static List<TRCacheItem> processItemString(String permType, String type, String item) {
+	public static List<TRCacheItem_Improved> processItemString(String permType, String type, String item) {
 		String key = permType + ";" + type;
 		cpermtype(permType, type);
 		return processItemString(key, item, -1);
 	}
 
-	public static List<TRCacheItem> processItemString(String permType, String type, String item, int data2) {
+	public static List<TRCacheItem_Improved> processItemString(String permType, String type, String item, int data2) {
 		String key = permType + ";" + type;
 		cpermtype(permType, type);
 		return processItemString(key, item, data2);
 	}
 
 	// used for reloads...
-	public static List<TRCacheItem> processItemString(String type, String item, int data2) {
+	public static List<TRCacheItem_Improved> processItemString(String type, String item, int data2) {
 		//type = noitem;key
 		//item = value
 		//data2 = -1 || c[1]
 		String itemx = item.replace(":-", ":=");
 		// converts a variable string into a list of data.
-		List<TRCacheItem> tci = new LinkedList<TRCacheItem>();
+		List<TRCacheItem_Improved> tci = new LinkedList<TRCacheItem_Improved>();
 
 		if (itemx.contains("-")) { // a range of items
 			// loop through this range and add each to the return stack.
@@ -386,11 +401,11 @@ public class TRCacheItem {
 				
 				if (cacheMods.containsKey(item.toLowerCase())) {
 					// modtypes
-					List<TRCacheItem> cc = cacheMods.get(item.toLowerCase());
-					for (TRCacheItem ci : cc) {
+					List<TRCacheItem_Improved> cc = cacheMods.get(item.toLowerCase());
+					for (TRCacheItem_Improved ci : cc) {
 						//tekkitrestrict.log.info(type+" <- "+ci.toString());
 						try{
-							TRCacheItem ci2 = (TRCacheItem)ci.clone();
+							TRCacheItem_Improved ci2 = (TRCacheItem_Improved)ci.clone();
 							ci2.setIntData(data2);
 							ci2.cacher = type+"="+ci2.id+":"+ci2.data;
 							cache.put(type+"="+ci2.id+":"+ci2.data, ci2);
@@ -415,23 +430,22 @@ public class TRCacheItem {
 
 	// to be used exclusively for types that require a permission type. (Type is
 	// then the var name)
-	public static TRCacheItem cacheItem(String permType, String type, int id,
-			int data) {
+	public static TRCacheItem_Improved cacheItem(String permType, String type, int id, int data) {
 		cpermtype(permType, type);
 		return cacheItem(permType + ";" + type, id, data);
 	}
 
 	// do not use for permission types. use the permType version instead.
-	public static TRCacheItem cacheItem(String type, int id, int data) {
-		String key = type + "=" + id + ":" + data;
-		TRCacheItem m = cache.get(key.toLowerCase());
+	public static TRCacheItem_Improved cacheItem(String type, int id, int data) {
+		String key = (type + "=" + id + ":" + data).toLowerCase(); //Noitem=10:1
+		TRCacheItem_Improved m = cache.get(key);//noitem=10:1
 		if (m == null) {
-			TRCacheItem c = new TRCacheItem();
+			TRCacheItem_Improved c = new TRCacheItem_Improved();
 			c.id = id;
 			c.data = data;
 			c.cacher = key;
 			//synchronized (cache) {
-				cache.put(key.toLowerCase(), m = c);
+				cache.put(key, m = c);
 			//}
 		}
 		return m;
@@ -440,11 +454,11 @@ public class TRCacheItem {
 	/**
 	 * add an item to the cache with cacher: "type=id:data"
 	 */
-	public static TRCacheItem cacheItem(String type, int id, int data, int numdata) {
-		String key = type + "=" + id + ":" + data;
-		TRCacheItem m = cache.get(key.toLowerCase());
+	public static TRCacheItem_Improved cacheItem(String type, int id, int data, int numdata) {
+		String key = (type + "=" + id + ":" + data).toLowerCase();
+		TRCacheItem_Improved m = cache.get(key);
 		if (m == null) {
-			TRCacheItem c = new TRCacheItem();
+			TRCacheItem_Improved c = new TRCacheItem_Improved();
 			c.id = id;
 			c.data = data;
 			c.cacher = key;
@@ -453,16 +467,16 @@ public class TRCacheItem {
 			/*synchronized (cache) {
 				
 			}*/
-			cache.put(key.toLowerCase(), m = c);
+			cache.put(key, m = c);
 		}
 		return m;
 	}
 
-	public static TRCacheItem cacheItem(String type, int id, int data, Object objdata) {
+	public static TRCacheItem_Improved cacheItem(String type, int id, int data, Object objdata) {
 		String key = type + "=" + id + ":" + data;
-		TRCacheItem m = cache.get(key.toLowerCase());
+		TRCacheItem_Improved m = cache.get(key.toLowerCase());
 		if (m == null) {
-			TRCacheItem c = new TRCacheItem();
+			TRCacheItem_Improved c = new TRCacheItem_Improved();
 			c.id = id;
 			c.data = data;
 			c.cacher = key;
@@ -475,9 +489,11 @@ public class TRCacheItem {
 		return m;
 	}
 
-	// used for any item call that is not directly using a type or permission
-	// type
-	public static TRCacheItem cacheItem(int id, int data) {
+	// used for any item call that is not directly using a type or permission type
+	/**
+	 * Uses {@link #cacheItem(String, int, int) cacheItem(type, id, data)} with type = "".
+	 */
+	public static TRCacheItem_Improved cacheItem(int id, int data) {
 		return cacheItem("", id, data); // caches a null-string type.
 	}
 
@@ -495,21 +511,21 @@ public class TRCacheItem {
 		}
 	}
 
-	public static List<TRCacheItem> processModString(String permType,
+	public static List<TRCacheItem_Improved> processModString(String permType,
 			String type, String ins) {
 		cpermtype(permType, type);
 		return processMultiString(permType + ";" + type, ins, -1);
 	}
 
-	public static List<TRCacheItem> processMultiString(String permType, String type, String ins, int data2) {
+	public static List<TRCacheItem_Improved> processMultiString(String permType, String type, String ins, int data2) {
 		cpermtype(permType, type);
 		return processMultiString(permType + ";" + type, ins, data2);
 	}
 
-	public static List<TRCacheItem> processMultiString(String type, String ins, int data2) {
+	public static List<TRCacheItem_Improved> processMultiString(String type, String ins, int data2) {
 		if (ins.contains(";")) {
 			String[] rs = ins.split(";");
-			List<TRCacheItem> l = new LinkedList<TRCacheItem>();
+			List<TRCacheItem_Improved> l = new LinkedList<TRCacheItem_Improved>();
 			for (String re : rs) {
 				l.addAll(processItemString(type, re, data2));
 			}
@@ -517,9 +533,10 @@ public class TRCacheItem {
 		} else if (ins.length() > 0) {
 			return processItemString(type, ins, data2);
 		}
-		return new LinkedList<TRCacheItem>();
+		return new LinkedList<TRCacheItem_Improved>();
 	}
 
+	/** Clears the cache */
 	public static void clearCache() {
 		// clears the cache so new perms can be added.
 		// tekkitrestrict.log.info(cache.size()+" - "+cacheMods.size()+" - "+cachePermTypes.size());
@@ -533,19 +550,4 @@ public class TRCacheItem {
 			cachePermTypes.clear();
 		}
 	}
-
-	private static String[] modItems = new String[] { "ee=27520-27599;126-130",
-			"buildcraft=153-174;4056-4066;4298-4324",
-			"additionalpipes=4299-4305;179",
-			"industrialcraft=219-223;225-250;30171-30256",
-			"nuclearcontrol=192;31256-31260", "powerconverters=190",
-			"compactsolars=183", "chargingbench=187",
-			"advancedmachines=253-254;188-191", "redpowercore=136",
-			"redpowerlogic=138;1258-1328", "redpowercontrol=133-134;148",
-			"redpowermachine=137;150-151", "redpowerlighting=147",
-			"wirelessredstone=177;6358-6363;6406;6408-6412",
-			"mffs=253-254;11366-11374", "railcraft=206-215;7256-7316",
-			"tubestuffs=194", "ironchests=19727-19762;181",
-			"balkonweaponmod=26483-26530", "enderchest=178;7493",
-			"chunkloaders=4095;214;7303;179" };
 }

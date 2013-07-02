@@ -80,6 +80,7 @@ public class TRLogger {
 		if (type.equals("eemisc")) return LogEEMisc;
 		if (type.equals("eedestructive")) return LogEEDestructive;
 		if (type.equals("debug")) return LogDebug;
+		if (type.equals("error")) return true;
 
 		return false;
 	}

@@ -20,6 +20,7 @@ import net.minecraft.server.NBTTagCompound;
 import net.minecraft.server.TileEntity;
 import net.minecraft.server.WorldServer;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
 import org.bukkit.Server;
@@ -275,6 +276,7 @@ class TGemArmorDisabler extends Thread {
 						EntityHuman human = (EntityHuman) it;
 						Player player = (Player) human.getBukkitEntity();
 						if (Util.hasBypass(player, "gemarmor.defensive")) continue;
+						player.sendMessage(ChatColor.RED + "You are not allowed to use GemArmor Movement Powers!");
 						toremove.add(human);
 					}
 					
@@ -283,18 +285,6 @@ class TGemArmorDisabler extends Thread {
 					}
 					//EEBase.playerArmorMovementToggle.clear();
 				}
-				/*
-				 * Set ks = EEBase.playerArmorMovementToggle.keySet();
-				 * Iterator ki = ks.iterator();
-				 * 
-				 * while(ki.hasNext()){ net.minecraft.server.EntityHuman H =
-				 * (net.minecraft.server.EntityHuman)ki.next();
-				 * 
-				 * if(!bypassers.contains(tr.getServer().getPlayer(H.name))){
-				 * EEBase.playerArmorMovementToggle.remove(H);
-				 * tr.getServer().getPlayer(H.name).sendRawMessage("<?>"); }
-				 * }
-				 */
 			}
 			
 			if (!Threads.GAOffensive) {
@@ -305,6 +295,7 @@ class TGemArmorDisabler extends Thread {
 						EntityHuman human = (EntityHuman) it;
 						Player player = (Player) human.getBukkitEntity();
 						if (Util.hasBypass(player, "gemarmor.offensive")) continue;
+						player.sendMessage(ChatColor.RED + "You are not allowed to use GemArmor Offensive Powers!");
 						toremove.add(human);
 					}
 					
@@ -314,47 +305,9 @@ class TGemArmorDisabler extends Thread {
 					
 					//EEBase.playerArmorOffensiveToggle.clear();
 				}
-				/*
-				 * Set ks1 = EEBase.playerArmorOffensiveToggle.keySet();
-				 * Iterator ki1 = ks1.iterator();
-				 * 
-				 * while(ki1.hasNext()){ net.minecraft.server.EntityHuman H
-				 * = (net.minecraft.server.EntityHuman)ki1.next(); //boolean
-				 * val =
-				 * ((Boolean)EEBase.playerArmorOffensiveToggle.get(H)).
-				 * booleanValue();
-				 * if(!bypassers.contains(tr.getServer().getPlayer
-				 * (H.name))){ EEBase.playerArmorMovementToggle.remove(H);
-				 * tr.getServer().getPlayer(H.name).sendRawMessage("<?>"); }
-				 * }
-				 */
 			}
 		} catch (Exception ex) {}
 	}
-	/*
-	private void reloadBypassers() {
-		//bypassers.clear();
-		//Player[] ps = tekkitrestrict.getInstance().getServer().getOnlinePlayers();
-		// boolean SSDisableGemArmor =
-		// tekkitrestrict.config.getBoolean("SSDisableGemArmor");
-
-		//for (Player player : ps) {
-			// boolean abypass = tekkitrestrict.p erm.h as(ps[i],
-			// "tekkitrestrict.abypass");
-			// boolean SSbypass = tekkitrestrict.p erm.h as(ps[i],
-			// "tekkitrestrict.safezone.bypass");
-			//boolean abypass = TRPermHandler.hasPermission(player, "abypass", "", "");
-			
-			 * boolean SSbypass =
-			 * tekkitrestrict.hasPermission(ps[i],"tekkitrestrict.safezone.bypass"
-			 * ); if(safeZone.inSafeZone(ps[i])){ //we now HAVE to have a
-			 * safezone bypass to disable this. if(SSDisableGemArmor){
-			 * if(SSbypass && abypass){ bypassers.add(ps[i]); } } } else
-			 
-			//if (abypass) bypassers.add(player);
-			
-		//}
-	}*/
 }
 
 class TEntityRemover extends Thread {
@@ -773,7 +726,7 @@ class DisableItemThread extends Thread {
 				for (TRCacheItem isr : iss) {
 					TRCharge gg = new TRCharge();
 					gg.id = isr.id;
-					gg.data = isr.getData();
+					gg.data = isr.data;
 					gg.maxcharge = max;
 					// tekkitrestrict.log.info(gg.id+":"+gg.data+" "+gg.maxcharge);
 					this.MCharges.add(gg);

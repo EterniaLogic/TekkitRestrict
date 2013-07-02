@@ -17,19 +17,30 @@
 ####Default hack names
 ##	"fly", "forcefield", "speed"
 
-##############################
-
-HackSpeedEnabled: true
-HackMoveSpeedMax: 2.5
-HackMoveSpeedTolerance: 30
-
-HackFlyEnabled: true
-HackFlyTolerance: 60
-HackFlyMinHeight: 3
-
-HackForcefieldEnabled: true
-HackForcefieldTolerance: 15
-HackForcefieldAngle: 40
+###########################################################################################
+# Enabled:      Do you want to enable Anti-Hack for this kind of hack?
+# Tolerance:    The amount of ticks the player has to hack before he is kicked.
+#               If you set this too low, innocent people might get kicked for connection
+#               problems.
+# MaxMoveSpeed: The maximum speed a player can have (in blocks per second).
+#               Speeds above this are considered hacking.
+#               People with quantum armor will have 3 times this limit.
+# MinHeight:    Minimal Height for the flycheck to kick in.
+#               If you set this too low, people might get kicked for jumping.
+# Angle:        The maximal angle you are allowed to hit a player with.
+Anti-Hacks:
+    MoveSpeed:
+        Enabled: true
+        Tolerance: 30
+        MaxMoveSpeed: 2.5
+    Fly:
+        Enabled: true
+        Tolerance: 60
+        MinHeight: 3
+    Forcefield:
+        Enabled: true
+        Tolerance: 30
+        Angle: 40
 
 
 HackBan: []
@@ -39,7 +50,7 @@ HackBroadcastString: "{PLAYER} tried to {TYPE}-hack!"
 
 
 ####Dupes####
-Dupes:
+Anti-Dupes:
     PreventAlchemyBagDupe: true
     PreventRMFurnaceDupe: true
     PreventTransmuteDupe: true

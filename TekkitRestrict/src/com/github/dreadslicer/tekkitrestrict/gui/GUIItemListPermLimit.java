@@ -12,7 +12,7 @@ import javax.swing.JList;
 import javax.swing.JButton;
 import javax.swing.ListModel;
 
-import com.github.dreadslicer.tekkitrestrict.ItemStack;
+import com.github.dreadslicer.tekkitrestrict.TRItemStack;
 import com.github.dreadslicer.tekkitrestrict.TRNoItem;
 
 import java.awt.Font;
@@ -128,7 +128,7 @@ public class GUIItemListPermLimit extends JDialog {
 		        String s = (String)JOptionPane.showInputDialog("Item(s) - Ranges can be denoted by using a '-'");
 				
 		        @SuppressWarnings("unused")
-				ItemStack[] gg = TRNoItem.gettRangedItemValues(s);
+				TRItemStack[] gg = TRNoItem.gettRangedItemValues(s);
 				
 				DefaultListModel Jmodelx = ((DefaultListModel) ((ListModel)Ilist.getModel()));
 				Jmodelx.addElement(s);

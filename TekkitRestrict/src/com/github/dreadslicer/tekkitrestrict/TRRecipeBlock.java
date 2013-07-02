@@ -25,12 +25,12 @@ public class TRRecipeBlock {
 			List<TRCacheItem> iss = TRCacheItem.processItemString("", s, -1);
 			for (TRCacheItem ir : iss) {
 				try {
-					blockRecipeVanilla(ir.id, ir.getData());
+					blockRecipeVanilla(ir.id, ir.data);
 				} catch (Exception e) {
 					TRLogger.Log("debug", "Error! [TRRecipe-RecipeBlockVanilla] " + e.getMessage());
 				}
 				try {
-					blockRecipeForge(ir.id, ir.getData());
+					blockRecipeForge(ir.id, ir.data);
 				} catch (Exception e) {
 					TRLogger.Log("debug", "Error! [TRRecipe-RecipeBlockForge] " + e.getMessage());
 				}
@@ -42,7 +42,7 @@ public class TRRecipeBlock {
 			List<TRCacheItem> iss = TRCacheItem.processItemString("", s, -1);
 			for (TRCacheItem ir : iss) {
 				try {
-					blockFurnaceRecipe(ir.id, ir.getData());
+					blockFurnaceRecipe(ir.id, ir.data);
 				} catch (Exception e) {
 					TRLogger.Log("debug", "Error! [TRRecipe-Furnace Block] " + e.getMessage());
 				}

@@ -20,7 +20,7 @@ public class TRBans {
 		if (TRPermHandler.hasPermission(player, permType, "*", "")) return true; //tekkitrestrict.noitem.*
 		if (Util.hasPermission(player, permType + "." + id + "." + data)) return true; //tekkitrestrict.noitem.10.1
 		if (Util.hasPermission(player, permType + "." + id)) return true; //tekkitrestrict.noitem.10
-		if (TRPermHandler.hasPermission(player, permType, id + "", "*")) return true; //tekkitrestrict.noitem.10.*
+		if (TRPermHandler.hasPermission(player, permType, "" + id, "*")) return true; //tekkitrestrict.noitem.10.*
 		
 		String group = Util.inGroup(id);
 		if (group != null){

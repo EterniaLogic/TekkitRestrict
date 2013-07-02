@@ -93,7 +93,7 @@ public class TRCommandTR implements CommandExecutor {
 				try {
 					List<TRCacheItem> iss = TRCacheItem.processItemString("", args[2], -1);
 					for (TRCacheItem isr : iss) {
-						int data = isr.getData();
+						int data = isr.data;
 						if (emc > 0) ee.EEMaps.addEMC(isr.id, data, emc);
 						else {
 							//Remove EMC value.
@@ -477,7 +477,7 @@ public class TRCommandTR implements CommandExecutor {
 							for (TRCacheItem isr : iss) {
 								for (TRLimit trl : cc.itemlimits) {
 									//tekkitrestrict.log.info(isr.id+":"+isr.getData()+" ?= "+trl.blockID+":"+trl.blockData);
-									if (TRNoItem.equalSet(isr.id, isr.getData(), trl.blockID, trl.blockData)) {
+									if (TRNoItem.equalSet(isr.id, isr.data, trl.blockID, trl.blockData)) {
 										if(trl.placedBlock != null)
 											trl.placedBlock.clear();
 										else

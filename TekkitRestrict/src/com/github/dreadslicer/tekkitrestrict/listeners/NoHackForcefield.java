@@ -10,6 +10,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.util.Vector;
 
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Hacks;
+import com.github.dreadslicer.tekkitrestrict.TRLogger;
 import com.github.dreadslicer.tekkitrestrict.TRNoHack;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.HackType;
 import com.github.dreadslicer.tekkitrestrict.Util;
@@ -65,9 +66,8 @@ public class NoHackForcefield implements Listener {
 		if (anglej < 90) {
 			angle = 360 - angle;
 		}
-
 		// tekkitrestrict.log.info("proj:  "+pdir+" / "+angle);
-
+		TRLogger.Log("debug", "Angle: " + angle);
 		// change between 0 and 360.
 		double cr1 = ((pdir + Hacks.ffVangle) > 360) ? pdir + Hacks.ffVangle - 360 : pdir + Hacks.ffVangle;
 		double cr2 = ((pdir - Hacks.ffVangle) < 0) ? 360 - Math.abs(pdir - Hacks.ffVangle) : pdir - Hacks.ffVangle;
@@ -88,7 +88,11 @@ public class NoHackForcefield implements Listener {
 					tickTolerance.put(name, oldValue + 1);
 			}
 		} else {
-			tickTolerance.remove(name);
+			Integer oldValue = tickTolerance.get(name);
+			if (oldValue == null) return;
+			
+			if (oldValue < 2) tickTolerance.remove(name);
+			else tickTolerance.put(name, oldValue - 1);
 		}
 	}
 

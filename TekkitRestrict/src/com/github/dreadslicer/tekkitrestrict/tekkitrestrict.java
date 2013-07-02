@@ -28,7 +28,6 @@ import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Global;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Hacks;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.LWC;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Listeners;
-import com.github.dreadslicer.tekkitrestrict.TRConfigCache.MetricValues;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.SafeZones;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Threads;
 import com.github.dreadslicer.tekkitrestrict.commands.TRCommandAlc;
@@ -126,6 +125,7 @@ public class tekkitrestrict extends JavaPlugin {
 				log.info("PEX is enabled!");
 			}
 		} catch (Exception ex) {
+			log.info("Linking with Pex Failed!");
 			// Was not able to load permissionsEx
 		}
 
@@ -181,7 +181,8 @@ public class tekkitrestrict extends JavaPlugin {
 					}
 				}
 			});
-			g.addPlotter(new Metrics.Plotter("Dupe attempts") {
+			
+			/*g.addPlotter(new Metrics.Plotter("Dupe attempts") {
 				@Override
 				public int getValue() {
 					try {
@@ -190,7 +191,7 @@ public class tekkitrestrict extends JavaPlugin {
 						return 0;
 					}
 				}
-			});
+			});*/
 			g.addPlotter(new Metrics.Plotter("Disabled items") {
 				@Override
 				public int getValue() {
@@ -217,7 +218,7 @@ public class tekkitrestrict extends JavaPlugin {
 				if (updater.getResult() == UpdateResult.UPDATE_AVAILABLE) log.info("There is an update available: " + updater.getLatestVersionString() + ". Use /tr admin update ingame to update.");
 		}
 		
-		log.info("TekkitRestrict v " + version+ " Enabled!");
+		log.info("TekkitRestrict v " + version + " Enabled!");
 		
 		/*
 		 * log.info("T: "+config.get("UseChunkUnloader").toString());
@@ -239,7 +240,7 @@ public class tekkitrestrict extends JavaPlugin {
 		ttt.bagCacheThread.interrupt();
 		ttt.limitFlyThread.interrupt();
 		
-		try { Thread.sleep(2000); } catch (InterruptedException e) {} //Sleep for 2 seconds to allow the savethread to save.
+		try { Thread.sleep(1500); } catch (InterruptedException e) {} //Sleep for 1.5 seconds to allow the savethread to save.
 		//try {
 		//	TRThread.originalEUEnd(); (Currently does nothing)
 		//} catch (Exception ex) {

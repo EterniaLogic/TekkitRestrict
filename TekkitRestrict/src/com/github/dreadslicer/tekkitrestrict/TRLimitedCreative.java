@@ -12,7 +12,7 @@ import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Listeners;
 public class TRLimitedCreative {
 	public static boolean handleCreativeInvClick(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
-		if (player.getGameMode() == GameMode.CREATIVE) return false;
+		if (player.getGameMode() != GameMode.CREATIVE) return false;
 		if (Util.hasBypass(player, "creative")) return false;
 		
 		try {
