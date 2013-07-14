@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 @SuppressWarnings("unused")
 public class TRCacheItem {
@@ -36,14 +37,14 @@ public class TRCacheItem {
 	public String cacher = "";
 	private int Data1 = -1;
 	private Object Data2 = -1;
-	private short newdata;
+	//private short newdata;
 
 	public TRItemStack getTRItemStack(int amount) {
 		return new TRItemStack(id, amount, data);
 	}
 
-	public org.bukkit.inventory.ItemStack getBukkitItemStack(int amount) {
-		return new org.bukkit.inventory.ItemStack(id, amount, (short) 0, (byte) data);
+	public ItemStack getBukkitItemStack(int amount) {
+		return new ItemStack(id, amount, (short) 0, (byte) data);
 		
 	}
 

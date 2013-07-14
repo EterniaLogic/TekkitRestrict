@@ -43,8 +43,8 @@ public class TRConfigCache {
 	
 	public static class LogFilter {
 		public static List<String> replaceList = new ArrayList<String>();
-		public static boolean logConsole;
-		public static String logLocation;
+		public static boolean splitLogs, filterLogs;
+		public static String logLocation, fileFormat, logFormat;
 	}
 	
 	public static class Threads {

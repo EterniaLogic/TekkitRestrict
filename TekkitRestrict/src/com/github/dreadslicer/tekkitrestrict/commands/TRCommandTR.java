@@ -169,7 +169,7 @@ public class TRCommandTR implements CommandExecutor {
 				if (send.noPerm("admin")) return true;
 
 				if (args.length == 1) {
-					sendHelp(1);
+					sendAdminHelp(1);
 					return true;
 				}
 				
@@ -178,14 +178,14 @@ public class TRCommandTR implements CommandExecutor {
 					if (args.length == 3){
 						try { page = Integer.parseInt(args[2]); } catch (NumberFormatException ex) {}
 					}
-					sendHelp(page);
+					sendAdminHelp(page);
 					return true;
 				}
 				
 				if (args[1].equals("reload")) {
 					if (send.noPerm("admin.reload")) return true;
 
-					tekkitrestrict.getInstance().reload();
+					tekkitrestrict.getInstance().reload(false);
 					send.msg("Tekkit Restrict Reloaded!");
 					return true;
 				}
@@ -200,10 +200,10 @@ public class TRCommandTR implements CommandExecutor {
 					
 					UpdateResult result = tekkitrestrict.updater.getResult();
 					if (result == UpdateResult.SUCCESS){
-						send.msg(ChatColor.GREEN + "TekkitRestrict will update on the next server start.");
+						send.msg(ChatColor.GREEN + "TekkitRestrict will update to " + tekkitrestrict.updater.shortVersion + " on the next server start.");
 						return true;
 					} else if (result == UpdateResult.UPDATE_AVAILABLE){
-						send.msg(ChatColor.GREEN + "TekkitRestrict will now start downloading version " + tekkitrestrict.updater.getLatestVersionString() + ".");
+						send.msg(ChatColor.GREEN + "TekkitRestrict will now start downloading version " + tekkitrestrict.updater.shortVersion + ".");
 						tekkitrestrict.getInstance().Update();
 						return true;
 					} else if (result == UpdateResult.NO_UPDATE){
@@ -569,12 +569,13 @@ public class TRCommandTR implements CommandExecutor {
 		return true;
 	}
 
-	public void sendHelp(int page) {
+	public void sendAdminHelp(int page) {
 		if (page == 1) {
 			send.msg("[TekkitRestrict " + tekkitrestrict.version + " Admin Commands] Page 1 / 2");
 			send.msg("/tr admin help <page>", "Show this help.");
 			send.msg("/tr admin reload", "Reload TekkitRestrict");
 			send.msg("/tr admin reinit", "Reload the server.");
+			send.msg("/tr admin update", "Check for updates.");
 			send.msg("/tr admin limit clear <player>", "Clear a players limits.");
 			send.msg("/tr admin limit clear <player> <id[:data]>", "Clear a players limits for a specific item.");
 			send.msg("/tr admin limit list <player> [id]", "List a players limits.");

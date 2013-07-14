@@ -1,8 +1,11 @@
 package com.github.dreadslicer.tekkitrestrict;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.channels.FileChannel;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
@@ -19,6 +22,7 @@ import net.h31ix.updater.Updater;
 import net.h31ix.updater.Updater.UpdateResult;
 import net.minecraft.server.RedPowerLogic;
 
+import org.bukkit.ChatColor;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -44,9 +48,8 @@ public class tekkitrestrict extends JavaPlugin {
 	public static Logger log;
 	public static TRFileConfiguration config;
 	public static boolean EEEnabled = false;
-	/**
-	 * Indicates if tekkitrestrict is disabling. Threads use this to check if they should stop.
-	 */
+	
+	/** Indicates if tekkitrestrict is disabling. Threads use this to check if they should stop. */
 	public static boolean disable = false;
 	public static String version;
 	public static Object perm = null;
@@ -69,6 +72,33 @@ public class tekkitrestrict extends JavaPlugin {
 		this.saveDefaultConfig();
 
 		config = this.getConfigx(); //Load the configuration files
+		if (config.getDouble("ConfigVersion", 0.9) < 1.1){
+			log.warning("The config file version differs from the current one.");
+			
+			log.warning("Backing up old config files and writing new ones.");
+			
+			String path = "plugins"+File.separator+"tekkitrestrict"+File.separator;
+			String bpath = path+"config_backup";
+			File temp = new File(bpath);
+			temp.mkdirs();
+			bpath += File.separator;
+			
+			backupConfig(path + "General.config.yml", bpath + "General.config.yml");
+			backupConfig(path + "Advanced.config.yml", bpath + "Advanced.config.yml");
+			backupConfig(path + "ModModifications.config.yml", bpath + "ModModifications.config.yml");
+			backupConfig(path + "DisableClick.config.yml", bpath + "DisableClick.config.yml");
+			backupConfig(path + "DisableItems.config.yml", bpath + "DisableItems.config.yml");
+			backupConfig(path + "Hack.config.yml", bpath + "Hack.config.yml");
+			backupConfig(path + "LimitedCreative.config.yml", bpath + "LimitedCreative.config.yml");
+			backupConfig(path + "Logging.config.yml", bpath + "Logging.config.yml");
+			backupConfig(path + "TPerformance.config.yml", bpath + "TPerformance.config.yml");
+			backupConfig(path + "MicroPermissions.config.yml", bpath + "MicroPermissions.config.yml");
+			backupConfig(path + "SafeZones.config.yml", bpath + "SafeZones.config.yml");
+
+			saveDefaultConfig(true);
+			reloadConfig();
+		}
+		
 		loadConfigCache();
 		
 		try {
@@ -131,13 +161,14 @@ public class tekkitrestrict extends JavaPlugin {
 
 		// Initiate noItem, Time-thread and our event listener
 		try {
-			reload(); // load em up!
+			reload(true);
 			ttt.init(); //Start up all threads
 
 			initHeartBeat();
 		} catch (Exception e) {
 			//e.printStackTrace();
 		}
+		
 		try {
 			Metrics metrics = new Metrics(this);
 			Metrics.Graph g = metrics.createGraph("TekkitRestrict Stats (Since last server restarts)");
@@ -209,22 +240,17 @@ public class tekkitrestrict extends JavaPlugin {
 		
 		if (Global.useNewBanSystem) TRCacheItem2.LoadNoItemConfig();
 		
-		version = getDescription().getVersion() + " Beta 2";//TODO remove before release
+		version = getDescription().getVersion();
 		
 		if (config.getBoolean("Auto-Update", true)){
 			updater = new Updater(this, "tekkit-restrict", this.getFile(), Updater.UpdateType.DEFAULT, true);
 		} else if (config.getBoolean("CheckForUpdateOnStartup", true)){
-				updater = new Updater(this, "tekkit-restrict", this.getFile(), Updater.UpdateType.NO_DOWNLOAD, true);
-				if (updater.getResult() == UpdateResult.UPDATE_AVAILABLE) log.info("There is an update available: " + updater.getLatestVersionString() + ". Use /tr admin update ingame to update.");
+			updater = new Updater(this, "tekkit-restrict", this.getFile(), Updater.UpdateType.NO_DOWNLOAD, true);
+			if (updater.getResult() == UpdateResult.UPDATE_AVAILABLE) log.info(ChatColor.GREEN + "There is an update available: " + updater.getLatestVersionString() + ". Use /tr admin update ingame to update.");
 		}
 		
 		log.info("TekkitRestrict v " + version + " Enabled!");
 		
-		/*
-		 * log.info("T: "+config.get("UseChunkUnloader").toString());
-		 * log.info("T1: "+config.get("FlyLimitDailyMinutes").toString());
-		 * log.info("T2: "+config.get("RPTimerMin").toString());
-		 */
 		// TRThrottler.init();
 	}
 
@@ -256,26 +282,6 @@ public class tekkitrestrict extends JavaPlugin {
 	public static tekkitrestrict getInstance() {
 		return instance;
 	}
-
-	/*
-	 * public static boolean hasPermission(Player p, String perm,boolean list){
-	 * if(list){ //this type of element is in a list... if(perm != null &&
-	 * pm.isPluginEnabled("PermissionsEx")){ //return
-	 * ((ru.tehkode.permissions.PermissionManager
-	 * )tekkitrestrict.perm).getUser(p).getAllPermissions(); String[] perms =
-	 * getAllPlayerPerms(p,perm); }else if(pm.isPluginEnabled("Vault")){
-	 * RegisteredServiceProvider<net.milkbowl.vault.permission.Permission>
-	 * permissionProvider = tekkitrestrict.getInstance().getServer().
-	 * getServicesManager
-	 * ().getRegistration(net.milkbowl.vault.permission.Permission.class);
-	 * //permission. }else{/* //use superperms Set<PermissionAttachmentInfo>
-	 * pail = p.getEffectivePermissions(); Iterator<PermissionAttachmentInfo> cc
-	 * = pail.iterator(); LinkedList<String> listr = new LinkedList<String>();
-	 * while(cc.hasNext()){ PermissionAttachmentInfo cr = cc.next();
-	 * listr.add(cr.getPermission());
-	 * //tekkitrestrict.log.info("playerperms+ "+cr.getPermission()); } return
-	 * false; } } else{ return hasPermission(p,perm); } }
-	 */
 	
 	public static void loadConfigCache(){
 		Hacks.broadcast = config.getStringList(ConfigFile.Hack, "HackBroadcasts");
@@ -312,8 +318,11 @@ public class tekkitrestrict extends JavaPlugin {
 		Listeners.BlockCreativeContainer = config.getBoolean("LimitedCreativeNoContainer", true);
 		
 		TRConfigCache.LogFilter.replaceList = config.getStringList("LogFilter");
-		TRConfigCache.LogFilter.logConsole = config.getBoolean("LogConsole", true);
-		TRConfigCache.LogFilter.logLocation = config.getString("LogLocation", "log");
+		TRConfigCache.LogFilter.splitLogs = config.getBoolean("SplitLogs", true);
+		TRConfigCache.LogFilter.filterLogs = config.getBoolean("FilterLogs", true);
+		TRConfigCache.LogFilter.logLocation = config.getString("SplitLogsLocation", "log");
+		TRConfigCache.LogFilter.fileFormat = config.getString("FilenameFormat", "{TYPE}-{DAY}-{MONTH}-{YEAR}.log");
+		TRConfigCache.LogFilter.logFormat = config.getString("LogStringFormat", "[{HOUR}:{MINUTE}:{SECOND}] {INFO}");
 		
 		Threads.gemArmorSpeed = config.getInt("GemArmorDThread");
 		Threads.inventorySpeed = config.getInt("InventoryThread");
@@ -475,7 +484,7 @@ public class tekkitrestrict extends JavaPlugin {
 		return values;
 	}
 	
-	public void reload() {
+	public void reload(boolean silent) {
 		this.reloadConfig();		
 		config = this.getConfigx();
 		loadConfigCache();
@@ -489,7 +498,7 @@ public class tekkitrestrict extends JavaPlugin {
 		TRRecipeBlock.reload();
 		TRLimitFlyThread.reload();
 		TREMCSet.reload();
-		log.info("TekkitRestrict Reloaded!");
+		if (!silent) log.info("TekkitRestrict Reloaded!");
 	}
 
 	public static String antisqlinject(String ins) {
@@ -589,7 +598,121 @@ public class tekkitrestrict extends JavaPlugin {
 		log.setLevel(ll);
 	}
 	
+	public void saveDefaultConfig(boolean force) {
+		Level ll = log.getLevel();
+		log.setLevel(Level.SEVERE);
+		try {
+			saveResource("General.config.yml", force);
+		} catch (Exception e) {
+		}
+		try {
+			saveResource("Advanced.config.yml", force);
+		} catch (Exception e) {
+		}
+		try {
+			saveResource("ModModifications.config.yml", force);
+		} catch (Exception e) {
+		}
+		try {
+			saveResource("DisableClick.config.yml", force);
+		} catch (Exception e) {
+		}
+		try {
+			saveResource("DisableItems.config.yml", force);
+		} catch (Exception e) {
+		}
+		try {
+			saveResource("Hack.config.yml", force);
+		} catch (Exception e) {
+		}
+		try {
+			saveResource("LimitedCreative.config.yml", force);
+		} catch (Exception e) {
+		}
+		try {
+			saveResource("Logging.config.yml", force);
+		} catch (Exception e) {
+		}
+		try {
+			saveResource("TPerformance.config.yml", force);
+		} catch (Exception e) {
+		}
+		try {
+			saveResource("MicroPermissions.config.yml", force);
+		} catch (Exception e) {
+		}
+		log.setLevel(ll);
+	}
+	
 	public void Update(){
 		updater = new Updater(this, "tekkit-restrict", this.getFile(), Updater.UpdateType.DEFAULT, true);
+	}
+	
+	private boolean backupConfig(String sourceString, String destString){
+		try {
+			File sourceFile = new File(sourceString);
+			File destFile = new File(destString);
+			if(!destFile.exists()) {
+				destFile.createNewFile();
+			}
+
+			FileChannel source = null;
+			FileChannel destination = null;
+
+			try {
+				source = new FileInputStream(sourceFile).getChannel();
+				destination = new FileOutputStream(destFile).getChannel();
+				destination.transferFrom(source, 0, source.size());
+			} finally {
+				if(source != null) source.close();
+				if(destination != null) destination.close();
+			}
+
+			if(source != null) source.close();
+			if(destination != null) destination.close();
+
+		} catch (IOException ex){
+			log.severe("Cannot backup config: " + sourceString);
+			return false;
+		}
+		return true;
+
+	}
+
+	public static String getFullVersion(){
+		return getMajorVersion() + "." + getMinorVersion() + getExtraVersion();
+	}
+	public static String getMajorVersion(){
+		return instance.getDescription().getVersion().split("\\D+")[0];
+	}
+	public static String getMinorVersion(){
+		return instance.getDescription().getVersion().split("\\D+")[1];
+	}
+	public static String getExtraVersion(){
+		String ver = instance.getDescription().getVersion().toLowerCase();
+		if (ver.contains("beta")){
+			String temp[] = ver.split(" ");
+			if (temp.length >= 3 && temp[2].matches("\\d+")){
+				return "b" + temp[2];
+			} else {
+				return "b1";
+			}
+		} else if (ver.contains("dev")){
+			String temp[] = ver.split(" ");
+			if (temp.length >= 3 && temp[2].matches("\\d+")){
+				return "d" + temp[2];
+			} else {
+				return "d1";
+			}
+		} else {
+			return "";
+		}
+	}
+	
+	public static boolean isBeta(){
+		return getExtraVersion().contains("b");
+	}
+	public static boolean isDev(){
+		return getExtraVersion().contains("d");
 	}
 }

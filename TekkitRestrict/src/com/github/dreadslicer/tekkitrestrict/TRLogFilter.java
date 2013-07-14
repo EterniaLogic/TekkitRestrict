@@ -68,13 +68,15 @@ private static boolean disabled = false;
 			String a = record.getMessage();
 			String b = record.getMessage().toLowerCase();
 			
-			if (TRConfigCache.LogFilter.logConsole) SplitLog(record, a, b);
+			if (TRConfigCache.LogFilter.splitLogs) SplitLog(record, a, b);
 			
-			String levelname = record.getLevel().getName().toLowerCase();
-			for (String filtera : TRConfigCache.LogFilter.replaceList) {
-				filtera = filtera.toLowerCase();
-				if (levelname.equals(filtera)) return false;
-				else if (b.contains(filtera)) return false;
+			if (TRConfigCache.LogFilter.filterLogs){
+				String levelname = record.getLevel().getName().toLowerCase();
+				for (String filtera : TRConfigCache.LogFilter.replaceList) {
+					filtera = filtera.toLowerCase();
+					if (levelname.equals(filtera)) return false;
+					else if (b.contains(filtera)) return false;
+				}
 			}
 			
 			return true;

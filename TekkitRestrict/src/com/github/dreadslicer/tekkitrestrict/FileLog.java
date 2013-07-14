@@ -10,33 +10,32 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 
+import org.bukkit.ChatColor;
+
 public class FileLog {
 	private BufferedWriter out;
 	private String type = "";
-	private String date = "";
 	private int day = 0;
 	private int counter = 0;
 	private static HashMap<String, FileLog> Logs = new HashMap<String, FileLog>();
 	private boolean alternate;
+	private static final String sep = File.separator;
 	
 	@SuppressWarnings("deprecation")
 	public FileLog(String type, boolean alternate){
 		this.alternate = alternate;
-		String sep = File.separator;
 		if (type == null) type = "null";
 		this.type = type;
 		Date curdate = new Date(System.currentTimeMillis());
 		this.day = curdate.getDay();
-		DateFormat formatter = new SimpleDateFormat("dd-MM-yy");
-		this.date = formatter.format(curdate);
 		
 		File log;
 		File folder;
 		if (!alternate){
-			log = new File("."+sep+TRConfigCache.LogFilter.logLocation+sep+type+sep+type+"-"+date+".log");
+			log = new File("."+sep+TRConfigCache.LogFilter.logLocation+sep+type+sep+formatName(type));
 			folder = new File("."+sep+TRConfigCache.LogFilter.logLocation+sep+type+sep);
 		} else {
-			log = new File("plugins"+sep+"tekkitrestrict"+sep+"log"+sep+type+sep+type+"-"+date+".log");
+			log = new File("plugins"+sep+"tekkitrestrict"+sep+"log"+sep+type+sep+formatName(type));
 			folder = new File("plugins"+sep+"tekkitrestrict"+sep+"log"+sep+type+sep);
 		}
 
@@ -50,7 +49,6 @@ public class FileLog {
 			}
 		}
 		try {
-			//out = new BufferedWriter(new FileWriter(log,true));
 			out = new BufferedWriter(new FileWriter(log, true));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -64,15 +62,12 @@ public class FileLog {
 	@SuppressWarnings("deprecation")
 	public FileLog(String type){
 		this.alternate = false;
-		String sep = File.separator;
 		if (type == null) type = "null";
 		this.type = type;
 		Date curdate = new Date(System.currentTimeMillis());
 		this.day = curdate.getDay();
-		DateFormat formatter = new SimpleDateFormat("dd-MM-yy");
-		this.date = formatter.format(curdate);
 		
-		File log = new File("."+sep+TRConfigCache.LogFilter.logLocation+sep+type+sep+type+"-"+date+".log");
+		File log = new File("."+sep+TRConfigCache.LogFilter.logLocation+sep+type+sep+formatName(type));
 		File folder = new File("."+sep+TRConfigCache.LogFilter.logLocation+sep+type+sep);
 		if (!folder.exists()) folder.mkdirs();
 		
@@ -84,7 +79,6 @@ public class FileLog {
 			}
 		}
 		try {
-			//out = new BufferedWriter(new FileWriter(log,true));
 			out = new BufferedWriter(new FileWriter(log, true));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -114,17 +108,13 @@ public class FileLog {
 	}
 	
 	public void log(String msg){
-		DateFormat formatter = new SimpleDateFormat("kk:mm:ss");
-		String time = formatter.format(new Date(System.currentTimeMillis()));
-		StringBuilder msgToWrite = new StringBuilder(time).append(" ").append(msg);
 		try {
 			if (type.equals("Chat"))
-				out.write(replacecolors(msgToWrite.toString()));
+				out.write(replacecolors(formatMsg(msg)));
 			else
-				out.write(replaceshort(msgToWrite.toString()));
+				out.write(replaceshort(formatMsg(msg)));
 			out.newLine();
-		} catch (IOException ex) {
-		}
+		} catch (IOException ex) {}
 		
 		counter++;
 
@@ -181,18 +171,15 @@ public class FileLog {
 			tekkitrestrict.log.warning("Unable to close the old log!");
 			return;
 		}
-		String sep = File.separator;
 		this.day = day;
-		DateFormat formatter = new SimpleDateFormat("dd-MM-yy");
-		this.date = formatter.format(curdate);
 		
 		File log;
 		File folder;
 		if (!alternate){
-			log = new File("."+sep+TRConfigCache.LogFilter.logLocation+sep+type+sep+type+"-"+date+".log");
+			log = new File("."+sep+TRConfigCache.LogFilter.logLocation+sep+type+sep+formatName(type));
 			folder = new File("."+sep+TRConfigCache.LogFilter.logLocation+sep+type+sep);
 		} else {
-			log = new File("plugins"+sep+"tekkitrestrict"+sep+"log"+sep+type+sep+type+"-"+date+".log");
+			log = new File("plugins"+sep+"tekkitrestrict"+sep+"log"+sep+type+sep+formatName(type));
 			folder = new File("plugins"+sep+"tekkitrestrict"+sep+"log"+sep+type+sep);
 		}
 		
@@ -282,5 +269,53 @@ public class FileLog {
 
 	private String replaceshort(String input){
 		return input.replace("\033[m", "");
+	}
+	
+	private boolean logged = false;
+	private boolean logged2 = false;
+	private String formatName(String type){
+		Date curdate = new Date(System.currentTimeMillis());
+		DateFormat formatter = new SimpleDateFormat("dd-MM-yy");
+		String data = formatter.format(curdate);
+		String date[] = data.split("-");
+		
+		String name = TRConfigCache.LogFilter.fileFormat;
+		if (name == null || name.equals("") || name.contains("*") || name.endsWith(".")){
+			if (!logged){
+				tekkitrestrict.log.warning(ChatColor.RED + "The filename format set in the Logging config is invalid!");
+				logged = true;
+			}
+			
+			name = type + "-" + data + ".log";
+		}
+		
+		name = name.replace("{DAY}", date[0]);
+		name = name.replace("{MONTH}", date[1]);
+		name = name.replace("{YEAR}", date[2]);
+		name = name.replace("{TYPE}", type);
+		name = name.replace("\\", "").replace("/", "");
+		return name;
+	}
+
+	private String formatMsg(String msg){
+		DateFormat formatter = new SimpleDateFormat("kk:mm:ss");
+		String times = formatter.format(new Date(System.currentTimeMillis()));
+		
+		String format = TRConfigCache.LogFilter.logFormat;
+		if (format == null || format.equals("")){
+			if (!logged2){
+				tekkitrestrict.log.warning(ChatColor.RED + "The log format set in the Logging config is invalid!");
+				logged2 = true;
+			}
+			
+			format = new StringBuilder("[").append(times).append("] ").append(msg).toString();
+		} else {
+			String time[] = times.split(":");
+			format = format.replace("{HOUR}", time[0]);
+			format = format.replace("{MINUTE}", time[1]);
+			format = format.replace("{SECOND}", time[2]);
+			format = format.replace("{INFO}", msg);
+		}
+		return format;
 	}
 }

@@ -6,30 +6,20 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 
 public class TRLogger {
-	private static String LogNameFormat, LogStringFormat;
-	private static boolean LogIsEnabled, LogAmulets, LogRings, LogDMTools, LogRMTools, LogEEMisc, LogEEDestructive, LogDebug;
+	private static boolean LogAmulets, LogRings, LogDMTools, LogRMTools, LogEEMisc, LogEEDestructive, LogDebug;
 	private static HashMap<String, ArrayList<String>> logMessages = new HashMap<String, ArrayList<String>>();
 
 	public static void reload() {
-		LogNameFormat = tekkitrestrict.config.getString("LogNameFormat");
-		LogStringFormat = tekkitrestrict.config.getString("LogStringFormat");
-		LogIsEnabled = tekkitrestrict.config.getBoolean("LogIsEnabled");
 		LogAmulets = tekkitrestrict.config.getBoolean("LogAmulets");
 		LogRings = tekkitrestrict.config.getBoolean("LogRings");
-
 		LogDMTools = tekkitrestrict.config.getBoolean("LogDMTools");
 		LogRMTools = tekkitrestrict.config.getBoolean("LogRMTools");
-		//LogOpenAlc = tekkitrestrict.config.getBoolean("LogOpenAlc");
 		LogEEMisc = tekkitrestrict.config.getBoolean("LogEEMisc");
 		LogEEDestructive = tekkitrestrict.config.getBoolean("LogEEDestructive");
 		LogDebug = tekkitrestrict.config.getBoolean("LogDebug");
 	}
 
 	public static void Log(String type, String info) {
-		// Player may be null
-
-		if (!LogIsEnabled) return;// determine if the log is enabled...
-
 		if (!isLoggable(type)) return;
 
 		Calendar c = new GregorianCalendar();
@@ -40,14 +30,14 @@ public class TRLogger {
 		String minute = c.get(Calendar.MINUTE) + "";
 		String second = c.get(Calendar.SECOND) + "";
 		
-		String LogNameFormatter = LogNameFormat;
+		String LogNameFormatter = TRConfigCache.LogFilter.fileFormat;
 		LogNameFormatter = LogNameFormatter.replace("{MONTH}", month);
 		LogNameFormatter = LogNameFormatter.replace("{YEAR}", year);
 		LogNameFormatter = LogNameFormatter.replace("{DAY}", day);
 		LogNameFormatter = LogNameFormatter.replace("{HOUR}", hour);
-		LogNameFormatter = LogNameFormatter.replace("{DTYPE}", type);
+		LogNameFormatter = LogNameFormatter.replace("{TYPE}", type);
 
-		String LogStringFormatter = LogStringFormat;
+		String LogStringFormatter = TRConfigCache.LogFilter.logFormat;
 		LogStringFormatter = LogStringFormatter.replace("{MONTH}", month);
 		LogStringFormatter = LogStringFormatter.replace("{YEAR}", year);
 		LogStringFormatter = LogStringFormatter.replace("{DAY}", day);
@@ -76,7 +66,6 @@ public class TRLogger {
 		if (type.equals("eedmtool")) return LogDMTools;
 		if (type.equals("eermtool")) return LogRMTools;
 		if (type.equals("eeamulet")) return LogAmulets;
-		//if (type.equals("openalc")) return LogOpenAlc;
 		if (type.equals("eemisc")) return LogEEMisc;
 		if (type.equals("eedestructive")) return LogEEDestructive;
 		if (type.equals("debug")) return LogDebug;
@@ -86,7 +75,6 @@ public class TRLogger {
 	}
 	
 	public static void saveLogs() {
-		if (!LogIsEnabled) return;
 		for (String current : logMessages.keySet()){
 			FileLog filelog = FileLog.getLogOrMake(current, true);
 			ArrayList<String> msgs = logMessages.get(current);
