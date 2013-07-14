@@ -1,49 +1,113 @@
-#Configuration file for TekkitRestrict
-#Author: DreadEnd
-#Email: dreadslicer@gmail.com
-#BukkitDev: http://dev.bukkit.org/server-mods/tekkit-restrict/
+##################################################################################
+## Configuration file for TekkitRestrict                                        ##
+## Authors: Taeir, DreadEnd (aka DreadSlicer)                                   ##
+## BukkitDev: http://dev.bukkit.org/server-mods/tekkit-restrict/                ##
+## Please ask questions/report issues on the BukkitDev page.                    ##
+##################################################################################
 
-######### Threading Configuration
-# Do not edit these values unless you know what you are doing.
-# These numbers are in [Milliseconds]. (1000 milliseconds = 1 second)
-#Note, the faster you set this to, your server is more likely to lag out.
-
-##############################
-
-
-####ChunkUnloader####
-# Note, if you turn this on, it MAY lag your server.
-#	Use with caution. However, using this will be very useful for preventing your server
-#	from getting over 30,000 chunks.
-#		There is a bug with the Normal Tekkit server in which the server gains "Trash" in
-#		The memory from disposing of chunks. I recommend keeping your MaxChunks around
-#		2000-3000 to prevent this from disabling your server over time. (MCPCSpout fixed this)
-#		If you lower it below 1000, you have a chance of lagging your server by player movements.
-###	MaxRadii is in meters. 1 chunk = 16 meters. 1 meter = 1 block.
+##################################################################################
+################################# ChunkUnloader ##################################
+##################################################################################
+# WARNING: Use with caution. If you turn this on, it MAY lag your server.
+# This will be very useful for preventing your server from getting over 30,000
+# chunks.
+#
+# There is a bug with the Normal Tekkit server in which the server gains "Trash"
+# in the memory from disposing of chunks. I recommend keeping your MaxChunks
+# around 3000-4000 to prevent this from disabling your server over time.
+# (MCPCSpout does not have this problem)
+#
+# If you lower it below 1000, you have a chance of lagging your server by player
+# movements.
 UseChunkUnloader: true
-MaxChunks: 5000
+
+# The maximal amount of chunks loaded at a time. If this amount is exceeded,
+# chunks will be forcefully unloaded (even if they have chunkloaders) to clear
+# RAM.
+# The more players you have on the server, the higher you should set this to.
+
+# Default: 4000
+MaxChunks: 4000
+
+# The maximal amount of chunks loaded per player.
+# If MaxChunksPerPlayer is 100 and you have 10 players on your server, the max
+# number of chunks will be 1000.
+#
+# NOTE: This feature has not been implemented (yet).
+# MaxChunksPerPlayer: 100
+
+# The radius of blocks that should stay loaded around a player.
+# The ChunkUnloader will not unload chunks that are within this radius to a
+# player.
+# The default is 128 blocks (8 chunks).
+# Default: 128 
 MaxRadii: 128
 
+##################################################################################
+############################ Threading Configuration #############################
+##################################################################################
 
-# Runs a thread for each player upon the Inventory Thread tick. (May take up some processor if you have a ton of players)
-# ThrottleInventoryThread: false currently unused
+# Do not edit these values unless you know what you are doing.
+# These numbers are in Milliseconds. (1000 milliseconds = 1 second)
+# NOTE: the faster you set this to, your server is more likely to lag out.
 
-
+# The amount of time the thread that disables GemArmor powers (see
+# ModModifications config) sleeps for.
+# If you set this too high, players might be able to use their powers by spamming.
+# If you set this too low, it might lag the server.
+#
+# Recommended: [100-200]
+# Default: 120
 GemArmorDThread: 120
+
+# The amount of time the thread that removes entities in SafeZones powers (see
+# SafeZones config) sleeps for.
+# If removing entities from a SafeZones is not something that is very important
+# for your server, you can raise this to 1000-2000 (1-2 seconds)
+#
+# Recommended: [350-2000]
+# Default: 350
 SSEntityRemoverThread: 350
+
+# The amount of time the inventory thread sleeps for.
+# The inventory thread takes care of removing DisabledItems,
+# Decharging EE Tools and Applying the Max EU values.
+#
+# Recommended: [250-500]
+# Default: 400
 InventoryThread: 400
-WorldCleanerThread: 10000
+
+# The amount of time the WorldCleanerThread sleeps for.
+# This thread takes care of the ChunkUnloader, RPTimer and the WorldScrubber
+#
+# Recommended: [10000-30000]
+# Default: 15000
+WorldCleanerThread: 15000
+
+# The amount of time the AutoSave Thread sleeps for.
+# This thread makes sure that all information is correctly saved to the database.
+# In case of a crash, you will only lose any data that has been modified within
+# the sleep time of this thread. (e.g. if you set this to 11000, you will only
+# lose data changed within 11 seconds before the crash)
+#
+# Recommended: [10000-30000]
+# Default: 11000
 AutoSaveThreadSpeed: 11000
 
+# Runs a thread for each player upon the Inventory Thread tick.
+# (May take up some processor if you have a ton of players)
+#
+# NOTE: currently unused
+# ThrottleInventoryThread: false
 
-##	GemArmorDThread enables:     [High-speed 2-commands (~4)]
+##################################################################################
+##################################################################################
+##################################################################################
+
+
+
 ##	Inventory thread enables:    [DisableItems, CreativeDisable, MaxEU, EEDecharger, EEMaxCharger (~198-5000x)]
 ##	WorldCleaner thread enables: [ChunkUnloader, RPTimer, DisabledItemBlockRemover (~40-Xx)]
 ##	AutoSave thread enables:     [SaveToSQL, BlockLimiter RemoveBlk (~8+x)]
 
-
-
-
-##############################
-##############################
-##############################
+##################################################################################

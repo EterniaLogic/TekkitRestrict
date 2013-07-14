@@ -1,36 +1,75 @@
-#Configuration file for TekkitRestrict
-#Author: DreadEnd
-#Email: dreadslicer@gmail.com
-#BukkitDev: http://dev.bukkit.org/server-mods/tekkit-restrict/
+######################################################################
+## Configuration file for TekkitRestrict                            ##
+## Authors: Taeir, DreadEnd (aka DreadSlicer)                       ##
+## BukkitDev: http://dev.bukkit.org/server-mods/tekkit-restrict/    ##
+## Please ask questions/report issues on the BukkitDev page.        ##
+######################################################################
 
-
-########################################################
-##  Some fast notes for you all. First, every option  ##
-## in this file is Reloadable. That means that by     ##
-## typing "/tr reload" in-game as an admin with       ##
-## "tekkitrestrict.admin", or typing "tr reload" in   ##
-## the console, you can reload every single config    ##
-## change in this file.                               ##
-##                                                    ##
-## Have fun, Play safe. Good luck.                    ##
-## * DreadEnd * out.                                  ##
-########################################################
+######################################################################
+## Some fast notes for you all. First, every option in this file is ##
+## Reloadable. That means that by typing "/tr admin reload" in-game ##
+## (with the "tekkitrestrict.admin.reload" permission), or by       ##
+## typing "tr admin reload" in the console, you can reload every    ##
+## single config change in this file.                               ##
+##                                                                  ##
+## Have fun, Play safe. Good luck.                                  ##
+## * DreadEnd * out.                                                ##
+######################################################################
 
 UseAutoRPTimer: true
 UseItemLimiter: true
 UseLimitedCreative: true
+# If UseOpenAlc is false, the command /openalc will be disabled.
+# Default: true
 UseOpenAlc: true
+
+# Should NoItem (Bans items) be enabled?
+# Default: true
 UseNoItem: true
+
+# Should debug messages be shown on the console?
+# If you are having problems, you can try to turn this on to get more
+# information when an error occurs.
+# Default: false
 ShowDebugMessages: false
+
+# If KickFromConsole is true, the console will execute the /kick
+# command instead of the default Bukkit kick when a player gets
+# kicked by TekkitRestrict (e.g. for hacking).
+# Useful if you want to log kicks or use a different bansystem.
+# Default: false
 KickFromConsole: false
+
+# Should the new banned items system be used?
+# WARNING: This feature is still in development. If you turn this on,
+#          banned items and interacts might not get loaded correctly
+#          and micropermissions will NOT work.
+# Default: false
 UseNewBannedItemsSystem: false
+
+######################################################################
+############################## Updater ###############################
+# Should TekkitRestrict check for an update when the server starts?
+# Default: true
 CheckForUpdateOnStartup: true
+
+# Should the update be downloaded automatically if there is one?
+# Default: true
 Auto-Update: true
+
+# Should TekkitRestrict update to beta versions?
+# If you are currently running a beta version, this option is ignored.
+# Default: false
+UpdateToBetaVersions: false
+
+# Should TekkitRestrict update to development versions?
+# If you are currently running a dev version, this option is ignored.
+# Default: false
 UpdateToDevelopmentVersions: false
 
-
-
-################################################################
-################################################################
+######################################################################
+######################################################################
 # Do NOT change this. It will reset the config files if you do.
-ConfigVersion: 1.0
+ConfigVersion: 1.1
+
+######################################################################

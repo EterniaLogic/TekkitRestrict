@@ -1,12 +1,37 @@
-#Configuration file for TekkitRestrict
-#Author: DreadEnd
-#Email: dreadslicer@gmail.com
-#BukkitDev: http://dev.bukkit.org/server-mods/tekkit-restrict/
+######################################################################
+## Configuration file for TekkitRestrict                            ##
+## Authors: Taeir, DreadEnd (aka DreadSlicer)                       ##
+## BukkitDev: http://dev.bukkit.org/server-mods/tekkit-restrict/    ##
+## Please ask questions/report issues on the BukkitDev page.        ##
+######################################################################
 
-##############################################
-######### DisableItems Configuration #########
-# Permission: tekkitrestrict.noitem.ID.DATA
+######################################################################
+##################### DisableItems Configuration #####################
+######################################################################
 
+# Should disabledItemBlocks be removed from the map?
+# WARNING: It can cause lag as the complete map has to be searched for
+#          disabled blocks.
+# Default: false
+RemoveDisabledItemBlocks: false
+
+# When a disabled item is found in someones inventory, it is changed
+# into this item ID.
+#
+# Default: 3 (dirt)
+ChangeDisabledItemsIntoId: 3
+
+# All Items listed below will be "disabled". This means that if a
+# player does not have the bypass permission
+# (tekkitrestrict.bypass.noitem), any item listed here will be
+# uncraftable for him. If he has an item listed here in his inventory,
+# it will be changed to the item specified by
+# ChangeDisabledItemsIntoId (default dirt).
+#
+# You can also use individual permissions to add bans to some players
+# only. The individual permission is: tekkitrestrict.noitem.ID.DATA
+#
+# Examples:
 #- EE
 #- RedPowerCore
 #- RedPowerControl
@@ -28,22 +53,10 @@
 #- IronChests
 #- BalkonWeaponMod
 #- EnderChest (EnderChest, EnderPouch)
-#-----Cross-Mod------
 #- ChunkLoaders
 #- 200-3000
 #- 246
 #- "150:3"
-
-##############################
-
-
-RemoveDisabledItemBlocks: false
-ChangeDisabledItemsIntoId: 3
 DisableItems: []
 
-
-
-
-##############################
-##############################
-##############################
+######################################################################

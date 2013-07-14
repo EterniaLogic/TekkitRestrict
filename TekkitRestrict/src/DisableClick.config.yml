@@ -1,42 +1,43 @@
-#Configuration file for TekkitRestrict
-#Author: DreadEnd
-#Email: dreadslicer@gmail.com
-#BukkitDev: http://dev.bukkit.org/server-mods/tekkit-restrict/
+##########################################################################################
+## Configuration file for TekkitRestrict                                                ##
+## Authors: Taeir, DreadEnd (aka DreadSlicer)                                           ##
+## BukkitDev: http://dev.bukkit.org/server-mods/tekkit-restrict/                        ##
+## Please ask questions/report issues on the BukkitDev page.                            ##
+##########################################################################################
 
-##############################################
-######### DisableClick Configuration #########
+##########################################################################################
+############################### DisableClick Configuration ###############################
+##########################################################################################
 
-### Disable the left or right click of the item.
-#- "27562"                          (All Item Data Types, Left and Right Clicking)
-#- "27562 left"                     (All Item Data Types, Left clicking)
-#- "27562-27566 left"               (All Items in range, Left clicking)
-#- "27562:1 right"                  (Prevent right click (in the air and on blocks))
-#- "27562:1 both"                   (Prevent left and right click (in the air and on blocks))
-#- "27562:1 trample"                (Prevent trampling while holding this item)
-#- "27562:1 all"                    (Prevent clicking and trampling with this item (in the air and on blocks))
-#- "27562:1 left safezone"          (Prevent left-clicking with this item in a safezone (in the air and on blocks))
-#- "27562:1 safezone"               (Prevent clicking with this item in a safezone (in the air and on blocks))
-#- "27562:1 right air"              (Prevent right-clicking with this item in the air)
-#- "27562:1 both block"             (Prevent clicking with this item on a block)
-#- "27562:1 all air safezone"       (Prevents clicking and trampling in the air in a safezone)
-#- "27562-27566 all block safezone" (Prevents clicking and trampling on blocks in a safezone with a range of items)
-#- "ee left"					    (Prevents EE items from being right-clicked)
-
-### Disable the Gui or Right-click on a block(s).
-#- "block 126:1"                    (When you right-click on this block, it will be disallowed)
-#- "block 126-150"
-#- "block ee"
-
-##############################
-
-
-
+###################### Disable the left or right click of the item. ######################
+#
+#- "27562"                          All Item Data Types, Left and Right Clicking
+#- "27562 left"                     All Item Data Types, Left clicking
+#- "27562-27566 left"               All Items in range, Left clicking
+#- "27562:1 right"                  Prevent right click (in the air and on blocks)
+#- "27562:1 both"                   Prevent left and right click
+#                                   (in the air and on blocks)
+#- "27562:1 trample"                Prevent trampling while holding this item
+#- "27562:1 all"                    Prevent clicking and trampling with this item
+#                                   (in the air and on blocks)
+#- "27562:1 left safezone"          Prevent left-clicking with this item in a safezone
+#                                   (in the air and on blocks)
+#- "27562:1 safezone"               Prevent clicking with this item in a safezone
+#                                   (in the air and on blocks)
+#- "27562:1 right air"              Prevent right-clicking with this item in the air
+#- "27562:1 both block"             Prevent clicking with this item on a block
+#- "27562:1 all air safezone"       Prevents clicking and trampling in the air
+#                                   in a safezone.
+#- "27562-27566 all block safezone" Prevents clicking and trampling on blocks
+#                                   in a safezone with a range of items
+#- "ee left"					    Prevents EE items from being right-clicked
+#
+######################## Disable the Gui or Right-click on a block #######################
+#
+#- "block 126:1"    When you right-click on this block, it will be disallowed.
+#- "block 126-150"  When you right-click on a block in this range, it will be disallowed.
+#- "block ee"       When you right-click on any EE block, it will be disallowed.
 
 DisableClick: []
 
-
-
-
-##############################
-##############################
-##############################
+##########################################################################################

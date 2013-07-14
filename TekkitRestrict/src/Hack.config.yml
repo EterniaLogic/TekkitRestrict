@@ -1,23 +1,15 @@
-#Configuration file for TekkitRestrict
-#Author: DreadEnd
-#Email: dreadslicer@gmail.com
-#BukkitDev: http://dev.bukkit.org/server-mods/tekkit-restrict/
+##########################################################################################
+## Configuration file for TekkitRestrict                                                ##
+## Authors: Taeir, DreadEnd (aka DreadSlicer)                                           ##
+## BukkitDev: http://dev.bukkit.org/server-mods/tekkit-restrict/                        ##
+## Please ask questions/report issues on the BukkitDev page.                            ##
+##########################################################################################
 
-#################################################
-######### Anti-Hack Configuration ######### 
+##########################################################################################
+################################ Anti-Hack Configuration #################################
+##########################################################################################
 # Block hackers from screwing your server up!
-
-## Move Speed Max is the speed in Blocks/second
-## (~3 seconds) Move Speed Tolerance is based off the number of "Moves" a player does.
-
-## Fly hack Tolerance is based off the number of "Moves" a player does (1~5 per second).
-
-## Forcefield Tolerance is based off the number of times a player hits a mob or player.
-
-####Default hack names
-##	"fly", "forcefield", "speed"
-
-###########################################################################################
+#
 # Enabled:      Do you want to enable Anti-Hack for this kind of hack?
 # Tolerance:    The amount of ticks the player has to hack before he is kicked.
 #               If you set this too low, innocent people might get kicked for connection
@@ -42,14 +34,40 @@ Anti-Hacks:
         Tolerance: 30
         Angle: 40
 
-
-HackBan: []
+# A player will be kicked if he hacks with any of the types listed here.
+#
+# Possible: fly", "forcefield" and "speed"
+# Default: ["fly","forcefield","speed"]
 HackKick: ["fly","forcefield","speed"]
+
+# If someone hacks and the hacktype is in this list, it is broadcasted to players on the
+# server with the tekkitrestrict.notify.hack permission.
+#
+# Possible: fly", "forcefield" and "speed"
+# Default: ["fly","forcefield","speed"]
 HackBroadcasts: ["fly","forcefield","speed"]
+
+# The formatting of the BroadcastString.
+#
+# Default: "{PLAYER} tried to {TYPE}-hack!"
 HackBroadcastString: "{PLAYER} tried to {TYPE}-hack!"
 
-
-####Dupes####
+##########################################################################################
+################################ Anti-Dupe Configuration #################################
+##########################################################################################
+# BroadcastString: The formatting of the BroadcastString for dupes.
+# Default: "{PLAYER} tried to dupe using {TYPE}!"
+#
+# Broadcast: If someone tries to dupe and the dupetype is in this list, it is broadcasted
+#            to players on the server with the tekkitrestrict.notify.dupe permission.
+# Possible: "rmfurnace", "alc", "transmute", "tankcart"
+# Default: ["rmfurnace", "alc", "tankcart"]
+#
+# Kick: If a player dupes with a dupetype listed here, he will be kicked.
+#       NOTE: It is not recommended to kick players on attempting to dupe. In most cases
+#             it was not the players intention to dupe.
+# Possible: "rmfurnace", "alc", "transmute", "tankcart"
+# Default: []
 Anti-Dupes:
     PreventAlchemyBagDupe: true
     PreventRMFurnaceDupe: true
@@ -59,16 +77,7 @@ Anti-Dupes:
     PreventTeleportDupe: true
     PreventPedestalEmcGen: true
     BroadcastString: "{PLAYER} tried to dupe using {TYPE}!"
-    Broadcast: ["rmfurnace", "alc"]
+    Broadcast: ["rmfurnace", "alc", "tankcart"]
     Kick: []
-#####        "RMFurnace", "alc", "transmute", "tankcart"
 
-
-
-
-
-
-
-##############################
-##############################
-##############################
+##########################################################################################

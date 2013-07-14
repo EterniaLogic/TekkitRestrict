@@ -1,16 +1,20 @@
-#Configuration file for TekkitRestrict
-#Author: DreadEnd
-#Email: dreadslicer@gmail.com
-#BukkitDev: http://dev.bukkit.org/server-mods/tekkit-restrict/
+#####################################################################################
+## Configuration file for TekkitRestrict                                           ##
+## Authors: Taeir, DreadEnd (aka DreadSlicer)                                      ##
+## BukkitDev: http://dev.bukkit.org/server-mods/tekkit-restrict/                   ##
+## Please ask questions/report issues on the BukkitDev page.                       ##
+#####################################################################################
 
-##############################################
-######### Micro Permissions Configuration #########
-#help-page: http://dev.bukkit.org/server-mods/tekkit-restrict/pages/config-micro-permisisons/
+#####################################################################################
+########################## Micro Permissions Configuration ##########################
+#####################################################################################
+
+# You can find more information on:
+# http://dev.bukkit.org/server-mods/tekkit-restrict/pages/config-micro-permisisons/
+
 # Permission: tekkitrestrict.noitem.[name]
 #             tekkitrestrict.limiter.[name]
 #             tekkitrestrict.creative.[name]
-
-#	tekkitrestrict.noitem.default
 
 MicroPermissions:
     NoItem:
@@ -21,8 +25,4 @@ MicroPermissions:
         default: ""
 
 
-
-
-##############################
-##############################
-##############################
+#####################################################################################

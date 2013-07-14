@@ -1,54 +1,67 @@
-#Configuration file for TekkitRestrict
-#Author: DreadEnd
-#Email: dreadslicer@gmail.com
-#BukkitDev: http://dev.bukkit.org/server-mods/tekkit-restrict/
+##############################################################################
+## Configuration file for TekkitRestrict                                    ##
+## Authors: Taeir, DreadEnd (aka DreadSlicer)                               ##
+## BukkitDev: http://dev.bukkit.org/server-mods/tekkit-restrict/            ##
+## Please ask questions/report issues on the BukkitDev page.                ##
+##############################################################################
 
+##############################################################################
+############################# Advanced Functions #############################
+##############################################################################
 
-#############################################
-############ Advanced Functions #############
-#############################################
-
-
-
-
-#Limits the number of blocks a player can place. (Global)
-#Please note that these cannot be changed in-game.
-#  ID      Limit (Please use ONE space between the ID and limit to separate them)
+# Limits the number of blocks a player can place. (Global)
+# Please note that these cannot be changed in-game.
+#  ID Limit (Please use ONE space between the ID and limit to separate them)
 #- 153 1
 #- 100-200 1
 #- "52:55 1"
-LimitBlocks: 
-- "227 3"
+#- "227 3"
+LimitBlocks: []
 
-
-
-
-#[] RecipeBlock removes the recipe from both vanilla and Forge mods.
-#       please note that once you remove a recipe with /tr reload + config,
-#       you must restart the server in order to get them back if you changed
-#       the config.
+##############################################################################
+# All items listed here will be uncraftable. You can also use mod names to
+# make all items of that mod uncraftable.
+#
+# Please note that removed recipes can NOT be readded with /tr admin reload.
+# In order to get them back you have to restart the server.
+#
+# Examples:
+#RecipeBlock:
 #- 27232
 #- "126:3"
 #- ee
 RecipeBlock: []
 
 
-
-
-#[] RecipeFurnaceBlock removes the recipe with the start item specified
-#                       Below. AKA: bake some wood, remove recipe by removing
-#                       the log, not the resultant, coal.
+##############################################################################
+# All items listed here will be unable to be smelted.
+#
+# For example, if you add 17 (log), you will be unable to smelt logs into
+# charcoal.
+#
+# Please note that removed recipes can NOT be readded with /tr admin reload.
+# In order to get them back you have to restart the server.
+#
+# Examples:
+#RecipeFurnaceBlock:
 #- 27232
 #- "126:3"
 RecipeFurnaceBlock: []
 
+##############################################################################
+# LWC Protection Extension for Tekkit
+#
+# All items listed here cannot be placed next to a lockette unless the player
+# has access to it. This is useful for preventing players from "pumping"
+# items out of chests, using block breakers to break chests, etc.
 
-
-
-#LWC Protection Extension for Tekkit
-#       Prevents specified IDs from being placed next to a lockette unless
-#       CPrivate or Cmodified to give a player permissions.
-#       Useful for preventing players from "pumping" or breaking chests.
+# Default:
+#LWCPreventNearLocked:
+#- 4306
+#- 4301
+#- 150
+#- 136
+#- 166
 LWCPreventNearLocked:
 - 4306
 - 4301
@@ -56,9 +69,4 @@ LWCPreventNearLocked:
 - 136
 - 166
 
-
-
-
-##############################
-##############################
-##############################
+##############################################################################

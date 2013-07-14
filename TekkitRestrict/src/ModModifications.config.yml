@@ -1,32 +1,47 @@
-#Configuration file for TekkitRestrict
-#Author: DreadEnd
-#Email: dreadslicer@gmail.com
-#BukkitDev: http://dev.bukkit.org/server-mods/tekkit-restrict/
+##########################################################################################
+## Configuration file for TekkitRestrict                                                ##
+## Authors: Taeir, DreadEnd (aka DreadSlicer)                                           ##
+## BukkitDev: http://dev.bukkit.org/server-mods/tekkit-restrict/                        ##
+## Please ask questions/report issues on the BukkitDev page.                            ##
+##########################################################################################
 
-####################################################################
+##########################################################################################
+################################ Mod Modifications Config ################################
+##########################################################################################
 
-#Limit fly time using rings and jet packs in minutes
+# Limit fly time using rings and jet packs in minutes
+# NOTE: This feature is currently not working.
+# Default: false
 LimitFlightTime: false
 FlyLimitDailyMinutes: 99999999999
 
-####Global EE Options####
+# Should offensive powers of gemarmor be allowed? (explosion, lightning)
+# Default: false
 AllowGemArmorOffensive: false
+
+# Should the defensive powers of gemarmor be allowed? (flying, automatic running)
+# Default: true
 AllowGemArmorDefensive: true
 
-# Limit RedPower timer's minimum time by seconds
+# Set RedPower timers minimum time in seconds
+# Default: 1.1
 RPTimerMin: 1.1
 
+##########################################################################################
+######################################### Set EMC ########################################
+##########################################################################################
 
-######## Set EMC ########
-# Set EMC Values for ANY Item, including items that are not previously in the system.
-#DIFFICULTY: HARD Mode -> DarkMatter, DM Blocks, RedMatter, RMBlocks EMC*2.
+# Set or change EMC Values for ANY item, block or tool, even the ones that usually don't
+# have EMC values.
+#
+# Example: HARD Mode -> DarkMatter, DM Blocks, RedMatter, RMBlocks EMC*2.
 #- "27541 300000"
 #- "126:8 800000"
 #- "27563 900000"
 #- "126:9 1300000"
-#########################
+#
+# DEFAULT: EMC farm removal [Milk, Blaze Rod, Bonemeal, Indigo Flower, Flower, Rose, Seed]
 SetEMC: 
-#DEFAULT: EMC farm removal [[Milk, Blaze Rod, Bonemeal, Indigo Flower, Flower, Rose, Seed]]
 - "335 100"
 - "369 780"
 - "351:15 30"
@@ -35,39 +50,36 @@ SetEMC:
 - "38 4"
 - "295 4"
 
+##########################################################################################
+####################################### Item Max EU ######################################
+##########################################################################################
 
-
-
-######## Item Max EU ########
-#Max EU storable in an IC2 Item (Check out IC2 Wiki for MaxEU details)
-### Default EU values ###
+# Set the Max EU storable in an IC2 Item (Check out IC2 Wiki for MaxEU details)
+#
+# Some default EU values:
 #- "30148 40000" #Nano saber
 #- "30234 10000" #Diamond Drill
 #- "30177 100000" #ANY piece Nano Armor
 #- "30173 1000000" #ANY piece Quantum Armor
-#############################
-MaxEU: []
-
+#
+# Examples:
 # Charge Quantum armor set 2x slower
 #- "30171-30174 1000000 500"
 # Charge Quantum armor set 4x slower
 #- "30171-30174 1000000 250"
+MaxEU: []
 
+##########################################################################################
+################################### Max EE Tool Charge ###################################
+##########################################################################################
 
-
-
-######## Max EE Tool Charge ########
-#MaxCharge limits the maximum EE charge of an item. (0-100%)
+# MaxCharge limits the maximum EE charge of an item. (0-100%)
 #- "27573 30" (This will set the max charge of a morning star to 30%)
 #- "27564-27573 50" (This will Gimp ALL Red Matter Tools down to only 50% charge capacity)
-####################################
 MaxCharge: []
 
-
-
-
-#This will automatically decharge set EE items when a player enters a safezone. (Make your safezones very large)
-#       Requires SSDischargeEE to be true
+# This will automatically decharge set EE items when a player enters a safezone.
+# NOTE: Requires SSDischargeEE to be true
 DechargeInSS: 
 - 27526
 - 27527
@@ -95,9 +107,4 @@ DechargeInSS:
 - 27573
 - 27574
 
-
-
-
-##############################
-##############################
-##############################
+##########################################################################################
