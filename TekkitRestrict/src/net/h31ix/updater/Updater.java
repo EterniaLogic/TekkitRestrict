@@ -426,7 +426,8 @@ public class Updater
 		
 		String[] fullTitle = title.split(" ");
 		if (fullTitle.length >= 3){
-			shortVersion = fullTitle[1] + fullTitle[2] + fullTitle[3];
+			if (fullTitle.length >= 4) shortVersion = fullTitle[1] + fullTitle[2] + fullTitle[3];
+			else shortVersion = fullTitle[1] + fullTitle[2];
 			//fullTitle[0] = TekkitRestrict
 			//fullTitle[1] = 1.15
 			//fullTitle[2] = Beta
