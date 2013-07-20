@@ -173,6 +173,11 @@ public class TRCommandTR implements CommandExecutor {
 					return true;
 				}
 				
+				if (args[1].equals("2")) {
+					sendAdminHelp(2);
+					return true;
+				}
+				
 				if (args[1].equals("help")) {
 					int page = 1;
 					if (args.length == 3){
@@ -344,8 +349,13 @@ public class TRCommandTR implements CommandExecutor {
 						if (send.noConsole()) return true;
 						
 						if (send.noPerm("admin.safezone.addwg")) return true;
-						Player player = (Player) sender;
+						if (args.length != 4){
+							send.msg(ChatColor.RED + "Incorrect syntaxis!");
+							send.msg(ChatColor.RED + "Correct usage: /tr admin safezone addwg <name>");
+						}
 						String name = args[3];
+						Player player = (Player) sender;
+						
 
 						for (TRSafeZone current : TRSafeZone.zones){
 							if (current.world.equalsIgnoreCase(player.getWorld().getName())){
