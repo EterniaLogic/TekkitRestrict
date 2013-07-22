@@ -10,5 +10,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/TownPlugins"/>
 	<classpathentry kind="lib" path="C:/Users/Taico/workspace/libraries/Essentials.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Taico/workspace/libraries/Tekkit_Classic/mods/EE2ServerV1.4.6.5-bukkit-mcpc-1.2.5-r5.zip"/>
+	<classpathentry kind="lib" path="C:/Users/Taico/workspace/libraries/protection/WorldEdit.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

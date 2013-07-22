@@ -96,6 +96,11 @@ permissions:
         default: false
         children:
             tekkitrestrict.admin: true
+    tekkitrestrict.admin.update:
+        description: Allows someone to update the server with /tr admin update
+        default: op
+        children:
+            tekkitrestrict.admin: true
     tekkitrestrict.admin.safezone:
         description: Grants the ability to use /tr admin safezone commands
         default: op

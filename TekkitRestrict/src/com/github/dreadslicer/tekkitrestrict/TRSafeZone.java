@@ -31,8 +31,14 @@ import com.massivecraft.factions.FPlayer;
 import com.massivecraft.factions.FPlayers;
 import com.massivecraft.factions.Faction;
 import com.massivecraft.factions.struct.FPerm;
+import com.palmergames.bukkit.towny.exceptions.NotRegisteredException;
+import com.palmergames.bukkit.towny.object.Resident;
+import com.palmergames.bukkit.towny.object.Town;
+import com.palmergames.bukkit.towny.object.TownBlock;
 import com.palmergames.bukkit.towny.object.TownyPermission;
+import com.palmergames.bukkit.towny.object.TownyUniverse;
 import com.palmergames.bukkit.towny.utils.PlayerCacheUtil;
+import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
@@ -52,7 +58,6 @@ public class TRSafeZone {
 	 * 4 = GriefPrevention
 	 */
 	public int mode = 0;
-	//public static HashMap<String, >
 
 	public static List<TRSafeZone> zones = Collections.synchronizedList(new LinkedList<TRSafeZone>());
 
@@ -67,6 +72,28 @@ public class TRSafeZone {
 				sz.mode = rs.getInt("mode");
 				sz.data = rs.getString("data");
 				sz.loadedFromSqlite = true;
+				if (sz.mode == 4 && sz.data != null && !sz.data.equals("")){
+					String temp[] = sz.data.split(",");
+					sz.x1 = Integer.parseInt(temp[0]);
+					sz.y1 = Integer.parseInt(temp[1]);
+					sz.z1 = Integer.parseInt(temp[2]);
+					sz.x2 = Integer.parseInt(temp[3]);
+					sz.y2 = Integer.parseInt(temp[4]);
+					sz.z2 = Integer.parseInt(temp[5]);
+				} else if (sz.mode == 1) {
+					ProtectedRegion temp = getWGRegion(sz.name);
+					if (temp != null){
+						BlockVector loc1 = temp.getMaximumPoint();
+						BlockVector loc2 = temp.getMinimumPoint();
+						
+						sz.x1 = loc1.getBlockX();
+						sz.y1 = loc1.getBlockY();
+						sz.z1 = loc1.getBlockZ();
+						sz.x2 = loc2.getBlockX();
+						sz.y2 = loc2.getBlockY();
+						sz.z2 = loc2.getBlockZ();
+					}
+				}
 				zones.add(sz);
 			}
 			rs.close();
@@ -161,11 +188,9 @@ public class TRSafeZone {
 		name = name.toLowerCase();
 		
 		for (TRSafeZone current : TRSafeZone.zones){
-			//if (current.world.equalsIgnoreCase(player.getWorld().getName())){
-				if (current.name.toLowerCase().equals(name)){
-					return SafeZoneCreate.AlreadyExists;
-				}
-			//}
+			if (current.name.toLowerCase().equals(name)){
+				return SafeZoneCreate.AlreadyExists;
+			}
 		}
 		
 		pluginName = pluginName.toLowerCase();
@@ -204,8 +229,12 @@ public class TRSafeZone {
 					return SafeZoneCreate.RegionNotFound;
 				}
 				
+				BlockVector loc1 = pr.getMaximumPoint();
+				BlockVector loc2 = pr.getMinimumPoint();
+				
 				TRSafeZone zone = new TRSafeZone();
 				zone.mode = 1;
+				zone.data = loc1.getBlockX() + "," + loc1.getBlockY() + "," + loc1.getBlockZ() + "," + loc2.getBlockX() + "," + loc2.getBlockY() + "," + loc2.getBlockZ();
 				zone.name = name;
 				zone.world = player.getWorld().getName();
 				TRSafeZone.zones.add(zone);
@@ -537,6 +566,18 @@ public class TRSafeZone {
 		return "";
 	}
 	
+	public static ProtectedRegion getWGRegion(String name){
+		WorldGuardPlugin WGB = (WorldGuardPlugin) PM().getPlugin("WorldGuard");
+		try {
+			for (World world : Bukkit.getWorlds()){
+				ProtectedRegion PR = WGB.getRegionManager(world).getRegion(name);
+				if (PR != null) return PR;
+			}
+		} catch (Exception ex) {
+		}
+		return null;
+	}
+	
 	public static ProtectedRegion getWGRegionAt(String name, Location loc){
 		WorldGuardPlugin WGB = (WorldGuardPlugin) PM().getPlugin("WorldGuard");
 		try {
@@ -605,6 +646,10 @@ public class TRSafeZone {
 		return null;
 	}
 
+	
+	
+	
+	
 	//Unused.
 	/*public static void setFly(PlayerMoveEvent e) {
 		if (SafeZones.SSDisableFly) {
@@ -616,4 +661,154 @@ public class TRSafeZone {
 			}
 		}
 	}*/
+	public static class PS {
+		//TODO IMPORTANT
+		/**
+		 * Note: All faction zones are safezones by default.<br>
+		 * @return The faction at the given location if it is a safezone.<br>Null otherwise.
+		 */
+		public static Faction getSafeZoneAt(Location loc){
+			//TODO Check if Factions has an option to add flags.
+			if (!SafeZones.UseSafeZones || !SafeZones.UseFactions || !PM().isPluginEnabled("Factions")) return null;
+			
+			FLocation ccc = new FLocation(loc);
+			Faction f = Board.getFactionAt(ccc);
+			return f;
+		}
+		
+		/**
+		 * Note: All faction zones are safezones by default.<br>
+		 * @return If there is a Factions safezone at the given location.<br>
+		 */
+		public static boolean isSafeZoneAt(Location loc){
+			return getSafeZoneAt(loc)!=null;
+		}
+		
+		/**
+		 * Note: All faction zones are safezones by default.<br>
+		 * If strict is <b>false</b> and &lt;player&gt; is a resident in the faction at his location, the safezone will NOT apply for him.<br>
+		 * If strict is <b>true</b>, the safezone will apply for &lt;player&gt; if he cannot build at his location.<br>
+		 * @return If the Factions safezone at &lt;player&gt;'s location applies for him.<br>
+		 * If there is no Factions safezone at his location, this will return false.
+		 */
+		public static boolean doesSafeZoneApplyForPlayer(Player p, boolean strict){
+			//TODO Check if Factions has an option to add flags.
+			if (!SafeZones.UseSafeZones || !SafeZones.UseFactions || !PM().isPluginEnabled("Factions")) return false;
+			
+			String name = p.getName();
+			
+			if (Conf.playersWhoBypassAllProtection.contains(name)) return false;
+			
+			FPlayer fplayer = FPlayers.i.get(name);
+			
+			if (!strict){
+				Faction faction = getSafeZoneAt(p.getLocation());
+				if (faction != null) return faction.getFPlayers().contains(fplayer);
+			}
+			
+			FLocation ccc = new FLocation(p);
+			return !FPerm.BUILD.has(fplayer, ccc);
+		}
+	}
+	
+	public static class Factions {
+		/**
+		 * Note: All faction zones are safezones by default.<br>
+		 * @return The faction at the given location if it is a safezone.<br>Null otherwise.
+		 */
+		public static Faction getSafeZoneAt(Location loc){
+			//TODO Check if Factions has an option to add flags.
+			if (!SafeZones.UseSafeZones || !SafeZones.UseFactions || !PM().isPluginEnabled("Factions")) return null;
+			
+			FLocation ccc = new FLocation(loc);
+			Faction f = Board.getFactionAt(ccc);
+			return f;
+		}
+		
+		/**
+		 * Note: All faction zones are safezones by default.<br>
+		 * @return If there is a Factions safezone at the given location.<br>
+		 */
+		public static boolean isSafeZoneAt(Location loc){
+			return getSafeZoneAt(loc)!=null;
+		}
+		
+		/**
+		 * Note: All faction zones are safezones by default.<br>
+		 * If strict is <b>false</b> and &lt;player&gt; is a resident in the faction at his location, the safezone will NOT apply for him.<br>
+		 * If strict is <b>true</b>, the safezone will apply for &lt;player&gt; if he cannot build at his location.<br>
+		 * @return If the Factions safezone at &lt;player&gt;'s location applies for him.<br>
+		 * If there is no Factions safezone at his location, this will return false.
+		 */
+		public static boolean doesSafeZoneApplyForPlayer(Player p, boolean strict){
+			//TODO Check if Factions has an option to add flags.
+			if (!SafeZones.UseSafeZones || !SafeZones.UseFactions || !PM().isPluginEnabled("Factions")) return false;
+			
+			String name = p.getName();
+			
+			if (Conf.playersWhoBypassAllProtection.contains(name)) return false;
+			
+			FPlayer fplayer = FPlayers.i.get(name);
+			
+			if (!strict){
+				Faction faction = getSafeZoneAt(p.getLocation());
+				if (faction != null) return faction.getFPlayers().contains(fplayer);
+			}
+			
+			FLocation ccc = new FLocation(p);
+			return !FPerm.BUILD.has(fplayer, ccc);
+		}
+	}
+	
+	public static class Towny {
+		
+		/**
+		 * Note: All towns are safezones by default.<br>
+		 * @return The town at the given location if it is a safezone.<br>Null otherwise.
+		 */
+		public static Town getSafeZoneAt(Location loc){
+			if (!SafeZones.UseSafeZones || !SafeZones.UseTowny || !PM().isPluginEnabled("Towny")) return null;
+			
+			TownBlock tb = TownyUniverse.getTownBlock(loc);
+			try {
+				return tb.getTown();
+			} catch (NotRegisteredException e) {
+				return null;
+			}
+		}
+		
+		/**
+		 * Note: All towns are safezones by default.<br>
+		 * @return If there is a Towny safezone at the given location.<br>
+		 * @see #getSafeZoneAt(Location)
+		 */
+		public static boolean isSafeZoneAt(Location loc){
+			return getSafeZoneAt(loc)!=null;
+		}
+		
+		/**
+		 * Note: All towns are safezones by default.<br><br>
+		 * If strict is <b>false</b> and &lt;player&gt; is a resident in the town at his location, the safezone will NOT apply for him.<br>
+		 * If strict is <b>true</b>, the safezone will apply for &lt;player&gt; if he cannot build at his location.<br>
+		 * @return If the Towny safezone at &lt;player&gt;'s location applies for him.<br>
+		 * If there is no Towny safezone at his location, this will return false.
+		 */
+		public static boolean doesSafeZoneApplyForPlayer(Player p, boolean strict){
+			//TODO Check if Factions has an option to add flags.
+			if (!SafeZones.UseSafeZones || !SafeZones.UseTowny || !PM().isPluginEnabled("Towny")) return false;
+			
+			if (!strict){
+				Town town = getSafeZoneAt(p.getLocation());
+				if (town != null){
+					for (Resident resident : town.getResidents()){
+						if (resident.getName().equalsIgnoreCase(p.getName())) return false;
+					}
+				}
+			}
+			
+			Block cb = p.getWorld().getHighestBlockAt(p.getLocation());
+			boolean hasperm = PlayerCacheUtil.getCachePermission(p, p.getLocation(), cb.getTypeId(), (byte) 0, TownyPermission.ActionType.DESTROY);
+			return !hasperm;
+		}
+	}
 }

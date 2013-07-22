@@ -265,15 +265,14 @@ public class TRCommandTR implements CommandExecutor {
 						if (totalPages == 0) totalPages = 1;
 						if (requestedPage > totalPages) requestedPage = totalPages;
 						
-						send.msg("SafeZones - Page " + requestedPage + " of " + totalPages);
+						send.msg(ChatColor.YELLOW + "SafeZones - Page " + requestedPage + " of " + totalPages);
 						for (int i = ((requestedPage-1) * 5); i < (requestedPage * 5); i++){
 							if (TRSafeZone.zones.size() <= i) break;
 							
 							TRSafeZone z = TRSafeZone.zones.get(i);
 							if (z == null) continue;
 							
-							send.msg("[" + z.world + "] " + z.name);
-							send.msg("  - Location: [" + z.x1 + " " + z.y1 + " " + z.z1 + "] - [" + z.x2 + " " + z.y2 + " " + z.z2 + "]");
+							send.msg("" + ChatColor.YELLOW + i + ": " + z.name + " - Location: [" + z.world + "] [" + z.x1 + " " + z.y1 + " " + z.z1 + "] - [" + z.x2 + " " + z.y2 + " " + z.z2 + "]");
 						}
 						return true;
 					}
@@ -298,9 +297,9 @@ public class TRCommandTR implements CommandExecutor {
 						}
 						String name = TRSafeZone.getSafeZone(target);
 						if (!name.equals(""))
-							send.msg(ChatColor.BLUE + target.getName() + " is currently in the " + name + ".");
+							send.msg(ChatColor.YELLOW + target.getName() + " is currently in the safezone " + name + ".");
 						else
-							send.msg(ChatColor.BLUE + target.getName() + " is currently " + ChatColor.RED + "not" + ChatColor.BLUE + " in a safezone.");
+							send.msg(ChatColor.YELLOW + target.getName() + " is currently " + ChatColor.RED + "not" + ChatColor.YELLOW + " in a safezone.");
 						
 						return true;
 					}
@@ -353,9 +352,9 @@ public class TRCommandTR implements CommandExecutor {
 							send.msg(ChatColor.RED + "Incorrect syntaxis!");
 							send.msg(ChatColor.RED + "Correct usage: /tr admin safezone addwg <name>");
 						}
+						
 						String name = args[3];
 						Player player = (Player) sender;
-						
 
 						for (TRSafeZone current : TRSafeZone.zones){
 							if (current.world.equalsIgnoreCase(player.getWorld().getName())){
@@ -382,9 +381,17 @@ public class TRCommandTR implements CommandExecutor {
 								zone.world = player.getWorld().getName();
 								TRSafeZone.zones.add(zone);
 								TRSafeZone.save();
-								send.msg(ChatColor.GREEN + "Attached to region `" + name + "`!");
+								send.msg(ChatColor.GREEN + "Attached to region \"" + name + "\"!");
 							} else {
 								send.msg(ChatColor.RED + "Region does not exist!");
+								
+								String allregions = "";
+								for (String current : rm.keySet()) allregions += current + ", ";
+								
+								if (allregions.length()==0) allregions = "There are no regions!";
+								else allregions = allregions.substring(0, allregions.length()-2);
+								
+								send.msg(ChatColor.YELLOW + "Possible regions: " + allregions);
 								return true;
 							}
 						} catch (Exception E) {

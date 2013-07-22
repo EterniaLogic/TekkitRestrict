@@ -557,44 +557,37 @@ public class tekkitrestrict extends JavaPlugin {
 		log.setLevel(Level.SEVERE);
 		try {
 			saveResource("General.config.yml", false);
-		} catch (Exception e) {
-		}
+		} catch (Exception e) {}
 		try {
 			saveResource("Advanced.config.yml", false);
-		} catch (Exception e) {
-		}
+		} catch (Exception e) {}
 		try {
 			saveResource("ModModifications.config.yml", false);
-		} catch (Exception e) {
-		}
+		} catch (Exception e) {}
 		try {
 			saveResource("DisableClick.config.yml", false);
-		} catch (Exception e) {
-		}
+		} catch (Exception e) {}
 		try {
 			saveResource("DisableItems.config.yml", false);
-		} catch (Exception e) {
-		}
+		} catch (Exception e) {}
 		try {
 			saveResource("Hack.config.yml", false);
-		} catch (Exception e) {
-		}
+		} catch (Exception e) {}
 		try {
 			saveResource("LimitedCreative.config.yml", false);
-		} catch (Exception e) {
-		}
+		} catch (Exception e) {}
 		try {
 			saveResource("Logging.config.yml", false);
-		} catch (Exception e) {
-		}
+		} catch (Exception e) {}
 		try {
 			saveResource("TPerformance.config.yml", false);
-		} catch (Exception e) {
-		}
+		} catch (Exception e) {}
 		try {
 			saveResource("MicroPermissions.config.yml", false);
-		} catch (Exception e) {
-		}
+		} catch (Exception e) {}
+		try {
+			saveResource("SafeZones.config.yml", false);
+		} catch (Exception e) {}
 		log.setLevel(ll);
 	}
 	
@@ -603,44 +596,37 @@ public class tekkitrestrict extends JavaPlugin {
 		log.setLevel(Level.SEVERE);
 		try {
 			saveResource("General.config.yml", force);
-		} catch (Exception e) {
-		}
+		} catch (Exception e) {}
 		try {
 			saveResource("Advanced.config.yml", force);
-		} catch (Exception e) {
-		}
+		} catch (Exception e) {}
 		try {
 			saveResource("ModModifications.config.yml", force);
-		} catch (Exception e) {
-		}
+		} catch (Exception e) {}
 		try {
 			saveResource("DisableClick.config.yml", force);
-		} catch (Exception e) {
-		}
+		} catch (Exception e) {}
 		try {
 			saveResource("DisableItems.config.yml", force);
-		} catch (Exception e) {
-		}
+		} catch (Exception e) {}
 		try {
 			saveResource("Hack.config.yml", force);
-		} catch (Exception e) {
-		}
+		} catch (Exception e) {}
 		try {
 			saveResource("LimitedCreative.config.yml", force);
-		} catch (Exception e) {
-		}
+		} catch (Exception e) {}
 		try {
 			saveResource("Logging.config.yml", force);
-		} catch (Exception e) {
-		}
+		} catch (Exception e) {}
 		try {
 			saveResource("TPerformance.config.yml", force);
-		} catch (Exception e) {
-		}
+		} catch (Exception e) {}
 		try {
 			saveResource("MicroPermissions.config.yml", force);
-		} catch (Exception e) {
-		}
+		} catch (Exception e) {}
+		try {
+			saveResource("SafeZones.config.yml", force);
+		} catch (Exception e) {}
 		log.setLevel(ll);
 	}
 	
@@ -652,10 +638,10 @@ public class tekkitrestrict extends JavaPlugin {
 		try {
 			File sourceFile = new File(sourceString);
 			File destFile = new File(destString);
-			if(!destFile.exists()) {
-				destFile.createNewFile();
-			}
-
+			if (!sourceFile.exists()) return false;
+			
+			if(!destFile.exists()) destFile.createNewFile();
+			
 			FileChannel source = null;
 			FileChannel destination = null;
 

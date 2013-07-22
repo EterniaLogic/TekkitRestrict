@@ -20,7 +20,7 @@ public class TRLimitedCreative {
 				String invname = event.getView().getTopInventory().getName();
 				if (Listeners.BlockCreativeContainer) {
 					if (!invname.equals("container.inventory")) {
-						player.sendMessage(ChatColor.RED + "[TRLimitedCreative] You may not interact with other inventories");
+						player.sendMessage(ChatColor.RED + "[TRLimitedCreative] You may not interact with other inventories.");
 						event.setCancelled(true);
 						return true;
 					}
