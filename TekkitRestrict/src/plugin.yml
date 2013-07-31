@@ -1,7 +1,8 @@
 name: tekkitrestrict
 main: com.github.dreadslicer.tekkitrestrict.tekkitrestrict
+authors: [Taeir, DreadSlicer]
 prefix: TekkitRestrict
-version: 1.15
+version: 1.16 Dev 1
 
 permissions:
     tekkitrestrict.bypass.*:
@@ -44,7 +45,6 @@ permissions:
         description: Enables someone to use gemarmor defensively.
     tekkitrestrict.bypass.gemarmor.offensive:
         description: Enables someone to use gemarmor offensive.
-    
     tekkitrestrict.bypass.dupe:
         description:  Enables somebody to bypass the anti-dupe.
     tekkitrestrict.bypass.dupe.alcbag:
@@ -59,14 +59,12 @@ permissions:
         description:  Enables somebody to bypass the anti-dupe for the transmution tablet.
     tekkitrestrict.bypass.dupe.pedestal:
         description:  Enables somebody to bypass the anti-dupe for the pedestal emc generator.
-    
     tekkitrestrict.bypass.limiter:
         description:  Enables somebody to have no block limits.
     tekkitrestrict.bypass.lwc:
         description:  Enables somebody to bypass LWC attached protections.
     tekkitrestrict.bypass.flylimit:
         description:  Bypass global flight time limit
-    
     tekkitrestrict.notify.hack:
         description: Get notified if someone hacks.
         default: op
@@ -157,13 +155,13 @@ permissions:
             tekkitrestrict.emc: true
 
 commands:
-   tekkitrestrict:
-      description: View TekkitRestrict commands.
-      usage: /<command>
-      aliases: tr
-   openalc:
-      description: View a player's Alchemy bag.
-      usage: /<command> <player> <color>
-   tpic:
-      description: Teleports you to an area where a cluster of items is sitting on the ground.
-      usage: /<command> [Min Items Threshhold] [Thorough]
+    tekkitrestrict:
+        description: View TekkitRestrict commands.
+        usage: /<command>
+        aliases: tr
+    openalc:
+        description: View a player's Alchemy bag.
+        usage: /<command> <player> <color>
+    tpic:
+        description: Teleports you to an area where a cluster of items is sitting on the ground.
+        usage: /<command> [Min Items Threshhold] [Thorough]

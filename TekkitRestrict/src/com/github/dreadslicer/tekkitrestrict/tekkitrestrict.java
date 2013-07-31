@@ -125,7 +125,6 @@ public class tekkitrestrict extends JavaPlugin {
 		Log.init();
 		log.info("SQLite loaded!");
 	}
-
 	@Override
 	public void onEnable() {
 		
@@ -253,7 +252,6 @@ public class tekkitrestrict extends JavaPlugin {
 		
 		// TRThrottler.init();
 	}
-
 	@Override
 	public void onDisable() {
 		disable = true;
@@ -281,6 +279,15 @@ public class tekkitrestrict extends JavaPlugin {
 
 	public static tekkitrestrict getInstance() {
 		return instance;
+	}
+	
+	public boolean linkEEPatch(){
+		try {
+			Class.forName("ee.events.EEEvent");
+			return true;
+		} catch (ClassNotFoundException e) {
+			return false;
+		}
 	}
 	
 	public static void loadConfigCache(){
@@ -378,7 +385,6 @@ public class tekkitrestrict extends JavaPlugin {
 		db = new SQLite("Data", this.getDataFolder().getPath());
 		db.open();
 	}
-
 	private void initSqlite() {
 		//determine if Data.db is older.
 		Double ver = new Double(this.getDescription().getVersion());
@@ -590,7 +596,6 @@ public class tekkitrestrict extends JavaPlugin {
 		} catch (Exception e) {}
 		log.setLevel(ll);
 	}
-	
 	public void saveDefaultConfig(boolean force) {
 		Level ll = log.getLevel();
 		log.setLevel(Level.SEVERE);
