@@ -48,6 +48,7 @@ public class tekkitrestrict extends JavaPlugin {
 	public static Logger log;
 	public static TRFileConfiguration config;
 	public static boolean EEEnabled = false;
+	public static Boolean EEPatch = null;
 	
 	/** Indicates if tekkitrestrict is disabling. Threads use this to check if they should stop. */
 	public static boolean disable = false;
@@ -158,6 +159,12 @@ public class tekkitrestrict extends JavaPlugin {
 			// Was not able to load permissionsEx
 		}
 
+		if (linkEEPatch()){
+			
+			//TODO
+			log.info("Linked with EEPatch!");
+		}
+		
 		// Initiate noItem, Time-thread and our event listener
 		try {
 			reload(true);
@@ -282,10 +289,13 @@ public class tekkitrestrict extends JavaPlugin {
 	}
 	
 	public boolean linkEEPatch(){
+		if (EEPatch != null) return EEPatch.booleanValue();
 		try {
 			Class.forName("ee.events.EEEvent");
+			EEPatch = true;
 			return true;
 		} catch (ClassNotFoundException e) {
+			EEPatch = false;
 			return false;
 		}
 	}
@@ -536,6 +546,7 @@ public class tekkitrestrict extends JavaPlugin {
 		configList.add(reloadc("TPerformance.config.yml"));
 		configList.add(reloadc("MicroPermissions.config.yml"));
 		configList.add(reloadc("SafeZones.config.yml"));
+		if (linkEEPatch()) configList.add(reloadc("EEPatch.config.yml"));
 	}
 
 	private YamlConfiguration reloadc(String loc) {
@@ -594,6 +605,11 @@ public class tekkitrestrict extends JavaPlugin {
 		try {
 			saveResource("SafeZones.config.yml", false);
 		} catch (Exception e) {}
+		try {
+			if (linkEEPatch()){
+				saveResource("EEPatch.config.yml", false);
+			}
+		} catch (Exception e) {}
 		log.setLevel(ll);
 	}
 	public void saveDefaultConfig(boolean force) {
@@ -631,6 +647,11 @@ public class tekkitrestrict extends JavaPlugin {
 		} catch (Exception e) {}
 		try {
 			saveResource("SafeZones.config.yml", force);
+		} catch (Exception e) {}
+		try {
+			if (linkEEPatch()){
+				saveResource("EEPatch.config.yml", force);
+			}
 		} catch (Exception e) {}
 		log.setLevel(ll);
 	}
