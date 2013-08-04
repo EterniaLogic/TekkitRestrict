@@ -15,7 +15,7 @@
 # Default: false
 RemoveDisabledItemBlocks: false
 
-# When a disabled item is found in someones inventory, it is changed
+# When a disabled item is found in someone's inventory, it is changed
 # into this item ID.
 #
 # Default: 3 (dirt)

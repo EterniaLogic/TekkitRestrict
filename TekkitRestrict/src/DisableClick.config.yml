@@ -32,7 +32,7 @@
 #                                   in a safezone with a range of items
 #- "ee left"					    Prevents EE items from being right-clicked
 #
-######################## Disable the Gui or Right-click on a block #######################
+######################## Disable the GUI or Right-click on a block #######################
 #
 #- "block 126:1"    When you right-click on this block, it will be disallowed.
 #- "block 126-150"  When you right-click on a block in this range, it will be disallowed.

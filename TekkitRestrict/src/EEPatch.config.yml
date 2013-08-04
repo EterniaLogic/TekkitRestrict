@@ -12,7 +12,7 @@
 #
 # Q: Why should I use this one over the one in ModModifications.config?
 # A: Because this one directly blocks a player from charging. The one in the other config
-#    uncharges a tool a level as soon as it finds one in someones inventory that is
+#    uncharges a tool a level as soon as it finds one in someone's inventory that is
 #    charged too high. Using this one over the one in ModModifications.config results in
 #    a faster response and less server load.
 #
@@ -65,7 +65,7 @@ EEMaxCharge:
 # don't have to block most actions that break blocks in a radius, unless you don't want
 # people to ever use these actions, not even where they are wanted.
 #
-# NOTE: If you change someones permissions, it can take up to 60 seconds before the changes
+# NOTE: If you change someone's permissions, it can take up to 60 seconds before the changes
 # take effect.
 #
 # Default: true for all values

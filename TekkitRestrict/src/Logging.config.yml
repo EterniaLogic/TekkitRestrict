@@ -30,7 +30,7 @@ LogDebug: false
 # Default: true
 SplitLogs: true
 
-# The folder where TekkitRestrict should place the splitted logs.
+# The folder where TekkitRestrict should place the split logs.
 # NOTE: The path starts at the server root.
 # Example file: server_root/log/chat/chat-23-10-13.log
 # Default: "log"

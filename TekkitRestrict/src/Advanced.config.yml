@@ -22,7 +22,7 @@ LimitBlocks: []
 # All items listed here will be uncraftable. You can also use mod names to
 # make all items of that mod uncraftable.
 #
-# Please note that removed recipes can NOT be readded with /tr admin reload.
+# Please note that removed recipes can NOT be re-added with /tr admin reload.
 # In order to get them back you have to restart the server.
 #
 # Examples:

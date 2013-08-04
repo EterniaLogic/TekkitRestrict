@@ -40,7 +40,7 @@ Anti-Hacks:
 # Default: ["fly","forcefield","speed"]
 HackKick: ["fly","forcefield","speed"]
 
-# If someone hacks and the hacktype is in this list, it is broadcasted to players on the
+# If someone hacks and the hacktype is in this list, it is broadcast to players on the
 # server with the tekkitrestrict.notify.hack permission.
 #
 # Possible: fly", "forcefield" and "speed"
@@ -58,7 +58,7 @@ HackBroadcastString: "{PLAYER} tried to {TYPE}-hack!"
 # BroadcastString: The formatting of the BroadcastString for dupes.
 # Default: "{PLAYER} tried to dupe using {TYPE}!"
 #
-# Broadcast: If someone tries to dupe and the dupetype is in this list, it is broadcasted
+# Broadcast: If someone tries to dupe and the dupetype is in this list, it is broadcast
 #            to players on the server with the tekkitrestrict.notify.dupe permission.
 # Possible: "rmfurnace", "alc", "transmute", "tankcart"
 # Default: ["rmfurnace", "alc", "tankcart"]

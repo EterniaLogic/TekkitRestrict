@@ -22,7 +22,7 @@
 UseChunkUnloader: true
 
 # The maximal amount of chunks loaded at a time. If this amount is exceeded,
-# chunks will be forcefully unloaded (even if they have chunkloaders) to clear
+# chunks will be forcefully unloaded (even if they have chunk loaders) to clear
 # RAM.
 # The more players you have on the server, the higher you should set this to.
 
