@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.FileChannel;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
@@ -38,6 +39,7 @@ import com.github.dreadslicer.tekkitrestrict.commands.TRCommandAlc;
 import com.github.dreadslicer.tekkitrestrict.commands.TRCommandTPIC;
 import com.github.dreadslicer.tekkitrestrict.commands.TRCommandTR;
 import com.github.dreadslicer.tekkitrestrict.database.SQLite;
+import com.github.dreadslicer.tekkitrestrict.eepatch.EEPSettings;
 import com.github.dreadslicer.tekkitrestrict.lib.TRFileConfiguration;
 import com.github.dreadslicer.tekkitrestrict.lib.YamlConfiguration;
 import com.github.dreadslicer.tekkitrestrict.listeners.Assigner;
@@ -53,6 +55,7 @@ public class tekkitrestrict extends JavaPlugin {
 	/** Indicates if tekkitrestrict is disabling. Threads use this to check if they should stop. */
 	public static boolean disable = false;
 	public static String version;
+	public static double dbversion = 1.2;
 	public static Object perm = null;
 	public static SQLite db;
 	public static Updater updater = null;
@@ -67,10 +70,17 @@ public class tekkitrestrict extends JavaPlugin {
 		instance = this;
 		log = this.getLogger();
 		
-		loadSqlite(); //pre-load the sqlite
-		initSqlite();
+		//pre-load the sqlite
+		log.info("Loading SQLite Database...");
+		if (!loadSqlite()){
+			log.warning("Failed to load SQLite Database!");
+		} else {
+			initSqlite();
+			log.info("SQLite Database loaded!");
+		}
+		log.info("SQLite loaded!");
 
-		this.saveDefaultConfig();
+		saveDefaultConfig(false);
 
 		config = this.getConfigx(); //Load the configuration files
 		if (config.getDouble("ConfigVersion", 0.9) < 1.1){
@@ -95,7 +105,8 @@ public class tekkitrestrict extends JavaPlugin {
 			backupConfig(path + "TPerformance.config.yml", bpath + "TPerformance.config.yml");
 			backupConfig(path + "MicroPermissions.config.yml", bpath + "MicroPermissions.config.yml");
 			backupConfig(path + "SafeZones.config.yml", bpath + "SafeZones.config.yml");
-
+			backupConfig(path + "EEPatch.config.yml", bpath + "EEPatch.config.yml");
+			
 			saveDefaultConfig(true);
 			reloadConfig();
 		}
@@ -124,13 +135,12 @@ public class tekkitrestrict extends JavaPlugin {
 		// ///////////
 
 		Log.init();
-		log.info("SQLite loaded!");
 	}
 	@Override
 	public void onEnable() {
 		
 		ttt = new TRThread();
-		Assigner.assign(this); //Register the required listeners
+		Assigner.assign(); //Register the required listeners
 		
 		new TRLogger();
 		
@@ -159,20 +169,34 @@ public class tekkitrestrict extends JavaPlugin {
 			// Was not able to load permissionsEx
 		}
 
-		if (linkEEPatch()){
-			
-			//TODO
-			log.info("Linked with EEPatch!");
-		}
+		
 		
 		// Initiate noItem, Time-thread and our event listener
 		try {
-			reload(true);
+			reload(false, true);
 			ttt.init(); //Start up all threads
 
 			initHeartBeat();
 		} catch (Exception e) {
 			//e.printStackTrace();
+		}
+		
+		log.info("Linking with EEPatch for extended functionality ...");
+		if (linkEEPatch()){
+			boolean success = true;
+			try {
+				Assigner.assignEEPatch();
+				//TODO add more here
+			} catch (Exception ex){
+				success = false;
+			}
+			
+			if (success)
+				log.info("Linked with EEPatch!");
+			else 
+				log.warning("Linking with EEPatch Failed!");
+		} else {
+			log.info("EEPatch is not available. Extended functionality disabled.");
 		}
 		
 		try {
@@ -391,15 +415,31 @@ public class tekkitrestrict extends JavaPlugin {
 		}, 60L, 32L);
 	}
 
-	private void loadSqlite() {
+	private boolean newdb = false;
+	/** @return If opening the database was successful. */
+	private boolean loadSqlite() {
+		File dbfile = new File(this.getDataFolder().getPath() + File.separator + "Data.db");
+		if (!dbfile.exists()){
+			newdb = true;
+			log.info("Creating database file...");
+		}
 		db = new SQLite("Data", this.getDataFolder().getPath());
-		db.open();
+		
+		return db.open();
 	}
-	private void initSqlite() {
+	private boolean initSqlite() {
 		//determine if Data.db is older.
 		Double ver = new Double(this.getDescription().getVersion());
 		ResultSet prev = null;
 		LinkedList<LinkedList<String>> srvals = null, limvals=null;
+		
+		if (!db.isOpen()) {
+			if (!db.open()){
+				log.warning("Cannot open the database!");
+				return false;
+			}
+		}
+
 		try{
 			//Version select
 			ResultSet rs = db.query("SELECT version FROM tr_dbversion");
@@ -411,12 +451,11 @@ public class tekkitrestrict extends JavaPlugin {
 				}
 			}
 			rs.close();
-		}
-		catch(Exception e){
+		} catch(Exception e){
 			if(prev != null)
 				try {prev.close();} catch (SQLException e1) {}
 			//PRE-1.00 version, remove/purge and replace.
-			tekkitrestrict.log.info("Transfering last Data.db info to new Database prototype");
+			log.info("Transfering last Data.db info to new Database prototype");
 			//remove all relevant information from both databases.
 			//tr_saferegion =	id name mode data world
 			//tr_limiter = 		id player blockdata
@@ -432,7 +471,7 @@ public class tekkitrestrict extends JavaPlugin {
 			}
 			
 			if (srvals != null && limvals != null)
-				tekkitrestrict.log.info("DB - Copied "+(srvals.size() + limvals.size())+" rows");
+				log.info("DB - Copied "+(srvals.size() + limvals.size())+" rows");
 			
 			try{db.query("DROP TABLE `tr_saferegion`;");} catch(Exception ex){}
 			try{db.query("DROP TABLE `tr_limiter`;");} catch(Exception ex){}
@@ -461,7 +500,7 @@ public class tekkitrestrict extends JavaPlugin {
 					db.query("INSERT INTO 'tr_saferegion' VALUES("+tadd+");");
 				}
 			}
-		} catch (Exception E) {
+		} catch (Exception ex) {
 		}
 		try {
 			db.query("CREATE TABLE IF NOT EXISTS 'tr_limiter' ( "
@@ -481,6 +520,69 @@ public class tekkitrestrict extends JavaPlugin {
 		}
 	}
 
+	private void transferOldDB() {
+		LinkedList<LinkedList<String>> srvals = null, limvals=null;
+		//PRE-1.00 version, remove/purge and replace.
+		log.info("Transfering last Data.db info to new Database prototype");
+		//remove all relevant information from both databases.
+		//tr_saferegion =	id name mode data world
+		//tr_limiter = 		id player blockdata
+		try {
+			srvals = this.getTableVals("tr_saferegion");
+		} catch(SQLException ex){
+			log.warning("Minor exception occured when trying to load the safezones from the database.");
+		}
+		try {
+			limvals = this.getTableVals("tr_limiter");
+		} catch(SQLException ex){
+			log.warning("Minor exception occured when trying to load the limiter from the database.");
+		}
+		
+		if (srvals != null && limvals != null)
+			log.info("DB - Copied "+(srvals.size() + limvals.size())+" rows");
+		
+		try{db.query("DROP TABLE `tr_saferegion`;");} catch(Exception ex){}
+		try{db.query("DROP TABLE `tr_limiter`;");} catch(Exception ex){}
+		
+		
+		try {
+			db.query("CREATE TABLE IF NOT EXISTS 'tr_dbversion' (version NUMERIC);");
+			db.query("INSERT INTO 'tr_dbversion' (version) VALUES("+dbversion+");");
+		} catch (Exception E) {
+		}
+		
+		try {
+			db.query("CREATE TABLE IF NOT EXISTS 'tr_saferegion' ( "
+					+ "'id' INTEGER PRIMARY KEY AUTOINCREMENT,"
+					+ "'name' TEXT," + "'mode' INT," + "'data' TEXT,"
+					+ "'world' TEXT); ");
+			if(srvals != null){
+				for(LinkedList<String> sr:srvals){
+					String tadd = "";
+					for(String l:sr) tadd+=","+l;
+					//tadd = tadd.replace("null", "''");
+					if(tadd.startsWith(",")) tadd=tadd.substring(1, tadd.length());
+					//tekkitrestrict.log.info("INSERT INTO 'tr_saferegion' VALUES("+tadd+");");
+					db.query("INSERT INTO 'tr_saferegion' VALUES("+tadd+");");
+				}
+			}
+		} catch (Exception ex) {}
+		try {
+			db.query("CREATE TABLE IF NOT EXISTS 'tr_limiter' ( "
+					+ "'id' INTEGER PRIMARY KEY AUTOINCREMENT,"
+					+ "'player' TEXT," + "'blockdata' TEXT);");
+			if(limvals != null){
+				for(LinkedList<String> sr:limvals){
+					String tadd = "";
+					for(String l:sr) tadd+=","+l;
+					//tadd = tadd.replace("null", "''");
+					if(tadd.startsWith(",")) tadd=tadd.substring(1, tadd.length());
+					//tekkitrestrict.log.info("INSERT INTO 'tr_saferegion' VALUES("+tadd+");");
+					db.query("INSERT INTO 'tr_limiter' VALUES("+tadd+");");
+				}
+			}
+		} catch (Exception ex) {}
+	}
 	private LinkedList<LinkedList<String>> getTableVals(String table) throws SQLException {
 		ResultSet rs = db.query("SELECT * FROM `"+table+"`");
 		LinkedList<LinkedList<String>> values = new LinkedList<LinkedList<String>>();
@@ -500,7 +602,10 @@ public class tekkitrestrict extends JavaPlugin {
 		return values;
 	}
 	
-	public void reload(boolean silent) {
+	public void reload(boolean listeners, boolean silent) {
+		if (listeners){
+			Assigner.unregisterAll();
+		}
 		this.reloadConfig();		
 		config = this.getConfigx();
 		loadConfigCache();
@@ -514,6 +619,16 @@ public class tekkitrestrict extends JavaPlugin {
 		TRRecipeBlock.reload();
 		TRLimitFlyThread.reload();
 		TREMCSet.reload();
+		if (linkEEPatch()){
+			EEPSettings.loadAllDisabledActions();
+			EEPSettings.loadMaxCharge();
+			if (listeners)
+				Assigner.assignEEPatch();
+		}
+		
+		if (listeners)
+			Assigner.assign();
+		
 		if (!silent) log.info("TekkitRestrict Reloaded!");
 	}
 
@@ -567,7 +682,8 @@ public class tekkitrestrict extends JavaPlugin {
 		}
 		return conf;
 	}
-
+	
+	@Deprecated
 	@Override
 	public void saveDefaultConfig() {
 		Level ll = log.getLevel();

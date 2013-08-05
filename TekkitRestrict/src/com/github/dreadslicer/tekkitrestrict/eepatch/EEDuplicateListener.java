@@ -8,6 +8,6 @@ import ee.events.EEDuplicateEvent;
 public class EEDuplicateListener implements Listener {
 	@EventHandler
 	public void onDuplicateEvent(EEDuplicateEvent event){
-		if (!EEPSettings.allowOreDupe) event.setCancelled(true);
+		event.setCancelled(true);
 	}
 }

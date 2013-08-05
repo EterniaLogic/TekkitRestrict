@@ -56,6 +56,15 @@ public class SQLite {
 			return false;
 		}
 	}
+	
+	public boolean isOpen() {
+		if (connection == null) return false;
+		try {
+			return !connection.isClosed();
+		} catch (SQLException e) {
+			return false;
+		}
+	}
 
 	public void close() {
 		if (connection == null) return;

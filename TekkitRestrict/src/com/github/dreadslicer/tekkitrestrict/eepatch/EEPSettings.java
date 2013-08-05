@@ -10,7 +10,6 @@ import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
 import ee.events.EEEnums.EERingAction;
 
 public class EEPSettings {
-	public static boolean allowOreDupe = true;
 	public static HashMap<Integer, Integer> MaxCharge = new HashMap<Integer, Integer>();
 	
 	public static HashMap<String, ArrayList<Integer>> Groups = new HashMap<String, ArrayList<Integer>>();
@@ -206,12 +205,8 @@ public class EEPSettings {
 		}
 	}
 	
-	public static void loadDisabledActions(){
-		
-	}
-	
-	public static void loadDuplicateSettings(){
-		allowOreDupe = tekkitrestrict.config.getBoolean("AllowRMFurnaceOreDuplication", true);
+	public static void loadAllDisabledActions(){
+		loadDisabledRingActions();
 	}
 	
 	public static ArrayList<Integer> zeroring = new ArrayList<Integer>();
@@ -223,6 +218,14 @@ public class EEPSettings {
 	public static ArrayList<Integer> blackholeband = new ArrayList<Integer>();
 	public static ArrayList<Integer> voidring = new ArrayList<Integer>();
 	public static void loadDisabledRingActions(){
+		zeroring.clear();
+		firering.clear();
+		harvestring.clear();
+		flyring.clear();
+		arcanering.clear();
+		blackholeband.clear();
+		voidring.clear();
+		
 		//tekkitrestrict.config.getConfigurationSection("Actions.Rings");
 		if (!tekkitrestrict.config.getBoolean("Actions.Rings.ZeroRing.FreezeRadius", true))
 			zeroring.add(EERingAction.Freeze.ordinal());
