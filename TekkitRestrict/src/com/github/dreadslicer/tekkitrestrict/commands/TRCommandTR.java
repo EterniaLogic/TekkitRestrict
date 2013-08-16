@@ -40,11 +40,6 @@ public class TRCommandTR implements CommandExecutor {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		if (!cmd.getName().toLowerCase().equals("tekkitrestrict")) {
-			Log.Debug("Please inform the developer that onCommand is acting strangely.");
-			return true;
-		}
-		
 		send.sender = sender;
 		
 		String[] largs = args.clone();
@@ -269,7 +264,7 @@ public class TRCommandTR implements CommandExecutor {
 						return true;
 					}
 					
-					if (eIC(largs[2], "list")){
+					if (largs[2].equals("list")){
 						if (send.noPerm("admin.safezone.list")) return true;
 						
 						int requestedPage = 1;
@@ -297,13 +292,13 @@ public class TRCommandTR implements CommandExecutor {
 						return true;
 					}
 					
-					if (eIC(largs[2], "check")){
+					if (largs[2].equals("check")){
 						Player target;
 						if (largs.length == 4){
 							if (send.noPerm("admin.safezone.check.others")) return true;
 							target = Bukkit.getPlayer(largs[3]);
 							if (target == null){
-								send.msg(ChatColor.RED + "Cannot find player " + largs[3] + "!");
+								send.msg(ChatColor.RED + "Cannot find player " + args[3] + "!");
 								return true;
 							}
 						} else {
@@ -324,7 +319,7 @@ public class TRCommandTR implements CommandExecutor {
 						return true;
 					}
 					
-					if (eIC(largs[2], "rem", "del") || eIC(largs[2], "remove", "delete")){
+					if (largs[2].equals("rem") || largs[2].equals("del") || largs[2].equals("remove") || largs[2].equals("delete")){
 						if (send.noPerm("admin.safezone.remove")) return true;
 						
 						if (largs.length != 4){
@@ -358,13 +353,13 @@ public class TRCommandTR implements CommandExecutor {
 						//FIXME uppercase problem
 						try {
 							tekkitrestrict.db.query("DELETE FROM `tr_saferegion` WHERE `name` = '"
-											+ tekkitrestrict.antisqlinject((name == null ? largs[3] : name)) + "'");
+											+ tekkitrestrict.antisqlinject((name == null ? largs[3] : name)) + "' COLLATE NOCASE");
 						} catch (SQLException ex) {}
 						
 						return true;
 					}
 					
-					if (eIC(largs[2], "addwg")){
+					if (largs[2].equals("addwg")){
 						if (send.noConsole()) return true;
 						
 						if (send.noPerm("admin.safezone.addwg")) return true;
@@ -421,7 +416,7 @@ public class TRCommandTR implements CommandExecutor {
 						return true;
 					}
 					
-					if (eIC(largs[2], "addgp")){
+					if (largs[2].equals("addgp")){
 						if (send.noConsole()) return true;
 						
 						if (send.noPerm("admin.safezone.addgp")) return true;
@@ -583,24 +578,23 @@ public class TRCommandTR implements CommandExecutor {
 					send.msg("/tr admin limit clear <player> <id[:data]>", "Clear a players limits for a specific itemid.");
 					return true;
 					
+				} else {
+					send.msg(ChatColor.RED + "Unknown subcommand " + args[0] + "!");
+					send.msg("Use /tr admin help to see all subcommands.");
+					return true;
 				}
-				
-				
-				
 			} else {
 				send.msg("[TekkitRestrict " + tekkitrestrict.version + " Commands]");
 				send.msg("Aliases: /tr, /tekkitrestrict");
 				if (sender.hasPermission("tekkitrestrict.emc")) send.msg("/tr emc", "List EMC commands.");
 				if (sender.hasPermission("tekkitrestrict.admin")) send.msg("/tr admin", "list admin commands");
+				send.msg("/tr about", "List information about the version and authors of TekkitRestrict");
 				return true;
 			}
 			
-		} catch (Exception e) {
+		} catch (Exception ex) {
 			send.msg(ChatColor.RED + "An error has occured processing your command.");
-			TRLogger.Log("debug", "TRCommandTR Error: " + e.getMessage());
-			for (StackTraceElement ee : e.getStackTrace()) {
-				TRLogger.Log("debug", "     " + ee.toString());
-			}
+			Log.Exception(ex);
 		}
 
 		return true;
@@ -616,7 +610,7 @@ public class TRCommandTR implements CommandExecutor {
 			send.msg("/tr admin limit clear <player>", "Clear a players limits.");
 			send.msg("/tr admin limit clear <player> <id[:data]>", "Clear a players limits for a specific item.");
 			send.msg("/tr admin limit list <player> [id]", "List a players limits.");
-		} else if (page == 2) {
+		} else if (page >= 2) {
 			send.msg("[TekkitRestrict " + tekkitrestrict.version + " Admin Commands] Page 2 / 2");
 			send.msg("/tr admin safezone list [page]", "List safezones.");
 			send.msg("/tr admin safezone check [player]", "Check if a player is in a safezone.");
@@ -625,15 +619,7 @@ public class TRCommandTR implements CommandExecutor {
 			send.msg("/tr admin safezone rem <name>", "Remove a safezone.");
 			send.msg("/tr admin threadlag", "Display threadlag information.");
 		} else {
-			send.msg(ChatColor.RED + "Page doesnt exist.");
+			send.msg(ChatColor.RED + "Page " + page + " doesn't exist. ");
 		}
-	}
-	
-	private static boolean eIC(String arg, String arg2){
-		return arg.toLowerCase().equals(arg2.toLowerCase());
-	}
-	private static boolean eIC(String arg, String arg2, String arg3){
-		arg = arg.toLowerCase();
-		return arg.equals(arg2.toLowerCase()) ? true : arg.equals(arg3.toLowerCase());
 	}
 }

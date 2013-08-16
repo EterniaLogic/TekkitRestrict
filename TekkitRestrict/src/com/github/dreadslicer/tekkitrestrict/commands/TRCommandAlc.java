@@ -24,7 +24,6 @@ import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.event.CraftEventFactory;
 import org.bukkit.entity.Player;
 
-import com.github.dreadslicer.tekkitrestrict.Log;
 import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
 
 import ee.AlchemyBagData;
@@ -49,11 +48,6 @@ public class TRCommandAlc implements CommandExecutor {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		if (!cmd.getName().toLowerCase().equals("alc")){
-			Log.Debug("Please inform the developer that onCommand is acting strangely.");
-			return true;
-		}
-		
 		if (!(sender instanceof Player)){
 			sender.sendMessage(ChatColor.RED + "The console cannot use this command!");
 			return true;

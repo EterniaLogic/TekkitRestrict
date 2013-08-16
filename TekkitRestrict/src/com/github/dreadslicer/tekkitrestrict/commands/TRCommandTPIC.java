@@ -1,7 +1,6 @@
 package com.github.dreadslicer.tekkitrestrict.commands;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -14,7 +13,6 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import com.github.dreadslicer.tekkitrestrict.Log;
 import com.github.dreadslicer.tekkitrestrict.Send;
 
 public class TRCommandTPIC implements CommandExecutor {
@@ -25,11 +23,6 @@ public class TRCommandTPIC implements CommandExecutor {
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		if (!cmd.getName().toLowerCase().equals("tpic")){
-			Log.Debug("Please inform the developer that onCommand is acting strangely.");
-			return true;
-		}
-		
 		send.sender = sender;
 		
 		if (send.noConsole()) return true;
@@ -96,10 +89,5 @@ public class TRCommandTPIC implements CommandExecutor {
 			player.sendMessage(ChatColor.YELLOW + "There are no chunks with " + max + " entities.");
 		else
 			player.sendMessage(ChatColor.YELLOW + "There are no chunks with " + max + " items.");
-	}
-	
-	@Override
-	protected void finalize(){
-		Logger.getLogger("Minecraft").info("Class TRCommandTP has been killed.");
 	}
 }
