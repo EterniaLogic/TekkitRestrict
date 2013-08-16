@@ -6,7 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.FileChannel;
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
@@ -54,8 +53,11 @@ public class tekkitrestrict extends JavaPlugin {
 	
 	/** Indicates if tekkitrestrict is disabling. Threads use this to check if they should stop. */
 	public static boolean disable = false;
+	
 	public static String version;
 	public static double dbversion = 1.2;
+	public static int dbworking = 0;
+	
 	public static Object perm = null;
 	public static SQLite db;
 	public static Updater updater = null;
@@ -71,14 +73,15 @@ public class tekkitrestrict extends JavaPlugin {
 		log = this.getLogger();
 		
 		//pre-load the sqlite
-		log.info("Loading SQLite Database...");
+		log.info("[DB] Loading SQLite Database...");
 		if (!loadSqlite()){
-			log.warning("Failed to load SQLite Database!");
+			log.warning("[DB] Failed to load SQLite Database!");
 		} else {
-			initSqlite();
-			log.info("SQLite Database loaded!");
+			if (initSqlite())
+				log.info("[DB] SQLite Database loaded!");
+			else
+				log.warning("[DB] Failed to load SQLite Database!");
 		}
-		log.info("SQLite loaded!");
 
 		saveDefaultConfig(false);
 
@@ -421,182 +424,237 @@ public class tekkitrestrict extends JavaPlugin {
 		File dbfile = new File(this.getDataFolder().getPath() + File.separator + "Data.db");
 		if (!dbfile.exists()){
 			newdb = true;
-			log.info("Creating database file...");
+			log.info("[DB] Creating database file...");
 		}
 		db = new SQLite("Data", this.getDataFolder().getPath());
 		
 		return db.open();
 	}
+
 	private boolean initSqlite() {
-		//determine if Data.db is older.
-		Double ver = new Double(this.getDescription().getVersion());
-		ResultSet prev = null;
-		LinkedList<LinkedList<String>> srvals = null, limvals=null;
-		
 		if (!db.isOpen()) {
 			if (!db.open()){
-				log.warning("Cannot open the database!");
+				log.warning("[DB] Cannot open the database!");
+				dbworking = 20;
 				return false;
 			}
 		}
+		
+		ResultSet prev = null;
 
-		try{
-			//Version select
-			ResultSet rs = db.query("SELECT version FROM tr_dbversion");
-			prev = rs;
-			if(rs.next()){
-				Double verX = rs.getDouble("version");
-				if(verX == 1.10 || verX == 1.00){
-					//nothing changed...
-				}
-			}
-			rs.close();
-		} catch(Exception e){
+		try {
+			double verX = -1d;
+
+			prev = db.query("SELECT version FROM tr_dbversion");
+			if(prev.next()) verX = prev.getDouble("version");
+			
+			prev.close();
+			
+			//Change version to 1.2 if it is lower
+			if(verX != -1d && verX < dbversion)
+				db.query("INSERT OR REPLACE INTO 'tr_dbversion' (version) VALUES(" + dbversion + ");");
+			
+		} catch(Exception ex1){
 			if(prev != null)
-				try {prev.close();} catch (SQLException e1) {}
-			//PRE-1.00 version, remove/purge and replace.
-			log.info("Transfering last Data.db info to new Database prototype");
-			//remove all relevant information from both databases.
-			//tr_saferegion =	id name mode data world
-			//tr_limiter = 		id player blockdata
-			try {
-				srvals = this.getTableVals("tr_saferegion");
-			} catch(SQLException ex){
-				log.warning("Minor exception occured when trying to load the safezones from the database.");
-			}
-			try {
-				limvals = this.getTableVals("tr_limiter");
-			} catch(SQLException ex){
-				log.warning("Minor exception occured when trying to load the limiter from the database.");
-			}
+				try {prev.close();} catch (SQLException ex2) {}
 			
-			if (srvals != null && limvals != null)
-				log.info("DB - Copied "+(srvals.size() + limvals.size())+" rows");
-			
-			try{db.query("DROP TABLE `tr_saferegion`;");} catch(Exception ex){}
-			try{db.query("DROP TABLE `tr_limiter`;");} catch(Exception ex){}
-			
-			
-			try {
-				db.query("CREATE TABLE IF NOT EXISTS 'tr_dbversion' (version NUMERIC);");
-				db.query("INSERT INTO 'tr_dbversion' (version) VALUES("+ver+");");
-			} catch (Exception E) {
-			}
+			if (newdb) initNewDB();
+			else transferOldDB();
 		}
-		
-		
+		if (dbworking == 0) return true;
+		return false;
+	}
+	
+	private void initNewDB(){
+		dbworking = 0;
+		log.info("[DB] Creating new database...");
+		try {
+			db.query("CREATE TABLE IF NOT EXISTS 'tr_dbversion' (version NUMERIC);");
+			db.query("INSERT OR REPLACE INTO 'tr_dbversion' (version) VALUES("+dbversion+");");
+		} catch (Exception ex) {
+			log.warning("[DB] Unable to write version to database!");
+			for (StackTraceElement cur : ex.getStackTrace()){
+				log.warning("[DB] " + cur.toString());
+			}
+			dbworking += 1;
+		}
+	
 		try {
 			db.query("CREATE TABLE IF NOT EXISTS 'tr_saferegion' ( "
-					+ "'id' INTEGER PRIMARY KEY AUTOINCREMENT,"
-					+ "'name' TEXT," + "'mode' INT," + "'data' TEXT,"
-					+ "'world' TEXT); ");
-			if(srvals != null){
-				for(LinkedList<String> sr:srvals){
-					String tadd = "";
-					for(String l:sr) tadd+=","+l;
-					//tadd = tadd.replace("null", "''");
-					if(tadd.startsWith(",")) tadd=tadd.substring(1, tadd.length());
-					//tekkitrestrict.log.info("INSERT INTO 'tr_saferegion' VALUES("+tadd+");");
-					db.query("INSERT INTO 'tr_saferegion' VALUES("+tadd+");");
-				}
-			}
+			+ "'id' INTEGER PRIMARY KEY AUTOINCREMENT,"
+			+ "'name' TEXT,"
+			+ "'mode' INT,"
+			+ "'data' TEXT,"
+			+ "'world' TEXT);");
 		} catch (Exception ex) {
+			log.severe("[DB] Unable to create safezones table!");
+			for (StackTraceElement cur : ex.getStackTrace()){
+				log.warning("[DB] " + cur.toString());
+			}
+			
+			dbworking += 2;
 		}
+		
 		try {
 			db.query("CREATE TABLE IF NOT EXISTS 'tr_limiter' ( "
-					+ "'id' INTEGER PRIMARY KEY AUTOINCREMENT,"
-					+ "'player' TEXT," + "'blockdata' TEXT);");
-			if(limvals != null){
-				for(LinkedList<String> sr:limvals){
-					String tadd = "";
-					for(String l:sr) tadd+=","+l;
-					//tadd = tadd.replace("null", "''");
-					if(tadd.startsWith(",")) tadd=tadd.substring(1, tadd.length());
-					//tekkitrestrict.log.info("INSERT INTO 'tr_saferegion' VALUES("+tadd+");");
-					db.query("INSERT INTO 'tr_limiter' VALUES("+tadd+");");
-				}
+			+ "'id' INTEGER PRIMARY KEY AUTOINCREMENT,"
+			+ "'player' TEXT,"
+			+ "'blockdata' TEXT);");
+		} catch (Exception ex) {
+			log.severe("[DB] Unable to create limiter table!");
+			for (StackTraceElement cur : ex.getStackTrace()){
+				log.warning("[DB] " + cur.toString());
 			}
-		} catch (Exception E) {
+			dbworking += 4;
 		}
+		
+		dbFailMsg(dbworking);
+		if (dbworking != 0)
+			log.info("[DB] Not all tables could be created!");
+		else 
+			log.info("[DB] Database created successfully!");
 	}
 
+	/** Transfer the database from PRE-1.00 version format to the new format. */
 	private void transferOldDB() {
+		dbworking = 0;
+		log.info("[DB] Transfering old database into the new database format...");
+		
 		LinkedList<LinkedList<String>> srvals = null, limvals=null;
-		//PRE-1.00 version, remove/purge and replace.
-		log.info("Transfering last Data.db info to new Database prototype");
-		//remove all relevant information from both databases.
+		
 		//tr_saferegion =	id name mode data world
 		//tr_limiter = 		id player blockdata
 		try {
-			srvals = this.getTableVals("tr_saferegion");
+			srvals = getTableVals("tr_saferegion");
 		} catch(SQLException ex){
-			log.warning("Minor exception occured when trying to load the safezones from the database.");
+			log.warning("[DB] Unable to transfer safezones from the old format to the new one!");
 		}
 		try {
-			limvals = this.getTableVals("tr_limiter");
+			limvals = getTableVals("tr_limiter");
 		} catch(SQLException ex){
-			log.warning("Minor exception occured when trying to load the limiter from the database.");
+			log.warning("[DB] Unable to transfer limits from the old format to the new one!");
 		}
 		
-		if (srvals != null && limvals != null)
-			log.info("DB - Copied "+(srvals.size() + limvals.size())+" rows");
-		
+		//Delete old tables
 		try{db.query("DROP TABLE `tr_saferegion`;");} catch(Exception ex){}
 		try{db.query("DROP TABLE `tr_limiter`;");} catch(Exception ex){}
 		
-		
+		//################################### VERSION ###################################
 		try {
 			db.query("CREATE TABLE IF NOT EXISTS 'tr_dbversion' (version NUMERIC);");
-			db.query("INSERT INTO 'tr_dbversion' (version) VALUES("+dbversion+");");
-		} catch (Exception E) {
+			db.query("INSERT OR REPLACE INTO 'tr_dbversion' (version) VALUES("+dbversion+");");
+		} catch (Exception ex) {
+			log.warning("[DB] Unable to write version to database!");
+			for (StackTraceElement cur : ex.getStackTrace()){
+				log.warning("[DB] " + cur.toString());
+			}
+			dbworking += 1;
 		}
+		//###############################################################################
 		
+		//################################## SAFEZONES ##################################
 		try {
 			db.query("CREATE TABLE IF NOT EXISTS 'tr_saferegion' ( "
 					+ "'id' INTEGER PRIMARY KEY AUTOINCREMENT,"
-					+ "'name' TEXT," + "'mode' INT," + "'data' TEXT,"
+					+ "'name' TEXT,"
+					+ "'mode' INT,"
+					+ "'data' TEXT,"
 					+ "'world' TEXT); ");
-			if(srvals != null){
-				for(LinkedList<String> sr:srvals){
-					String tadd = "";
-					for(String l:sr) tadd+=","+l;
-					//tadd = tadd.replace("null", "''");
-					if(tadd.startsWith(",")) tadd=tadd.substring(1, tadd.length());
-					//tekkitrestrict.log.info("INSERT INTO 'tr_saferegion' VALUES("+tadd+");");
-					db.query("INSERT INTO 'tr_saferegion' VALUES("+tadd+");");
-				}
+		} catch (Exception ex) {
+			log.severe("[DB] Unable to create safezones table!");
+			for (StackTraceElement cur : ex.getStackTrace()){
+				log.warning("[DB] " + cur.toString());
 			}
-		} catch (Exception ex) {}
+			
+			dbworking += 2;
+		}
+		
+		try {
+			//Import safezones
+			if(srvals != null){
+				for(LinkedList<String> vals:srvals){
+					String toadd = "";
+					for(String str:vals) toadd+=","+str;
+					//toadd = toadd.replace("null", "''");
+					if(toadd.startsWith(",")) toadd=toadd.substring(1, toadd.length());
+					db.query("INSERT INTO 'tr_saferegion' VALUES("+toadd+");");
+				}
+				
+				log.info("[DB] Transferred " + srvals.size() + " safezones.");
+			}
+		} catch (Exception ex) {
+			log.warning("[DB] Unable to write safezones to database!");
+			for (StackTraceElement cur : ex.getStackTrace()){
+				log.warning("[DB] " + cur.toString());
+			}
+		}
+		//###############################################################################
+		
+		//################################### LIMITER ###################################
 		try {
 			db.query("CREATE TABLE IF NOT EXISTS 'tr_limiter' ( "
 					+ "'id' INTEGER PRIMARY KEY AUTOINCREMENT,"
-					+ "'player' TEXT," + "'blockdata' TEXT);");
-			if(limvals != null){
-				for(LinkedList<String> sr:limvals){
-					String tadd = "";
-					for(String l:sr) tadd+=","+l;
-					//tadd = tadd.replace("null", "''");
-					if(tadd.startsWith(",")) tadd=tadd.substring(1, tadd.length());
-					//tekkitrestrict.log.info("INSERT INTO 'tr_saferegion' VALUES("+tadd+");");
-					db.query("INSERT INTO 'tr_limiter' VALUES("+tadd+");");
-				}
+					+ "'player' TEXT,"
+					+ "'blockdata' TEXT);");
+		} catch (Exception ex) {
+			log.severe("[DB] Unable to create limiter table!");
+			for (StackTraceElement cur : ex.getStackTrace()){
+				log.warning("[DB] " + cur.toString());
 			}
-		} catch (Exception ex) {}
+			dbworking += 4;
+		}
+		
+		try {
+			if(limvals != null){
+				for(LinkedList<String> vals:limvals){
+					String toadd = "";
+					for(String str:vals) toadd+=","+str;
+					if(toadd.startsWith(",")) toadd=toadd.substring(1, toadd.length());
+					db.query("INSERT INTO 'tr_limiter' VALUES("+toadd+");");
+				}
+				
+				log.info("[DB] Transferred "+ limvals.size() + " limits.");
+			}
+		} catch (Exception ex) {
+			log.warning("[DB] Unable to write limits to database!");
+			for (StackTraceElement cur : ex.getStackTrace()){
+				log.warning("[DB] " + cur.toString());
+			}
+		}
+		if (dbworking == 0) {
+			log.info("[DB] Transfering into the new database format succeeded!");
+		} else {
+			dbFailMsg(dbworking);
+			log.warning("[DB] Transfering into the new database format failed!");
+		}
+		
 	}
+	
+	private void dbFailMsg(int fail){
+		if (fail == 1 || fail == 3 || fail == 5)
+			log.severe("[DB] The database will RESET upon next server startup because the version table couldn't be created!");
+		if (fail == 2 || fail == 3 || fail == 6)
+			log.severe("[DB] Safezones will NOT work properly because the safezones table couldn't be created!");
+		if (fail == 4 || fail == 5 || fail == 6)
+			log.severe("[DB] The limiter will NOT work properly because the limiter table couldn't be created!");
+		else if (fail == 7) 
+			log.severe("[DB] All database actions failed! Safezones and the limiter will NOT be stored!");
+	}
+	
 	private LinkedList<LinkedList<String>> getTableVals(String table) throws SQLException {
 		ResultSet rs = db.query("SELECT * FROM `"+table+"`");
 		LinkedList<LinkedList<String>> values = new LinkedList<LinkedList<String>>();
 		if (rs == null) return values;
 		while(rs.next()) {
-			LinkedList<String> j = new LinkedList<String>();
-			for(int i=1;i<=1000;i++){
+			LinkedList<String> row = new LinkedList<String>();
+			for (int i=1;i<=20;i++){
 				try {
-					j.add(rs.getString(i));
-				} catch (Exception e){
+					row.add(rs.getString(i));
+				} catch (Exception ex){
 					break;
 				}
 			}
-			values.add(j);
+			values.add(row);
 		}
 		rs.close();
 		return values;
