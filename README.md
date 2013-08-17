@@ -2,23 +2,25 @@ TekkitRestrict
 ==============
 
 The TekkitRestrict Source Requires the following Dependencies:
-- Any CraftBukkit 1.2.5 build
-- bPermissions
-- EssentialsGroupManager
-- Factions
-- GriefPrevention
-- LWC
-- PermissionsBukkit
-- PermissionsEx
-- Towny
-- Vault
-- WorldGuard
-- EE2
-- PreciousStones
-- IndustrialCraft2
-- RedPower2
+- Bukkit 1.2.5-R5.0 OR Tekkit.jar from Tekkit 3.1.2
+- bPermissions v2.9.12
+- Essentials v2.9.2
+- EssentialsGroupManager v2.0 (2.9.2) (Phoenix) or v2.0.23 (Phoenix)
+- Factions v1.7.5 Beta
+- GriefPrevention v5.5.1
+- LWC v4.3.0 or v4.3.1
+- PermissionsBukkit v2.0
+- PermissionsEx v1.19.3
+- Towny v0.82.0.0
+- Vault v1.2.16
+- WorldEdit v5.3*
+- WorldGuard v5.5.3*
+- EquivalentExchange2 v1.4.6.5
+- PreciousStones v9.4.0
+- IndustrialCraft2 v1.97
+- RedPower2 v2.0p5b2
 
-
+* WorldEdit and WorldGuard are kinda confusing. The last WE build for 1.2.5 is v5.4.2, but the last WG build for 1.2.5 is v5.6.5, but it requires WE 5.4.5 (which doesn't support 1.2.5)...
 Railcraft And EE Modifications
 --
 All rights reserved.
