@@ -20,7 +20,7 @@ The TekkitRestrict Source Requires the following Dependencies:
 - IndustrialCraft2 v1.97
 - RedPower2 v2.0p5b2
 
-* WorldEdit and WorldGuard are kinda confusing. The last WE build for 1.2.5 is v5.4.2, but the last WG build for 1.2.5 is v5.6.5, but it requires WE 5.4.5 (which doesn't support 1.2.5)...
+\* WorldEdit and WorldGuard are kinda confusing. The last WE build for 1.2.5 is v5.4.2, but the last WG build for 1.2.5 is v5.6.5, which requires WE 5.4.5 (which doesn't support 1.2.5)...
 Railcraft And EE Modifications
 --
 All rights reserved.
