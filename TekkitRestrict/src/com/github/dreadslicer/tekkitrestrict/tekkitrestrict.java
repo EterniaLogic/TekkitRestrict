@@ -69,10 +69,10 @@ public class tekkitrestrict extends JavaPlugin {
 
 	@Override
 	public void onLoad() {
-		instance = this;
-		log = this.getLogger();
+		instance = this; //Set the instance
+		log = getLogger(); //Set the logger
 		
-		//pre-load the sqlite
+		//#################### load SQLite ####################
 		log.info("[DB] Loading SQLite Database...");
 		if (!loadSqlite()){
 			log.warning("[DB] Failed to load SQLite Database!");

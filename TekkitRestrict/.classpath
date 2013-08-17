@@ -4,10 +4,11 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
 	<classpathentry kind="lib" path="miglayout15-swing.jar" sourcepath="miglayout-src.zip"/>
 	<classpathentry kind="lib" path="forms-1.3.0.jar" sourcepath="forms-1.3.0-src.zip"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/TekkitRestrict"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/PermissionPlugins"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/ProtectionPlugins"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/TownPlugins"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/TR_Remaining"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Tekkit Classic Mods Base for TekkitRestrict"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Permission Plugins for Tekkit Classic"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Protection Plugins for Tekkit Classic"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Tekkit Classic Bukkit"/>
+	<classpathentry kind="lib" path="C:/Program Files/eclipse_Kepler/lib/Tekkit_Classic/Essentials 2.9.2 for 1.2.5.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/eclipse_Kepler/lib/Tekkit_Classic/EEPatch.zip"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
