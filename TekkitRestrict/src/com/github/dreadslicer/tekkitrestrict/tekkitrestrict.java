@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.nio.channels.FileChannel;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.LinkedList;
@@ -46,6 +47,8 @@ import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.SSMode;
 
 public class tekkitrestrict extends JavaPlugin {
+	
+	private static tekkitrestrict instance;
 	public static Logger log;
 	public static TRFileConfiguration config;
 	public static boolean EEEnabled = false;
@@ -61,12 +64,24 @@ public class tekkitrestrict extends JavaPlugin {
 	public static Object perm = null;
 	public static SQLite db;
 	public static Updater updater = null;
-	private static tekkitrestrict instance;
+	
 	public static ExecutorService basfo = Executors.newCachedThreadPool();
 	
 	private static TRThread ttt = null;
+	private static TRLogFilter filter = null;
 	public static LinkedList<YamlConfiguration> configList = new LinkedList<YamlConfiguration>();
 
+	public ArrayList<String> msgCache = new ArrayList<String>();
+	
+	/**
+	 * Log a warning while the plugin is still loading.
+	 * If you type /tr warnings, you will see the warnings again.
+	 */
+	public static void loadWarning(String warning){
+		log.warning(warning);
+		instance.msgCache.add(warning);
+	}
+	
 	@Override
 	public void onLoad() {
 		instance = this; //Set the instance
@@ -75,52 +90,38 @@ public class tekkitrestrict extends JavaPlugin {
 		//#################### load SQLite ####################
 		log.info("[DB] Loading SQLite Database...");
 		if (!loadSqlite()){
-			log.warning("[DB] Failed to load SQLite Database!");
+			loadWarning("[DB] Failed to load SQLite Database!");
 		} else {
 			if (initSqlite())
 				log.info("[DB] SQLite Database loaded!");
-			else
-				log.warning("[DB] Failed to load SQLite Database!");
+			else {
+				loadWarning("[DB] Failed to load SQLite Database!");
+			}
 		}
 
 		saveDefaultConfig(false);
 
 		config = this.getConfigx(); //Load the configuration files
-		if (config.getDouble("ConfigVersion", 0.9) < 1.1){
-			log.warning("The config file version differs from the current one.");
-			
-			log.warning("Backing up old config files and writing new ones.");
-			
-			String path = "plugins"+File.separator+"tekkitrestrict"+File.separator;
-			String bpath = path+"config_backup";
-			File temp = new File(bpath);
-			temp.mkdirs();
-			bpath += File.separator;
-			
-			backupConfig(path + "General.config.yml", bpath + "General.config.yml");
-			backupConfig(path + "Advanced.config.yml", bpath + "Advanced.config.yml");
-			backupConfig(path + "ModModifications.config.yml", bpath + "ModModifications.config.yml");
-			backupConfig(path + "DisableClick.config.yml", bpath + "DisableClick.config.yml");
-			backupConfig(path + "DisableItems.config.yml", bpath + "DisableItems.config.yml");
-			backupConfig(path + "Hack.config.yml", bpath + "Hack.config.yml");
-			backupConfig(path + "LimitedCreative.config.yml", bpath + "LimitedCreative.config.yml");
-			backupConfig(path + "Logging.config.yml", bpath + "Logging.config.yml");
-			backupConfig(path + "TPerformance.config.yml", bpath + "TPerformance.config.yml");
-			backupConfig(path + "MicroPermissions.config.yml", bpath + "MicroPermissions.config.yml");
-			backupConfig(path + "SafeZones.config.yml", bpath + "SafeZones.config.yml");
-			backupConfig(path + "EEPatch.config.yml", bpath + "EEPatch.config.yml");
-			
-			saveDefaultConfig(true);
-			reloadConfig();
-		}
+		double configVer = config.getDouble("ConfigVersion", 0.9);
+		if (configVer < 1.1)
+			UpdateConfigFiles.v09();
+		else if (configVer < 1.2)
+			UpdateConfigFiles.v11();
 		
 		loadConfigCache();
+		if (config.getBoolean("UseAutoRPTimer")){
+			try {
+				double value = config.getDouble("RPTimerMin", 0.2d);
+				int ticks = (int) Math.round((value-0.1d) * 20d);
+				RedPowerLogic.minInterval = ticks; // set minimum interval for logic timers...
+				log.info("Set the RedPower Timer Min interval to " + value + " seconds.");
+			} catch (Exception e) {
+				loadWarning("Setting the RedPower Timer failed!");
+			}
+		}
 		
-		try {
-			int ticks = (int) Math.round(config.getDouble("RPTimerMin", 0.2) * 20);
-			RedPowerLogic.minInterval = ticks; // set minimum interval for logic timers...
-		} catch (Exception e) {
-			log.warning("Setting the RedPower Timer failed.");
+		if (config.getBoolean("PatchComputerCraft", true)){
+			PatchCC.start();
 		}
 
 		// ///////////
@@ -128,7 +129,7 @@ public class tekkitrestrict extends JavaPlugin {
 		
 		if (config.getBoolean("UseLogFilter", true)){
 			Enumeration<String> cc = LogManager.getLogManager().getLoggerNames();
-			TRLogFilter filter = new TRLogFilter();
+			filter = new TRLogFilter();
 			while(cc.hasMoreElements()) {
 				Logger.getLogger(cc.nextElement()).setFilter(filter); 
 			}
@@ -141,7 +142,6 @@ public class tekkitrestrict extends JavaPlugin {
 	}
 	@Override
 	public void onEnable() {
-		
 		ttt = new TRThread();
 		Assigner.assign(); //Register the required listeners
 		
@@ -282,7 +282,20 @@ public class tekkitrestrict extends JavaPlugin {
 			if (updater.getResult() == UpdateResult.UPDATE_AVAILABLE) log.info(ChatColor.GREEN + "There is an update available: " + updater.getLatestVersionString() + ". Use /tr admin update ingame to update.");
 		}
 		
-		log.info("TekkitRestrict v " + version + " Enabled!");
+		if (config.getBoolean("UseLogFilter", true)){
+			Enumeration<String> cc = LogManager.getLogManager().getLoggerNames();
+			while (cc.hasMoreElements()){
+				Logger l = Logger.getLogger(cc.nextElement());
+				if (!(l.getFilter() instanceof TRLogFilter)) l.setFilter(filter);
+			}
+		}
+		
+		if (!msgCache.isEmpty()){
+			log.warning("There were some warnings while loading TekkitRestrict!");
+			log.warning("Use /tr warnings to view them again (in case you missed them).");
+		}
+		
+		log.info("TekkitRestrict v" + version + " Enabled!");
 		
 		// TRThrottler.init();
 	}
@@ -434,7 +447,7 @@ public class tekkitrestrict extends JavaPlugin {
 	private boolean initSqlite() {
 		if (!db.isOpen()) {
 			if (!db.open()){
-				log.warning("[DB] Cannot open the database!");
+				loadWarning("[DB] Cannot open the database!");
 				dbworking = 20;
 				return false;
 			}
@@ -472,9 +485,9 @@ public class tekkitrestrict extends JavaPlugin {
 			db.query("CREATE TABLE IF NOT EXISTS 'tr_dbversion' (version NUMERIC);");
 			db.query("INSERT OR REPLACE INTO 'tr_dbversion' (version) VALUES("+dbversion+");");
 		} catch (Exception ex) {
-			log.warning("[DB] Unable to write version to database!");
+			loadWarning("[DB] Unable to write version to database!");
 			for (StackTraceElement cur : ex.getStackTrace()){
-				log.warning("[DB] " + cur.toString());
+				loadWarning("[DB] " + cur.toString());
 			}
 			dbworking += 1;
 		}
@@ -487,9 +500,9 @@ public class tekkitrestrict extends JavaPlugin {
 			+ "'data' TEXT,"
 			+ "'world' TEXT);");
 		} catch (Exception ex) {
-			log.severe("[DB] Unable to create safezones table!");
+			loadWarning("[DB] Unable to create safezones table!");
 			for (StackTraceElement cur : ex.getStackTrace()){
-				log.warning("[DB] " + cur.toString());
+				loadWarning("[DB] " + cur.toString());
 			}
 			
 			dbworking += 2;
@@ -501,16 +514,16 @@ public class tekkitrestrict extends JavaPlugin {
 			+ "'player' TEXT,"
 			+ "'blockdata' TEXT);");
 		} catch (Exception ex) {
-			log.severe("[DB] Unable to create limiter table!");
+			loadWarning("[DB] Unable to create limiter table!");
 			for (StackTraceElement cur : ex.getStackTrace()){
-				log.warning("[DB] " + cur.toString());
+				loadWarning("[DB] " + cur.toString());
 			}
 			dbworking += 4;
 		}
 		
 		dbFailMsg(dbworking);
 		if (dbworking != 0)
-			log.info("[DB] Not all tables could be created!");
+			loadWarning("[DB] Not all tables could be created!");
 		else 
 			log.info("[DB] Database created successfully!");
 	}
@@ -527,12 +540,12 @@ public class tekkitrestrict extends JavaPlugin {
 		try {
 			srvals = getTableVals("tr_saferegion");
 		} catch(SQLException ex){
-			log.warning("[DB] Unable to transfer safezones from the old format to the new one!");
+			loadWarning("[DB] Unable to transfer safezones from the old format to the new one!");
 		}
 		try {
 			limvals = getTableVals("tr_limiter");
 		} catch(SQLException ex){
-			log.warning("[DB] Unable to transfer limits from the old format to the new one!");
+			loadWarning("[DB] Unable to transfer limits from the old format to the new one!");
 		}
 		
 		//Delete old tables
@@ -544,9 +557,9 @@ public class tekkitrestrict extends JavaPlugin {
 			db.query("CREATE TABLE IF NOT EXISTS 'tr_dbversion' (version NUMERIC);");
 			db.query("INSERT OR REPLACE INTO 'tr_dbversion' (version) VALUES("+dbversion+");");
 		} catch (Exception ex) {
-			log.warning("[DB] Unable to write version to database!");
+			loadWarning("[DB] Unable to write version to database!");
 			for (StackTraceElement cur : ex.getStackTrace()){
-				log.warning("[DB] " + cur.toString());
+				loadWarning("[DB] " + cur.toString());
 			}
 			dbworking += 1;
 		}
@@ -561,9 +574,9 @@ public class tekkitrestrict extends JavaPlugin {
 					+ "'data' TEXT,"
 					+ "'world' TEXT); ");
 		} catch (Exception ex) {
-			log.severe("[DB] Unable to create safezones table!");
+			loadWarning("[DB] Unable to create safezones table!");
 			for (StackTraceElement cur : ex.getStackTrace()){
-				log.warning("[DB] " + cur.toString());
+				loadWarning("[DB] " + cur.toString());
 			}
 			
 			dbworking += 2;
@@ -583,9 +596,9 @@ public class tekkitrestrict extends JavaPlugin {
 				log.info("[DB] Transferred " + srvals.size() + " safezones.");
 			}
 		} catch (Exception ex) {
-			log.warning("[DB] Unable to write safezones to database!");
+			loadWarning("[DB] Unable to write safezones to database!");
 			for (StackTraceElement cur : ex.getStackTrace()){
-				log.warning("[DB] " + cur.toString());
+				loadWarning("[DB] " + cur.toString());
 			}
 		}
 		//###############################################################################
@@ -597,9 +610,9 @@ public class tekkitrestrict extends JavaPlugin {
 					+ "'player' TEXT,"
 					+ "'blockdata' TEXT);");
 		} catch (Exception ex) {
-			log.severe("[DB] Unable to create limiter table!");
+			loadWarning("[DB] Unable to create limiter table!");
 			for (StackTraceElement cur : ex.getStackTrace()){
-				log.warning("[DB] " + cur.toString());
+				loadWarning("[DB] " + cur.toString());
 			}
 			dbworking += 4;
 		}
@@ -616,29 +629,29 @@ public class tekkitrestrict extends JavaPlugin {
 				log.info("[DB] Transferred "+ limvals.size() + " limits.");
 			}
 		} catch (Exception ex) {
-			log.warning("[DB] Unable to write limits to database!");
+			loadWarning("[DB] Unable to write limits to database!");
 			for (StackTraceElement cur : ex.getStackTrace()){
-				log.warning("[DB] " + cur.toString());
+				loadWarning("[DB] " + cur.toString());
 			}
 		}
 		if (dbworking == 0) {
 			log.info("[DB] Transfering into the new database format succeeded!");
 		} else {
 			dbFailMsg(dbworking);
-			log.warning("[DB] Transfering into the new database format failed!");
+			loadWarning("[DB] Transfering into the new database format failed!");
 		}
 		
 	}
 	
 	private void dbFailMsg(int fail){
 		if (fail == 1 || fail == 3 || fail == 5)
-			log.severe("[DB] The database will RESET upon next server startup because the version table couldn't be created!");
+			loadWarning("[DB] The database will RESET upon next server startup because the version table couldn't be created!");
 		if (fail == 2 || fail == 3 || fail == 6)
-			log.severe("[DB] Safezones will NOT work properly because the safezones table couldn't be created!");
+			loadWarning("[DB] Safezones will NOT work properly because the safezones table couldn't be created!");
 		if (fail == 4 || fail == 5 || fail == 6)
-			log.severe("[DB] The limiter will NOT work properly because the limiter table couldn't be created!");
+			loadWarning("[DB] The limiter will NOT work properly because the limiter table couldn't be created!");
 		else if (fail == 7) 
-			log.severe("[DB] All database actions failed! Safezones and the limiter will NOT be stored!");
+			loadWarning("[DB] All database actions failed! Safezones and the limiter will NOT be stored!");
 	}
 	
 	private LinkedList<LinkedList<String>> getTableVals(String table) throws SQLException {
@@ -734,7 +747,7 @@ public class tekkitrestrict extends JavaPlugin {
 			try {
 				defConfigStream.close();
 			} catch (IOException e) {
-				tekkitrestrict.log.warning("Exception while trying to reload the config!");
+				loadWarning("Exception while trying to reload the config!");
 				e.printStackTrace();
 			}
 		}
@@ -834,7 +847,7 @@ public class tekkitrestrict extends JavaPlugin {
 		updater = new Updater(this, "tekkit-restrict", this.getFile(), Updater.UpdateType.DEFAULT, true);
 	}
 	
-	private boolean backupConfig(String sourceString, String destString){
+	public boolean backupConfig(String sourceString, String destString){
 		try {
 			File sourceFile = new File(sourceString);
 			File destFile = new File(destString);
@@ -858,7 +871,7 @@ public class tekkitrestrict extends JavaPlugin {
 			if(destination != null) destination.close();
 
 		} catch (IOException ex){
-			log.severe("Cannot backup config: " + sourceString);
+			loadWarning("Cannot backup config: " + sourceString);
 			return false;
 		}
 		return true;

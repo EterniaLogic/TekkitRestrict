@@ -16,6 +16,11 @@
 ## * DreadEnd * out.                                                ##
 ######################################################################
 
+# Patch ComputerCraft once to prevent some server crashes with
+# ComputerCraft computers.
+# Default: true
+PatchComputerCraft: true
+
 UseAutoRPTimer: true
 UseItemLimiter: true
 UseLimitedCreative: true
@@ -70,6 +75,6 @@ UpdateToDevelopmentVersions: false
 ######################################################################
 ######################################################################
 # Do NOT change this. It will reset the config files if you do.
-ConfigVersion: 1.1
+ConfigVersion: 1.2
 
 ######################################################################
