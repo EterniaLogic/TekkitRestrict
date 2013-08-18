@@ -160,7 +160,7 @@ public class TRListener implements Listener {
 			if (UseBlockLimit) {
 				TRLimitBlock il = TRLimitBlock.getLimiter(player.getName());
 				if (!il.checkLimit(e)) {
-					if (!Util.hasBypass(player, "limiter")) {
+					if (!player.hasPermission("tekkitrestrict.bypass.limiter")) {
 						player.sendMessage(ChatColor.RED + "[TRItemLimiter] You cannot place down any more of that block!");
 						e.setCancelled(true);
 						if (te1 instanceof TileCovered) {
@@ -188,7 +188,7 @@ public class TRListener implements Listener {
 			if (Global.useNewBanSystem){
 				if (TRCacheItem2.isBanned(player, "noitem", id, data)) banned = true;
 			} else {
-				if (TRNoItem.isItemBanned(player, id, data)) banned = true;
+				if (TRNoItem.isItemBanned(player, id, data, true)) banned = true;
 			}
 			
 			if (banned) {
@@ -213,7 +213,7 @@ public class TRListener implements Listener {
 				errorBlockPlace = true;
 			}
 			TRLogger.Log("debug", "Error: [onBlockPlace] " + ex.getMessage());
-			Log.Exception(ex);
+			Log.debugEx(ex);
 		}
 		
 	}
@@ -225,7 +225,7 @@ public class TRListener implements Listener {
 		if (player == null) return;
 		
 		if (player.getGameMode() == GameMode.CREATIVE){
-			if (!Util.hasBypass(player, "creative")) {
+			if (!player.hasPermission("tekkitrestrict.bypass.creative")) {
 				event.setCancelled(true);
 				player.sendMessage(ChatColor.RED + "[TRLimitedCreative] You cannot drop items!");
 				return;
@@ -250,7 +250,7 @@ public class TRListener implements Listener {
 				errorDrop = true;
 			}
 			TRLogger.Log("debug", "Error: [onDropItem, handleDropDupes] " + ex.getMessage());
-			Log.Exception(ex);
+			Log.debugEx(ex);
 		}
 	}
 
@@ -286,7 +286,7 @@ public class TRListener implements Listener {
 					if (Global.useNewBanSystem){
 						if (TRCacheItem2.isBanned(player, "creative", str.getTypeId(), str.getDurability())) banned = true;
 					} else {
-						if (TRNoItem.isCreativeItemBanned(player, str.getTypeId(), str.getDurability())) banned = true;
+						if (TRNoItem.isItemBannedInCreative(player, str.getTypeId(), str.getDurability(), true)) banned = true;
 					}
 				} catch (Exception ex) {
 					if (!errorInteract){
@@ -294,7 +294,7 @@ public class TRListener implements Listener {
 						tekkitrestrict.log.warning("(This error is only logged once) Error: [ListenInteract TRLimitedCreative] " + ex.getMessage());
 						errorInteract = true;
 					}
-					Log.Exception(ex);
+					Log.debugEx(ex);
 					TRLogger.Log("debug", "Error: [ListenInteract TRLimitedCreative] " + ex.getMessage());
 				}
 				
@@ -370,7 +370,7 @@ public class TRListener implements Listener {
 				errorCreativeClick = true;
 			}
 			TRLogger.Log("debug", "Error! [handleCreativeInvClick] : " + ex.getMessage());
-			Log.Exception(ex);
+			Log.debugEx(ex);
 		}
 		try {
 			// Determine if they are crafting a banned item.
@@ -382,7 +382,7 @@ public class TRListener implements Listener {
 				errorCraft = true;
 			}
 			TRLogger.Log("debug", "Error! [TRhandleCraftBlock] : " + ex.getMessage());
-			Log.Exception(ex);
+			Log.debugEx(ex);
 		}
 	}
 
@@ -391,14 +391,14 @@ public class TRListener implements Listener {
 		ItemStack item = event.getCurrentItem();
 		if (item == null) return false;
 		
-		if (Util.hasBypass(player, "noitem")) return false;
+		if (player.hasPermission("tekkitrestrict.bypass.noitem")) return false;
 		
 		boolean banned = false;
 		
 		if (Global.useNewBanSystem){
 			if (TRCacheItem2.isBanned(player, "noitem", item.getTypeId(), item.getDurability())) banned = true;
 		} else {
-			if (TRNoItem.isItemBanned(player, item.getTypeId(), item.getDurability())) banned = true;
+			if (TRNoItem.isItemBanned(player, item.getTypeId(), item.getDurability(), false)) banned = true;
 		}
 		
 		if (banned) {
@@ -457,7 +457,7 @@ public class TRListener implements Listener {
 			}
 		} catch (Exception ex) {
 			TRLogger.Log("debug", "Error! [TRNoDupePickup] : " + ex.getMessage());
-			Log.Exception(ex);
+			Log.debugEx(ex);
 		}
 	}
 }

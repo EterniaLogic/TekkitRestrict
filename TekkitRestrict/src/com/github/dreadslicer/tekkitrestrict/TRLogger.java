@@ -23,12 +23,12 @@ public class TRLogger {
 		if (!isLoggable(type)) return;
 
 		Calendar c = new GregorianCalendar();
-		String month = (c.get(Calendar.MONTH) + 1) + "";
-		String year = c.get(Calendar.YEAR) + "";
-		String day = c.get(Calendar.DATE) + "";
-		String hour = c.get(Calendar.HOUR_OF_DAY) + "";
-		String minute = c.get(Calendar.MINUTE) + "";
-		String second = c.get(Calendar.SECOND) + "";
+		String month = "" + (c.get(Calendar.MONTH) + 1);
+		String year = "" + c.get(Calendar.YEAR);
+		String day = "" + c.get(Calendar.DATE);
+		String hour = "" + c.get(Calendar.HOUR_OF_DAY);
+		String minute = "" + c.get(Calendar.MINUTE);
+		String second = "" + c.get(Calendar.SECOND);
 		
 		String LogNameFormatter = TRConfigCache.LogFilter.fileFormat;
 		LogNameFormatter = LogNameFormatter.replace("{MONTH}", month);

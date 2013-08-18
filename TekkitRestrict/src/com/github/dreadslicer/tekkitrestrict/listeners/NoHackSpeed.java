@@ -10,7 +10,6 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Hacks;
 import com.github.dreadslicer.tekkitrestrict.TRNoHack;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.HackType;
-import com.github.dreadslicer.tekkitrestrict.Util;
 
 public class NoHackSpeed implements Listener{
 	private static ConcurrentHashMap<String, Double[]> tickLastLoc = new ConcurrentHashMap<String, Double[]>();
@@ -20,7 +19,7 @@ public class NoHackSpeed implements Listener{
 	@EventHandler
 	void handleMove(PlayerMoveEvent e) {
 		Player player = e.getPlayer();
-		if (Util.hasHackBypass(player, "speed")) return;
+		if (player.hasPermission("tekkitrestrict.bypass.hack.speed")) return;
 		String name = player.getName();
 		// determine position of player to get velocity.
 		

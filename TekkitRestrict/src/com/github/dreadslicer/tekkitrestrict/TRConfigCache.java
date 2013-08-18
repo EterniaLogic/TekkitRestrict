@@ -64,5 +64,8 @@ public class TRConfigCache {
 	public static class ChunkUnloader {
 		public static int maxChunks, maxRadii;
 		public static boolean enabled;
+		public static int maxChunksEnd, maxChunksNether, maxChunksNormal;//TODO
+		public static int maxChunksTotal;//TODO
+		public static int unloadOrder;
 	}
 }

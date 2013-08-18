@@ -12,7 +12,6 @@ import com.github.dreadslicer.tekkitrestrict.TRCacheItem2;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Global;
 import com.github.dreadslicer.tekkitrestrict.TRNoItem;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Dupes;
-import com.github.dreadslicer.tekkitrestrict.Util;
 
 public class InventoryClickListener implements Listener {
 	static boolean doDupeCheck = false;
@@ -28,13 +27,13 @@ public class InventoryClickListener implements Listener {
 		{
 			id1 = event.getCurrentItem().getTypeId();
 			data1 = event.getCurrentItem().getDurability();
-			if (!Util.hasBypass(player, "noitem")) {
+			if (!player.hasPermission("tekkitrestrict.bypass.noitem")) {
 				boolean banned = false;
 				
 				if (Global.useNewBanSystem){
 					if (TRCacheItem2.isBanned(player, "noitem", id1, data1)) banned = true;
 				} else {
-					if (TRNoItem.isItemBanned(player, id1, data1)) banned = true;
+					if (TRNoItem.isItemBanned(player, id1, data1, false)) banned = true;
 				}
 				
 				if (banned) {

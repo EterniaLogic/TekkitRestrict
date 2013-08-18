@@ -10,10 +10,11 @@ import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Global;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Listeners;
 
 public class TRLimitedCreative {
+	/** Checks bypass creative permission. */
 	public static boolean handleCreativeInvClick(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
 		if (player.getGameMode() != GameMode.CREATIVE) return false;
-		if (Util.hasBypass(player, "creative")) return false;
+		if (player.hasPermission("tekkitrestrict.bypass.creative")) return false;
 		
 		try {
 			if (event.getView().getTopInventory() != null){
@@ -27,8 +28,8 @@ public class TRLimitedCreative {
 				}
 			}
 		} catch (Exception ex) {
-			TRLogger.Log("debug", "Error! [TRLimitedCreative ContainerCheck] : " + ex.getMessage());
-			Log.Exception(ex);
+			tekkitrestrict.log.warning("An error occured in TRLimitedCreative ContainerCheck! Please inform the author.");
+			Log.Exception(ex, false);
 		}
 		
 		try {
@@ -39,7 +40,7 @@ public class TRLimitedCreative {
 			if (Global.useNewBanSystem){
 				if (TRCacheItem2.isBanned(player, "creative", ccc.getTypeId(), ccc.getDurability())) banned = true;
 			} else {
-				if (TRNoItem.isCreativeItemBanned(player, ccc.getTypeId(), ccc.getData().getData())) banned = true;
+				if (TRNoItem.isItemBannedInCreative(player, ccc.getTypeId(), ccc.getData().getData(), false)) banned = true;
 			}
 			
 			if (banned) {
@@ -49,8 +50,8 @@ public class TRLimitedCreative {
 			}
 			
 		} catch (Exception ex) {
-			TRLogger.Log("debug", "Error! [TRLimitedCreative BannedCreativeItem] : " + ex.getMessage());
-			Log.Exception(ex);
+			tekkitrestrict.log.warning("An error occured in TRLimitedCreative BannedCreativeItem! Please inform the author.");
+			Log.Exception(ex, false);
 		}
 		return false;
 	}

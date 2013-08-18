@@ -5,8 +5,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-import com.github.dreadslicer.tekkitrestrict.Util;
-
 import ee.events.EEChargeEvent;
 
 public class EEChargeListener implements Listener {
@@ -24,7 +22,7 @@ public class EEChargeListener implements Listener {
 		Integer charge = EEPSettings.MaxCharge.get(id);
 		
 		if (charge == null){
-			if (Util.hasPermission(player, "maxcharge."+id+"."+old)){
+			if (player.hasPermission("tekkitrestrict.maxcharge."+id+"."+old)){
 				event.setCancelled(true);
 				player.sendMessage(ChatColor.RED + "You are not allowed to charge this tool to level " + old + " or above.");
 			}

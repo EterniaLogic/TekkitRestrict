@@ -101,8 +101,9 @@ public class TRPerformance {
 			}
 			out.close();
 			sender.sendMessage(ChatColor.YELLOW + "File 'threadinfo.txt' generated at serverdir.");
-		} catch (Exception e) {
-
+		} catch (Exception ex) {
+			sender.sendMessage(ChatColor.RED + "An error occured while trying to generate threadinfo!");
+			Log.debugEx(ex);
 		}
 	}
 

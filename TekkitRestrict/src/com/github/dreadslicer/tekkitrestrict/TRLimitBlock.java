@@ -42,10 +42,12 @@ public class TRLimitBlock {
 
 		Player pl = Bukkit.getPlayer(p);
 		if(pl != null){
-			TRCacheItem ci = TRCacheItem.getPermCacheItem(pl, "limiter", thisid, thisdata);
+			TRCacheItem ci = TRCacheItem.getPermCacheItem(pl, "l", "limiter", thisid, thisdata);
+			//TRCacheItem ci = TRCacheItem.getPermCacheItem(pl, "limiter", thisid, thisdata);
 			if (ci != null) {
 				TLimit = ci.getIntData();
 			}
+
 			
 			if (TLimit == -1) {
 				TLimit = TRPermHandler.getPermNumeral(pl, "limiter", thisid, thisdata);
@@ -193,7 +195,7 @@ public class TRLimitBlock {
 
 				// see if they have a bypass... (For this world)
 
-				if (!Util.hasBypass(p, "limiter")) {
+				if (!p.hasPermission("tekkitrestrict.bypass.limiter")) {
 					// This player does not have a bypass =(
 					// add data
 					String blockdata = dbin.getString("blockdata");
@@ -282,6 +284,11 @@ public class TRLimitBlock {
 	/** Save the limiters to the database. */
 	public static void saveLimiters() {
 		// looping through each player's limiters
+		synchronized (limiters) {
+			for (TRLimitBlock lb : limiters){
+				saveLimiter(lb);
+			}
+		}
 		for (int i = 0; i < limiters.size(); i++) {
 			TRLimitBlock il = limiters.get(i);
 			saveLimiter(il);
@@ -320,7 +327,7 @@ public class TRLimitBlock {
 				}
 				// loop through each Limit
 				TRLimit li1 = il.itemlimits.get(j);
-				String block = li1.blockID + "";
+				String block = "" + li1.blockID;//id or id:data
 				String DATA = "";
 				// tekkitrestrict.log.info(block+":"+li1.blockData+" "+li1.placedBlock.size());
 				// set data if it exists
@@ -350,22 +357,41 @@ public class TRLimitBlock {
 			}
 		} catch (Exception E) {
 		}
+		/*
 		int estID = 0;
 		// get a numeral from the player's name.
 		for (int i = 0; i < player.length(); i++) {
 			char c = player.charAt(i); //TODO FIXME IMPORTANT This can be the same for multiple names. (abba = 1+2+2+1=6, baab = 2+1+1+2 = 6)
 			estID += Character.getNumericValue(c);
 		}
+		for (int i = 0; i < player.length(); i++) {
+			char c = player.charAt(i); //TODO FIXME IMPORTANT This can be the same for multiple names. (abba = 1+2+2+1=6, baab = 2+1+1+2 = 6)
+			estID += Character.getNumericValue(c)*i;//abba = 1*1+2*2+2*3+1*4 = 1+4+6+4 = 15, baab = 2*1+1*2+1*3+2*4 = 2+2+3+8 = 15)
+		}
+		
+		String estID2 = "";
+		for (int i = 0; i < player.length(); i++) {
+			char c = player.charAt(i); //TODO FIXME IMPORTANT This can be the same for multiple names. (abba = 1+2+2+1=6, baab = 2+1+1+2 = 6)
+			int nr = Character.getNumericValue(c);
+			if (nr < 0) estID2 += 00;
+			else if (nr < 10) estID2 += "0" + nr;
+			estID2 += Character.getNumericValue(c);//abba = 1221, baab = 2112, z = 
+		}*/
 
 		try {
 			if (!blockdata.equals("")) {
-				tekkitrestrict.db.query("INSERT OR REPLACE INTO `tr_limiter` (`id`,`player`,`blockdata`) VALUES ("
-										+ estID
-										+ ",'"
-										+ player
-										+ "','"
-										+ blockdata
-										+ "')");
+				//tekkitrestrict.db.query("INSERT OR REPLACE INTO `tr_limiter` (`id`,`player`,`blockdata`) VALUES ("
+				//						+ estID
+				//						+ ",'"
+				//						+ player
+				//						+ "','"
+				//						+ blockdata
+				//						+ "')");
+				tekkitrestrict.db.query("INSERT OR REPLACE INTO `tr_limiter` (`player`,`blockdata`) VALUES ('"
+						+ player
+						+ "','"
+						+ blockdata
+						+ "')");
 			}
 		} catch (Exception E) {
 		}
@@ -479,12 +505,27 @@ public class TRLimitBlock {
 	}
 
 	public static void reload() {
-		List<String> ccl = tekkitrestrict.config.getStringList("LimitBlocks");
+		List<String> limitedBlocks = tekkitrestrict.config.getStringList("LimitBlocks");
 		configLimits.clear();
-		for (String ir : ccl) {
+		for (String limBlock : limitedBlocks) {
 			try {
-				String[] g = ir.split(" ");
-				TRCacheItem.processItemString("limiter", "afsd90ujpj", g[0], Integer.valueOf(g[1]));
+				String[] temp = limBlock.split(" ");
+				if (temp.length!=2){
+					tekkitrestrict.log.warning("[Config] You have an error in your Advanced.config.yml in LimitBlocks!");
+					tekkitrestrict.log.warning("[Config] \""+limBlock+"\" does not follow the syntaxis \"itemIndex limit\"!");
+					continue;
+				}
+				int limit = 0;
+				try {
+					limit = Integer.parseInt(temp[1]);
+				} catch (NumberFormatException ex){
+					tekkitrestrict.log.warning("[Config] You have an error in your Advanced.config.yml in LimitBlocks!");
+					tekkitrestrict.log.warning("[Config] \""+temp[1]+"\" is not a valid number!");
+					continue;
+				}
+				
+				TRCacheItem.processItemString("l", "afsd90ujpj", temp[0], limit);
+				//TRCacheItem.processItemString("limiter", "afsd90ujpj", temp[0], limit);
 				/*
 				 * ItemStack[] ar = TRNoItem.getRangedItemValues(g[0]); int
 				 * limit = Integer.valueOf(g[1]); for (ItemStack iss : ar) {
@@ -493,7 +534,7 @@ public class TRLimitBlock {
 				 * ccr.blockData = iss.getData(); configLimits.add(ccr); }
 				 */
 			} catch (Exception e) {
-				tekkitrestrict.log.info("[config] LimitBlocks: has an error!");
+				tekkitrestrict.log.warning("[Config] LimitBlocks: has an error!");
 			}
 		}
 	}

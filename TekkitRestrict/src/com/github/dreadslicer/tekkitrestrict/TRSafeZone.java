@@ -281,6 +281,7 @@ public class TRSafeZone {
 	}
 
 	/**
+	 * Checks bypass.safezone permission.
 	 * <b>Heavy operation. Call last if possible.</b>
 	 * @return A String with information about the Safezone the given player is in.<br>
 	 * Returns "" if the player isn't in a safezone, or if the safezone cannot be found.
@@ -288,7 +289,7 @@ public class TRSafeZone {
 	public static String getSafeZone(Player player) {
 		if (!SafeZones.UseSafeZones) return "";
 		
-		if (Util.hasBypass(player, "safezone")) return "";
+		if (player.hasPermission("tekkitrestrict.bypass.safezone")) return "";
 		
 		if (isGriefPreventionSafeZoneFor(player)) return "GriefPrevention Safezone Claim owned by: " + lastGPClaim;
 		

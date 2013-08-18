@@ -15,7 +15,7 @@ public class TREnums {
 	}
 	
 	public enum ConfigFile {
-		General, Advanced, ModModifications, DisableClick, DisableItems, Hack, LimitedCreative, Logging, TPreformance, MicroPermissions, SafeZones;
+		General, Advanced, ModModifications, DisableClick, DisableItems, Hack, LimitedCreative, Logging, TPerformance, MicroPermissions, SafeZones, EEPatch;
 	}
 	
 	public enum SSMode {

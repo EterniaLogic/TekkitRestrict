@@ -260,7 +260,7 @@ public class tekkitrestrict extends JavaPlugin {
 				@Override
 				public int getValue() {
 					try {
-						return TRNoItem.getTotalLen();
+						return TRNoItem.getBannedItemsAmount();
 					} catch(Exception ex){
 						return 0;
 					}
@@ -417,9 +417,14 @@ public class tekkitrestrict extends JavaPlugin {
 		//SafeZones.allGPClaimsAreSafezone = config.getBoolean("AllGriefPreventionClaimsAreSafezones", false);
 		//SafeZones.allowNormalUser = config.getBoolean("SSAllowNormalUsersToHaveSafeZones", true);
 		
-		ChunkUnloader.enabled = config.getBoolean("UseChunkUnloader", false);
-		ChunkUnloader.maxChunks = config.getInt("MaxChunks", 3000);
-		ChunkUnloader.maxRadii = config.getInt("MaxRadii", 256);
+		ChunkUnloader.enabled = config.getBoolean(ConfigFile.TPerformance, "UseChunkUnloader", false);
+		ChunkUnloader.maxChunks = config.getInt(ConfigFile.TPerformance, "MaxChunks", 3000);
+		ChunkUnloader.maxChunksEnd = config.getInt(ConfigFile.TPerformance, "MaxChunks.TheEnd", 200);
+		ChunkUnloader.maxChunksNether = config.getInt(ConfigFile.TPerformance, "MaxChunks.Nether", 400);
+		ChunkUnloader.maxChunksNormal = config.getInt(ConfigFile.TPerformance, "MaxChunks.Normal", 4000);
+		ChunkUnloader.maxChunksTotal = config.getInt(ConfigFile.TPerformance, "MaxChunks.Total", 4000);
+		ChunkUnloader.unloadOrder = config.getInt(ConfigFile.TPerformance, "UnloadOrder", 0);
+		ChunkUnloader.maxRadii = config.getInt(ConfigFile.TPerformance, "MaxRadii", 256);
 	}
 
 	private static void initHeartBeat() {
@@ -457,15 +462,22 @@ public class tekkitrestrict extends JavaPlugin {
 
 		try {
 			double verX = -1d;
-
+			boolean purged = true;
 			prev = db.query("SELECT version FROM tr_dbversion");
 			if(prev.next()) verX = prev.getDouble("version");
+			if(prev.next()) purged = false;
 			
 			prev.close();
 			
-			//Change version to 1.2 if it is lower
-			if(verX != -1d && verX < dbversion)
-				db.query("INSERT OR REPLACE INTO 'tr_dbversion' (version) VALUES(" + dbversion + ");");
+			//Change version to 1.3 if it is lower
+			if(verX != -1d && verX < dbversion){
+				db.query("DELETE FROM 'tr_dbversion'");//clear table
+				db.query("INSERT INTO 'tr_dbversion' (version) VALUES(" + dbversion + ");");//Insert new version
+				transferDB12To13();//Transfer to version 1.3
+			} else if (!purged) {
+				db.query("DELETE FROM 'tr_dbversion'");//clear table
+				db.query("INSERT INTO 'tr_dbversion' (version) VALUES(" + dbversion + ");");//Insert new version
+			}
 			
 		} catch(Exception ex1){
 			if(prev != null)
@@ -510,8 +522,7 @@ public class tekkitrestrict extends JavaPlugin {
 		
 		try {
 			db.query("CREATE TABLE IF NOT EXISTS 'tr_limiter' ( "
-			+ "'id' INTEGER PRIMARY KEY AUTOINCREMENT,"
-			+ "'player' TEXT,"
+			+ "'player' TEXT UNIQUE,"
 			+ "'blockdata' TEXT);");
 		} catch (Exception ex) {
 			loadWarning("[DB] Unable to create limiter table!");
@@ -606,8 +617,7 @@ public class tekkitrestrict extends JavaPlugin {
 		//################################### LIMITER ###################################
 		try {
 			db.query("CREATE TABLE IF NOT EXISTS 'tr_limiter' ( "
-					+ "'id' INTEGER PRIMARY KEY AUTOINCREMENT,"
-					+ "'player' TEXT,"
+					+ "'player' TEXT UNIQUE,"
 					+ "'blockdata' TEXT);");
 		} catch (Exception ex) {
 			loadWarning("[DB] Unable to create limiter table!");
@@ -641,6 +651,22 @@ public class tekkitrestrict extends JavaPlugin {
 			loadWarning("[DB] Transfering into the new database format failed!");
 		}
 		
+	}
+	
+	private void transferDB12To13(){
+		log.info("[DB] Updating Database to new format...");
+		try {
+			db.query("ALTER TABLE 'tr_limiter' RENAME TO 'tr_limiter_old'");
+			db.query("CREATE TABLE 'tr_limiter' ("
+					+ "'player' TEXT UNIQUE,"
+					+ "'blockdata' TEXT);");
+			db.query("INSERT INTO 'tr_limiter' (player, blockdata) SELECT player, blockdata FROM tr_limiter_old ORDER BY player ASC");
+		} catch (SQLException ex) {
+			loadWarning("[DB] Error while updating db!");
+			for (StackTraceElement st : ex.getStackTrace()){
+				loadWarning("[DB] " + st.toString());
+			}
+		}
 	}
 	
 	private void dbFailMsg(int fail){

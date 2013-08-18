@@ -23,10 +23,71 @@ public class TRPermHandler {
 
 	public TRPermHandler() {}
 	private static RegisteredServiceProvider<net.milkbowl.vault.permission.Permission> v;
+	
+	public static boolean hasPermission(Player p, String type) {
+		try {
+			String perm = "tekkitrestrict." + type;
+
+			PluginManager pm = Bukkit.getPluginManager();
+			if(pm.isPluginEnabled("Vault")){
+				if(v == null) v = Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
+		        if (v != null) {
+		        	net.milkbowl.vault.permission.Permission permission = v.getProvider();
+		        	return permission.has(p, perm);
+		        }
+			} else if (pm.isPluginEnabled("PermissionsEx") && isForceThis(0)) {
+				return ((PermissionManager) tekkitrestrict.perm).getUser(p).has(perm);
+			} else if (pm.isPluginEnabled("bPermissions") && isForceThis(2)) {
+				return ApiLayer.hasPermission(p.getWorld().getName(), CalculableType.USER, p.getName(), perm);
+			} else if (pm.isPluginEnabled("GroupManager") && isForceThis(3)) {
+				GroupManager ps = (GroupManager) pm.getPlugin("GroupManager");
+				return ps.getWorldsHolder().getWorldData(p).getUser(p.getName()).hasSamePermissionNode(perm);
+			} else {
+				return p.hasPermission(perm);
+			}
+		} catch (Exception ex) {
+			tekkitrestrict.log.warning("An error occured in the PermHandler(0)! Please inform the author.");
+			Log.Exception(ex, false);
+		}
+		return false;
+	}
+	
+	public static boolean hasPermission(Player p, String type, String node1) {
+		try {
+			String n1 = node1.equals("") ? "" : "." + node1;
+			String perm = "tekkitrestrict." + type + n1;
+
+			PluginManager pm = Bukkit.getPluginManager();
+			if(pm.isPluginEnabled("Vault")){
+				if(v == null) v = Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
+		        if (v != null) {
+		        	net.milkbowl.vault.permission.Permission permission = v.getProvider();
+		        	return permission.has(p, perm);
+		        }
+			} else if (pm.isPluginEnabled("PermissionsEx") && isForceThis(0)) {
+				return ((PermissionManager) tekkitrestrict.perm).getUser(p).has(perm);
+			} else if (pm.isPluginEnabled("bPermissions") && isForceThis(2)) {
+				return ApiLayer.hasPermission(p.getWorld().getName(), CalculableType.USER, p.getName(), perm);
+			} else if (pm.isPluginEnabled("GroupManager") && isForceThis(3)) {
+				GroupManager ps = (GroupManager) pm.getPlugin("GroupManager");
+				return ps.getWorldsHolder().getWorldData(p).getUser(p.getName()).hasSamePermissionNode(perm);
+			} else {
+				return p.hasPermission(perm);
+			}
+		} catch (Exception ex) {
+			tekkitrestrict.log.warning("An error occured in the PermHandler(1)! Please inform the author.");
+			Log.Exception(ex, false);
+		}
+		return false;
+	}
+	
+	/**
+	 * Only use this for 2 nodes!
+	 */
 	public static boolean hasPermission(Player p, String type, String node1, String node2) {
 		try {
-			String n1 = !node1.equals("") ? "." + node1 : "";
-			String n2 = !node2.equals("") ? "." + node2 : "";
+			String n1 = node1.equals("") ? "" : "." + node1;
+			String n2 = node2.equals("") ? "" : "." + node2;
 			String perm = "tekkitrestrict." + type + n1 + n2;
 
 			PluginManager pm = Bukkit.getPluginManager();
@@ -46,8 +107,9 @@ public class TRPermHandler {
 			} else {
 				return p.hasPermission(perm);
 			}
-		} catch (Exception e) {
-			TRLogger.Log("debug", (new StringBuilder("Error: [PermHandle_hasPermission] ")).append(e.getMessage()).toString());
+		} catch (Exception ex) {
+			tekkitrestrict.log.warning("An error occured in the PermHandler(2)! Please inform the author.");
+			Log.Exception(ex, false);
 		}
 		return false;
 	}

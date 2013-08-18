@@ -92,9 +92,19 @@ public class Log {
 		McLogger.log(Level.parse("TEDupe"), message);
 	}
 	/** For each stackTrace element, it will write it to the debug log. */
-	public static void Exception(Exception ex){
+	public static void debugEx(Exception ex){
 		for (StackTraceElement element : ex.getStackTrace()) {
 			TRLogger.Log("debug", "     " + element.toString());
+		}
+	}
+	/** For each stackTrace element, log to console */
+	public static void Exception(Exception ex, boolean severe){
+		if (severe){
+			for (StackTraceElement element : ex.getStackTrace())
+				tekkitrestrict.log.severe(element.toString());
+		} else {
+			for (StackTraceElement element : ex.getStackTrace())
+				tekkitrestrict.log.warning(element.toString());
 		}
 	}
 	

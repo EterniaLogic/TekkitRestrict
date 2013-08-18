@@ -14,11 +14,14 @@ import com.griefcraft.model.Permission;
 import com.griefcraft.model.Protection;
 
 public class TRLWCProtect {
-	/** @return False if the event was cancelled. */
+	/**
+	 * Checks tekkitrestrict.bypass.lwc permission.
+	 * @return False if the event was cancelled.
+	 */
 	public static boolean checkLWCAllowed(BlockPlaceEvent event) {
 		Player player = event.getPlayer();
 		// link up with LWC!
-		if (Util.hasBypass(player, "lwc")) return true;
+		if (player.hasPermission("tekkitrestrict.bypass.lwc")) return true;
 		
 		Block block = event.getBlock();
 		int id = block.getTypeId();

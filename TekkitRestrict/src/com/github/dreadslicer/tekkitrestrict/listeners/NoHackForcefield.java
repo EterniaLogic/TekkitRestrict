@@ -13,7 +13,6 @@ import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Hacks;
 import com.github.dreadslicer.tekkitrestrict.TRLogger;
 import com.github.dreadslicer.tekkitrestrict.TRNoHack;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.HackType;
-import com.github.dreadslicer.tekkitrestrict.Util;
 
 public class NoHackForcefield implements Listener {
 	private static ConcurrentHashMap<String, Integer> tickTolerance = new ConcurrentHashMap<String, Integer>();
@@ -24,7 +23,7 @@ public class NoHackForcefield implements Listener {
 
 		Player damager = (Player) e.getDamager();
 
-		if (Util.hasHackBypass(damager, "forcefield")) return;
+		if (damager.hasPermission("tekkitrestrict.bypass.hack.forcefield")) return;
 		
 		//Ignore rm sword and katar.
 		if (damager.getItemInHand() != null && (damager.getItemInHand().getTypeId() == 27567 || damager.getItemInHand().getTypeId() == 27572)) return;

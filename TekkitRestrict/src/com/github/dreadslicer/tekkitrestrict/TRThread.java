@@ -31,7 +31,11 @@ import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.ExperienceOrb;
+import org.bukkit.entity.FallingSand;
+import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Vehicle;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -139,7 +143,7 @@ class TRLimitFlyThread extends Thread {
 	
 	@SuppressWarnings("unused")
 	private static void willGround(Player player) {
-		if (Util.hasBypass(player, "flylimit")) return;
+		if (player.hasPermission("tekkitrestrict.bypass.flylimit")) return;
 		Integer time = playerTimes.get(player);
 		if (time == null) return;
 		
@@ -194,7 +198,7 @@ class TRBagCacheThread extends Thread {
 	}
 	
 	public static void setCheck(Player player) {
-		if (Util.hasBypass(player, "dupe", "alcbag")) return;
+		if (player.hasPermission("tekkitrestrict.bypass.dupe.alcbag")) return;
 		
 		for (int i = 0; i < 16; i++) {
 			try {
@@ -247,7 +251,7 @@ class TGemArmorDisabler extends Thread {
 			} catch (Exception ex) {
 				errors++;
 				TRLogger.Log("debug", "Error: [GemArmor thread] " + ex.getMessage());
-				Log.Exception(ex);
+				Log.debugEx(ex);
 				
 				if (errors > 100){
 					tekkitrestrict.log.warning("The GemArmorDisabler thread has errord for more than 100 time now. It will now be disabled.");
@@ -275,7 +279,7 @@ class TGemArmorDisabler extends Thread {
 					while (it.hasNext()){
 						EntityHuman human = (EntityHuman) it;
 						Player player = (Player) human.getBukkitEntity();
-						if (Util.hasBypass(player, "gemarmor.defensive")) continue;
+						if (player.hasPermission("tekkitrestrict.bypass.gemarmor.defensive")) continue;
 						player.sendMessage(ChatColor.RED + "You are not allowed to use GemArmor Movement Powers!");
 						toremove.add(human);
 					}
@@ -294,7 +298,7 @@ class TGemArmorDisabler extends Thread {
 					while (it.hasNext()){
 						EntityHuman human = (EntityHuman) it;
 						Player player = (Player) human.getBukkitEntity();
-						if (Util.hasBypass(player, "gemarmor.offensive")) continue;
+						if (player.hasPermission("tekkitrestrict.bypass.gemarmor.offensive")) continue;
 						player.sendMessage(ChatColor.RED + "You are not allowed to use GemArmor Offensive Powers!");
 						toremove.add(human);
 					}
@@ -318,7 +322,7 @@ class TEntityRemover extends Thread {
 				disableEntities();
 			} catch (Exception ex) {
 				TRLogger.Log("debug", "Error: [Entity thread] " + ex.getMessage());
-				Log.Exception(ex);
+				Log.debugEx(ex);
 			}
 			
 			try {
@@ -338,7 +342,8 @@ class TEntityRemover extends Thread {
 			Iterator<Entity> entities = world.getEntities().iterator();
 			while (entities.hasNext()){
 				Entity e = entities.next();
-				if (e instanceof Player || e instanceof org.bukkit.entity.Item) continue;
+				
+				if (e instanceof Player || e instanceof org.bukkit.entity.Item || e instanceof Vehicle || e instanceof ExperienceOrb || e instanceof FallingSand || e instanceof Painting) continue;
 				if (TRSafeZone.inXYZSafeZone(e.getLocation())) {
 					e.remove();
 				}
@@ -393,12 +398,12 @@ class DisableItemThread extends Thread {
 						//}
 					} catch (Exception ex) {
 						TRLogger.Log("debug", "Error: [ItemDisabler[1] thread] " + ex.getMessage());
-						Log.Exception(ex);
+						Log.debugEx(ex);
 					}
 				}
 			} catch (Exception ex) {
 				TRLogger.Log("debug", "Error: [ItemDisabler thread] " + ex.getMessage());
-				Log.Exception(ex);
+				Log.debugEx(ex);
 			}
 			
 			try {
@@ -448,8 +453,8 @@ class DisableItemThread extends Thread {
 						if (TRCacheItem2.isBanned(player, "noitem", id, data)) banned = true;
 						else if (player.getGameMode() == GameMode.CREATIVE && TRCacheItem2.isBanned(player, "creative", id, data)) banned = true;
 					} else {
-						if (TRNoItem.isItemBanned(player, id, data)) banned = true;
-						else if (player.getGameMode() == GameMode.CREATIVE && TRNoItem.isCreativeItemBanned(player, id, data)) banned = true;
+						if (TRNoItem.isItemBanned(player, id, data, true)) banned = true;//TODO Check bypass once then change true to false.
+						else if (player.getGameMode() == GameMode.CREATIVE && TRNoItem.isItemBannedInCreative(player, id, data, true)) banned = true;//TODO Check bypass once then change true to false.
 					}
 					
 					if (banned) {
@@ -461,7 +466,7 @@ class DisableItemThread extends Thread {
 					if (changed) continue;
 					
 					try {
-						String tstr = st1[i].getTypeId() + "";// +":"+st1[i].getData();
+						String tstr = "" + st1[i].getTypeId();// +":"+st1[i].getData();
 
 						if (tekkitrestrict.EEEnabled) {
 							try {
@@ -492,7 +497,7 @@ class DisableItemThread extends Thread {
 								}
 							} catch (Exception ex) {
 								TRLogger.Log("debug", "Error: [MaxCharge thread] " + ex.getMessage());
-								Log.Exception(ex);
+								Log.debugEx(ex);
 							}
 						}
 
@@ -581,11 +586,11 @@ class DisableItemThread extends Thread {
 								 */
 							} catch (Exception ex) {
 								TRLogger.Log("debug", "Error: [Decharger[7] thread] " + ex.getMessage());
-								Log.Exception(ex);
+								Log.debugEx(ex);
 							}
 						}
 
-						if (!Util.hasBypass(player, "safezone") && TRSafeZone.inSafeZone(player)) {
+						if (!player.hasPermission("tekkitrestrict.bypass.safezone") && TRSafeZone.inSafeZone(player)) {
 							//tekkitrestrict.log.info("in SS");
 							try {
 								if (Threads.SSDisableArcane) {
@@ -596,7 +601,7 @@ class DisableItemThread extends Thread {
 								}
 							} catch (Exception ex) {
 								TRLogger.Log("debug", "SSDisableArcane[2] Error! " + ex.getMessage());
-								Log.Exception(ex);
+								Log.debugEx(ex);
 							}
 							
 							if (!Threads.SSDechargeEE) continue;
@@ -617,16 +622,16 @@ class DisableItemThread extends Thread {
 								}
 							} catch (Exception ex) {
 								TRLogger.Log("debug", "SSDisableItem[9] Error! " + ex.getMessage());
-								Log.Exception(ex);
+								Log.debugEx(ex);
 							}
 						}
 					} catch (Exception ex) {
 						TRLogger.Log("debug", "Error: [Decharger[6] thread] " + ex.getMessage());
-						Log.Exception(ex);
+						Log.debugEx(ex);
 					}
 				} catch (Exception ex) {
 					TRLogger.Log("debug", "Error: [ItemDisabler[16] thread] ");
-					Log.Exception(ex);
+					Log.debugEx(ex);
 				}
 				//Thread.sleep(3);
 			} //End of first for loop
@@ -644,8 +649,8 @@ class DisableItemThread extends Thread {
 						if (TRCacheItem2.isBanned(player, "noitem", id, data)) banned = true;
 						else if (player.getGameMode() == GameMode.CREATIVE && TRCacheItem2.isBanned(player, "creative", id, data)) banned = true;
 					} else {
-						if (TRNoItem.isItemBanned(player, id, data)) banned = true;
-						else if (player.getGameMode() == GameMode.CREATIVE && TRNoItem.isCreativeItemBanned(player, id, data)) banned = true;
+						if (TRNoItem.isItemBanned(player, id, data, true)) banned = true;//TODO Check bypass once then change true to false.
+						else if (player.getGameMode() == GameMode.CREATIVE && TRNoItem.isItemBannedInCreative(player, id, data, true)) banned = true;//TODO Check bypass once then change true to false.
 					}
 					
 					if (banned) {
@@ -664,7 +669,7 @@ class DisableItemThread extends Thread {
 			
 		} catch (Exception ex) {
 			TRLogger.Log("debug", "Error: [ItemDisabler[2] thread] " + ex.getMessage());
-			Log.Exception(ex);
+			Log.debugEx(ex);
 		}
 	}
 
@@ -868,7 +873,7 @@ class TWorldScrubber extends Thread {
 				doWScrub();
 			} catch (Exception ex) {
 				TRLogger.Log("debug", "Error: [WorldScrubber thread] " + ex.getMessage());
-				Log.Exception(ex);
+				Log.debugEx(ex);
 			}
 
 			try {
@@ -922,7 +927,7 @@ class TWorldScrubber extends Thread {
 							for (int y = 0; y < 256; y++) {
 								// so... yeah.
 								Block bl = c.getBlock(x, y, z);
-								if (TRNoItem.isBlockDisabled(bl)) {
+								if (TRNoItem.isBlockBanned(bl)) {
 									bl.setTypeId(Threads.ChangeDisabledItemsIntoId);
 								}
 							}
@@ -971,7 +976,7 @@ class TSaveThread extends Thread {
 			try{TRLimitBlock.manageData();}
 			catch(Exception ex){
 				TRLogger.Log("debug", "ManageData AutoSavethread Error: "+ex.getMessage());
-				Log.Exception(ex);
+				Log.debugEx(ex);
 			}
 
 			try {

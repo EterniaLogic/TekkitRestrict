@@ -8,22 +8,13 @@ import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Hacks;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.HackType;
 
 public class Util {
-	public static boolean hasBypass(Player player, String type){
-		return player.hasPermission("tekkitrestrict.bypass."+type);
-	}
-	public static boolean hasBypass(Player player, String type, String sub){
-		if (sub == null) return player.hasPermission("tekkitrestrict.bypass."+type);
-		return player.hasPermission("tekkitrestrict.bypass."+type+"."+sub);
-	}
-	public static boolean hasHackBypass(Player player, String type){
-		return player.hasPermission("tekkitrestrict.bypass.hack."+type);
-	}
 	public static void kick(Player player, String message){
 		if (Global.kickFromConsole)
 			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "kick " + player.getName() + " " + message);
 		else
 			player.kickPlayer(message);
 	}
+	
 	public static boolean kickHack(HackType type){
 		if (type == HackType.fly) return Hacks.kick.contains("fly");
 		else if (type == HackType.forcefield) return Hacks.kick.contains("forcefield");
@@ -37,10 +28,6 @@ public class Util {
 	 */
 	public static void kickHacker(HackType type, Player player){
 		if (Util.kickHack(type)) Util.kick(player, "Kicked for " + type.toString() + "-Hacking!");
-	}
-	
-	public static boolean hasPermission(Player player, String permission){
-		return player.hasPermission("tekkitrestrict."+permission);
 	}
 	
 	public static String inGroup(int id){

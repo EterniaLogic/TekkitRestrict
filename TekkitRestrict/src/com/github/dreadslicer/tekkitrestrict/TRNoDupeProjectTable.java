@@ -10,11 +10,14 @@ public class TRNoDupeProjectTable {
 	private static ConcurrentHashMap<Location,String> UsedTables = new ConcurrentHashMap<Location, String>(); //loc, player
 	private static ConcurrentHashMap<String, Location> PlayerUsed = new ConcurrentHashMap<String, Location>();
 	
-	/** @return True if the player is not allowed to use this table. */
+	/**
+	 * Checks bypass.dupe.projecttable permission
+	 * @return True if the player is not allowed to use this table.
+	 */
 	public static boolean tableUseNotAllowed(Block block, Player player){
 		if(block == null) return false;
 		
-		if (Util.hasBypass(player, "dupe.projecttable")) return false;
+		if (player.hasPermission("tekkitrestrict.bypass.dupe.projecttable")) return false;
 		
 		if(block.getTypeId() == 137 && block.getData() == 3){
 			String playerName = player.getName().toLowerCase();

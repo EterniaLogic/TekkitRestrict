@@ -22,7 +22,6 @@ import org.bukkit.inventory.PlayerInventory;
 import com.github.dreadslicer.tekkitrestrict.Log;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Hacks;
 import com.github.dreadslicer.tekkitrestrict.TRNoHack;
-import com.github.dreadslicer.tekkitrestrict.Util;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.HackType;
 
 public class NoHackFly implements Listener {
@@ -32,7 +31,7 @@ public class NoHackFly implements Listener {
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	private void handleFly(PlayerMoveEvent event) {
 		Player player = event.getPlayer();
-		if (Util.hasHackBypass(player, "fly")) return;
+		if (player.hasPermission("tekkitrestrict.bypass.hack.fly")) return;
 		if (player.getGameMode() == GameMode.CREATIVE) return;
 		if (!isFlying(player)) return;
 		//if (Util.hasHackBypass(player, "fly")) return;

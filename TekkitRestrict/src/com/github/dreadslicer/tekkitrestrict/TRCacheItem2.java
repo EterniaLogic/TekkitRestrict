@@ -38,7 +38,7 @@ public class TRCacheItem2 {
 	 */
 	public static boolean isBanned(Player player, String type, int id, int data){
 		if (id == 0) return false;
-		if (Util.hasBypass(player, type)) return false;
+		if (player.hasPermission("tekkitrestrict.bypass."+type)) return false;
 		
 		if (type.equals("noitem")) if (inNoitemConfigBans(id, data)) return true;
 		else if (type.equals("creative")) if (inCreativeConfigBans(id, data)) return true;

@@ -34,7 +34,7 @@ public class TRNoDupe_BagCache {
 		// removes all "Devices" form alc bag.
 		if (!Dupes.alcBag) return;
 		
-		if (!tekkitrestrict.EEEnabled || Util.hasBypass(player, "dupe", "alcbag")) return;
+		if (!tekkitrestrict.EEEnabled || player.hasPermission("tekkitrestrict.bypass.dupe.alcbag")) return;
 		for (int i = 0; i < 16; i++) {
 			try {
 				EntityHuman H = ((CraftPlayer) player).getHandle();
