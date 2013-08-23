@@ -181,7 +181,7 @@ public class tekkitrestrict extends JavaPlugin {
 
 			initHeartBeat();
 		} catch (Exception e) {
-			//e.printStackTrace();
+			e.printStackTrace();
 		}
 		
 		log.info("Linking with EEPatch for extended functionality ...");
@@ -308,15 +308,15 @@ public class tekkitrestrict extends JavaPlugin {
 		ttt.gemArmorThread.interrupt();
 		ttt.worldScrubThread.interrupt();
 		ttt.saveThread.interrupt();
-		ttt.bagCacheThread.interrupt();
-		ttt.limitFlyThread.interrupt();
+		if (ttt.bagCacheThread.isAlive()) ttt.bagCacheThread.interrupt();
+		//ttt.limitFlyThread.interrupt();
 		
 		try { Thread.sleep(1500); } catch (InterruptedException e) {} //Sleep for 1.5 seconds to allow the savethread to save.
 		//try {
 		//	TRThread.originalEUEnd(); (Currently does nothing)
 		//} catch (Exception ex) {
 		//}
-
+		TRLogger.saveLogs();
 		TRLogFilter.disable();
 		Log.deinit();
 		FileLog.closeAll();
@@ -703,12 +703,16 @@ public class tekkitrestrict extends JavaPlugin {
 		if (listeners){
 			Assigner.unregisterAll();
 		}
-		this.reloadConfig();		
+		this.reloadConfig();
 		config = this.getConfigx();
 		loadConfigCache();
 		TRNoItem.clear(); //TRNI
 		TRCacheItem.reload();
-		TRNoItem.reload(); //TRNI2
+		try {
+			TRNoItem.reload(); //TRNI2 FIXME errors
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 		TRThread.reload(); // branches out
 		TRListener.reload();
 		TRLimitBlock.reload();

@@ -60,10 +60,10 @@ public class UpdateConfigFiles {
 	
 	public static void v12(){
 		//System.out.println("Updating the config files from v1.1 to v1.3...");
-		tekkitrestrict.log.info("Updating the config files from v1.1 to v1.3...");
+		tekkitrestrict.log.info("Updating the config files from v1.2 to v1.3...");
 		
-		General11To13();
-		TPerformance11To13();
+		General12To13();
+		TPerformance12To13();
 		
 		//System.out.println("The config files were successfully updated!");
 		tekkitrestrict.log.info("The config files were successfully updated!");
@@ -139,8 +139,8 @@ public class UpdateConfigFiles {
 		try {
 			input = new BufferedReader(new FileReader(genConfig));
 		} catch (FileNotFoundException e2) {
-			//System.out.println("[UpdateConfig] Cannot Find General.config.yml! (" + genConfig.getAbsolutePath() + ")");
-			tekkitrestrict.loadWarning("Cannot Find General.config.yml! (" + genConfig.getAbsolutePath() + ")");
+			System.out.println("Cannot Find General.config.yml! (" + genConfig.getAbsolutePath() + ")");
+			//tekkitrestrict.loadWarning("Cannot Find General.config.yml! (" + genConfig.getAbsolutePath() + ")");
 			return;
 		}
 		
@@ -152,8 +152,8 @@ public class UpdateConfigFiles {
 			}
 			input.close();
 		} catch (IOException e) {
-			//System.out.println("[UpdateConfig] Cannot read General.config.yml! (" + genConfig.getAbsolutePath() + ")");
-			tekkitrestrict.loadWarning("Cannot read General.config.yml! (" + genConfig.getAbsolutePath() + ")");
+			System.out.println("Cannot read General.config.yml! (" + genConfig.getAbsolutePath() + ")");
+			//tekkitrestrict.loadWarning("Cannot read General.config.yml! (" + genConfig.getAbsolutePath() + ")");
 			try {
 				input.close();
 			} catch (IOException e1) {}
@@ -167,8 +167,10 @@ public class UpdateConfigFiles {
 			}
 		}
 		if (veroption == 0){
-			tekkitrestrict.loadWarning("General.config.yml is malformed and cannot be patched!");
-			tekkitrestrict.loadWarning("Please make a backup of the file, delete it and restart the server to let a new one generate.");
+			System.out.println("General.config.yml is malformed and cannot be patched!");
+			System.out.println("Please make a backup of the file, delete it and restart the server to let a new one generate.");
+			//tekkitrestrict.loadWarning("General.config.yml is malformed and cannot be patched!");
+			//tekkitrestrict.loadWarning("Please make a backup of the file, delete it and restart the server to let a new one generate.");
 			return;
 		}
 		lines.remove(veroption);
@@ -183,8 +185,8 @@ public class UpdateConfigFiles {
 			}
 			output.close();
 		} catch (IOException e) {
-			//System.out.println("Unable to write changes to General.config.yml!");
-			tekkitrestrict.loadWarning("Unable to write changes to General.config.yml!");
+			System.out.println("Unable to write changes to General.config.yml!");
+			//tekkitrestrict.loadWarning("Unable to write changes to General.config.yml!");
 			return;
 		}
 	}
@@ -196,8 +198,8 @@ public class UpdateConfigFiles {
 		try {
 			input = new BufferedReader(new FileReader(perfConfig));
 		} catch (FileNotFoundException e2) {
-			//System.out.println("Cannot Find TPerformance.config.yml! (" + perfConfig.getAbsolutePath() + ")");
-			tekkitrestrict.loadWarning("Cannot Find TPerformance.config.yml! (" + perfConfig.getAbsolutePath() + ")");
+			System.out.println("Cannot Find TPerformance.config.yml! (" + perfConfig.getAbsolutePath() + ")");
+			//tekkitrestrict.loadWarning("Cannot Find TPerformance.config.yml! (" + perfConfig.getAbsolutePath() + ")");
 			return;
 		}
 		
@@ -209,8 +211,8 @@ public class UpdateConfigFiles {
 			}
 			input.close();
 		} catch (IOException e) {
-			//System.out.println("Cannot read TPerformance.config.yml! (" + perfConfig.getAbsolutePath() + ")");
-			tekkitrestrict.loadWarning("Cannot read TPerformance.config.yml! (" + perfConfig.getAbsolutePath() + ")");
+			System.out.println("Cannot read TPerformance.config.yml! (" + perfConfig.getAbsolutePath() + ")");
+			//tekkitrestrict.loadWarning("Cannot read TPerformance.config.yml! (" + perfConfig.getAbsolutePath() + ")");
 			try {
 				input.close();
 			} catch (IOException e1) {}
@@ -224,8 +226,10 @@ public class UpdateConfigFiles {
 				mcoption = i;
 			} else if (l.contains("MaxChunks: ")) {
 				if (mcoption != i-1){
-					tekkitrestrict.loadWarning("TPerformance.config.yml is malformed and cannot be patched!");
-					tekkitrestrict.loadWarning("Please make a backup of the file, delete it and restart the server to let a new one generate.");
+					System.out.println("TPerformance.config.yml is malformed and cannot be patched!");
+					System.out.println("Please make a backup of the file, delete it and restart the server to let a new one generate.");
+					//tekkitrestrict.loadWarning("TPerformance.config.yml is malformed and cannot be patched!");
+					//tekkitrestrict.loadWarning("Please make a backup of the file, delete it and restart the server to let a new one generate.");
 					return;
 				}
 			} else if (l.contains("# The default is 128 blocks (8 chunks).")){
@@ -233,13 +237,57 @@ public class UpdateConfigFiles {
 			}
 		}
 		if (mcoption == 0 || radoption == 0){
-			tekkitrestrict.loadWarning("TPerformance.config.yml is malformed and cannot be patched!");
-			tekkitrestrict.loadWarning("Please make a backup of the file, delete it and restart the server to let a new one generate.");
+			System.out.println("TPerformance.config.yml is malformed and cannot be patched!");
+			System.out.println("Please make a backup of the file, delete it and restart the server to let a new one generate.");
+			//tekkitrestrict.loadWarning("TPerformance.config.yml is malformed and cannot be patched!");
+			//tekkitrestrict.loadWarning("Please make a backup of the file, delete it and restart the server to let a new one generate.");
 			return;
 		}
 		
 		lines.remove(radoption);
 		lines.add(radoption, "# The default for TekkitRestrict is 128 blocks (8 chunks).\n# Minecraft's default is 256 blocks (16 chunks).\n#\n# Recommended: 128-256");
+		
+		lines.remove(mcoption);
+		lines.remove(mcoption);
+		lines.add(mcoption, "MaxChunks:\n"
+				+ "    # Max number of chunks for the End.\n"
+				+ "    # Recommended: 100-400 (the End is usually not a often visited place)\n"
+				+ "    # Default: 200\n"
+				+ "    TheEnd: 200\n\n"
+				
+				+ "    # Max number of chunks for the Nether.\n"
+				+ "    # Recommended: 300-600 (depends on how many players live in the Nether)\n"
+				+ "    # Default: 400\n"
+				+ "    Nether: 400\n\n"
+				
+				+ "    # Max number of chunks for normal type worlds.\n"
+				+ "    # Recommended: (Server RAM in GB)*700 to (Server RAM in GB)*900\n"
+				+ "    # Default: 4000\n"
+				+ "    Normal: 4000\n\n"
+				
+				+ "    # Max number of chunks loaded in total (all worlds)\n"
+				+ "    # If this number is exceeded, the UnloadOrder will come in effect.\n"
+				+ "    # Recommended: (Server RAM in GB)*700 to (Server RAM in GB)*900\n"
+				+ "    # Default: 4000\n"
+				+ "    Total: 4000\n\n"
+				
+				+ "# UnloadOrder\n"
+				+ "# The order in which chunks from worlds will be unloaded when the total number\n"
+				+ "# of chunks is exceeded.\n"
+				+ "# 0 - The End, Nether, Normal worlds    (default)\n"
+				+ "# 1 - Nether, The End, Normal worlds\n"
+				+ "#\n"
+				+ "# 2 - Normal worlds, The End, Nether    (not recommended)\n"
+				+ "# 3 - The End, Normal worlds, Nether    (not recommended)\n"
+				+ "#\n"
+				+ "# 4 - Nether, Normal worlds, The End    (not recommended)\n"
+				+ "# 5 - Normal worlds, Nether, The End    (not recommended)\n"
+				+ "#\n"
+				+ "# 2 and 3 are not recommended unless your main world is a Nether world.\n"
+				+ "# 4 and 5 are not recommended unless your main world is an End world.\n"
+				+ "#\n"
+				+ "# It is recommended to put the least used world first.\n"
+				+ "UnloadOrder: 0");
 		
 		
 		BufferedWriter output = null;
@@ -251,9 +299,13 @@ public class UpdateConfigFiles {
 			}
 			output.close();
 		} catch (IOException e) {
-			//System.out.println("Unable to write changes to General.config.yml!");
-			tekkitrestrict.loadWarning("Unable to write changes to TPerformance.config.yml!");
+			System.out.println("Unable to write changes to TPerformance.config.yml!");
+			//tekkitrestrict.loadWarning("Unable to write changes to TPerformance.config.yml!");
 			return;
 		}
+	}
+	
+	private static void TPerformance12To13(){
+		TPerformance11To13();
 	}
 }

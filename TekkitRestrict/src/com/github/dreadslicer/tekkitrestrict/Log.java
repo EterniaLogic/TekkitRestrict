@@ -69,7 +69,7 @@ public class Log {
 	
 	public static void Debug(String msg){
 		if (!Global.debug) return;
-		tekkitrestrict.log.log(Level.parse("Debug"), msg);
+		TRLogger.Log("debug", msg);
 	}
 	public static void Dupe(String niceName, String type, String playername){
 		String message = TRConfigCache.Dupes.broadcastFormat;

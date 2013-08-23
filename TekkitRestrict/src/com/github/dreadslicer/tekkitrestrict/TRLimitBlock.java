@@ -42,7 +42,7 @@ public class TRLimitBlock {
 
 		Player pl = Bukkit.getPlayer(p);
 		if(pl != null){
-			TRCacheItem ci = TRCacheItem.getPermCacheItem(pl, "l", "limiter", thisid, thisdata);
+			TRCacheItem ci = TRCacheItem.getPermCacheItem(pl, "l", "limiter", thisid, thisdata, true);
 			//TRCacheItem ci = TRCacheItem.getPermCacheItem(pl, "limiter", thisid, thisdata);
 			if (ci != null) {
 				TLimit = ci.getIntData();
@@ -569,8 +569,7 @@ public class TRLimitBlock {
 		int x = bloc.getBlockX();
 		int y = bloc.getBlockY();
 		int z = bloc.getBlockZ();
-		String pl = allBlockOwners.get(bloc.getWorld().getName() + ":" + x
-				+ ":" + y + ":" + z);
+		String pl = allBlockOwners.get(bloc.getWorld().getName() + ":" + x + ":" + y + ":" + z);
 		if (pl != null) return pl;
 		return null;
 	}

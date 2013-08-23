@@ -20,6 +20,7 @@ import net.minecraft.server.NBTTagCompound;
 import net.minecraft.server.TileEntity;
 import net.minecraft.server.WorldServer;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
@@ -61,9 +62,9 @@ public class TRThread {
 	/** Thread will NOT trigger again if interrupted. */
 	public TEntityRemover entityRemoveThread = new TEntityRemover();
 	public TRBagCacheThread bagCacheThread = new TRBagCacheThread();
-	public TRLimitFlyThread limitFlyThread = new TRLimitFlyThread();
+	//public TRLimitFlyThread limitFlyThread = new TRLimitFlyThread();
 	private static TRThread instance;
-
+	private static boolean initialized = false;
 	public TRThread() {
 		instance = this;
 	}
@@ -76,7 +77,7 @@ public class TRThread {
 		gemArmorThread.setName("TekkitRestrict_GemArmorThread");
 		entityRemoveThread.setName("TekkitRestrict_EntityRemoverThread");
 		bagCacheThread.setName("TekkitRestrict_BagCacheThread");
-		limitFlyThread.setName("TekkitRestrict_LimitFlyThread_Unused");
+		//limitFlyThread.setName("TekkitRestrict_LimitFlyThread_Unused");
 		saveThread.start();
 		disableItemThread.start();
 		worldScrubThread.start();
@@ -84,13 +85,14 @@ public class TRThread {
 		entityRemoveThread.start();
 		//if (tekkitrestrict.config.getBoolean("LimitFlightTime", false)) limitFlyThread.start();
 		
-		if (tekkitrestrict.EEEnabled && Dupes.alcBag) bagCacheThread.start();
+		if (tekkitrestrict.EEEnabled && Dupes.alcBag && !bagCacheThread.isAlive()) bagCacheThread.start();
+		initialized = true;
 	}
-
+	
 	public static void reload() {
 		// reloads the variables in each thread...
 		instance.disableItemThread.reload();
-		if (tekkitrestrict.EEEnabled && Dupes.alcBag && !instance.bagCacheThread.isAlive()) instance.bagCacheThread.start();
+		if (initialized && tekkitrestrict.EEEnabled && Dupes.alcBag && !instance.bagCacheThread.isAlive()) instance.bagCacheThread.start();
 	}
 
 	public static void originalEUEnd() {
@@ -163,36 +165,48 @@ class TRBagCacheThread extends Thread {
 	@Override
 	public void run(){
 		while (true) {
-			// We want to loop through all of their alchemy bags HERE.
-			// This function will also clean up the ones with non-players.
-
-			// loop through all of teh players
-			Player[] players = tekkitrestrict.getInstance().getServer().getOnlinePlayers();
-			for (int i = 0; i < players.length; i++) {
-				try {
-					setCheck(players[i]); // checks and sets the vars.
-				} catch (Exception e) {
-				}
-			}
-
-			// remove offline players!
-			int to = TRNoDupe_BagCache.watchers.size();
-			for (int i = 0; i < to; i++) {
-				try {
-					TRNoDupe_BagCache cc = TRNoDupe_BagCache.watchers.get(i);
-					if (!cc.isOnline()) {
-						TRNoDupe_BagCache.watchers.remove(i);
-						to--;
-						i--;
-					}
-				} catch (Exception e) {
-				}
-			}
-
 			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				if (tekkitrestrict.disable) break;
+				// We want to loop through all of their alchemy bags HERE.
+				// This function will also clean up the ones with non-players.
+	
+				// loop through all of teh players
+				Player[] players = Bukkit.getOnlinePlayers();
+				for (int i = 0; i < players.length; i++) {
+					try {
+						setCheck(players[i]); // checks and sets the vars.
+					} catch (Exception e) {
+					}
+				}
+	
+				// remove offline players!
+				int to = TRNoDupe_BagCache.watchers.size();
+				for (int i = 0; i < to; i++) {
+					try {
+						TRNoDupe_BagCache cc = TRNoDupe_BagCache.watchers.get(i);
+						if (!cc.isOnline()) {
+							TRNoDupe_BagCache.watchers.remove(i);
+							to--;
+							i--;
+						}
+					} catch (Exception e) {
+					}
+				}
+	
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					if (tekkitrestrict.disable) break;
+				}
+			} catch (Exception ex){
+				for (StackTraceElement st : ex.getStackTrace()){
+					tekkitrestrict.log.warning(st.toString());
+				}
+				
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					if (tekkitrestrict.disable) break;
+				}
 			}
 		}
 	}
@@ -321,7 +335,7 @@ class TEntityRemover extends Thread {
 			try {
 				disableEntities();
 			} catch (Exception ex) {
-				TRLogger.Log("debug", "Error: [Entity thread] " + ex.getMessage());
+				TRLogger.Log("debug", "Error: [Entity thread] " + ex.getMessage());//FIXME not debug logging
 				Log.debugEx(ex);
 			}
 			
@@ -381,7 +395,7 @@ class DisableItemThread extends Thread {
 			try {
 				// Disabled Items remover
 				// if (UseNoItem) {
-				Player[] ps = tekkitrestrict.getInstance().getServer().getOnlinePlayers();
+				Player[] ps = Bukkit.getOnlinePlayers();
 				for (Player pp : ps) {
 					try {
 						oos = pp;

@@ -107,7 +107,7 @@ public class TRNoItem {
 	 * @return If the given id:data combination is banned for this player.
 	 */
 	public static boolean isItemBanned(Player player, int id, int data, boolean doBypassCheck) {
-		return useNoItem ? isTypeBanned("n", "noitem", DisabledItems, player, id, data, doBypassCheck) : false;
+		return useNoItem ? isTypeNoItemBanned(player, id, data, doBypassCheck) : false;
 	}
 	/**
 	 * Goes through all banned items and checks if the id and data match.
@@ -132,12 +132,10 @@ public class TRNoItem {
 	 * in creative mode.
 	 */
 	public static boolean isItemBannedInCreative(Player player, int id, int data, boolean doBypassCheck) {
-		return useNoCreative ? isTypeBanned("c", "creative", DisabledCreativeItems, player, id, data, doBypassCheck) : false;
+		return useNoCreative ? isTypeCreativeBanned(player, id, data, doBypassCheck) : false;
 	}
-
 	
-	
-	/**/@Deprecated
+	/*
 	private static boolean isTypeBanned(String Type, String perm, List<TRCacheItem> tlist, Player player, int id, int data, boolean doBypassCheck) {
 		if (doBypassCheck && player.hasPermission("tekkitrestrict.bypass."+perm)) return false;
 
@@ -170,12 +168,12 @@ public class TRNoItem {
 		}
 		
 		return false;
-	}
+	}*/
 	
 	private static boolean isTypeCreativeBanned(Player player, int id, int data, boolean doBypassCheck) {
 		if (doBypassCheck && player.hasPermission("tekkitrestrict.bypass.creative")) return false;
 
-		TRCacheItem ci1 = TRCacheItem.getPermCacheItem(player, "c", "creative", id, data); //FIXME Also checks bypass permission..
+		TRCacheItem ci1 = TRCacheItem.getPermCacheItem(player, "c", "creative", id, data, false); //FIXME Also checks bypass permission..
 		if (ci1 != null) return true;
 		
 		String idStr = "tekkitrestrict.creative."+id;
@@ -209,7 +207,7 @@ public class TRNoItem {
 	private static boolean isTypeNoItemBanned(Player player, int id, int data, boolean doBypassCheck) {
 		if (doBypassCheck && player.hasPermission("tekkitrestrict.bypass.noitem")) return false;
 
-		TRCacheItem ci1 = TRCacheItem.getPermCacheItem(player, "n", "noitem", id, data); //FIXME Also checks bypass permission..
+		TRCacheItem ci1 = TRCacheItem.getPermCacheItem(player, "n", "noitem", id, data, false); //FIXME Also checks bypass permission..
 		if (ci1 != null) return true;
 		
 		String idStr = "tekkitrestrict.noitem."+id;

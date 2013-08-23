@@ -43,7 +43,6 @@ MaxChunks:
     
     # Max number of chunks loaded in total (all worlds)
     # If this number is exceeded, the UnloadOrder will come in effect.
-    #
     # Recommended: (Server RAM in GB)*700 to (Server RAM in GB)*900
     # Default: 4000
     Total: 4000
@@ -147,7 +146,7 @@ AutoSaveThreadSpeed: 11000
 
 
 ##	Inventory thread enables:    [DisableItems, CreativeDisable, MaxEU, EEDecharger, EEMaxCharger (~198-5000x)]
-##	WorldCleaner thread enables: [ChunkUnloader, RPTimer, DisabledItemBlockRemover (~40-Xx)]
+##	WorldCleaner thread enables: [ChunkUnloader, RPTimer enforcer, DisabledItemBlockRemover (~40-Xx)]
 ##	AutoSave thread enables:     [SaveToSQL, BlockLimiter RemoveBlk (~8+x)]
 
 ##################################################################################

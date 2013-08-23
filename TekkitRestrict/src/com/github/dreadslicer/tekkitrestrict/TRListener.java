@@ -34,7 +34,6 @@ public class TRListener implements Listener {
 	boolean SSInnvincible, UseBlockLimit;
 	boolean LogAmulets, LogRings, LogDMTools, LogRMTools, LogEEMisc;
 	private Map<Integer, String> EENames = Collections.synchronizedMap(new HashMap<Integer, String>());
-	//private int[] Exceptions = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 17, 24, 35, 44, 98, 142 };
 
 	public TRListener() {
 		EENames.put(27526, "Philosopher Stone");
@@ -128,11 +127,11 @@ public class TRListener implements Listener {
 		return instance;
 	}
 	
-	int lastdata = 0;
+	private int lastdata = 0;
 
-	/** @return <b>True</b> if id < 14 or id = 17, 24, 35, 44, 98 or 142. <b>False</b> otherwise. */
+	/** @return <b>True</b> if id < 8 or id = 12, 13, 17, 24, 35, 44, 98 or 142. <b>False</b> otherwise. */
 	private boolean Exempt(int id){
-		return (id < 14 || id == 17 || id == 24 || id == 35 || id == 44 || id == 98 || id == 142);
+		return (id < 8 || id == 12 || id == 13 || id == 17 || id == 24 || id == 35 || id == 44 || id == 98 || id == 142);
 	}
 	
 	public static boolean errorBlockPlace = false;
