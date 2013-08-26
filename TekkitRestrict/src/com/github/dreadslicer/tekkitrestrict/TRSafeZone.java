@@ -49,7 +49,7 @@ public class TRSafeZone {
 	public int x2, y2, z2;
 	public String name;
 	public String world, data = "";
-	public boolean loadedFromSqlite = false;
+	public boolean loadedFromSql = false;
 	/**
 	 * 0 = NONE<br>
 	 * 1 = WorldGuard<br>
@@ -71,7 +71,7 @@ public class TRSafeZone {
 				sz.world = rs.getString("world");
 				sz.mode = rs.getInt("mode");
 				sz.data = rs.getString("data");
-				sz.loadedFromSqlite = true;
+				sz.loadedFromSql = true;
 				if (sz.mode == 4 && sz.data != null && !sz.data.equals("")){
 					String temp[] = sz.data.split(",");
 					sz.x1 = Integer.parseInt(temp[0]);
@@ -125,7 +125,7 @@ public class TRSafeZone {
 	public static void save() {
 		for (int i = 0; i < zones.size(); i++) {
 			TRSafeZone z = zones.get(i);
-			if (!z.loadedFromSqlite) {
+			if (!z.loadedFromSql) {
 				// insert the new rows!
 				try {
 					tekkitrestrict.db.query("INSERT OR REPLACE INTO `tr_saferegion` (`id`,`name`,`mode`,`data`,`world`) VALUES ('"
@@ -133,7 +133,7 @@ public class TRSafeZone {
 									+ TRDB.antisqlinject(z.name)
 									+ "'," + z.mode + ",'" + z.data + "','"
 									+ z.world + "');");
-					z.loadedFromSqlite = true;
+					z.loadedFromSql = true;
 				} catch (Exception E) {
 				}
 			}
