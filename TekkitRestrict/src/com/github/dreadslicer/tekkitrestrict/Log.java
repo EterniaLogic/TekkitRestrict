@@ -8,8 +8,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.Command;
 
-import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Global;
-
 public class Log {
 	/**
 	 * Creates 2 custom levels and assigns the loggers.
@@ -66,7 +64,6 @@ public class Log {
 	}
 	
 	public static void Debug(String msg){
-		if (!Global.debug) return;
 		TRLogger.Log("debug", msg);
 	}
 	public static void Dupe(String niceName, String type, String playername){

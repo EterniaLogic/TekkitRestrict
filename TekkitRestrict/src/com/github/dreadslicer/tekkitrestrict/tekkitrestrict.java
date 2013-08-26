@@ -164,11 +164,9 @@ public class tekkitrestrict extends JavaPlugin {
 		ttt = new TRThread();
 		Assigner.assign(); //Register the required listeners
 		
-		new TRLogger();
-		
 		TRSafeZone.init();
 		
-		TRLimitBlock.init();
+		TRLimiter.init();
 
 		getCommand("tekkitrestrict").setExecutor(new TRCommandTR());
 		getCommand("openalc").setExecutor(new TRCommandAlc());
@@ -386,25 +384,30 @@ public class tekkitrestrict extends JavaPlugin {
 		Dupes.transmute = config.getBoolean(ConfigFile.Hack, "Dupes.PreventTransmuteDupe", true);
 		Dupes.pedestal = config.getBoolean(ConfigFile.Hack, "Dupes.PedestalEmcGen", true);
 		
-		Global.debug = config.getBoolean("ShowDebugMessages", false);
-		Global.kickFromConsole = config.getBoolean("KickFromConsole", false);
-		Global.useNewBanSystem = config.getBoolean("UseNewBannedItemsSystem", false);
+		Global.debug = config.getBoolean(ConfigFile.General, "ShowDebugMessages", false) ||
+					   config.getBoolean(ConfigFile.Logging, "LogDebug", false);
 		
-		Listeners.UseBlockLimit = config.getBoolean("UseItemLimiter", true);
-		Listeners.BlockCreativeContainer = config.getBoolean("LimitedCreativeNoContainer", true);
+		Global.kickFromConsole = config.getBoolean(ConfigFile.General, "KickFromConsole", false);
+		//Global.useNewBanSystem = config.getBoolean("UseNewBannedItemsSystem", false);
+		Global.useNewBanSystem = false;
 		
-		TRConfigCache.LogFilter.replaceList = config.getStringList("LogFilter");
-		TRConfigCache.LogFilter.splitLogs = config.getBoolean("SplitLogs", true);
-		TRConfigCache.LogFilter.filterLogs = config.getBoolean("FilterLogs", true);
-		TRConfigCache.LogFilter.logLocation = config.getString("SplitLogsLocation", "log");
-		TRConfigCache.LogFilter.fileFormat = config.getString("FilenameFormat", "{TYPE}-{DAY}-{MONTH}-{YEAR}.log");
-		TRConfigCache.LogFilter.logFormat = config.getString("LogStringFormat", "[{HOUR}:{MINUTE}:{SECOND}] {INFO}");
+		Listeners.UseBlockLimit = config.getBoolean(ConfigFile.General, "UseItemLimiter", true);
+		Listeners.BlockCreativeContainer = config.getBoolean(ConfigFile.LimitedCreative, "LimitedCreativeNoContainer", true);
+		Listeners.UseNoItem = config.getBoolean(ConfigFile.General, "UseNoItem", true);
+		Listeners.UseLimitedCreative = config.getBoolean(ConfigFile.General, "UseLimitedCreative", true);
 		
-		Threads.gemArmorSpeed = config.getInt("GemArmorDThread");
-		Threads.inventorySpeed = config.getInt("InventoryThread");
-		Threads.saveSpeed = config.getInt("AutoSaveThreadSpeed");
-		Threads.SSEntityRemoverSpeed = config.getInt("SSEntityRemoverThread");
-		Threads.worldCleanerSpeed = config.getInt("WorldCleanerThread");
+		TRConfigCache.LogFilter.replaceList = config.getStringList(ConfigFile.Logging, "LogFilter");
+		TRConfigCache.LogFilter.splitLogs = config.getBoolean(ConfigFile.Logging, "SplitLogs", true);
+		TRConfigCache.LogFilter.filterLogs = config.getBoolean(ConfigFile.Logging, "FilterLogs", true);
+		TRConfigCache.LogFilter.logLocation = config.getString(ConfigFile.Logging, "SplitLogsLocation", "log");
+		TRConfigCache.LogFilter.fileFormat = config.getString(ConfigFile.Logging, "FilenameFormat", "{TYPE}-{DAY}-{MONTH}-{YEAR}.log");
+		TRConfigCache.LogFilter.logFormat = config.getString(ConfigFile.Logging, "LogStringFormat", "[{HOUR}:{MINUTE}:{SECOND}] {INFO}");
+		
+		Threads.gemArmorSpeed = config.getInt(ConfigFile.TPerformance, "GemArmorDThread", 120);
+		Threads.inventorySpeed = config.getInt(ConfigFile.TPerformance, "InventoryThread", 400);
+		Threads.saveSpeed = config.getInt(ConfigFile.TPerformance, "AutoSaveThreadSpeed", 11000);
+		Threads.SSEntityRemoverSpeed = config.getInt(ConfigFile.TPerformance, "SSEntityRemoverThread", 350);
+		Threads.worldCleanerSpeed = config.getInt(ConfigFile.TPerformance, "WorldCleanerThread", 15000);
 		
 		Threads.GAMovement = config.getBoolean(ConfigFile.ModModifications, "AllowGemArmorDefensive", true);
 		Threads.GAOffensive = config.getBoolean(ConfigFile.ModModifications, "AllowGemArmorOffensive", false);
@@ -413,23 +416,23 @@ public class tekkitrestrict extends JavaPlugin {
 		Threads.SSDechargeEE = config.getBoolean(ConfigFile.SafeZones, "InSafeZones.DechargeEE", true);
 		Threads.SSDisableArcane = config.getBoolean(ConfigFile.SafeZones, "InSafeZones.DisableRingOfArcana", true);
 		
-		Threads.RMDB = config.getBoolean("RemoveDisabledItemBlocks", false);
-		Threads.UseRPTimer = config.getBoolean("UseAutoRPTimer", false);
-		Threads.ChangeDisabledItemsIntoId = config.getInt("ChangeDisabledItemsIntoId", 3);
-		Threads.RPTickTime = (int) Math.round((config.getDouble("RPTimerMin", 0.2)-0.1d) * 20d);
+		Threads.RMDB = config.getBoolean(ConfigFile.DisableItems, "RemoveDisabledItemBlocks", false);
+		Threads.UseRPTimer = config.getBoolean(ConfigFile.General, "UseAutoRPTimer", false);
+		Threads.ChangeDisabledItemsIntoId = config.getInt(ConfigFile.DisableItems, "ChangeDisabledItemsIntoId", 3);
+		Threads.RPTickTime = (int) Math.round((config.getDouble(ConfigFile.ModModifications, "RPTimerMin", 0.2)-0.1d) * 20d);
 		
-		LWC.blocked = config.getStringList("LWCPreventNearLocked");
-		if (LWC.blocked == null) LWC.blocked = Collections.synchronizedList(new LinkedList<String>());
-		else LWC.blocked = Collections.synchronizedList(LWC.blocked);
+		List<String> lwcblocked = config.getStringList(ConfigFile.Advanced, "LWCPreventNearLocked");
+		if (lwcblocked == null) LWC.blocked = Collections.synchronizedList(new LinkedList<String>());
+		else LWC.blocked = Collections.synchronizedList(lwcblocked);
 		
-		SafeZones.UseSafeZones = config.getBoolean("UseSafeZones", true);
-		SafeZones.UseFactions = config.getBoolean("SSEnabledPlugins.Factions", true);
-		SafeZones.UseGP = config.getBoolean("SSEnabledPlugins.GriefPrevention", true);
-		SafeZones.UsePS = config.getBoolean("SSEnabledPlugins.PreciousStones", true);
-		SafeZones.UseTowny = config.getBoolean("SSEnabledPlugins.Towny", true);
-		SafeZones.UseWG = config.getBoolean("SSEnabledPlugins.WorldGuard", true);
-		SafeZones.GPMode = SSMode.parse(config.getString("GriefPreventionSafeZoneMethod", "admin"));
-		SafeZones.WGMode = SSMode.parse(config.getString("WorldGuardSafeZoneMethod", "specific"));
+		SafeZones.UseSafeZones = config.getBoolean(ConfigFile.SafeZones, "UseSafeZones", true);
+		SafeZones.UseFactions = config.getBoolean(ConfigFile.SafeZones, "SSEnabledPlugins.Factions", true);
+		SafeZones.UseGP = config.getBoolean(ConfigFile.SafeZones, "SSEnabledPlugins.GriefPrevention", true);
+		SafeZones.UsePS = config.getBoolean(ConfigFile.SafeZones, "SSEnabledPlugins.PreciousStones", true);
+		SafeZones.UseTowny = config.getBoolean(ConfigFile.SafeZones, "SSEnabledPlugins.Towny", true);
+		SafeZones.UseWG = config.getBoolean(ConfigFile.SafeZones, "SSEnabledPlugins.WorldGuard", true);
+		SafeZones.GPMode = SSMode.parse(config.getString(ConfigFile.SafeZones, "GriefPreventionSafeZoneMethod", "admin"));
+		SafeZones.WGMode = SSMode.parse(config.getString(ConfigFile.SafeZones, "WorldGuardSafeZoneMethod", "specific"));
 		
 		//SafeZones.SSPlugins = config.getStringList("SSEnabledPlugins");
 		//SafeZones.SSDisableFly = config.getBoolean("SSDisableFlying", false);
@@ -451,7 +454,7 @@ public class tekkitrestrict extends JavaPlugin {
 		instance.getServer().getScheduler().scheduleAsyncRepeatingTask(instance, new Runnable() {
 			@Override
 			public void run() {
-				TRLimitBlock.expireLimiters();
+				TRLimiter.expireLimiters();
 			}
 		}, 60L, 32L);
 	}
@@ -472,7 +475,7 @@ public class tekkitrestrict extends JavaPlugin {
 		}
 		TRThread.reload(); // branches out
 		TRListener.reload();
-		TRLimitBlock.reload();
+		TRLimiter.reload();
 		TRLogger.reload();
 		TRRecipeBlock.reload();
 		TRLimitFlyThread.reload();

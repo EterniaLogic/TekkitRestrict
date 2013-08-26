@@ -25,13 +25,14 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Global;
+import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Listeners;
 import com.github.dreadslicer.tekkitrestrict.commands.TRCommandAlc;
+import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
 
 import eloraam.core.TileCovered;
 
 public class TRListener implements Listener {
 	private static TRListener instance;
-	boolean SSInnvincible, UseBlockLimit;
 	boolean LogAmulets, LogRings, LogDMTools, LogRMTools, LogEEMisc;
 	private Map<Integer, String> EENames = Collections.synchronizedMap(new HashMap<Integer, String>());
 
@@ -111,14 +112,11 @@ public class TRListener implements Listener {
 	}
 
 	public static void reload() {
-		instance.SSInnvincible = tekkitrestrict.config.getBoolean("SSInvincible");
-		instance.UseBlockLimit = tekkitrestrict.config.getBoolean("UseItemLimiter");
-
-		instance.LogAmulets = tekkitrestrict.config.getBoolean("LogAmulets");
-		instance.LogRings = tekkitrestrict.config.getBoolean("LogRings");
-		instance.LogDMTools = tekkitrestrict.config.getBoolean("LogDMTools");
-		instance.LogRMTools = tekkitrestrict.config.getBoolean("LogRMTools");
-		instance.LogEEMisc = tekkitrestrict.config.getBoolean("LogEEMisc");
+		instance.LogAmulets = tekkitrestrict.config.getBoolean(ConfigFile.Logging, "LogAmulets", true);
+		instance.LogRings = tekkitrestrict.config.getBoolean(ConfigFile.Logging, "LogRings", true);
+		instance.LogDMTools = tekkitrestrict.config.getBoolean(ConfigFile.Logging, "LogDMTools", true);
+		instance.LogRMTools = tekkitrestrict.config.getBoolean(ConfigFile.Logging, "LogRMTools", true);
+		instance.LogEEMisc = tekkitrestrict.config.getBoolean(ConfigFile.Logging, "LogEEMisc", true);
 		
 		TRNoClick.reload();
 	}
@@ -130,18 +128,18 @@ public class TRListener implements Listener {
 	private int lastdata = 0;
 
 	/** @return <b>True</b> if id < 8 or id = 12, 13, 17, 24, 35, 44, 98 or 142. <b>False</b> otherwise. */
-	private boolean Exempt(int id){
+	private static boolean Exempt(int id){
 		return (id < 8 || id == 12 || id == 13 || id == 17 || id == 24 || id == 35 || id == 44 || id == 98 || id == 142);
 	}
 	
 	public static boolean errorBlockPlace = false;
 	@EventHandler(ignoreCancelled = true)
-	public void onBlockPlace(BlockPlaceEvent e) {
-		Block block = e.getBlock();
+	public void onBlockPlace(BlockPlaceEvent event) {
+		Block block = event.getBlock();
 		int id = block.getTypeId();
 		if (Exempt(id)) return;
 		
-		Player player = e.getPlayer();
+		Player player = event.getPlayer();
 		
 		if (player == null) {
 			lastdata = block.getData();
@@ -149,19 +147,19 @@ public class TRListener implements Listener {
 		}
 		
 		try {
-			if (!TRLWCProtect.checkLWCAllowed(e)) return;
+			if (!TRLWCProtect.checkLWCAllowed(event)) return;
 
 			int data = block.getData();
 			WorldServer ws = ((CraftWorld) block.getWorld()).getHandle();
 			
 			TileEntity te1 = ws.getTileEntity(block.getX(), block.getY(), block.getZ());
 
-			if (UseBlockLimit && !player.hasPermission("tekkitrestrict.bypass.limiter")) {
-				TRLimitBlock il = TRLimitBlock.getLimiter(player.getName());
-				if (!il.checkLimit(e, false)) {
+			if (Listeners.UseBlockLimit && !player.hasPermission("tekkitrestrict.bypass.limiter")) {
+				TRLimiter il = TRLimiter.getOnlineLimiter(player);
+				if (!il.checkLimit(event, false)) {
 					
 					player.sendMessage(ChatColor.RED + "[TRItemLimiter] You cannot place down any more of that block!");
-					e.setCancelled(true);
+					event.setCancelled(true);
 					if (te1 instanceof TileCovered) {
 						TileCovered tc = (TileCovered) te1;
 						for (int i = 0; i < 6; i++) {
@@ -192,7 +190,7 @@ public class TRListener implements Listener {
 			if (banned) {
 				// tekkitrestrict.log.info(cc.id+":"+cc.getData());
 				player.sendMessage(ChatColor.RED + "[TRItemDisabler] You cannot place down this type of block!");
-				e.setCancelled(true);
+				event.setCancelled(true);
 				if (te1 instanceof TileCovered) {
 					TileCovered tc = (TileCovered) te1;
 					for (int i = 0; i < 6; i++) {
@@ -203,15 +201,13 @@ public class TRListener implements Listener {
 					tc.updateBlockChange();
 				}
 			}
-			lastdata = e.getBlock().getData();
+			lastdata = event.getBlock().getData();
 		} catch(Exception ex){
 			if (!errorBlockPlace){
-				tekkitrestrict.log.warning("A exception occured in tekkitrestrict. Please give the developer the following information: ");
-				tekkitrestrict.log.warning("(This error is only logged once) Error: [onBlockPlace] " + ex.getMessage());
+				tekkitrestrict.log.warning("An error occured in the BlockPlace Listener! Please inform the author (This error will only be logged once).");
+				Log.Exception(ex, false);
 				errorBlockPlace = true;
 			}
-			TRLogger.Log("debug", "Error: [onBlockPlace] " + ex.getMessage());
-			Log.debugEx(ex);
 		}
 		
 	}
@@ -222,7 +218,7 @@ public class TRListener implements Listener {
 		Player player = event.getPlayer();
 		if (player == null) return;
 		
-		if (player.getGameMode() == GameMode.CREATIVE){
+		if (Listeners.UseLimitedCreative && player.getGameMode() == GameMode.CREATIVE){
 			if (!player.hasPermission("tekkitrestrict.bypass.creative")) {
 				event.setCancelled(true);
 				player.sendMessage(ChatColor.RED + "[TRLimitedCreative] You cannot drop items!");
@@ -243,12 +239,10 @@ public class TRListener implements Listener {
 			}
 		} catch (Exception ex) {
 			if (!errorDrop){
-				tekkitrestrict.log.warning("A exception occured in tekkitrestrict. Please give the developer the following information: ");
-				tekkitrestrict.log.warning("(This error is only logged once) Error: [onDropItem, handleDropDupes] " + ex.getMessage());
+				tekkitrestrict.log.warning("An error occured in the DropItem Listener! (This error is only logged once)");
+				Log.Exception(ex, false);
 				errorDrop = true;
 			}
-			TRLogger.Log("debug", "Error: [onDropItem, handleDropDupes] " + ex.getMessage());
-			Log.debugEx(ex);
 		}
 	}
 
@@ -288,12 +282,10 @@ public class TRListener implements Listener {
 					}
 				} catch (Exception ex) {
 					if (!errorInteract){
-						tekkitrestrict.log.warning("A exception occured in tekkitrestrict. Please give the developer the following information: ");
-						tekkitrestrict.log.warning("(This error is only logged once) Error: [ListenInteract TRLimitedCreative] " + ex.getMessage());
+						tekkitrestrict.log.warning("An error occured in the InteractListener for LimitedCreative!");
+						Log.Exception(ex, false);
 						errorInteract = true;
 					}
-					Log.debugEx(ex);
-					TRLogger.Log("debug", "Error: [ListenInteract TRLimitedCreative] " + ex.getMessage());
 				}
 				
 				if (banned) {
@@ -363,28 +355,25 @@ public class TRListener implements Listener {
 			if (TRLimitedCreative.handleCreativeInvClick(event)) return;
 		} catch (Exception ex) {
 			if (!errorCreativeClick){
-				tekkitrestrict.log.warning("A exception occured in tekkitrestrict. Please give the developer the following information: ");
-				tekkitrestrict.log.warning("(This error is only logged once) Error: [handleCreativeInvClick] " + ex.getMessage());
+				tekkitrestrict.log.warning("An error occured in the CreativeInvClickListener! Please inform the author.");
+				Log.Exception(ex, false);
 				errorCreativeClick = true;
 			}
-			TRLogger.Log("debug", "Error! [handleCreativeInvClick] : " + ex.getMessage());
-			Log.debugEx(ex);
 		}
 		try {
 			// Determine if they are crafting a banned item.
 			if (handleCraftBlock(event)) return;
 		} catch (Exception ex) {
 			if (!errorCraft){
-				tekkitrestrict.log.warning("A exception occured in tekkitrestrict. Please give the developer the following information: ");
-				tekkitrestrict.log.warning("(This error is only logged once) Error: [TRhandleCraftBlock] " + ex.getMessage());
+				tekkitrestrict.log.warning("An error occured in the CraftBlockHandler! Please inform the author.");
+				Log.Exception(ex, false);
 				errorCraft = true;
 			}
-			TRLogger.Log("debug", "Error! [TRhandleCraftBlock] : " + ex.getMessage());
-			Log.debugEx(ex);
 		}
 	}
 
 	private boolean handleCraftBlock(InventoryClickEvent event) {
+		if (!Listeners.UseNoItem) return false;
 		Player player = (Player) event.getWhoClicked();
 		ItemStack item = event.getCurrentItem();
 		if (item == null) return false;

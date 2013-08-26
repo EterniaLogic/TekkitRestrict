@@ -6,10 +6,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Listeners;
+import com.github.dreadslicer.tekkitrestrict.annotations.Safe;
 
 public class TRLimitedCreative {
 	/** Checks bypass creative permission. */
+	@Safe(allownull = false)
 	public static boolean handleCreativeInvClick(InventoryClickEvent event) {
+		if (!Listeners.UseLimitedCreative) return false;
 		Player player = (Player) event.getWhoClicked();
 		if (player.getGameMode() != GameMode.CREATIVE) return false;
 		if (player.hasPermission("tekkitrestrict.bypass.creative")) return false;

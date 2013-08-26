@@ -36,8 +36,8 @@ public class TRConfigCache {
 	}
 	
 	public static class Listeners {
-		public static int[] Exceptions = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 12, 13, 17, 24, 35, 44, 98, 142 };
 		public static boolean UseBlockLimit, BlockCreativeContainer;
+		public static boolean UseNoItem, UseLimitedCreative;
 	}
 	
 	public static class LogFilter {

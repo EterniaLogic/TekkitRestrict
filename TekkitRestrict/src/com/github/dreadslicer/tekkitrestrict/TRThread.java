@@ -963,7 +963,7 @@ class TSaveThread extends Thread {
 		while (true) {
 			// runs save functions for both safezones and itemlimiter
 			try {
-				TRLimitBlock.saveLimiters();
+				TRLimiter.saveLimiters();
 			} catch (Exception ex) {}
 			
 			try {
@@ -973,7 +973,7 @@ class TSaveThread extends Thread {
 			TRLogger.saveLogs();
 			TRNoHack.clearMaps();
 			try {
-				TRLimitBlock.manageData();
+				TRLimiter.manageData();
 			} catch(Exception ex){
 				TRLogger.Log("debug", "ManageData AutoSavethread Error: "+ex.getMessage());
 				Log.debugEx(ex);

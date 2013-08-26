@@ -23,7 +23,7 @@ import com.github.dreadslicer.tekkitrestrict.Log;
 import com.github.dreadslicer.tekkitrestrict.Send;
 import com.github.dreadslicer.tekkitrestrict.TRCacheItem;
 import com.github.dreadslicer.tekkitrestrict.TRDB;
-import com.github.dreadslicer.tekkitrestrict.TRLimitBlock;
+import com.github.dreadslicer.tekkitrestrict.TRLimiter;
 import com.github.dreadslicer.tekkitrestrict.TRNoItem;
 import com.github.dreadslicer.tekkitrestrict.TRPerformance;
 import com.github.dreadslicer.tekkitrestrict.TRSafeZone;
@@ -637,7 +637,7 @@ public class TRCommandTR implements CommandExecutor {
 			return;
 		}
 		
-		TRLimitBlock cc = TRLimitBlock.getLimiter(largs[3]);
+		TRLimiter cc = TRLimiter.getLimiter(largs[3]);
 		if (cc == null){
 			send.msg(ChatColor.RED + "This player doesn't exist!");
 			return;
@@ -679,7 +679,7 @@ public class TRCommandTR implements CommandExecutor {
 			return;
 		}
 		
-		TRLimitBlock cc = TRLimitBlock.getLimiter(largs[3]);
+		TRLimiter cc = TRLimiter.getLimiter(largs[3]);
 		
 		if(cc.itemlimits.isEmpty()){
 			send.msg(ChatColor.RED + largs[3] + " doesn't have any limits!");

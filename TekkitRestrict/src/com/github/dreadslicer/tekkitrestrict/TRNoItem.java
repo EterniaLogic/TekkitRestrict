@@ -10,6 +10,7 @@ import java.util.Map;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
+import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Listeners;
 import com.github.dreadslicer.tekkitrestrict.objects.TRItemStack;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
 
@@ -24,7 +25,6 @@ public class TRNoItem {
 	private static LinkedList<TRCacheItem> DisabledCreativeItems = new LinkedList<TRCacheItem>();
 	
 	public static Map<String, List<TRCacheItem>> modItemDat = Collections.synchronizedMap(new HashMap<String, List<TRCacheItem>>());
-	private static boolean useNoItem, useNoCreative;
 
 	/**	Clear all Lists and maps in this class (no items will be banned any more) */
 	public static void clear() {
@@ -43,8 +43,6 @@ public class TRNoItem {
 	public static void reload() {
 		allocateDisabledItems();
 		allocateDisabledCreativeItems();
-		useNoItem = tekkitrestrict.config.getBoolean("UseNoItem");
-		useNoCreative = tekkitrestrict.config.getBoolean("UseLimitedCreative");
 	}
 	
 	/**
@@ -78,7 +76,7 @@ public class TRNoItem {
 	 * @return If the given block is a disabled item (set in the config).
 	 */
 	public static boolean isBlockBanned(Block block) {
-		if (!useNoItem) return false;
+		if (!Listeners.UseNoItem) return false;
 		
 		int id = block.getTypeId();
 		byte data = block.getData();
@@ -108,7 +106,7 @@ public class TRNoItem {
 	 * @return If the given id:data combination is banned for this player.
 	 */
 	public static boolean isItemBanned(Player player, int id, int data, boolean doBypassCheck) {
-		return useNoItem ? isTypeNoItemBanned(player, id, data, doBypassCheck) : false;
+		return Listeners.UseNoItem ? isTypeNoItemBanned(player, id, data, doBypassCheck) : false;
 	}
 	/**
 	 * Goes through all banned items and checks if the id and data match.
@@ -116,7 +114,7 @@ public class TRNoItem {
 	 * @return If the given item/block is banned in the config.
 	 */
 	public static boolean isItemGloballyBanned(int id, int data) {
-		if (!useNoItem) return false;
+		if (!Listeners.UseNoItem) return false;
 		
 		for (TRCacheItem bannedItem : DisabledItems) {
 			if (bannedItem.compare(id, data)) return true;
@@ -133,7 +131,7 @@ public class TRNoItem {
 	 * in creative mode.
 	 */
 	public static boolean isItemBannedInCreative(Player player, int id, int data, boolean doBypassCheck) {
-		return useNoCreative ? isTypeCreativeBanned(player, id, data, doBypassCheck) : false;
+		return Listeners.UseLimitedCreative ? isTypeCreativeBanned(player, id, data, doBypassCheck) : false;
 	}
 	
 	/*

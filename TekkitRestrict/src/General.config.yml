@@ -32,12 +32,6 @@ UseOpenAlc: true
 # Default: true
 UseNoItem: true
 
-# Should debug messages be shown on the console?
-# If you are having problems, you can try to turn this on to get more
-# information when an error occurs.
-# Default: false
-ShowDebugMessages: false
-
 # If KickFromConsole is true, the console will execute the /kick
 # command instead of the default Bukkit kick when a player gets
 # kicked by TekkitRestrict (e.g. for hacking).
@@ -50,7 +44,7 @@ KickFromConsole: false
 #          banned items and interacts might not get loaded correctly
 #          and micropermissions will NOT work.
 # Default: false
-UseNewBannedItemsSystem: false
+# UseNewBannedItemsSystem: false
 
 ######################################################################
 ############################## Updater ###############################

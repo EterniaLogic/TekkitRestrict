@@ -5,8 +5,10 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 
+import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Global;
+
 public class TRLogger {
-	private static boolean LogAmulets, LogRings, LogDMTools, LogRMTools, LogEEMisc, LogEEDestructive, LogDebug;
+	private static boolean LogAmulets, LogRings, LogDMTools, LogRMTools, LogEEMisc, LogEEDestructive;
 	private static HashMap<String, ArrayList<String>> logMessages = new HashMap<String, ArrayList<String>>();
 
 	public static void reload() {
@@ -16,7 +18,6 @@ public class TRLogger {
 		LogRMTools = tekkitrestrict.config.getBoolean("LogRMTools");
 		LogEEMisc = tekkitrestrict.config.getBoolean("LogEEMisc");
 		LogEEDestructive = tekkitrestrict.config.getBoolean("LogEEDestructive");
-		LogDebug = tekkitrestrict.config.getBoolean("LogDebug");
 	}
 
 	public static void Log(String type, String info) {
@@ -68,7 +69,7 @@ public class TRLogger {
 		if (type.equals("eeamulet")) return LogAmulets;
 		if (type.equals("eemisc")) return LogEEMisc;
 		if (type.equals("eedestructive")) return LogEEDestructive;
-		if (type.equals("debug")) return LogDebug;
+		if (type.equals("debug")) return Global.debug;
 		if (type.equals("error")) return true;
 
 		return false;

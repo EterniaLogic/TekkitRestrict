@@ -6,7 +6,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import com.github.dreadslicer.tekkitrestrict.TRLimitBlock;
+import com.github.dreadslicer.tekkitrestrict.TRLimiter;
 import com.github.dreadslicer.tekkitrestrict.TRNoDupeProjectTable;
 import com.github.dreadslicer.tekkitrestrict.TRNoHack;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Listeners;
@@ -31,7 +31,7 @@ public class QuitListener implements Listener{
 		TRNoDupeProjectTable.playerUnuse(player.getName());
 		
 		if (Listeners.UseBlockLimit) {
-			try {TRLimitBlock.setExpire(player.getName());}catch(Exception eee){}
+			try {TRLimiter.setExpire(player.getName());}catch(Exception eee){}
 		}
 	}
 }

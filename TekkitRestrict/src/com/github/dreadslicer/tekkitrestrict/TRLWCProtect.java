@@ -2,6 +2,7 @@ package com.github.dreadslicer.tekkitrestrict;
 
 import java.util.List;
 
+import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -62,7 +63,7 @@ public class TRLWCProtect {
 					if (pe.getName().toLowerCase().equals(playername)) continue outerloop;
 				}
 	
-				player.sendMessage("You are not allowed to place this here!");
+				player.sendMessage(ChatColor.RED + "You are not allowed to place this here!");
 				event.setCancelled(true);
 				return false;
 			}
