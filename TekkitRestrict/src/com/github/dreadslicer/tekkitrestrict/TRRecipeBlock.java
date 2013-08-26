@@ -58,7 +58,7 @@ public class TRRecipeBlock {
 		while (recipes.hasNext()) {
 			if ((recipe = recipes.next()) != null) {
 				int tid = recipe.getResult().getData().getItemTypeId();
-				int tdata = recipe.getResult().getData().getData();
+				int tdata = recipe.getResult().getDurability();
 				if (tid == id && (tdata == data || data == 0)) {
 					recipes.remove();
 					status = true;
@@ -79,7 +79,7 @@ public class TRRecipeBlock {
 			if (r instanceof ShapedRecipe) {
 				ShapedRecipe recipe = (ShapedRecipe) r;
 				int tid = recipe.getResult().getTypeId();
-				int tdata = recipe.getResult().getData().getData();
+				int tdata = recipe.getResult().getDurability();
 				if (tid == id && (tdata == data || data == 0)) {
 					recipes.remove(i);
 					i--;
@@ -89,7 +89,7 @@ public class TRRecipeBlock {
 			if (r instanceof ShapelessRecipe) {
 				ShapelessRecipe recipe = (ShapelessRecipe) r;
 				int tid = recipe.getResult().getTypeId();
-				int tdata = recipe.getResult().getData().getData();
+				int tdata = recipe.getResult().getDurability();
 				if (tid == id && (tdata == data || data == 0)) {
 					recipes.remove(i--);
 					status = true;

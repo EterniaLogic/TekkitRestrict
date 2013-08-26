@@ -156,21 +156,20 @@ public class TRListener implements Listener {
 			
 			TileEntity te1 = ws.getTileEntity(block.getX(), block.getY(), block.getZ());
 
-			if (UseBlockLimit) {
+			if (UseBlockLimit && !player.hasPermission("tekkitrestrict.bypass.limiter")) {
 				TRLimitBlock il = TRLimitBlock.getLimiter(player.getName());
-				if (!il.checkLimit(e)) {
-					if (!player.hasPermission("tekkitrestrict.bypass.limiter")) {
-						player.sendMessage(ChatColor.RED + "[TRItemLimiter] You cannot place down any more of that block!");
-						e.setCancelled(true);
-						if (te1 instanceof TileCovered) {
-							TileCovered tc = (TileCovered) te1;
-							for (int i = 0; i < 6; i++) {
-								if (tc.getCover(i) != -1 && tc.getCover(i) == data) {
-									tc.tryRemoveCover(i);
-								}
+				if (!il.checkLimit(e, false)) {
+					
+					player.sendMessage(ChatColor.RED + "[TRItemLimiter] You cannot place down any more of that block!");
+					e.setCancelled(true);
+					if (te1 instanceof TileCovered) {
+						TileCovered tc = (TileCovered) te1;
+						for (int i = 0; i < 6; i++) {
+							if (tc.getCover(i) != -1 && tc.getCover(i) == data) {
+								tc.tryRemoveCover(i);
 							}
-							tc.updateBlockChange();
 						}
+						tc.updateBlockChange();
 					}
 				}
 			}

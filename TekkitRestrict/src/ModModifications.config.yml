@@ -72,7 +72,6 @@ MaxEU: []
 ##########################################################################################
 ################################### Max EE Tool Charge ###################################
 ##########################################################################################
-
 # MaxCharge limits the maximum EE charge of an item. (0-100%)
 #- "27573 30" (This will set the max charge of a morning star to 30%)
 #- "27564-27573 50" (This will Gimp ALL Red Matter Tools down to only 50% charge capacity)

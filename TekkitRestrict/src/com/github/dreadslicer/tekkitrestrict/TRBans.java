@@ -17,7 +17,7 @@ public class TRBans {
 			return false;
 		}
 		
-		if (TRPermHandler.hasPermission(player, permType, "*", "")) return true; //tekkitrestrict.noitem.*
+		if (TRPermHandler.hasPermission(player, permType, "*")) return true; //tekkitrestrict.noitem.*
 		if (player.hasPermission("tekkitrestrict." + permType + "." + id + "." + data)) return true; //tekkitrestrict.noitem.10.1
 		if (player.hasPermission("tekkitrestrict." + permType + "." + id)) return true; //tekkitrestrict.noitem.10
 		if (TRPermHandler.hasPermission(player, permType, "" + id, "*")) return true; //tekkitrestrict.noitem.10.*

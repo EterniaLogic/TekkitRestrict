@@ -10,6 +10,7 @@ import java.util.Map;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
+import com.github.dreadslicer.tekkitrestrict.objects.TRItemStack;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
 
 /**
@@ -299,12 +300,12 @@ public class TRNoItem {
 					// if(ins.contains(":")) ins = ins.split(":")[0];
 			try {
 				r.add(new TRItemStack(Integer.parseInt(insx), 1, 0));
-			} catch (Exception E) {
+			} catch (Exception ex) {
 			}
 		}
 
 		TRItemStack[] isz = r.toArray(new TRItemStack[0]);
-		r.clear();
+		//r.clear();
 		return isz;
 	}
 

@@ -4,9 +4,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.ItemStack;
 
-import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Global;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Listeners;
 
 public class TRLimitedCreative {
@@ -31,7 +29,8 @@ public class TRLimitedCreative {
 			tekkitrestrict.log.warning("An error occured in TRLimitedCreative ContainerCheck! Please inform the author.");
 			Log.Exception(ex, false);
 		}
-		
+		//Dont ban items in creative inventory. They cant rightclick anyway and it causes crashes.
+		/*
 		try {
 			// determine of player attempted to pick an item up...
 			ItemStack ccc = event.getCurrentItem();
@@ -40,7 +39,7 @@ public class TRLimitedCreative {
 			if (Global.useNewBanSystem){
 				if (TRCacheItem2.isBanned(player, "creative", ccc.getTypeId(), ccc.getDurability())) banned = true;
 			} else {
-				if (TRNoItem.isItemBannedInCreative(player, ccc.getTypeId(), ccc.getData().getData(), false)) banned = true;
+				if (TRNoItem.isItemBannedInCreative(player, ccc.getTypeId(), ccc.getDurability(), false)) banned = true;
 			}
 			
 			if (banned) {
@@ -53,6 +52,7 @@ public class TRLimitedCreative {
 			tekkitrestrict.log.warning("An error occured in TRLimitedCreative BannedCreativeItem! Please inform the author.");
 			Log.Exception(ex, false);
 		}
+		*/
 		return false;
 	}
 }

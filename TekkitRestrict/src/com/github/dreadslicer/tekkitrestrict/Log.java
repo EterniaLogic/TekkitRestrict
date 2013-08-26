@@ -11,7 +11,6 @@ import org.bukkit.command.Command;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Global;
 
 public class Log {
-	
 	/**
 	 * Creates 2 custom levels and assigns the loggers.
 	 */
@@ -19,9 +18,8 @@ public class Log {
 		McLogger = Logger.getLogger("Minecraft");
 		new CustomLevel("Notice", 801);
 		new CustomLevel("Command", 802);
-		new CustomLevel("Debug", 803);
-		new CustomLevel("TRDupe", 804);
-		new CustomLevel("TRHack", 805);
+		new CustomLevel("TRDupe", 803);
+		new CustomLevel("TRHack", 804);
 	}
 	static void deinit(){
 		McLogger = null;
@@ -56,7 +54,7 @@ public class Log {
 	}
 	public static class Config {
 		public static void Warning(String message){
-			tekkitrestrict.log.log(Level.WARNING, "[Config] " + message);
+			tekkitrestrict.log.warning("[Config] " + message);
 		}
 		public static void Notice(String message){
 			tekkitrestrict.log.log(Level.parse("Notice"), "[Config] " + message);
@@ -89,7 +87,7 @@ public class Log {
 	}
 	public static void Glitch(String type, String playername) {
 		String message = playername + " tried to glitch using a " + type + ".";
-		McLogger.log(Level.parse("TEDupe"), message);
+		McLogger.log(Level.parse("TRDupe"), message);
 	}
 	/** For each stackTrace element, it will write it to the debug log. */
 	public static void debugEx(Exception ex){

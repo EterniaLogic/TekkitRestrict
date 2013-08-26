@@ -1,11 +1,12 @@
 package com.github.dreadslicer.tekkitrestrict;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import org.anjocaido.groupmanager.GroupManager;
+import org.anjocaido.groupmanager.data.Group;
 import org.anjocaido.groupmanager.data.User;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -35,11 +36,11 @@ public class TRPermHandler {
 		        	net.milkbowl.vault.permission.Permission permission = v.getProvider();
 		        	return permission.has(p, perm);
 		        }
-			} else if (pm.isPluginEnabled("PermissionsEx") && isForceThis(0)) {
+			} else if (pm.isPluginEnabled("PermissionsEx")) {
 				return ((PermissionManager) tekkitrestrict.perm).getUser(p).has(perm);
-			} else if (pm.isPluginEnabled("bPermissions") && isForceThis(2)) {
+			} else if (pm.isPluginEnabled("bPermissions")) {
 				return ApiLayer.hasPermission(p.getWorld().getName(), CalculableType.USER, p.getName(), perm);
-			} else if (pm.isPluginEnabled("GroupManager") && isForceThis(3)) {
+			} else if (pm.isPluginEnabled("GroupManager")) {
 				GroupManager ps = (GroupManager) pm.getPlugin("GroupManager");
 				return ps.getWorldsHolder().getWorldData(p).getUser(p.getName()).hasSamePermissionNode(perm);
 			} else {
@@ -64,11 +65,11 @@ public class TRPermHandler {
 		        	net.milkbowl.vault.permission.Permission permission = v.getProvider();
 		        	return permission.has(p, perm);
 		        }
-			} else if (pm.isPluginEnabled("PermissionsEx") && isForceThis(0)) {
+			} else if (pm.isPluginEnabled("PermissionsEx")) {
 				return ((PermissionManager) tekkitrestrict.perm).getUser(p).has(perm);
-			} else if (pm.isPluginEnabled("bPermissions") && isForceThis(2)) {
+			} else if (pm.isPluginEnabled("bPermissions")) {
 				return ApiLayer.hasPermission(p.getWorld().getName(), CalculableType.USER, p.getName(), perm);
-			} else if (pm.isPluginEnabled("GroupManager") && isForceThis(3)) {
+			} else if (pm.isPluginEnabled("GroupManager")) {
 				GroupManager ps = (GroupManager) pm.getPlugin("GroupManager");
 				return ps.getWorldsHolder().getWorldData(p).getUser(p.getName()).hasSamePermissionNode(perm);
 			} else {
@@ -97,11 +98,11 @@ public class TRPermHandler {
 		        	net.milkbowl.vault.permission.Permission permission = v.getProvider();
 		        	return permission.has(p, perm);
 		        }
-			} else if (pm.isPluginEnabled("PermissionsEx") && isForceThis(0)) {
+			} else if (pm.isPluginEnabled("PermissionsEx")) {
 				return ((PermissionManager) tekkitrestrict.perm).getUser(p).has(perm);
-			} else if (pm.isPluginEnabled("bPermissions") && isForceThis(2)) {
+			} else if (pm.isPluginEnabled("bPermissions")) {
 				return ApiLayer.hasPermission(p.getWorld().getName(), CalculableType.USER, p.getName(), perm);
-			} else if (pm.isPluginEnabled("GroupManager") && isForceThis(3)) {
+			} else if (pm.isPluginEnabled("GroupManager")) {
 				GroupManager ps = (GroupManager) pm.getPlugin("GroupManager");
 				return ps.getWorldsHolder().getWorldData(p).getUser(p.getName()).hasSamePermissionNode(perm);
 			} else {
@@ -114,73 +115,40 @@ public class TRPermHandler {
 		return false;
 	}
 
-	/*
-	 * public static boolean hassSpecialPermission(Player p, String s, int id,
-	 * int data) { boolean r = false;
-	 * 
-	 * /*String perms[] = getPermissions(p, s); String negPerms[] =
-	 * getPermissions(p, (new StringBuilder("-")) .append(s).toString()); for
-	 * (int i = 0; i < negPerms.length; i++) { String gp[] =
-	 * negPerms[i].replace('.', ';').split(";"); String gs[] = s.replace('.',
-	 * ';').split(";"); if (gp.length >= 2 && gs.length >= 2 && gp[1] != null &&
-	 * gs[1] != null && gp[1].equals(gs[1]) && TRNoItem.isInRanged(gp.length !=
-	 * 4 ? gp[2] : (new StringBuilder(String.valueOf(gp[2])))
-	 * .append(":").append(gp[3]).toString(), id, data)) return false; }
-	 * 
-	 * for (int i = 0; i < perms.length; i++) { String gp[] =
-	 * perms[i].replace('.', ';').split(";"); String gs[] = s.replace('.',
-	 * ';').split(";"); if (gp.length >= 2 && gs.length >= 2 && gp[1] != null &&
-	 * gs[1] != null && gp[1].equals(gs[1]) && TRNoItem.isInRanged(gp.length !=
-	 * 4 ? gp[2] : (new StringBuilder(String.valueOf(gp[2])))
-	 * .append(":").append(gp[3]).toString(), id, data)) return true; }* /
-	 * 
-	 * return r; }
-	 */
-
-	/** @return always 0 */
-	@Deprecated
-	public static int getPermNumeral(Player player, String string, int thisid) {
-		return 0;
-	}
-
 	public static int getPermNumeral(Player p, String permBase, int id, int data) {
 		int r = -1;
-		String perms[] = getPermissions(p, permBase);
-		//String negPerms[] = getPermissions(p, (new StringBuilder("-")).append(permBase).toString());
+		
 		String negPerms[] = getPermissions(p, "-"+permBase);
 		for (int i = 0; i < negPerms.length; i++) {
-			String gp[] = negPerms[i].replace('.', ';').split(";");//tekkitrestrict;limiter
-			String gs[] = permBase.replace('.', ';').split(";");
+			String gp[] = negPerms[i].replace('.', ';').split(";");//tekkitrestrict;limiter;id
+			String gs[] = permBase.replace('.', ';').split(";");//tekkitrestrict;limiter
 			if (gp.length < 2 || gs.length < 2) continue;
 			if (gp[1] == null || gs[1] == null) continue;
 			if (!gp[1].equals(gs[1])) continue;
-			if (gp.length != 5){
-				if (TRNoItem.isInRanged(gp[2]+":-10", id, data)) return -1;
-			} else {
-				if (TRNoItem.isInRanged(gp[2]+":"+gp[3], id, data)) return -1;
-			}
-			
-			//if (TRNoItem.isInRanged((gp.length != 5 ? (gp[2]+":-10") : (gp[2]+":"+gp[3])), id, data)) {
-			//	return -1;
-			//}
-			//if (TRNoItem.isInRanged(gp.length != 5 ? (new StringBuilder(gp[2])).append(":-10").toString()
-			//: (new StringBuilder(gp[2])).append(":").append(gp[3]).toString(), id, data)) {
-			//return -1;
-			//}
+			try {
+				if (gp.length != 5){
+					if (TRNoItem.isInRanged(gp[2]+":-10", id, data)) return -1;
+				} else {
+					if (TRNoItem.isInRanged(gp[2]+":"+gp[3], id, data)) return -1;
+				}
+			} catch (Exception ex){}
 		}
 
+		String perms[] = getPermissions(p, permBase);
 		for (int i = 0; i < perms.length; i++) {
-			String gp[] = perms[i].replace('.', ';').split(";");
-			String gs[] = permBase.replace('.', ';').split(";");
+			String gp[] = perms[i].replace('.', ';').split(";");//tekkitrestrict;limiter;id
+			String gs[] = permBase.replace('.', ';').split(";");//tekkitrestrict;limiter
 			if (gp.length < 2 || gs.length < 2) continue;
 			if (gp[1] == null || gs[1] == null) continue;
 			if (!gp[1].equals(gs[1])) continue;
 			
-			if (TRNoItem.isInRanged(gp.length != 5 ? gp[2]
-							: (new StringBuilder(gp[2])).append(":").append(gp[3]).toString(), id,
-							data)) {
-				return Integer.valueOf(gp.length != 5 ? gp[3] : gp[4]).intValue();
-			}
+			try {
+				if (gp.length != 5){
+					if (TRNoItem.isInRanged(gp[2], id, data)) return Integer.parseInt(gp[3]);
+				} else {
+					if (TRNoItem.isInRanged(gp[2]+":"+gp[3], id, data)) return Integer.parseInt(gp[4]);
+				}
+			} catch (Exception ex){}
 		}
 
 		return r;
@@ -188,15 +156,17 @@ public class TRPermHandler {
 
 	private static String[] getPermissions(Player p, String s) {
 		PluginManager pm = Bukkit.getPluginManager();
-		if (pm.isPluginEnabled("PermissionsEx") && isForceThis(0)) {
+		if (pm.isPluginEnabled("PermissionsEx")) {
 			return getAllPEXPlayerPerms(p, s);
 		}
-		if (pm.isPluginEnabled("PermissionsBukkit") && isForceThis(1)) {
+		
+		if (pm.isPluginEnabled("PermissionsBukkit")) {
 			return new String[0];
 		}
-		if (pm.isPluginEnabled("bPermissions") && isForceThis(2)) {
+		
+		if (pm.isPluginEnabled("bPermissions")) {
 			Permission ps[] = ApiLayer.getPermissions(p.getWorld().getName(), CalculableType.USER, p.getName());
-			List<String> sr = new LinkedList<String>();
+			LinkedList<String> sr = new LinkedList<String>();
 			Permission apermission[];
 			int k = (apermission = ps).length;
 			for (int j = 0; j < k; j++) {
@@ -212,37 +182,46 @@ public class TRPermHandler {
 			}
 
 			String lz[] = sr.toArray(new String[0]);
-			sr.clear();
+			//sr.clear();
 			return lz;
 		}
-		if (pm.isPluginEnabled("GroupManager") && isForceThis(3)) {
+		if (pm.isPluginEnabled("GroupManager")) {
 			GroupManager ps = (GroupManager) pm.getPlugin("GroupManager");
-			List<String> sr = new LinkedList<String>();
+			HashSet<String> sr = new HashSet<String>();
 			User user = ps.getWorldsHolder().getWorldData(p).getUser(p.getName());
 			sr.addAll(user.getPermissionList());
-			sr.addAll(user.getGroup().getPermissionList());
-			String a;
-			for (Iterator<String> iterator = user.getGroup().getInherits().iterator(); iterator.hasNext(); sr.add(a)) {
-				a = iterator.next();
+			for (Group group : user.subGroupListCopy()){
+				sr.addAll(group.getPermissionList());
 			}
-
-			for (int i = 0; i < sr.size(); i++) {
-				if (!sr.get(i).startsWith(s)) {
-					sr.remove(i);
-					i--;
+			sr.addAll(user.getGroup().getPermissionList());
+			//String a;
+			for (String inherit: user.getGroup().getInherits()){
+				Group gi = ps.getWorldsHolder().getWorldData(p).getGroup(inherit);
+				if (gi == null) continue;
+				
+				sr.addAll(gi.getPermissionList());
+			}
+			
+			//for (Iterator<String> iterator = user.getGroup().getInherits().iterator(); iterator.hasNext(); sr.add(a)) {
+			//	a = iterator.next();
+			//}
+			Iterator<String> it = sr.iterator();
+			while (it.hasNext()){
+				String str = it.next();
+				if (!str.startsWith(s)) {
+					it.remove();
 				}
 			}
 
 			String lz[] = sr.toArray(new String[0]);
-			sr.clear();
 			return lz;
 		} else {
 			return new String[0];
 		}
 	}
 
-	static String[] getAllPEXPlayerPerms(Player p, String sss) {
-		List<String> l = new LinkedList<String>();
+	private static String[] getAllPEXPlayerPerms(Player p, String sss) {
+		LinkedList<String> l = new LinkedList<String>();
 		PermissionUser pu = ((PermissionManager) tekkitrestrict.perm).getUser(p);
 		String as[];
 		int j = (as = pu.getPermissions(p.getWorld().getName())).length;
@@ -315,14 +294,8 @@ public class TRPermHandler {
 		}
 
 		String lsst[] = l.toArray(new String[0]);
-		l.clear();
+		//l.clear();
 		return lsst;
 	}
-
-	private static boolean isForceThis(int t) {
-		return forcepermmanager == -1 ? true : forcepermmanager == t;
-	}
-
-	private static int forcepermmanager = -1;
 
 }

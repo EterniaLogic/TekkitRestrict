@@ -22,13 +22,13 @@ import org.bukkit.plugin.PluginManager;
 import com.github.dreadslicer.tekkitrestrict.Log;
 import com.github.dreadslicer.tekkitrestrict.Send;
 import com.github.dreadslicer.tekkitrestrict.TRCacheItem;
-import com.github.dreadslicer.tekkitrestrict.TRLimit;
 import com.github.dreadslicer.tekkitrestrict.TRLimitBlock;
 import com.github.dreadslicer.tekkitrestrict.TRNoItem;
 import com.github.dreadslicer.tekkitrestrict.TRPerformance;
 import com.github.dreadslicer.tekkitrestrict.TRSafeZone;
 import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
 import com.github.dreadslicer.tekkitrestrict.api.SafeZones.SafeZoneCreate;
+import com.github.dreadslicer.tekkitrestrict.objects.TRLimit;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
@@ -696,14 +696,14 @@ public class TRCommandTR implements CommandExecutor {
 			
 			for (TRLimit l : cc.itemlimits) {
 				if (l.blockID != id) continue;
-				int cccl = cc.getMax(cc.player, l.blockID, l.blockData);
+				int cccl = cc.getMax(cc.player, l.blockID, l.blockData, true);
 				cccl = cccl == -1 ? 0 : cccl;
 				send.msg("[" + l.blockID + ":" + l.blockData + "] - " + l.placedBlock.size() + "/" + cccl + " blocks");
 			}
 			
 		} else {
 			for (TRLimit l : cc.itemlimits) {
-				int cccl = cc.getMax(cc.player, l.blockID, l.blockData);
+				int cccl = cc.getMax(cc.player, l.blockID, l.blockData, true);
 				cccl = cccl == -1 ? 0 : cccl;
 				send.msg("[" + l.blockID + ":" + l.blockData + "] - " + l.placedBlock.size()+"/"+cccl+" blocks");
 			}

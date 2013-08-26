@@ -4,7 +4,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
+import com.github.dreadslicer.tekkitrestrict.Log;
 import com.github.dreadslicer.tekkitrestrict.TRLimitBlock;
+import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
 
 public class LoginListener implements Listener {
 	@EventHandler
@@ -13,6 +15,9 @@ public class LoginListener implements Listener {
 		try {
 			TRLimitBlock.removeExpire(playerName);
 			TRLimitBlock.getLimiter(playerName);
-		} catch(Exception ex){}
+		} catch(Exception ex){
+			tekkitrestrict.log.warning("An error occured in the LoginListener!");
+			Log.Exception(ex, false);
+		}
 	}
 }

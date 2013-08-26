@@ -50,7 +50,7 @@ public class NoHackFly implements Listener {
 		ItemStack boots = inventory.getBoots();
 		if (boots != null){
 			//checks if the player is wearing boots before deciding whether or not they are flyhacking
-			if (boots.getTypeId() == 30171 && (inventory.getBoots().getData().getData() < 27)) { //wearing quantum boots. checks for charge
+			if (boots.getTypeId() == 30171 && (inventory.getBoots().getDurability() < 27)) { //wearing quantum boots. checks for charge
 		    	//if charged boots, increase fly tolerance. *10 is just an example
 				flyTolerance *= 5;
 		    } else if (boots.getTypeId() == 27582) { //checks for hurricane boots
@@ -62,11 +62,11 @@ public class NoHackFly implements Listener {
 		if (chest != null){
 			//jetpack check
 			if (chest.getTypeId() == 30209) {
-				int data = chest.getData().getData();
+				int data = chest.getDurability();
 				if (data <= 25 && data != 0) return false; //Fuel check
 				
 			} else if (chest.getTypeId() == 30210) {
-				int data = chest.getData().getData();
+				int data = chest.getDurability();
 				if (data < 18000 && data != 0) return false; //Fuel check
 				
 			}

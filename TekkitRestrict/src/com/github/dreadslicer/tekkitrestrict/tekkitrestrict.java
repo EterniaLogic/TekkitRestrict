@@ -86,6 +86,7 @@ public class tekkitrestrict extends JavaPlugin {
 	public void onLoad() {
 		instance = this; //Set the instance
 		log = getLogger(); //Set the logger
+		Log.init();
 		
 		//#################### load SQLite ####################
 		log.info("[DB] Loading SQLite Database...");
@@ -98,7 +99,10 @@ public class tekkitrestrict extends JavaPlugin {
 				loadWarning("[DB] Failed to load SQLite Database!");
 			}
 		}
-
+		//#####################################################
+		
+		
+		//#################### load Config ####################
 		saveDefaultConfig(false);
 
 		config = this.getConfigx(); //Load the configuration files
@@ -109,6 +113,10 @@ public class tekkitrestrict extends JavaPlugin {
 			UpdateConfigFiles.v11();
 		
 		loadConfigCache();
+		//#####################################################
+		
+		
+		//###################### RPTimer ######################
 		if (config.getBoolean("UseAutoRPTimer")){
 			try {
 				double value = config.getDouble("RPTimerMin", 0.2d);
@@ -119,14 +127,17 @@ public class tekkitrestrict extends JavaPlugin {
 				loadWarning("Setting the RedPower Timer failed!");
 			}
 		}
+		//#####################################################
 		
+		
+		//###################### Patch CC #####################
 		if (config.getBoolean("PatchComputerCraft", true)){
 			PatchCC.start();
 		}
-
-		// ///////////
+		//#####################################################
 		
 		
+		//##################### Log Filter ####################
 		if (config.getBoolean("UseLogFilter", true)){
 			Enumeration<String> cc = LogManager.getLogManager().getLoggerNames();
 			filter = new TRLogFilter();
@@ -135,10 +146,7 @@ public class tekkitrestrict extends JavaPlugin {
 			}
 			log.info("Log filter Placed!");
 		}
-		
-		// ///////////
-
-		Log.init();
+		//#####################################################
 	}
 	@Override
 	public void onEnable() {
@@ -397,7 +405,7 @@ public class tekkitrestrict extends JavaPlugin {
 		Threads.RMDB = config.getBoolean("RemoveDisabledItemBlocks", false);
 		Threads.UseRPTimer = config.getBoolean("UseAutoRPTimer", false);
 		Threads.ChangeDisabledItemsIntoId = config.getInt("ChangeDisabledItemsIntoId", 3);
-		Threads.RPTickTime = (int) Math.round(config.getDouble("RPTimerMin", 0.2) * 20);
+		Threads.RPTickTime = (int) Math.round((config.getDouble("RPTimerMin", 0.2)-0.1d) * 20d);
 		
 		LWC.blocked = config.getStringList("LWCPreventNearLocked");
 		if (LWC.blocked == null) LWC.blocked = Collections.synchronizedList(new LinkedList<String>());
@@ -427,6 +435,7 @@ public class tekkitrestrict extends JavaPlugin {
 		ChunkUnloader.maxRadii = config.getInt(ConfigFile.TPerformance, "MaxRadii", 256);
 	}
 
+	/** Make the limiter expire limits every 32 ticks. */
 	private static void initHeartBeat() {
 		instance.getServer().getScheduler().scheduleAsyncRepeatingTask(instance, new Runnable() {
 			@Override

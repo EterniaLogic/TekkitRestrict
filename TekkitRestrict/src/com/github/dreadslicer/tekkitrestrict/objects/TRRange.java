@@ -1,4 +1,4 @@
-package com.github.dreadslicer.tekkitrestrict;
+package com.github.dreadslicer.tekkitrestrict.objects;
 
 public class TRRange {
 	private boolean same;

@@ -39,6 +39,7 @@ public class InventoryClickListener implements Listener {
 				if (banned) {
 					player.sendMessage(ChatColor.RED + "This item is banned!");
 					event.setCancelled(true);
+					return;
 				}
 			}
 		}

@@ -12,8 +12,8 @@ import javax.swing.JList;
 import javax.swing.JButton;
 import javax.swing.ListModel;
 
-import com.github.dreadslicer.tekkitrestrict.TRItemStack;
 import com.github.dreadslicer.tekkitrestrict.TRNoItem;
+import com.github.dreadslicer.tekkitrestrict.objects.TRItemStack;
 
 import java.awt.Font;
 import java.awt.event.ActionListener;

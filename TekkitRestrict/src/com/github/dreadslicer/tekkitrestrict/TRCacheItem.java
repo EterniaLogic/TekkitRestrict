@@ -10,6 +10,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
+import com.github.dreadslicer.tekkitrestrict.annotations.Safe;
+
 public class TRCacheItem {
 	//Note:
 	//Block ID's Forge: 0-4095
@@ -24,8 +26,8 @@ public class TRCacheItem {
 	private static ConcurrentHashMap<String, List<TRCacheItem>> cacheMods = new ConcurrentHashMap<String, List<TRCacheItem>>();
 	
 	/**
-	 * There are 3 cache types: "l" (limiter), "n" (noitem) and "c" (creative)
-	 * CachePermTypes contains a set for each of these values.
+	 * There are 3 cache types: "l" (limiter), "n" (noitem) and "c" (creative)<br>
+	 * CachePermTypes contains a HashSet&lt;String&gt; for each of these values.
 	 */
 	private static ConcurrentHashMap<String, Set<String>> cachePermTypes = new ConcurrentHashMap<String, Set<String>>();
 	
@@ -45,8 +47,6 @@ public class TRCacheItem {
 		"balkonweaponmod=26483-26530", "enderchest=178;7493",
 		"chunkloaders=4095;214;7303;179"
 	};
-	
-	// cacheTypes is used for exclusive types and is returned through
 
 	protected TRCacheItem() {}
 
@@ -55,18 +55,6 @@ public class TRCacheItem {
 	private String cacher = "";
 	private int Data1 = -1;
 	private Object Data2 = -1;
-	//private short newdata;
-
-	/*
-	private TRItemStack getTRItemStack(int amount) {
-		return new TRItemStack(id, amount, data);
-	}
-	private ItemStack getBukkitItemStack(int amount) {
-		return new ItemStack(id, amount, (short) 0, (byte) data);
-	}
-	private net.minecraft.server.ItemStack getMCItemStack(int amount) {
-		return new net.minecraft.server.ItemStack(id, amount, data);
-	}*/
 
 	public int getIntData() {
 		return Data1;
@@ -90,6 +78,7 @@ public class TRCacheItem {
 	 * <li>this.id == id AND this.data == -10 AND data == 0</li>
 	 * </ul>
 	 */
+	@Safe
 	public boolean compare(int id, int data) {
 		//boolean isAllDataTypes = (this.data == -10 && data == 0);
 		//boolean isALL = (this.id == -11);
@@ -187,9 +176,7 @@ public class TRCacheItem {
 	 * }
 	 */
 	
-	/**
-	 * @see #getCacheList(String) Uses getCacheList(permType + ";" + type)
-	 */
+	/** @see #getCacheList(String) Uses getCacheList(permType + ";" + type) */
 	@SuppressWarnings("unused")
 	private static List<TRCacheItem> getCacheList(String permType, String type) {
 		return getCacheList(permType + ";" + type);
@@ -207,9 +194,7 @@ public class TRCacheItem {
 		return addCacheList(permType, type, l);
 	}
 
-	/**
-	 * @see #addCacheList(String, List) Uses addCacheList(permType + ";" + type, list)
-	 */
+	/** @see #addCacheList(String, List) Uses addCacheList(permType + ";" + type, list) */
 	private static List<TRCacheItem> addCacheList(String permType, String type, List<TRCacheItem> list) {
 		String key = permType + ";" + type;
 		return addCacheList(key, list);
@@ -419,13 +404,18 @@ public class TRCacheItem {
 						.append("=")
 						.append(id)
 						.append(":").toString();
+		//l;CachePermTypes.get(l)=49:
+		//l;afsd90ujpj=49:
 		
+		//l;afsd90ujpj=49:-10
 		if (data == 0 && cache.contains(new StringBuilder(keybase.length()+3).append(keybase).append("-10").toString()))
 			return true;
 		
+		//l;afsd90ujpj=49:0
 		if (cache.contains(new StringBuilder(keybase.length()+5).append(keybase).append(data).toString())) 
 			return true;
 		
+		//l;afsd90ujpj=49:0
 		if (cache.contains(new StringBuilder(keybase.length()+1).append(keybase).append("0").toString()))
 			return true;
 
@@ -454,7 +444,7 @@ public class TRCacheItem {
 		return false;
 	}*/
 
-	/* */ private static TRCacheItem getCacheItem(String permType, String type, int id, int data) {
+	private static TRCacheItem getCacheItem(String permType, String type, int id, int data) {
 		String keybase = new StringBuilder(permType.length()+type.length()+8)
 						.append(permType.toLowerCase())
 						.append(";")
@@ -479,12 +469,7 @@ public class TRCacheItem {
 		return null;
 	}
 
-	/**
-	 * @param data2 Use -1 to apply to all data values.
-	 */
-	//TRCacheItem.processItemString("l", "afsd90ujpj", temp[0], limit);
-	//TRCacheItem.processItemString("n", "", str, -1);
-	//TRCacheItem.processItemString("c", "afsd90ujpj", str, -1)
+	/** @param data2 Use -1 to apply to all data values. */
 	public static List<TRCacheItem> processItemString(String permType, String type, String item, int data2) {
 		String key = permType + ";" + type;			//l;afsd90ujpj		"n;"		"c;afsd90ujpj"
 		cpermtype(permType, type);					//l, afsd90ujpj		"n",""		"c","afsd90ujpj"
@@ -498,7 +483,7 @@ public class TRCacheItem {
 		//data2 = -1 || c[1]
 		String itemx = item.replace(":-", ":=");
 		// converts a variable string into a list of data.
-		List<TRCacheItem> tci = new LinkedList<TRCacheItem>();
+		LinkedList<TRCacheItem> tci = new LinkedList<TRCacheItem>();
 
 		if (itemx.contains("-")) { // a range of items
 			// loop through this range and add each to the return stack.
@@ -526,7 +511,7 @@ public class TRCacheItem {
 			try {
 				id = Integer.parseInt(t[0]);
 				data = Integer.parseInt(t[1].replace('=', '-'));
-			} catch (NumberFormatException ex){
+			} catch (NumberFormatException | ArrayIndexOutOfBoundsException ex2){
 			}
 			
 			if (t[1].equals("0")) { //If :0, then :-10
@@ -593,9 +578,8 @@ public class TRCacheItem {
 		return tci;
 	}
 
-	// to be used exclusively for types that require a permission type. (Type is
-	// then the var name)
-	/* */ private static TRCacheItem cacheItem(String permType, String type, int id, int data) {
+	/** To be used exclusively for types that require a permission type. */
+	private static TRCacheItem cacheItem(String permType, String type, int id, int data) {
 		cpermtype(permType, type);
 		return cacheItem(permType + ";" + type, id, data);
 	}
@@ -705,27 +689,27 @@ public class TRCacheItem {
 	/** Clears the cache so new perms can be added. */
 	private static void clearCache() {
 		synchronized (cache) {
-			//for (String s : cache.keySet()){
-			//	Log.Debug("cache.get("+s+"): "+cache.get(s).toString());
-			//}
+			for (String s : cache.keySet()){
+				Log.Debug("cache.get("+s+"): "+cache.get(s).toString());
+			}
 			cache.clear();
 		}
 		synchronized (cacheMods) {
-			//for (String s : cacheMods.keySet()){
-			//	List<TRCacheItem> cis = cacheMods.get(s);
-			//	for (TRCacheItem ci : cis){
-			//		Log.Debug("cacheMods.get("+s+"): " + ci.toString());
-			//	}
-			//}
+			for (String s : cacheMods.keySet()){
+				List<TRCacheItem> cis = cacheMods.get(s);
+				for (TRCacheItem ci : cis){
+					Log.Debug("cacheMods.get("+s+"): " + ci.toString());
+				}
+			}
 			cacheMods.clear();
 		}
 		synchronized (cachePermTypes) {
-			//for (String s : cachePermTypes.keySet()){
-			//	Set<String> strs = cachePermTypes.get(s);
-			//	for (String str : strs){
-			//		Log.Debug("cachePermTypes.get("+s+"): " + str);
-			//	}
-			//}
+			for (String s : cachePermTypes.keySet()){
+				Set<String> strs = cachePermTypes.get(s);
+				for (String str : strs){
+					Log.Debug("cachePermTypes.get("+s+"): " + str);
+				}
+			}
 			cachePermTypes.clear();
 		}
 	}

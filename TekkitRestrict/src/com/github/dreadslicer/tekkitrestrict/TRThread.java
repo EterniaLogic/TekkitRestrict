@@ -11,8 +11,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import net.minecraft.server.EntityHuman;
 import net.minecraft.server.Item;
@@ -20,7 +18,6 @@ import net.minecraft.server.NBTTagCompound;
 import net.minecraft.server.TileEntity;
 import net.minecraft.server.WorldServer;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
@@ -43,6 +40,7 @@ import org.bukkit.inventory.ItemStack;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Dupes;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Threads;
 import com.github.dreadslicer.tekkitrestrict.commands.TRCommandAlc;
+import com.github.dreadslicer.tekkitrestrict.objects.TRCharge;
 
 import ee.AlchemyBagData;
 import ee.EEBase;
@@ -170,7 +168,7 @@ class TRBagCacheThread extends Thread {
 				// This function will also clean up the ones with non-players.
 	
 				// loop through all of teh players
-				Player[] players = Bukkit.getOnlinePlayers();
+				Player[] players = tekkitrestrict.getInstance().getServer().getOnlinePlayers();
 				for (int i = 0; i < players.length; i++) {
 					try {
 						setCheck(players[i]); // checks and sets the vars.
@@ -198,9 +196,7 @@ class TRBagCacheThread extends Thread {
 					if (tekkitrestrict.disable) break;
 				}
 			} catch (Exception ex){
-				for (StackTraceElement st : ex.getStackTrace()){
-					tekkitrestrict.log.warning(st.toString());
-				}
+				Log.Exception(ex, false);
 				
 				try {
 					Thread.sleep(1000);
@@ -335,8 +331,8 @@ class TEntityRemover extends Thread {
 			try {
 				disableEntities();
 			} catch (Exception ex) {
-				TRLogger.Log("debug", "Error: [Entity thread] " + ex.getMessage());//FIXME not debug logging
-				Log.debugEx(ex);
+				tekkitrestrict.log.warning("An error occured trying to disable entities!");
+				Log.Exception(ex, false);
 			}
 			
 			try {
@@ -351,16 +347,21 @@ class TEntityRemover extends Thread {
 		if (!Threads.SSDisableEntities) return;
 
 		List<World> worlds = tekkitrestrict.getInstance().getServer().getWorlds();
-
+		ArrayList<Entity> tbr = new ArrayList<Entity>();
+		
 		for (World world : worlds) {
-			Iterator<Entity> entities = world.getEntities().iterator();
-			while (entities.hasNext()){
-				Entity e = entities.next();
-				
-				if (e instanceof Player || e instanceof org.bukkit.entity.Item || e instanceof Vehicle || e instanceof ExperienceOrb || e instanceof FallingSand || e instanceof Painting) continue;
-				if (TRSafeZone.inXYZSafeZone(e.getLocation())) {
-					e.remove();
+			List<Entity> entities = world.getEntities();
+			try {
+				for (int i = 0;i<entities.size();i++){
+					Entity e = entities.get(i);
+					
+					if (e instanceof Player || e instanceof org.bukkit.entity.Item || e instanceof Vehicle || e instanceof ExperienceOrb || e instanceof FallingSand || e instanceof Painting) continue;
+					if (TRSafeZone.inXYZSafeZone(e.getLocation())) {
+						tbr.add(e);
+					}
 				}
+			} catch (Exception ex){
+				//Entities list probably modified while iterating over it.
 			}
 			
 			//net.minecraft.server.World wo = ((CraftWorld) world).getHandle();
@@ -373,43 +374,47 @@ class TEntityRemover extends Thread {
 			//	}
 			//}
 		}
+		
+		for (Entity e : tbr){
+			if (e == null) continue;
+			e.remove();
+		}
 	}
 }
 
 class DisableItemThread extends Thread {
 	//private boolean throttle;
 	private List<TRCacheItem> SSDecharged = Collections.synchronizedList(new LinkedList<TRCacheItem>());
-	private List<TRCharge> MCharges = Collections.synchronizedList(new LinkedList<TRCharge>()),
-						   maxEU = Collections.synchronizedList(new LinkedList<TRCharge>());
+	private List<TRCharge> MCharges = Collections.synchronizedList(new LinkedList<TRCharge>());
+	private List<TRCharge> maxEU = Collections.synchronizedList(new LinkedList<TRCharge>());
 	//private List<TRCharge> originalEU = Collections.synchronizedList(new LinkedList<TRCharge>());
-	private List<String> MChargeStr = Collections
-			.synchronizedList(new LinkedList<String>()),
-			SSDechargedStr = Collections
-					.synchronizedList(new LinkedList<String>()),
-			maxEUStr = Collections.synchronizedList(new LinkedList<String>());
-	Player oos;
-	ExecutorService exe = Executors.newCachedThreadPool();
+	private List<String> MChargeStr = Collections.synchronizedList(new LinkedList<String>());
+	private List<String> SSDechargedStr = Collections.synchronizedList(new LinkedList<String>());
+	private List<String> maxEUStr = Collections.synchronizedList(new LinkedList<String>());
+	//Player oos;
+	//ExecutorService exe = Executors.newCachedThreadPool();
 	@Override
 	public void run() {
 		while (true) {
 			try {
 				// Disabled Items remover
-				// if (UseNoItem) {
-				Player[] ps = Bukkit.getOnlinePlayers();
-				for (Player pp : ps) {
+				Player[] players = tekkitrestrict.getInstance().getServer().getOnlinePlayers();
+				for (Player player : players) {
 					try {
-						oos = pp;
-
-						/*if (throttle) {
+						/*
+						if (throttle) {
+							oos = pp;
 							exe.execute((new Runnable() {
 								@Override
 								public void run() {
 									disableItems(oos);
 								}
 							}));
-						} else {*/
+						} else {
 							disableItems(pp);
-						//}
+						}
+						*/
+						disableItems(player);
 					} catch (Exception ex) {
 						TRLogger.Log("debug", "Error: [ItemDisabler[1] thread] " + ex.getMessage());
 						Log.debugEx(ex);
@@ -427,59 +432,46 @@ class DisableItemThread extends Thread {
 			}
 		}
 	}
-
+	
 	private void disableItems(Player player) {
 		try {
 			PlayerInventory inv = player.getInventory();
 			ItemStack[] st1 = inv.getContents();
 			ItemStack[] st2 = inv.getArmorContents();
 
-			/*try {
-				if (player.getItemOnCursor() != null) {
-					org.bukkit.inventory.ItemStack str = player
-							.getItemOnCursor();
-					if(str != null){
-						ItemStack ee = new ItemStack(str.getTypeId(),
-								str.getAmount(), str.getData().getData());
-						if (TRNoItem.isItemBanned(player, ee)
-								|| TRNoItem.isCreativeItemBanned(player, ee)) {
-							player.setItemOnCursor(null);
-						}
-					}
-				}
-			} catch (Exception ex) {
-				TRLogger.Log("debug", "Error: [Inventory thread] DisableCursorItem " + ex.getMessage());
-				Log.Exception(ex);
-			}*/
 			// //////////// NORMAL INVENTORY
 			boolean changed = false;
+			boolean bypassn = player.hasPermission("tekkitrestrict.bypass.noitem");
+			boolean bypassc = player.hasPermission("tekkitrestrict.bypass.creative");
+			boolean isCreative = player.getGameMode() == GameMode.CREATIVE;
+			
 			for (int i = 0; i < st1.length; i++) {
 				try {
 					if (st1[i] == null) continue;
-
-					net.minecraft.server.ItemStack mcItemStack = ((CraftItemStack) st1[i]).getHandle();
-
-					// //// BAN THE ITEM
-					int id = st1[i].getTypeId();
-					int data = st1[i].getData().getData();//TODO change to .getDurability()?
+					//  NOITEM AND LIMITED CREATIVE BANNING
 					boolean banned = false;
-					if (TRConfigCache.Global.useNewBanSystem){
-						if (TRCacheItem2.isBanned(player, "noitem", id, data)) banned = true;
-						else if (player.getGameMode() == GameMode.CREATIVE && TRCacheItem2.isBanned(player, "creative", id, data)) banned = true;
+					int id = st1[i].getTypeId();
+					int data = st1[i].getDurability();
+					
+					if (isCreative){
+						if (!bypassn && TRNoItem.isItemBanned(player, id, data, false)) banned = true;
+						else if (!bypassc && TRNoItem.isItemBannedInCreative(player, id, data, false)) banned = true;
 					} else {
-						if (TRNoItem.isItemBanned(player, id, data, true)) banned = true;//TODO Check bypass once then change true to false.
-						else if (player.getGameMode() == GameMode.CREATIVE && TRNoItem.isItemBannedInCreative(player, id, data, true)) banned = true;//TODO Check bypass once then change true to false.
+						if (!bypassn && TRNoItem.isItemBanned(player, id, data, false)) banned = true;
 					}
 					
 					if (banned) {
 						st1[i] = new ItemStack(Threads.ChangeDisabledItemsIntoId, 1);
-						changed = true;
+						continue; //Item is now dirt so continue with next one.
 					}
 
+					if (changed){
+						changed = false;
+						continue;
+					}
 					// //// HANDLE DECHARGE / MAXCHARGE (EE / IC2)
-					if (changed) continue;
-					
 					try {
+						net.minecraft.server.ItemStack mcItemStack = ((CraftItemStack) st1[i]).getHandle();
 						String tstr = "" + st1[i].getTypeId();// +":"+st1[i].getData();
 
 						if (tekkitrestrict.EEEnabled) {
@@ -652,35 +644,34 @@ class DisableItemThread extends Thread {
 			
 			
 			// //////////// ARMOR INVENTORY
-			boolean changed1 = false;
+			//boolean changed1 = false;
 			for (int i = 0; i < st2.length; i++) {
 				try {
 					ItemStack str = st2[i];
 					int id = str.getTypeId();
-					int data = str.getData().getData();
+					int data = str.getDurability();
+
 					boolean banned = false;
-					if (TRConfigCache.Global.useNewBanSystem){
-						if (TRCacheItem2.isBanned(player, "noitem", id, data)) banned = true;
-						else if (player.getGameMode() == GameMode.CREATIVE && TRCacheItem2.isBanned(player, "creative", id, data)) banned = true;
+					if (isCreative){
+						if (!bypassn && TRNoItem.isItemBanned(player, id, data, false)) banned = true;
+						else if (!bypassc && TRNoItem.isItemBannedInCreative(player, id, data, false)) banned = true;
 					} else {
-						if (TRNoItem.isItemBanned(player, id, data, true)) banned = true;//TODO Check bypass once then change true to false.
-						else if (player.getGameMode() == GameMode.CREATIVE && TRNoItem.isItemBannedInCreative(player, id, data, true)) banned = true;//TODO Check bypass once then change true to false.
+						if (!bypassn && TRNoItem.isItemBanned(player, id, data, false)) banned = true;
 					}
 					
 					if (banned) {
 						// this item is banned/disabled for this player!!!
 						st2[i] = new ItemStack(Threads.ChangeDisabledItemsIntoId, 1); //proceed to remove it.
-						changed1 = true;
+						continue;
 					}
 				} catch (Exception ex) {}
-				Thread.sleep(3);
+				//Thread.sleep(3);
 			}
 			
 			// place new inventory back.
 			//TODO Probably not needed as st1 and st2 are references to the players inventory.
-			if (changed) inv.setContents(st1);
-			if (changed1) inv.setArmorContents(st2);
-			
+			//if (changed) inv.setContents(st1);
+			//if (changed1) inv.setArmorContents(st2);
 		} catch (Exception ex) {
 			TRLogger.Log("debug", "Error: [ItemDisabler[2] thread] " + ex.getMessage());
 			Log.debugEx(ex);
@@ -688,29 +679,32 @@ class DisableItemThread extends Thread {
 	}
 
 	public void reload() {
-		if (this.SSDecharged != null) this.SSDecharged.clear();
+		if (SSDecharged == null) SSDecharged = Collections.synchronizedList(new LinkedList<TRCacheItem>());
+		else SSDecharged.clear();
+	
+		if (SSDechargedStr == null) SSDechargedStr = Collections.synchronizedList(new LinkedList<String>());
+		else SSDechargedStr.clear();
 		
-		if (this.SSDechargedStr != null) this.SSDechargedStr.clear();
+		if (MCharges == null) MCharges = Collections.synchronizedList(new LinkedList<TRCharge>());
+		else MCharges.clear();
 		
-		if (this.MCharges != null) this.MCharges.clear();
+		if (MChargeStr == null) MChargeStr = Collections.synchronizedList(new LinkedList<String>());
+		else MChargeStr.clear();
 		
-		if (this.MChargeStr != null) this.MChargeStr.clear();
+		if (maxEU == null) maxEU = Collections.synchronizedList(new LinkedList<TRCharge>());
+		else maxEU.clear();
 		
-		if (this.maxEU != null) this.maxEU.clear();
+		if (maxEUStr == null) maxEUStr = Collections.synchronizedList(new LinkedList<String>());
+		else maxEUStr.clear();
 		
-		if (this.maxEUStr != null) this.maxEUStr.clear();
+		//this.throttle = tekkitrestrict.config.getBoolean("ThrottleInventoryThread");
 		
-		//this.UseNoItem = tekkitrestrict.config.getBoolean("UseNoItem");
-		//this.throttle = tekkitrestrict.config
-		//		.getBoolean("ThrottleInventoryThread");
-		List<String> MaxCharges = tekkitrestrict.config.getStringList("MaxCharge");
-		List<String> sstr = tekkitrestrict.config.getStringList("DechargeInSS");
-
-		for (String s : sstr) {
+		List<String> dechargeSS = tekkitrestrict.config.getStringList("DechargeInSS");
+		for (String s : dechargeSS) {
 			List<TRCacheItem> iss = TRCacheItem.processItemString("", s, -1);
 			for (TRCacheItem iss1 : iss) {
-				this.SSDecharged.add(iss1);
-				this.SSDechargedStr.add(iss1.id + "");
+				SSDecharged.add(iss1);
+				SSDechargedStr.add(iss1.id + "");
 			}
 		}
 
@@ -734,23 +728,31 @@ class DisableItemThread extends Thread {
 		}
 
 		// process charges...
-		MCharges.clear();
-		for (int l = 0; l < MaxCharges.size(); l++) {
-			String Charge = MaxCharges.get(l);
-			if (Charge.contains(" ")) {
-				String[] sscharge = Charge.split(" ");
-				int max = Integer.parseInt(sscharge[1]);
-				// ItemStack[] gs = TRNoItem.getRangedItemValues(sscharge[0]);
-				List<TRCacheItem> iss = TRCacheItem.processItemString("", sscharge[0], -1);
-				for (TRCacheItem isr : iss) {
-					TRCharge gg = new TRCharge();
-					gg.id = isr.id;
-					gg.data = isr.data;
-					gg.maxcharge = max;
-					// tekkitrestrict.log.info(gg.id+":"+gg.data+" "+gg.maxcharge);
-					this.MCharges.add(gg);
-					this.MChargeStr.add(gg.id + "");
-				}
+		List<String> MaxCharges = tekkitrestrict.config.getStringList("MaxCharge");
+		for (String charge : MaxCharges) {
+			if (!charge.contains(" ")) {
+				Log.Config.Warning("You have an error in your maxchare list in ModModifications.config: \""+charge+"\" does not follow the format: \"itemstr percentage\"");
+				continue;
+			}
+			
+			String[] sscharge = charge.replace("%", "").split(" ");
+			int max = 0;
+			try {
+				max = Integer.parseInt(sscharge[1]);
+			} catch (NumberFormatException ex){
+				Log.Config.Warning("You have an error in your maxchare list in ModModifications.config: \""+sscharge[1]+"\" is not a valid number");
+				continue;
+			}
+			// ItemStack[] gs = TRNoItem.getRangedItemValues(sscharge[0]);
+			List<TRCacheItem> iss = TRCacheItem.processItemString("", sscharge[0], -1);
+			for (TRCacheItem isr : iss) {
+				TRCharge gg = new TRCharge();
+				gg.id = isr.id;
+				gg.data = isr.data;
+				gg.maxcharge = max;
+				// tekkitrestrict.log.info(gg.id+":"+gg.data+" "+gg.maxcharge);
+				this.MCharges.add(gg);
+				this.MChargeStr.add(gg.id + "");
 			}
 		}
 	}
@@ -870,24 +872,14 @@ class DisableItemThread extends Thread {
 }
 
 class TWorldScrubber extends Thread {
-	private boolean stillRunning = false;
-	private boolean logged = false;
 	@Override
 	public void run() {
 		while (true) {
 			try {
-				while (stillRunning){
-					sleep(1000); //While still running sleep 1 second to make it less likely that chunks are still being unloaded when it starts
-					//the Remove disabled blocks and Redpower checks
-					if (!logged){
-						logged = true;
-						Log.Config.Warning("Your WorldScrubber speed is too fast.");
-					}
-				}
 				doWScrub();
 			} catch (Exception ex) {
-				TRLogger.Log("debug", "Error: [WorldScrubber thread] " + ex.getMessage());
-				Log.debugEx(ex);
+				tekkitrestrict.log.warning("An error occured in the WorldScrubber!");
+				Log.Exception(ex, false);
 			}
 
 			try {
@@ -903,15 +895,14 @@ class TWorldScrubber extends Thread {
 	 * Then if UseRPTimer or RemoveDisabledBlocks is turned on, it will execute those features.
 	 */
 	private void doWScrub() {
-		stillRunning = true;
-		
 		try {
 			TRChunkUnloader.unloadSChunks();
 		} catch (Exception ex) {
+			tekkitrestrict.log.warning("An error occured in the ChunkUnloader!");
+			Log.Exception(ex, false);
 		}
 		
 		if (!Threads.RMDB && !Threads.UseRPTimer){
-			stillRunning = false;
 			return;
 		}
 		
@@ -919,27 +910,19 @@ class TWorldScrubber extends Thread {
 		if (Threads.UseRPTimer){
 			if (!server.getPluginManager().isPluginEnabled("mod_RedPowerLogic")) {
 				Threads.UseRPTimer = false;
-				if (!Threads.RMDB){
-					stillRunning = false;
-					return; //If both options are now false, nothing else has to be done.
-				}
+				if (!Threads.RMDB) return; //If both options are now false, nothing else has to be done.
 			}
 		}
-		//int currentChunkCount = 0;
 		
 		List<World> worlds = server.getWorlds();
 		for (World bukkitWorld : worlds) { //For each world
-			WorldServer worldServer = ((CraftWorld) bukkitWorld).getHandle();
-
 			Chunk[] loadedChunks = bukkitWorld.getLoadedChunks();
-			//currentChunkCount += loadedChunks.length;
 			
 			for (Chunk c : loadedChunks) { //For each loaded chunk
 				if (Threads.RMDB) { // loop through all of the blocks in the chunk...
 					for (int x = 0; x < 16; x++) {
 						for (int z = 0; z < 16; z++) {
 							for (int y = 0; y < 256; y++) {
-								// so... yeah.
 								Block bl = c.getBlock(x, y, z);
 								if (TRNoItem.isBlockBanned(bl)) {
 									bl.setTypeId(Threads.ChangeDisabledItemsIntoId);
@@ -952,6 +935,7 @@ class TWorldScrubber extends Thread {
 				if (!Threads.UseRPTimer) continue;
 				
 				try {
+					WorldServer worldServer = ((CraftWorld) bukkitWorld).getHandle();
 					BlockState[] tileEntities = c.getTileEntities();
 					for (BlockState gg : tileEntities) {
 						TileEntity te = worldServer.getTileEntity(gg.getX(), gg.getY(), gg.getZ());
@@ -959,16 +943,17 @@ class TWorldScrubber extends Thread {
 							TileLogicPointer timer = (TileLogicPointer) te;
 
 							if (timer.GetInterval() < Threads.RPTickTime) {
+								tekkitrestrict.log.info("[DEBUG] Set a timer at "+gg.getX()+","+gg.getY()+","+gg.getZ()+" from "+timer.GetInterval()+" to "+Threads.RPTickTime+".");
 								timer.SetInterval(Threads.RPTickTime);
 							}
 						}
 					}
-				} catch (Exception EER) {
-					TRLogger.Log("debug", "RPTimerError: " + EER.getMessage());
+				} catch (Exception ex) {
+					tekkitrestrict.log.warning("An error occured in the RPTimerSetter!");
+					Log.Exception(ex, false);
 				}
 			}
 		}
-		stillRunning = false;
 	}
 }
 
@@ -987,8 +972,9 @@ class TSaveThread extends Thread {
 
 			TRLogger.saveLogs();
 			TRNoHack.clearMaps();
-			try{TRLimitBlock.manageData();}
-			catch(Exception ex){
+			try {
+				TRLimitBlock.manageData();
+			} catch(Exception ex){
 				TRLogger.Log("debug", "ManageData AutoSavethread Error: "+ex.getMessage());
 				Log.debugEx(ex);
 			}

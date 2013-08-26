@@ -1,4 +1,4 @@
-package com.github.dreadslicer.tekkitrestrict;
+package com.github.dreadslicer.tekkitrestrict.objects;
 
 import java.util.ArrayList;
 
