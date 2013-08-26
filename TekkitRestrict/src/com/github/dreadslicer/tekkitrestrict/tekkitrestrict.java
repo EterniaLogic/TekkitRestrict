@@ -6,8 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.FileChannel;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -38,12 +36,13 @@ import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Threads;
 import com.github.dreadslicer.tekkitrestrict.commands.TRCommandAlc;
 import com.github.dreadslicer.tekkitrestrict.commands.TRCommandTPIC;
 import com.github.dreadslicer.tekkitrestrict.commands.TRCommandTR;
-import com.github.dreadslicer.tekkitrestrict.database.SQLite;
+import com.github.dreadslicer.tekkitrestrict.database.Database;
 import com.github.dreadslicer.tekkitrestrict.eepatch.EEPSettings;
 import com.github.dreadslicer.tekkitrestrict.lib.TRFileConfiguration;
 import com.github.dreadslicer.tekkitrestrict.lib.YamlConfiguration;
 import com.github.dreadslicer.tekkitrestrict.listeners.Assigner;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
+import com.github.dreadslicer.tekkitrestrict.objects.TREnums.DBType;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.SSMode;
 
 public class tekkitrestrict extends JavaPlugin {
@@ -62,7 +61,8 @@ public class tekkitrestrict extends JavaPlugin {
 	public static int dbworking = 0;
 	
 	public static Object perm = null;
-	public static SQLite db;
+	public static DBType dbtype = DBType.Unknown;
+	public static Database db;
 	public static Updater updater = null;
 	
 	public static ExecutorService basfo = Executors.newCachedThreadPool();
@@ -88,15 +88,26 @@ public class tekkitrestrict extends JavaPlugin {
 		log = getLogger(); //Set the logger
 		Log.init();
 		
-		//#################### load SQLite ####################
-		log.info("[DB] Loading SQLite Database...");
-		if (!loadSqlite()){
-			loadWarning("[DB] Failed to load SQLite Database!");
+		//##################### load SQL ######################
+		
+		log.info("[DB] Loading Database...");
+		if (!TRDB.loadDB()){
+			loadWarning("[DB] Failed to load Database!");
 		} else {
-			if (initSqlite())
-				log.info("[DB] SQLite Database loaded!");
-			else {
-				loadWarning("[DB] Failed to load SQLite Database!");
+			if (dbtype == DBType.SQLite) {
+				if (TRDB.initSQLite())
+					log.info("[SQLite] SQLite Database loaded!");
+				else {
+					loadWarning("[SQLite] Failed to load SQLite Database!");
+				}
+			} else if (dbtype == DBType.MySQL) {
+				if (TRDB.initMySQL()){
+					log.info("[MySQL] Database connection established!");
+				} else {
+					loadWarning("[MySQL] Failed to connect to MySQL Database!");
+				}
+			} else {
+				loadWarning("[DB] Unknown Database type set!");
 			}
 		}
 		//#####################################################
@@ -444,269 +455,6 @@ public class tekkitrestrict extends JavaPlugin {
 			}
 		}, 60L, 32L);
 	}
-
-	private boolean newdb = false;
-	/** @return If opening the database was successful. */
-	private boolean loadSqlite() {
-		File dbfile = new File(this.getDataFolder().getPath() + File.separator + "Data.db");
-		if (!dbfile.exists()){
-			newdb = true;
-			log.info("[DB] Creating database file...");
-		}
-		db = new SQLite("Data", this.getDataFolder().getPath());
-		
-		return db.open();
-	}
-
-	private boolean initSqlite() {
-		if (!db.isOpen()) {
-			if (!db.open()){
-				loadWarning("[DB] Cannot open the database!");
-				dbworking = 20;
-				return false;
-			}
-		}
-		
-		ResultSet prev = null;
-
-		try {
-			double verX = -1d;
-			boolean purged = true;
-			prev = db.query("SELECT version FROM tr_dbversion");
-			if(prev.next()) verX = prev.getDouble("version");
-			if(prev.next()) purged = false;
-			
-			prev.close();
-			
-			//Change version to 1.3 if it is lower
-			if(verX != -1d && verX < dbversion){
-				db.query("DELETE FROM 'tr_dbversion'");//clear table
-				db.query("INSERT INTO 'tr_dbversion' (version) VALUES(" + dbversion + ");");//Insert new version
-				transferDB12To13();//Transfer to version 1.3
-			} else if (!purged) {
-				db.query("DELETE FROM 'tr_dbversion'");//clear table
-				db.query("INSERT INTO 'tr_dbversion' (version) VALUES(" + dbversion + ");");//Insert new version
-			}
-			
-		} catch(Exception ex1){
-			if(prev != null)
-				try {prev.close();} catch (SQLException ex2) {}
-			
-			if (newdb) initNewDB();
-			else transferOldDB();
-		}
-		if (dbworking == 0) return true;
-		return false;
-	}
-	
-	private void initNewDB(){
-		dbworking = 0;
-		log.info("[DB] Creating new database...");
-		try {
-			db.query("CREATE TABLE IF NOT EXISTS 'tr_dbversion' (version NUMERIC);");
-			db.query("INSERT OR REPLACE INTO 'tr_dbversion' (version) VALUES("+dbversion+");");
-		} catch (Exception ex) {
-			loadWarning("[DB] Unable to write version to database!");
-			for (StackTraceElement cur : ex.getStackTrace()){
-				loadWarning("[DB] " + cur.toString());
-			}
-			dbworking += 1;
-		}
-	
-		try {
-			db.query("CREATE TABLE IF NOT EXISTS 'tr_saferegion' ( "
-			+ "'id' INTEGER PRIMARY KEY AUTOINCREMENT,"
-			+ "'name' TEXT,"
-			+ "'mode' INT,"
-			+ "'data' TEXT,"
-			+ "'world' TEXT);");
-		} catch (Exception ex) {
-			loadWarning("[DB] Unable to create safezones table!");
-			for (StackTraceElement cur : ex.getStackTrace()){
-				loadWarning("[DB] " + cur.toString());
-			}
-			
-			dbworking += 2;
-		}
-		
-		try {
-			db.query("CREATE TABLE IF NOT EXISTS 'tr_limiter' ( "
-			+ "'player' TEXT UNIQUE,"
-			+ "'blockdata' TEXT);");
-		} catch (Exception ex) {
-			loadWarning("[DB] Unable to create limiter table!");
-			for (StackTraceElement cur : ex.getStackTrace()){
-				loadWarning("[DB] " + cur.toString());
-			}
-			dbworking += 4;
-		}
-		
-		dbFailMsg(dbworking);
-		if (dbworking != 0)
-			loadWarning("[DB] Not all tables could be created!");
-		else 
-			log.info("[DB] Database created successfully!");
-	}
-
-	/** Transfer the database from PRE-1.00 version format to the new format. */
-	private void transferOldDB() {
-		dbworking = 0;
-		log.info("[DB] Transfering old database into the new database format...");
-		
-		LinkedList<LinkedList<String>> srvals = null, limvals=null;
-		
-		//tr_saferegion =	id name mode data world
-		//tr_limiter = 		id player blockdata
-		try {
-			srvals = getTableVals("tr_saferegion");
-		} catch(SQLException ex){
-			loadWarning("[DB] Unable to transfer safezones from the old format to the new one!");
-		}
-		try {
-			limvals = getTableVals("tr_limiter");
-		} catch(SQLException ex){
-			loadWarning("[DB] Unable to transfer limits from the old format to the new one!");
-		}
-		
-		//Delete old tables
-		try{db.query("DROP TABLE `tr_saferegion`;");} catch(Exception ex){}
-		try{db.query("DROP TABLE `tr_limiter`;");} catch(Exception ex){}
-		
-		//################################### VERSION ###################################
-		try {
-			db.query("CREATE TABLE IF NOT EXISTS 'tr_dbversion' (version NUMERIC);");
-			db.query("INSERT OR REPLACE INTO 'tr_dbversion' (version) VALUES("+dbversion+");");
-		} catch (Exception ex) {
-			loadWarning("[DB] Unable to write version to database!");
-			for (StackTraceElement cur : ex.getStackTrace()){
-				loadWarning("[DB] " + cur.toString());
-			}
-			dbworking += 1;
-		}
-		//###############################################################################
-		
-		//################################## SAFEZONES ##################################
-		try {
-			db.query("CREATE TABLE IF NOT EXISTS 'tr_saferegion' ( "
-					+ "'id' INTEGER PRIMARY KEY AUTOINCREMENT,"
-					+ "'name' TEXT,"
-					+ "'mode' INT,"
-					+ "'data' TEXT,"
-					+ "'world' TEXT); ");
-		} catch (Exception ex) {
-			loadWarning("[DB] Unable to create safezones table!");
-			for (StackTraceElement cur : ex.getStackTrace()){
-				loadWarning("[DB] " + cur.toString());
-			}
-			
-			dbworking += 2;
-		}
-		
-		try {
-			//Import safezones
-			if(srvals != null){
-				for(LinkedList<String> vals:srvals){
-					String toadd = "";
-					for(String str:vals) toadd+=","+str;
-					//toadd = toadd.replace("null", "''");
-					if(toadd.startsWith(",")) toadd=toadd.substring(1, toadd.length());
-					db.query("INSERT INTO 'tr_saferegion' VALUES("+toadd+");");
-				}
-				
-				log.info("[DB] Transferred " + srvals.size() + " safezones.");
-			}
-		} catch (Exception ex) {
-			loadWarning("[DB] Unable to write safezones to database!");
-			for (StackTraceElement cur : ex.getStackTrace()){
-				loadWarning("[DB] " + cur.toString());
-			}
-		}
-		//###############################################################################
-		
-		//################################### LIMITER ###################################
-		try {
-			db.query("CREATE TABLE IF NOT EXISTS 'tr_limiter' ( "
-					+ "'player' TEXT UNIQUE,"
-					+ "'blockdata' TEXT);");
-		} catch (Exception ex) {
-			loadWarning("[DB] Unable to create limiter table!");
-			for (StackTraceElement cur : ex.getStackTrace()){
-				loadWarning("[DB] " + cur.toString());
-			}
-			dbworking += 4;
-		}
-		
-		try {
-			if(limvals != null){
-				for(LinkedList<String> vals:limvals){
-					String toadd = "";
-					for(String str:vals) toadd+=","+str;
-					if(toadd.startsWith(",")) toadd=toadd.substring(1, toadd.length());
-					db.query("INSERT INTO 'tr_limiter' VALUES("+toadd+");");
-				}
-				
-				log.info("[DB] Transferred "+ limvals.size() + " limits.");
-			}
-		} catch (Exception ex) {
-			loadWarning("[DB] Unable to write limits to database!");
-			for (StackTraceElement cur : ex.getStackTrace()){
-				loadWarning("[DB] " + cur.toString());
-			}
-		}
-		if (dbworking == 0) {
-			log.info("[DB] Transfering into the new database format succeeded!");
-		} else {
-			dbFailMsg(dbworking);
-			loadWarning("[DB] Transfering into the new database format failed!");
-		}
-		
-	}
-	
-	private void transferDB12To13(){
-		log.info("[DB] Updating Database to new format...");
-		try {
-			db.query("ALTER TABLE 'tr_limiter' RENAME TO 'tr_limiter_old'");
-			db.query("CREATE TABLE 'tr_limiter' ("
-					+ "'player' TEXT UNIQUE,"
-					+ "'blockdata' TEXT);");
-			db.query("INSERT INTO 'tr_limiter' (player, blockdata) SELECT player, blockdata FROM tr_limiter_old ORDER BY player ASC");
-		} catch (SQLException ex) {
-			loadWarning("[DB] Error while updating db!");
-			for (StackTraceElement st : ex.getStackTrace()){
-				loadWarning("[DB] " + st.toString());
-			}
-		}
-	}
-	
-	private void dbFailMsg(int fail){
-		if (fail == 1 || fail == 3 || fail == 5)
-			loadWarning("[DB] The database will RESET upon next server startup because the version table couldn't be created!");
-		if (fail == 2 || fail == 3 || fail == 6)
-			loadWarning("[DB] Safezones will NOT work properly because the safezones table couldn't be created!");
-		if (fail == 4 || fail == 5 || fail == 6)
-			loadWarning("[DB] The limiter will NOT work properly because the limiter table couldn't be created!");
-		else if (fail == 7) 
-			loadWarning("[DB] All database actions failed! Safezones and the limiter will NOT be stored!");
-	}
-	
-	private LinkedList<LinkedList<String>> getTableVals(String table) throws SQLException {
-		ResultSet rs = db.query("SELECT * FROM `"+table+"`");
-		LinkedList<LinkedList<String>> values = new LinkedList<LinkedList<String>>();
-		if (rs == null) return values;
-		while(rs.next()) {
-			LinkedList<String> row = new LinkedList<String>();
-			for (int i=1;i<=20;i++){
-				try {
-					row.add(rs.getString(i));
-				} catch (Exception ex){
-					break;
-				}
-			}
-			values.add(row);
-		}
-		rs.close();
-		return values;
-	}
 	
 	public void reload(boolean listeners, boolean silent) {
 		if (listeners){
@@ -742,14 +490,6 @@ public class tekkitrestrict extends JavaPlugin {
 		if (!silent) log.info("TekkitRestrict Reloaded!");
 	}
 
-	public static String antisqlinject(String ins) {
-		ins = ins.replaceAll("--", "");
-		ins = ins.replaceAll("`", "");
-		ins = ins.replaceAll("'", "");
-		ins = ins.replaceAll("\"", "");
-		return ins;
-	}
-
 	private TRFileConfiguration getConfigx() {
 		if (configList.size() == 0) {
 			reloadConfig();
@@ -771,6 +511,7 @@ public class tekkitrestrict extends JavaPlugin {
 		configList.add(reloadc("TPerformance.config.yml"));
 		configList.add(reloadc("MicroPermissions.config.yml"));
 		configList.add(reloadc("SafeZones.config.yml"));
+		configList.add(reloadc("Database.config.yml"));
 		if (linkEEPatch()) configList.add(reloadc("EEPatch.config.yml"));
 	}
 

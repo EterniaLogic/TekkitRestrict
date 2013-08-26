@@ -1,6 +1,12 @@
+/**
+ * MySQL
+ * Inherited subclass for making a connection to a MySQL server.
+ * 
+ * Date Created: 2011-08-26 19:08
+ * @author PatPeter
+ */
 package com.github.dreadslicer.tekkitrestrict.database;
 
-import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -12,84 +18,96 @@ import java.util.logging.Level;
 import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
 
 @SuppressWarnings("resource")
-public class SQLite extends Database {
-	public String location;
-	public String name;
-	private File sqlFile;
+public class MySQL extends Database {
+	private String hostname = "localhost";
+	private String port = "3306";
+	private String username = "minecraft";
+	private String password = "";
+	private String database = "minecraft";
 
-	public SQLite(String name, String location) {
+	public MySQL(String hostname, String port, String database, String username, String password) {
 		this.connection = null;
-		this.name = name;
-		this.location = location;
-		File folder = new File(this.location);
-		if (this.name.contains("/") || this.name.contains("\\") || this.name.endsWith(".db")) {
-			throw new DBException("The database name can not contain: /, \\, or .db");
+		this.hostname = hostname;
+		if (!port.matches("\\d+")){
+			throw new DBException("You did not set a valid port! Only numbers are valid.");
 		}
-		if (!folder.exists()) folder.mkdir();
-
-		sqlFile = new File(folder.getAbsolutePath() + File.separator + name + ".db");
+		this.port = port;
+		this.database = database;
+		this.username = username;
+		this.password = password;
 	}
-	
+
 	protected boolean initialize() {
 		if (initialized) return working;
 		
 		initialized = true;
 		try {
-			Class.forName("org.sqlite.JDBC");
+			Class.forName("com.mysql.jdbc.Driver");
 			working = true;
 			return true;
 		} catch (ClassNotFoundException e) {
-			write("Unable to find the SQLite library!", Level.SEVERE);
+			write("The MySQL driver class is missing: " + e.getMessage() + ".", Level.SEVERE);
 			return false;
 		}
 	}
 
 	public boolean open() {
 		if (!initialize()) return false;
+		String url = "";
 		try {
-			connection = DriverManager.getConnection("jdbc:sqlite:" + sqlFile.getAbsolutePath());
+			url = "jdbc:mysql://" + hostname + ":" + port + "/" + database;
+			connection = DriverManager.getConnection(url, username, password);
 			return true;
 		} catch (SQLException e) {
-			write("Error when trying to open the database. " + e, Level.SEVERE);
+			write("Could not connect to database at \""+url+"\". Error: " + e.getMessage() + ".", Level.SEVERE);
 			return false;
 		}
 	}
 
+	/**
+	 * Tries to close the database connection and returns its result.<br>
+	 * If the connection is already closed this is a no-op and will return true.<br>
+	 * Returns true if the connection is null.
+	 */
 	public boolean close() {
 		if (connection == null) return true;
 		try {
 			connection.close();
 			return true;
-		} catch (SQLException ex) {
-			write("Error on Connection close: " + ex, Level.SEVERE);
+		} catch (Exception ex) {
+			write("Unable to close database connection. Error: " + ex.getMessage(), Level.SEVERE);
 			return false;
 		}
 	}
 
-	/** Opens the connection if it is null. */
 	public Connection getConnection() {
-		if (connection == null) open();
 		return connection;
 	}
 
+	/**
+	 * Checks if the connection is open (valid).
+	 * @return If the connection is closed or null will return false. Otherwise will return true.
+	 */
 	public boolean isOpen() {
 		if (connection == null) return false;
+		
 		try {
-			return !connection.isClosed();
+			return connection.isValid(1);
 		} catch (SQLException e) {
 			return false;
 		}
 	}
-	
+
 	/**
-	 * Executes a query.
+	 * Sends the given query to the database.
 	 * @return A resultSet if the query returned one.<br>
-	 * If the query was an update, delete or insert query it will return null.<br>
-	 * If the query Failed, it will throw an SQLExcpetion.
+	 * If the query was an update, delete or insert type query it will return null.<br>
+	 * If the query Failed, it will throw an SQLExcpetion. 
 	 */
 	public ResultSet query(String query) throws SQLException {
+		Statement statement = null;
 		try {
-			Statement statement = getConnection().createStatement();
+			statement = connection.createStatement();
 			if (statement.execute(query))
 				return statement.getResultSet();
 			else
@@ -103,7 +121,7 @@ public class SQLite extends Database {
 	/**
 	 * Executes a query in a PreparedStatement.
 	 * @return A resultSet if the query returned one.<br>
-	 * If the query was an update, delete or insert query it will return null.<br>
+	 * If the query was an update, delete or insert type query it will return null.<br>
 	 * If the query Failed, it will throw an SQLExcpetion.
 	 */
 	public ResultSet query(PreparedStatement ps) throws SQLException {
@@ -120,7 +138,7 @@ public class SQLite extends Database {
 
 	public PreparedStatement prepare(String query) {
 		try {
-			PreparedStatement ps = getConnection().prepareStatement(query);
+			PreparedStatement ps = connection.prepareStatement(query);
 			return ps;
 		} catch (SQLException e) {
 			if (!e.toString().contains("not return ResultSet")) {
@@ -132,6 +150,6 @@ public class SQLite extends Database {
 	
 	protected void write(String toWrite, Level level) {
 		if (toWrite == null || toWrite.equals("")) return;
-		tekkitrestrict.log.log(level, "[SQLite] " + toWrite);
+		tekkitrestrict.log.log(level, "[MySQL] " + toWrite);
 	}
 }

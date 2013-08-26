@@ -64,7 +64,7 @@ public class TRSafeZone {
 	public static void init() {
 		ResultSet rs = null;
 		try {
-			rs = tekkitrestrict.db.query("SELECT * FROM `tr_saferegion`");
+			rs = tekkitrestrict.db.query("SELECT * FROM `tr_saferegion`;");
 			while (rs.next()) {
 				TRSafeZone sz = new TRSafeZone();
 				sz.name = rs.getString("name");
@@ -107,7 +107,7 @@ public class TRSafeZone {
 
 	public long getID(){
 		long estID = 0;
-		// get a numeral from the player's name & world
+		// get a numeral from the safezone's name & world
 		for (int j = 0; j < name.length(); j++) {
 			char c = name.charAt(j);
 			estID += Character.getNumericValue(c);
@@ -128,12 +128,11 @@ public class TRSafeZone {
 			if (!z.loadedFromSqlite) {
 				// insert the new rows!
 				try {
-					tekkitrestrict.db.query(
-							"INSERT OR REPLACE INTO `tr_saferegion` (`id`,`name`,`mode`,`data`,`world`) VALUES ('"
+					tekkitrestrict.db.query("INSERT OR REPLACE INTO `tr_saferegion` (`id`,`name`,`mode`,`data`,`world`) VALUES ('"
 									+ z.getID() +"','"
-									+ tekkitrestrict.antisqlinject(z.name)
+									+ TRDB.antisqlinject(z.name)
 									+ "'," + z.mode + ",'" + z.data + "','"
-									+ z.world + "')");
+									+ z.world + "');");
 					z.loadedFromSqlite = true;
 				} catch (Exception E) {
 				}

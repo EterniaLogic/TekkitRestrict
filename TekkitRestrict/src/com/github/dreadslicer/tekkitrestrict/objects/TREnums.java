@@ -15,7 +15,7 @@ public class TREnums {
 	}
 	
 	public enum ConfigFile {
-		General, Advanced, ModModifications, DisableClick, DisableItems, Hack, LimitedCreative, Logging, TPerformance, MicroPermissions, SafeZones, EEPatch;
+		General, Advanced, ModModifications, DisableClick, DisableItems, Hack, LimitedCreative, Logging, TPerformance, MicroPermissions, SafeZones, Database, EEPatch;
 	}
 	
 	public enum SSMode {
@@ -43,5 +43,9 @@ public class TREnums {
 		public boolean PS(){return (this == SSPlugin.PreciousStones);}
 		public boolean F(){return (this == SSPlugin.Factions);}
 		public boolean T(){return (this == SSPlugin.Towny);}
+	}
+
+	public enum DBType {
+		SQLite, MySQL, Unknown;
 	}
 }

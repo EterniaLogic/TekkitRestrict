@@ -1,0 +1,28 @@
+######################################################################################
+## Configuration file for TekkitRestrict                                            ##
+## Authors: Taeir, DreadEnd (aka DreadSlicer)                                       ##
+## BukkitDev: http://dev.bukkit.org/server-mods/tekkit-restrict/                    ##
+## Please ask questions/report issues on the BukkitDev page.                        ##
+######################################################################################
+
+######################################################################################
+############################### Database Configuration ###############################
+######################################################################################
+
+# DatabaseType
+#
+# Set the type of database tekkitrestrict should use.
+# Possible: SQLite, MySQL
+# Default: SQLite
+DatabaseType: SQLite
+
+MySQL:
+    Hostname: localhost
+    Port: 3306
+    Username: root
+    Password: minecraft
+    Database: minecraft
+
+######################################################################################
+######################################################################################
+######################################################################################

@@ -22,6 +22,7 @@ import org.bukkit.plugin.PluginManager;
 import com.github.dreadslicer.tekkitrestrict.Log;
 import com.github.dreadslicer.tekkitrestrict.Send;
 import com.github.dreadslicer.tekkitrestrict.TRCacheItem;
+import com.github.dreadslicer.tekkitrestrict.TRDB;
 import com.github.dreadslicer.tekkitrestrict.TRLimitBlock;
 import com.github.dreadslicer.tekkitrestrict.TRNoItem;
 import com.github.dreadslicer.tekkitrestrict.TRPerformance;
@@ -498,7 +499,7 @@ public class TRCommandTR implements CommandExecutor {
 		//FIXME uppercase problem
 		try {
 			tekkitrestrict.db.query("DELETE FROM `tr_saferegion` WHERE `name` = '"
-							+ tekkitrestrict.antisqlinject((name == null ? largs[3] : name)) + "' COLLATE NOCASE");
+							+ TRDB.antisqlinject((name == null ? largs[3] : name)) + "' COLLATE NOCASE");
 		} catch (SQLException ex) {}
 	}
 	private void ssAddWG(String[] largs){
