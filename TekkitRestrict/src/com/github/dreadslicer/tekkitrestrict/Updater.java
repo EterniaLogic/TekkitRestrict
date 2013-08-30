@@ -4,7 +4,7 @@
  * This class provides the means to safetly and easily update a plugin, or check to see if it is updated using dev.bukkit.org
  */
 
-package net.h31ix.updater;
+package com.github.dreadslicer.tekkitrestrict;
 
 import java.io.*;
 import java.lang.Runnable;
@@ -15,14 +15,14 @@ import java.net.URLConnection;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
+
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
-
-import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
 
 /**
  * Check dev.bukkit.org to find updates for a given plugin, and download the updates if needed.
@@ -41,7 +41,7 @@ import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
  */
 
 public class Updater
-{
+{	
 	private Plugin plugin;
 	private UpdateType type;
 	private String versionTitle;
