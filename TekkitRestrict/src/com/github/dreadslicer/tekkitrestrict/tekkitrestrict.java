@@ -87,6 +87,20 @@ public class tekkitrestrict extends JavaPlugin {
 		log = getLogger(); //Set the logger
 		Log.init();
 		
+		//#################### load Config ####################
+		saveDefaultConfig(false); //Copy config files
+
+		config = this.getConfigx(); //Load the configuration files
+		double configVer = config.getDouble("ConfigVersion", 0.9);
+		if (configVer < 1.1)
+			UpdateConfigFiles.v09();
+		else if (configVer < 1.2)
+			UpdateConfigFiles.v11();
+		
+		loadConfigCache();
+		//#####################################################
+		
+		
 		//##################### load SQL ######################
 		
 		log.info("[DB] Loading Database...");
@@ -109,20 +123,6 @@ public class tekkitrestrict extends JavaPlugin {
 				loadWarning("[DB] Unknown Database type set!");
 			}
 		}
-		//#####################################################
-		
-		
-		//#################### load Config ####################
-		saveDefaultConfig(false);
-
-		config = this.getConfigx(); //Load the configuration files
-		double configVer = config.getDouble("ConfigVersion", 0.9);
-		if (configVer < 1.1)
-			UpdateConfigFiles.v09();
-		else if (configVer < 1.2)
-			UpdateConfigFiles.v11();
-		
-		loadConfigCache();
 		//#####################################################
 		
 		
@@ -218,74 +218,7 @@ public class tekkitrestrict extends JavaPlugin {
 			log.info("EEPatch is not available. Extended functionality disabled.");
 		}
 		
-		try {
-			Metrics metrics = new Metrics(this);
-			Metrics.Graph g = metrics.createGraph("TekkitRestrict Stats (Since last server restarts)");
-			/*
-			 * g.addPlotter(new Metrics.Plotter("Total Safezones") {
-			 * 
-			 * @Override public int getValue() { return TRSafeZone.zones.size();
-			 * } });
-			 */
-			
-			/*
-			g.addPlotter(new Metrics.Plotter("Hack attempts") {
-				@Override
-				public int getValue() {
-					try {
-						return TRNoHack.hacks;
-					} catch(Exception e){
-						return 0;
-					}
-				}
-			});*/
-			g.addPlotter(new Metrics.Plotter("Recipe blocks") {
-				@Override
-				public int getValue() {
-					try{
-						int size = 0;
-						List<String> ssr = tekkitrestrict.config.getStringList("RecipeBlock");
-						for (int i = 0; i < ssr.size(); i++) {
-							List<TRCacheItem> iss = TRCacheItem.processItemString("", ssr.get(i), -1);
-							size += iss.size();
-						}
-						ssr = tekkitrestrict.config.getStringList("RecipeFurnaceBlock");
-						for (int i = 0; i < ssr.size(); i++) {
-							List<TRCacheItem> iss = TRCacheItem.processItemString("", ssr.get(i), -1);
-							size += iss.size();
-						}
-						return size;
-					}
-					catch(Exception e){
-						return 0;
-					}
-				}
-			});
-			
-			/*g.addPlotter(new Metrics.Plotter("Dupe attempts") {
-				@Override
-				public int getValue() {
-					try {
-						return MetricValues.dupeAttempts;
-					} catch(Exception ex){
-						return 0;
-					}
-				}
-			});*/
-			g.addPlotter(new Metrics.Plotter("Disabled items") {
-				@Override
-				public int getValue() {
-					try {
-						return TRNoItem.getBannedItemsAmount();
-					} catch(Exception ex){
-						return 0;
-					}
-				}
-			});
-			metrics.start();
-		} catch (IOException e) {
-			// Failed to submit the stats :-(
-		}
+		initMetrics();
 		
 		if (Global.useNewBanSystem) TRCacheItem2.LoadNoItemConfig();
 		
@@ -342,6 +275,78 @@ public class tekkitrestrict extends JavaPlugin {
 
 	public static tekkitrestrict getInstance() {
 		return instance;
+	}
+	
+	private void initMetrics(){
+		try {
+			Metrics2 metrics2 = new Metrics2(this);
+			Metrics2.Graph g = metrics2.createGraph("TekkitRestrict Stats");
+			/*
+			 * g.addPlotter(new Metrics.Plotter("Total Safezones") {
+			 * 
+			 * @Override public int getValue() { return TRSafeZone.zones.size();
+			 * } });
+			 */
+			
+			/*
+			g.addPlotter(new Metrics.Plotter("Hack attempts") {
+				@Override
+				public int getValue() {
+					try {
+						return TRNoHack.hacks;
+					} catch(Exception e){
+						return 0;
+					}
+				}
+			});*/
+			g.addPlotter(new Metrics2.Plotter("Recipe blocks") {
+				@Override
+				public int getValue() {
+					try{
+						int size = 0;
+						List<String> ssr = tekkitrestrict.config.getStringList("RecipeBlock");
+						for (int i = 0; i < ssr.size(); i++) {
+							List<TRCacheItem> iss = TRCacheItem.processItemString("", ssr.get(i), -1);
+							size += iss.size();
+						}
+						ssr = tekkitrestrict.config.getStringList("RecipeFurnaceBlock");
+						for (int i = 0; i < ssr.size(); i++) {
+							List<TRCacheItem> iss = TRCacheItem.processItemString("", ssr.get(i), -1);
+							size += iss.size();
+						}
+						return size;
+					}
+					catch(Exception e){
+						return 0;
+					}
+				}
+			});
+			
+			/*g.addPlotter(new Metrics.Plotter("Dupe attempts") {
+				@Override
+				public int getValue() {
+					try {
+						return MetricValues.dupeAttempts;
+					} catch(Exception ex){
+						return 0;
+					}
+				}
+			});*/
+			g.addPlotter(new Metrics2.Plotter("Disabled items") {
+				@Override
+				public int getValue() {
+					try {
+						return TRNoItem.getBannedItemsAmount();
+					} catch(Exception ex){
+						return 0;
+					}
+				}
+			});
+			metrics2.start();
+		} catch (IOException e) {
+			log.info("Metrics failed to start!");
+			// Failed to submit the stats :-(
+		}
 	}
 	
 	public boolean linkEEPatch(){
@@ -575,6 +580,9 @@ public class tekkitrestrict extends JavaPlugin {
 			saveResource("SafeZones.config.yml", false);
 		} catch (Exception e) {}
 		try {
+			saveResource("Database.config.yml", false);
+		} catch (Exception e) {}
+		try {
 			if (linkEEPatch()){
 				saveResource("EEPatch.config.yml", false);
 			}
@@ -616,6 +624,9 @@ public class tekkitrestrict extends JavaPlugin {
 		} catch (Exception e) {}
 		try {
 			saveResource("SafeZones.config.yml", force);
+		} catch (Exception e) {}
+		try {
+			saveResource("Database.config.yml", force);
 		} catch (Exception e) {}
 		try {
 			if (linkEEPatch()){
