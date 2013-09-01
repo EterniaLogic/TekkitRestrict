@@ -269,8 +269,8 @@ public class TRSafeZone {
 		pluginName = pluginName.toLowerCase();
 		
 		if (SafeZones.UseGP && pluginName.equals("griefprevention") && griefPrevention != null) {
-			GriefPrevention pl = (GriefPrevention) griefPrevention;
-			Claim claim = pl.dataStore.getClaimAt(player.getLocation(), false, null);
+			GriefPrevention gpPlugin = (GriefPrevention) griefPrevention;
+			Claim claim = gpPlugin.dataStore.getClaimAt(player.getLocation(), false, null);
 			if (claim == null){
 				return SafeZoneCreate.RegionNotFound;
 			}
@@ -321,7 +321,7 @@ public class TRSafeZone {
 	}
 	
 	/** @return If the given player is allowed to turn the given claim into a safezone. */
-	public static boolean allowedToMakeGPSafeZone(Player player, Claim claim){
+	private static boolean allowedToMakeGPSafeZone(Player player, Claim claim){
 		if (SafeZones.GPMode.isAdmin()){
 			if (!claim.isAdminClaim()) return false; //Only admin claims can be made safezones.
 			return player.hasPermission("griefprevention.adminclaims"); //Only admins can make admin claims safezones.
