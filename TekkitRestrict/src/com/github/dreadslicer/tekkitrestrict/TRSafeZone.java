@@ -49,7 +49,7 @@ public class TRSafeZone {
 	public int x2, y2, z2;
 	public String name;
 	public String world, data = "";
-	public boolean loadedFromSql = false;
+	private boolean loadedFromSql = false;
 	/**
 	 * 0 = NONE<br>
 	 * 1 = WorldGuard<br>

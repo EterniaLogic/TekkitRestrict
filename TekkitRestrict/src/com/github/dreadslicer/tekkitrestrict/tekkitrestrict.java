@@ -279,8 +279,8 @@ public class tekkitrestrict extends JavaPlugin {
 	
 	private void initMetrics(){
 		try {
-			Metrics2 metrics2 = new Metrics2(this);
-			Metrics2.Graph g = metrics2.createGraph("TekkitRestrict Stats");
+			Metrics metrics2 = new Metrics(this);
+			Metrics.Graph g = metrics2.createGraph("TekkitRestrict Stats");
 			/*
 			 * g.addPlotter(new Metrics.Plotter("Total Safezones") {
 			 * 
@@ -299,7 +299,7 @@ public class tekkitrestrict extends JavaPlugin {
 					}
 				}
 			});*/
-			g.addPlotter(new Metrics2.Plotter("Recipe blocks") {
+			g.addPlotter(new Metrics.Plotter("Recipe blocks") {
 				@Override
 				public int getValue() {
 					try{
@@ -332,7 +332,7 @@ public class tekkitrestrict extends JavaPlugin {
 					}
 				}
 			});*/
-			g.addPlotter(new Metrics2.Plotter("Disabled items") {
+			g.addPlotter(new Metrics.Plotter("Disabled items") {
 				@Override
 				public int getValue() {
 					try {
