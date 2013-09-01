@@ -81,7 +81,7 @@ public class SafeZones {
 	 * @return <b>If the player is in a Factions Safezone that applies to him.</b><br>
 	 */
 	public static boolean isFactionsSafeZoneForPlayer(Player player){
-		return TRSafeZone.isFactionsSafeZoneFor(player);
+		return TRSafeZone.Factions.isSafeZoneFor(player, true);
 	}
 	
 	/**
@@ -92,7 +92,7 @@ public class SafeZones {
 	 * @return <b>If the player is in a PreciousStones Safezone that applies to him.</b><br>
 	 */
 	public static boolean isPreciousStonesSafeZoneForPlayer(Player player){
-		return TRSafeZone.isPreciousStonesSafeZoneFor(player);
+		return TRSafeZone.PS.isSafeZoneFor(player, true);
 	}
 	
 	/**
@@ -103,7 +103,7 @@ public class SafeZones {
 	 * @return <b>If the player is in a Towny Safezone that applies to him.</b><br>
 	 */
 	public static boolean isTownySafeZoneForPlayer(Player player){
-		return TRSafeZone.isTownySafeZoneFor(player);
+		return TRSafeZone.Towny.isSafeZoneFor(player, true);
 	}
 	
 	/**
@@ -114,7 +114,7 @@ public class SafeZones {
 	 * @return <b>If the player is in a GriefPrevention Safezone that applies to him.</b><br>
 	 */
 	public static boolean isGriefPreventionSafeZoneForPlayer(Player player){
-		return TRSafeZone.isGriefPreventionSafeZoneFor(player);
+		return TRSafeZone.GP.isSafeZoneFor(player);
 	}
 	
 	/**
@@ -133,14 +133,14 @@ public class SafeZones {
 	 * @see #getSafeZoneFor(Player, List)
 	 */
 	public static String getSafeZoneFor(Player player){
-		if (isGriefPreventionSafeZoneForPlayer(player)) return "GriefPrevention Safezone Claim owned by: " + TRSafeZone.lastGPClaim;
+		if (isGriefPreventionSafeZoneForPlayer(player)) return "GriefPrevention Safezone Claim owned by: " + TRSafeZone.GP.lastGP;
 		
 		String r = getSafeZoneByLocation(player.getLocation(), false);
 		if (!r.equals("")) return r;
 		
 		if (isTownySafeZoneForPlayer(player)) return "Towny Safezone";
-		if (isFactionsSafeZoneForPlayer(player)) return "Safezone Faction: " + TRSafeZone.lastFaction;
-		if (isPreciousStonesSafeZoneForPlayer(player)) return "PreciousStones SafeZone Field: " + TRSafeZone.lastPS;
+		if (isFactionsSafeZoneForPlayer(player)) return "Safezone Faction: " + TRSafeZone.Factions.lastFaction;
+		if (isPreciousStonesSafeZoneForPlayer(player)) return "PreciousStones SafeZone Field: " + TRSafeZone.PS.lastPS;
 		
 		return "";
 	}
@@ -154,14 +154,14 @@ public class SafeZones {
 	public static String getSafeZoneFor(Player player, List<SSPlugin> order){
 		for (SSPlugin current : order){
 			if (current.GP()){
-				if (isGriefPreventionSafeZoneForPlayer(player)) return "GriefPrevention Safezone Claim owned by: " + TRSafeZone.lastGPClaim;
+				if (isGriefPreventionSafeZoneForPlayer(player)) return "GriefPrevention Safezone Claim owned by: " + TRSafeZone.GP.lastGP;
 			} else if (current.WG()){
 				String r = getSafeZoneByLocation(player.getLocation(), false);
 				if (!r.equals("")) return r;
 			} else if (current.PS()){
-				if (isPreciousStonesSafeZoneForPlayer(player)) return "PreciousStones SafeZone Field: " + TRSafeZone.lastPS;
+				if (isPreciousStonesSafeZoneForPlayer(player)) return "PreciousStones SafeZone Field: " + TRSafeZone.PS.lastPS;
 			} else if (current.F()){
-				if (isFactionsSafeZoneForPlayer(player)) return "Safezone Faction: " + TRSafeZone.lastFaction;
+				if (isFactionsSafeZoneForPlayer(player)) return "Safezone Faction: " + TRSafeZone.Factions.lastFaction;
 			} else if (current.T()){
 				if (isTownySafeZoneForPlayer(player)) return "Towny Safezone";
 			}

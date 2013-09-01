@@ -29,7 +29,7 @@ public class TRNoClick {
 			}
 		} else if (TRNoItem.equalSet(id, data, iss.getTypeId(), iss.getDurability())) {
 
-			boolean insafezone = safezone ? TRSafeZone.inSafeZone(player) : true;
+			boolean insafezone = safezone ? TRSafeZone.isSafeZoneFor(player, true, true) : true;
 			if (insafezone) {
 				if (type.both()){
 					if (air && (action == Action.LEFT_CLICK_AIR || action == Action.RIGHT_CLICK_AIR)) return true;

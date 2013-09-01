@@ -48,4 +48,40 @@ public class TREnums {
 	public enum DBType {
 		SQLite, MySQL, Unknown;
 	}
+	
+	public enum SafeZone {
+		isNone(0), isAllowedStrict(1), isAllowedNonStrict(2), isDisallowed(3), hasBypass(5), pluginDisabled(6);
+		private int number = 0;
+		private SafeZone(int nr){
+			number = nr;
+		}
+		
+		public int getNumber(){
+			return this.number;
+		}
+		
+		public static int getNumber(SafeZone safeZone){
+			return safeZone.getNumber();
+		}
+		
+		public boolean isOne(){
+			return (number == 1 || number == 2 || number == 3);
+		}
+		
+		public static boolean isOne(SafeZone safeZone){
+			return safeZone.isOne();
+		}
+		
+		public static SafeZone getEnum(int number){
+			if (number == 0) return SafeZone.isNone;
+			else if (number == 1) return SafeZone.isAllowedStrict;
+			else if (number == 2) return SafeZone.isAllowedNonStrict;
+			else if (number == 3) return SafeZone.isDisallowed;
+			else if (number == 5) return SafeZone.hasBypass;
+			else if (number == 6) return SafeZone.pluginDisabled;
+			else {
+				throw new IllegalArgumentException("Number is invalid! Only 0, 1, 2, 3, 5 and 6 are allowed!");
+			}
+		}
+	}
 }

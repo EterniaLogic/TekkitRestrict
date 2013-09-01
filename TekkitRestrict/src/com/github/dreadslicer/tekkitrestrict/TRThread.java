@@ -350,29 +350,22 @@ class TEntityRemover extends Thread {
 		ArrayList<Entity> tbr = new ArrayList<Entity>();
 		
 		for (World world : worlds) {
-			List<Entity> entities = world.getEntities();
 			try {
+				List<Entity> entities = world.getEntities();
 				for (int i = 0;i<entities.size();i++){
 					Entity e = entities.get(i);
 					
 					if (e instanceof Player || e instanceof org.bukkit.entity.Item || e instanceof Vehicle || e instanceof ExperienceOrb || e instanceof FallingSand || e instanceof Painting) continue;
-					if (TRSafeZone.inXYZSafeZone(e.getLocation())) {
+					//if (TRSafeZone.inXYZSafeZone(e.getLocation())) {
+					//	tbr.add(e);
+					//}
+					if (!TRSafeZone.getSafeZoneByLocation(e.getLocation(), true).equals("")) {
 						tbr.add(e);
 					}
 				}
 			} catch (Exception ex){
 				//Entities list probably modified while iterating over it.
 			}
-			
-			//net.minecraft.server.World wo = ((CraftWorld) world).getHandle();
-			//Iterator<net.minecraft.server.Entity> entities = wo.entityList.iterator();
-			//while (entities.hasNext()){
-			//	Entity e = entities.next().getBukkitEntity();
-			//	if (e instanceof Player || e instanceof org.bukkit.entity.Item) continue;
-			//	if (TRSafeZone.inXYZSafeZone(e.getLocation(), e.getWorld().getName())) {
-			//		e.remove();
-			//	}
-			//}
 		}
 		
 		for (Entity e : tbr){
@@ -443,6 +436,7 @@ class DisableItemThread extends Thread {
 			boolean changed = false;
 			boolean bypassn = player.hasPermission("tekkitrestrict.bypass.noitem");
 			boolean bypassc = player.hasPermission("tekkitrestrict.bypass.creative");
+			boolean bypassSafezone = player.hasPermission("tekkitrestrict.bypass.safezone");
 			boolean isCreative = player.getGameMode() == GameMode.CREATIVE;
 			
 			for (int i = 0; i < st1.length; i++) {
@@ -596,7 +590,7 @@ class DisableItemThread extends Thread {
 							}
 						}
 
-						if (!player.hasPermission("tekkitrestrict.bypass.safezone") && TRSafeZone.inSafeZone(player)) {
+						if (!bypassSafezone && TRSafeZone.isSafeZoneFor(player, true, false)) {
 							//tekkitrestrict.log.info("in SS");
 							try {
 								if (Threads.SSDisableArcane) {

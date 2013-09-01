@@ -28,6 +28,7 @@ import com.github.dreadslicer.tekkitrestrict.TRSafeZone;
 import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
 import com.github.dreadslicer.tekkitrestrict.Updater.UpdateResult;
 import com.github.dreadslicer.tekkitrestrict.api.SafeZones.SafeZoneCreate;
+import com.github.dreadslicer.tekkitrestrict.objects.TREnums.SafeZone;
 import com.github.dreadslicer.tekkitrestrict.objects.TRLimit;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -458,11 +459,38 @@ public class TRCommandTR implements CommandExecutor {
 				return;
 			}
 		}
-		String name = TRSafeZone.getSafeZone(target);
-		if (!name.equals(""))
-			send.msg(ChatColor.YELLOW + target.getName() + " is currently in the safezone " + name + ".");
-		else
+		
+		Object[] temp = TRSafeZone.getSafeZoneStatusFor(target);
+		SafeZone status = (SafeZone) temp[2];
+		
+		if (status == SafeZone.isNone || status == SafeZone.pluginDisabled){
 			send.msg(ChatColor.YELLOW + target.getName() + " is currently " + ChatColor.RED + "not" + ChatColor.YELLOW + " in a safezone.");
+			return;
+		}
+		
+		String plugin = (String) temp[0];
+		String zone = (String) temp[1];
+		
+		if (zone.equals("")) zone = "NO_NAME";
+		if (status == SafeZone.isAllowedStrict) {
+			send.msg(ChatColor.YELLOW + target.getName() + " is currently in the "+plugin+" safezone " + zone + ", but it doesn't apply to him/her.");
+			return;
+		}
+		
+		if (status == SafeZone.isAllowedNonStrict) {
+			send.msg(ChatColor.YELLOW + target.getName() + " is currently in the "+plugin+" safezone " + zone + ".");
+			return;
+		}
+		
+		if (status == SafeZone.isDisallowed) {
+			send.msg(ChatColor.YELLOW + target.getName() + " is currently in the "+plugin+" safezone " + zone + ".");
+			return;
+		}
+		
+		if (status == SafeZone.hasBypass) {
+			send.msg(ChatColor.YELLOW + target.getName() + " is currently in the "+plugin+" safezone " + zone + ", but it doesn't apply to him/her.");
+			return;
+		}
 	}
 	private void ssDel(String[] largs){
 		if (send.noPerm("admin.safezone.remove")) return;
