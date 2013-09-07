@@ -220,8 +220,6 @@ public class tekkitrestrict extends JavaPlugin {
 		
 		initMetrics();
 		
-		if (Global.useNewBanSystem) TRCacheItem2.LoadNoItemConfig();
-		
 		version = getDescription().getVersion();
 		
 		if (config.getBoolean("Auto-Update", true)){
@@ -272,7 +270,7 @@ public class tekkitrestrict extends JavaPlugin {
 		
 		log.info("TekkitRestrict v " + version + " disabled!");
 	}
-
+	
 	public static tekkitrestrict getInstance() {
 		return instance;
 	}
@@ -393,7 +391,6 @@ public class tekkitrestrict extends JavaPlugin {
 		
 		Global.kickFromConsole = config.getBoolean(ConfigFile.General, "KickFromConsole", false);
 		//Global.useNewBanSystem = config.getBoolean("UseNewBannedItemsSystem", false);
-		Global.useNewBanSystem = false;
 		
 		Listeners.UseBlockLimit = config.getBoolean(ConfigFile.General, "UseItemLimiter", true);
 		Listeners.BlockCreativeContainer = config.getBoolean(ConfigFile.LimitedCreative, "LimitedCreativeNoContainer", true);

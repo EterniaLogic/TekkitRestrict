@@ -8,7 +8,7 @@ import com.griefcraft.lwc.LWCPlugin;
 
 public class TRConfigCache {
 	public static class Global {
-		public static boolean kickFromConsole, debug, useNewBanSystem;
+		public static boolean kickFromConsole, debug;
 	}
 	
 	public static class Hacks {

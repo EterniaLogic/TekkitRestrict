@@ -26,7 +26,7 @@ public class QuitListener implements Listener{
 	public void quit(Player player){
 		if (player == null) return;
 		
-		TRCommandAlc.setPlayerInv(player);
+		TRCommandAlc.restoreViewerInventory(player, false);
 		TRNoHack.playerLogout(player);
 		TRNoDupeProjectTable.playerUnuse(player.getName());
 		

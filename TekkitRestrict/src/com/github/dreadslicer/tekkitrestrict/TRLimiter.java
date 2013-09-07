@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Future;
 
 import org.bukkit.Bukkit;
@@ -32,7 +33,8 @@ public class TRLimiter {
 	/** A list of different kinds of limited blocks and the locations where they are placed (For this player). */
 	public List<TRLimit> itemlimits = Collections.synchronizedList(new LinkedList<TRLimit>());
 	
-	private static List<TRLimiter> limiters = Collections.synchronizedList(new LinkedList<TRLimiter>());
+	private static CopyOnWriteArrayList<TRLimiter> limiters = new CopyOnWriteArrayList<TRLimiter>();
+	//private static List<TRLimiter> limiters = Collections.synchronizedList(new LinkedList<TRLimiter>());
 	private static List<TRConfigLimit> configLimits = Collections.synchronizedList(new LinkedList<TRConfigLimit>());
 	private static Map<String, String> allBlockOwners = Collections.synchronizedMap(new HashMap<String, String>());
 
@@ -194,11 +196,10 @@ public class TRLimiter {
 	public static TRLimiter getLimiter(String playerName) {
 		playerName = playerName.toLowerCase();
 		// check if a previous itemlimiter exists...
-		synchronized(limiters){
-			for (TRLimiter il : limiters){
-				if (il.player.toLowerCase().equals(playerName)) {
-					return il;
-				}
+
+		for (TRLimiter il : limiters){
+			if (il.player.toLowerCase().equals(playerName)) {
+				return il;
 			}
 		}
 		//Player is not loaded or offline.
@@ -257,13 +258,13 @@ public class TRLimiter {
 	public static TRLimiter getOnlineLimiter(Player player) {
 		String playerName = player.getName().toLowerCase();
 		// check if a previous itemlimiter exists...
-		synchronized(limiters){
-			for (TRLimiter il : limiters){
-				if (il.player.toLowerCase().equals(playerName)) {
-					return il;
-				}
+
+		for (TRLimiter il : limiters){
+			if (il.player.toLowerCase().equals(playerName)) {
+				return il;
 			}
 		}
+		
 		
 		TRLimiter r = new TRLimiter();
 		r.player = playerName;
@@ -360,10 +361,9 @@ public class TRLimiter {
 	/** Save the limiters to the database. */
 	public static void saveLimiters() {
 		// looping through each player's limiters
-		synchronized (limiters) {
-			for (TRLimiter lb : limiters){
-				saveLimiter(lb);
-			}
+
+		for (TRLimiter lb : limiters){
+			saveLimiter(lb);
 		}
 	}
 
@@ -375,14 +375,13 @@ public class TRLimiter {
 	public static void setExpire(String player) {
 		player = player.toLowerCase();
 		// gets the player from the list of limiters (does nothing if player doesn't exist)
-		synchronized (limiters) {
-			for (int i = 0; i < limiters.size(); i++) {
-				TRLimiter il = limiters.get(i);
-				if (!il.player.equals(player)) continue;
-				
-				il.expire = 6; // Every 32 ticks 32*6 = Every 192 ticks
-				return;
-			}
+
+		for (int i = 0; i < limiters.size(); i++) {
+			TRLimiter il = limiters.get(i);
+			if (!il.player.equals(player)) continue;
+			
+			il.expire = 6; // Every 32 ticks 32*6 = Every 192 ticks
+			return;
 		}
 	}
 
@@ -564,39 +563,38 @@ public class TRLimiter {
 	public static void manageData() {
 		// manages and removes bad data.
 		// determines if the limit exists at a location. If not, remove it.
-		synchronized(limiters){
-			for (TRLimiter lb : limiters) {
-				boolean changed = false;
-				for (TRLimit l : lb.itemlimits) {
-					for (int i = 0; i < l.placedBlock.size(); i++) {
-						try {
-							Location loc = l.placedBlock.get(i);
-							ladslfl = loc;
-							Future<Chunk> returnFuture = Bukkit.getScheduler().callSyncMethod(tekkitrestrict.getInstance(), new Callable<Chunk>() {
-							   public Chunk call() {
-								   Chunk c = ladslfl.getChunk();
-								   c.load();
-							       return c;
-							   }
-							});
-	
-						    // This will block the current thread 
-							Chunk returnValue = returnFuture.get();//Load the chunk
-							if(returnValue != null){
-								Block b = loc.getWorld().getBlockAt(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
-								if (b.getTypeId() != l.blockID && !(l.blockData == 0 || l.blockData == b.getData())) {
-									l.placedBlock.remove(i);
-									i--;
-									changed = true;
-								}
+
+		for (TRLimiter lb : limiters) {
+			boolean changed = false;
+			for (TRLimit l : lb.itemlimits) {
+				for (int i = 0; i < l.placedBlock.size(); i++) {
+					try {
+						Location loc = l.placedBlock.get(i);
+						ladslfl = loc;
+						Future<Chunk> returnFuture = Bukkit.getScheduler().callSyncMethod(tekkitrestrict.getInstance(), new Callable<Chunk>() {
+						   public Chunk call() {
+							   Chunk c = ladslfl.getChunk();
+							   c.load();
+						       return c;
+						   }
+						});
+
+					    // This will block the current thread 
+						Chunk returnValue = returnFuture.get();//Load the chunk
+						if(returnValue != null){
+							Block b = loc.getWorld().getBlockAt(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+							if (b.getTypeId() != l.blockID && !(l.blockData == 0 || l.blockData == b.getData())) {
+								l.placedBlock.remove(i);
+								i--;
+								changed = true;
 							}
-						} catch (Exception e) {
 						}
+					} catch (Exception e) {
 					}
 				}
-				
-				if (changed) saveLimiter(lb);
 			}
+			
+			if (changed) saveLimiter(lb);
 		}
 	}
 
@@ -649,16 +647,15 @@ public class TRLimiter {
 	public static void expireLimiters() {
 		// loop through each limiter.
 		ArrayList<TRLimiter> tbr = new ArrayList<TRLimiter>();
-		synchronized(limiters){
-			for (TRLimiter il : limiters){
-				if (il.expire == -1) continue;
-				if (il.expire == 0) { // do expire
-					tbr.add(il);
-					// tekkitrestrict.log.info("Expired limiter");
-				} else {
-					// tekkitrestrict.log.info("Age limiter");
-					il.expire--;
-				}
+
+		for (TRLimiter il : limiters){
+			if (il.expire == -1) continue;
+			if (il.expire == 0) { // do expire
+				tbr.add(il);
+				// tekkitrestrict.log.info("Expired limiter");
+			} else {
+				// tekkitrestrict.log.info("Age limiter");
+				il.expire--;
 			}
 		}
 		
@@ -670,11 +667,9 @@ public class TRLimiter {
 	/** Called when a player logs in to make his limits not expire any more. */
 	public static void removeExpire(String playerName) {
 		playerName = playerName.toLowerCase();
-		synchronized(limiters){
-			for (TRLimiter il : limiters){
-				if (il.player.toLowerCase().equals(playerName))
-					il.expire = -1;
-			}
+		for (TRLimiter il : limiters){
+			if (il.player.toLowerCase().equals(playerName))
+				il.expire = -1;
 		}
 	}
 

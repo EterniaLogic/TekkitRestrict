@@ -24,7 +24,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Global;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Listeners;
 import com.github.dreadslicer.tekkitrestrict.commands.TRCommandAlc;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
@@ -181,11 +180,7 @@ public class TRListener implements Listener {
 			}
 			boolean banned = false;
 			
-			if (Global.useNewBanSystem){
-				if (TRCacheItem2.isBanned(player, "noitem", id, data)) banned = true;
-			} else {
-				if (TRNoItem.isItemBanned(player, id, data, true)) banned = true;
-			}
+			if (TRNoItem.isItemBanned(player, id, data, true)) banned = true;
 			
 			if (banned) {
 				// tekkitrestrict.log.info(cc.id+":"+cc.getData());
@@ -275,11 +270,7 @@ public class TRListener implements Listener {
 			if (str != null) {
 				boolean banned = false;
 				try {
-					if (Global.useNewBanSystem){
-						if (TRCacheItem2.isBanned(player, "creative", str.getTypeId(), str.getDurability())) banned = true;
-					} else {
-						if (TRNoItem.isItemBannedInCreative(player, str.getTypeId(), str.getDurability(), true)) banned = true;
-					}
+					if (TRNoItem.isItemBannedInCreative(player, str.getTypeId(), str.getDurability(), true)) banned = true;
 				} catch (Exception ex) {
 					if (!errorInteract){
 						tekkitrestrict.log.warning("An error occured in the InteractListener for LimitedCreative!");
@@ -382,11 +373,7 @@ public class TRListener implements Listener {
 		
 		boolean banned = false;
 		
-		if (Global.useNewBanSystem){
-			if (TRCacheItem2.isBanned(player, "noitem", item.getTypeId(), item.getDurability())) banned = true;
-		} else {
-			if (TRNoItem.isItemBanned(player, item.getTypeId(), item.getDurability(), false)) banned = true;
-		}
+		if (TRNoItem.isItemBanned(player, item.getTypeId(), item.getDurability(), false)) banned = true;
 		
 		if (banned) {
 			player.sendMessage(ChatColor.RED + "[TRItemDisabler] You cannot obtain/modify this Item type!");
@@ -405,7 +392,7 @@ public class TRListener implements Listener {
 		if (player == null) return;
 		
 		TRNoDupeProjectTable.playerUnuse(player.getName());
-		TRCommandAlc.setPlayerInv2(player);
+		TRCommandAlc.setPlayerInv(player, false);
 	}
 
 	private Map<String, Integer> PickupTick = Collections.synchronizedMap(new HashMap<String, Integer>());

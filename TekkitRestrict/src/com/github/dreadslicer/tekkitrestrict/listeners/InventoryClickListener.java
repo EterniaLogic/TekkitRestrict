@@ -8,8 +8,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 import com.github.dreadslicer.tekkitrestrict.Log;
-import com.github.dreadslicer.tekkitrestrict.TRCacheItem2;
-import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Global;
 import com.github.dreadslicer.tekkitrestrict.TRNoItem;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Dupes;
 
@@ -30,11 +28,7 @@ public class InventoryClickListener implements Listener {
 			if (!player.hasPermission("tekkitrestrict.bypass.noitem")) {
 				boolean banned = false;
 				
-				if (Global.useNewBanSystem){
-					if (TRCacheItem2.isBanned(player, "noitem", id1, data1)) banned = true;
-				} else {
-					if (TRNoItem.isItemBanned(player, id1, data1, false)) banned = true;
-				}
+				if (TRNoItem.isItemBanned(player, id1, data1, false)) banned = true;
 				
 				if (banned) {
 					player.sendMessage(ChatColor.RED + "This item is banned!");

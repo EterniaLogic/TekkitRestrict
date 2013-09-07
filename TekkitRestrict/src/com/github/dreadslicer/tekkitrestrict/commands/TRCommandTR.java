@@ -438,7 +438,14 @@ public class TRCommandTR implements CommandExecutor {
 			TRSafeZone z = TRSafeZone.zones.get(i);
 			if (z == null) continue;
 			
-			send.msg("" + ChatColor.YELLOW + i + ": " + z.name + " - Location: [" + z.world + "] [" + z.x1 + " " + z.y1 + " " + z.z1 + "] - [" + z.x2 + " " + z.y2 + " " + z.z2 + "]");
+			String pl = "";
+			if (z.mode == 1) pl = "[WG] ";
+			else if (z.mode == 4) pl = "[GP] ";
+			else if (z.mode == 0) pl = "[TR] ";
+			else if (z.mode == 2) pl = "[PS] ";
+			else if (z.mode == 3) pl = "[F] ";
+			
+			send.msg("" + ChatColor.YELLOW + (i+1) + ": " + pl + z.name + " - Loc: [" + z.world + "] [" + z.x1 + " " + z.y1 + " " + z.z1 + "] - [" + z.x2 + " " + z.y2 + " " + z.z2 + "]");
 		}
 	}
 	private void ssCheck(String[] largs){
@@ -536,6 +543,7 @@ public class TRCommandTR implements CommandExecutor {
 		if (largs.length != 4){
 			send.msg(ChatColor.RED + "Incorrect syntaxis!");
 			send.msg(ChatColor.RED + "Correct usage: /tr admin safezone addwg <name>");
+			return;
 		}
 		
 		String name = largs[3];
@@ -564,6 +572,13 @@ public class TRCommandTR implements CommandExecutor {
 				zone.mode = 1;
 				zone.name = name;
 				zone.world = player.getWorld().getName();
+				zone.x1 = pr.getMinimumPoint().getBlockX();
+				zone.x2 = pr.getMaximumPoint().getBlockX();
+				zone.y1 = pr.getMinimumPoint().getBlockY();
+				zone.y2 = pr.getMaximumPoint().getBlockY();
+				zone.z1 = pr.getMinimumPoint().getBlockZ();
+				zone.z2 = pr.getMaximumPoint().getBlockZ();
+				zone.locSet = true;
 				TRSafeZone.zones.add(zone);
 				TRSafeZone.save();
 				send.msg(ChatColor.GREEN + "Attached to region \"" + name + "\"!");

@@ -1,8 +1,6 @@
 package com.github.dreadslicer.tekkitrestrict.commands;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.logging.Level;
 
 import net.minecraft.server.BaseMod;
@@ -25,6 +23,7 @@ import org.bukkit.craftbukkit.event.CraftEventFactory;
 import org.bukkit.entity.Player;
 
 import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
+import com.github.dreadslicer.tekkitrestrict.objects.OpenAlcObj;
 
 import ee.AlchemyBagData;
 import forge.IGuiHandler;
@@ -33,19 +32,6 @@ import forge.NetworkMod;
 import forge.packets.PacketOpenGUI;
 
 public class TRCommandAlc implements CommandExecutor {
-
-	public static HashMap<String, HashMap<CraftPlayer, AlchemyBagData>> openAlc = new HashMap<String, HashMap<CraftPlayer, AlchemyBagData>>();
-
-	/**
-	 * First string is the player that owns the bag.
-	 * Second string is the player that views the bag.
-	 */
-	public static HashMap<String, String> openAlc2 = new HashMap<String, String>();
-	public static ArrayList<String> openAlc3 = new ArrayList<String>();
-	//private static int counter = 0;
-	
-	//private static HashMap<String, Object[]> InvAlc = new java.util.HashMap<String, Object[]>();
-
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (!(sender instanceof Player)){
@@ -55,13 +41,9 @@ public class TRCommandAlc implements CommandExecutor {
 
 		if (!sender.hasPermission("tekkitrestrict.openalc")){
 			sender.sendMessage(ChatColor.RED + "You are not allowed to use this command!");
-			//Logger.getLogger("Minecraft").log(Level.parse("Player_Command"), sender.getName() + " was denied to use /openalc");
 			return true;
 		}
 		
-		//LinkedList<String> message = new LinkedList<String>();
-		//boolean usemsg = true;
-		if (!cmd.getName().equalsIgnoreCase("openalc")) return true;
 		if (!tekkitrestrict.config.getBoolean("UseOpenAlc")){
 			sender.sendMessage(ChatColor.RED + "Openalc is disabled!");
 		}
@@ -87,7 +69,7 @@ public class TRCommandAlc implements CommandExecutor {
 		
 		Player player = (Player) sender;
 		
-		if (openAlc.containsKey(player.getName())) setPlayerInv(player);
+		if (OpenAlcObj.isViewing(player.getName())) restoreViewerInventory(player, false); //If player has an inventory open, close it.
 		
 		EntityPlayer looker = ((CraftPlayer) player).getHandle();
 		Player OPlayer = Playerz(player, args[0]);
@@ -103,7 +85,7 @@ public class TRCommandAlc implements CommandExecutor {
 			return true;
 		}
 		
-		if (openAlc2.containsKey(OName)){
+		if (OpenAlcObj.isViewed(OName)){
 			sender.sendMessage(ChatColor.RED + "Someone else is already viewing a bag of " + OName + "!");
 			return true;
 		}
@@ -123,20 +105,14 @@ public class TRCommandAlc implements CommandExecutor {
 			if (alcdata == null){
 				tekkitrestrict.log.warning("An error occured. " + OName + "'s bag will not save properly if he is offline.");
 			}
-			//open.add(player.getName());
-			String name = player.getName();
-			HashMap<CraftPlayer, AlchemyBagData> temp = new HashMap<CraftPlayer, AlchemyBagData>();
-			temp.put((CraftPlayer) OPlayer, alcdata);
-			openAlc.put(name, temp);
-			if (Bukkit.getPlayerExact(OName) == null) openAlc2.put(OName, name);
-			else openAlc3.add(name);
+			
+			new OpenAlcObj(alcdata, OPlayer, player); //Add new OpenAlcObject
+			
 			String strcolor = getColor(color);
 			sender.sendMessage(ChatColor.GREEN + "Opened " + OName + "'s " + strcolor + " Alchemy Bag!");
 			sender.sendMessage(ChatColor.BLUE + "Close your inventory (twice) to restore your own inventory.");
 			
 			tekkitrestrict.log.info(player.getName() + " opened " + OName + "'s " + strcolor + " Alchemy Bag!");
-			
-			//counter++;
 			
 		} catch (Exception e) {
 			sender.sendMessage(ChatColor.RED + "An error has occured processing your command.");
@@ -146,7 +122,8 @@ public class TRCommandAlc implements CommandExecutor {
 			return true;
 	}
 
-	/** Called when a player logs off while having an inventory open. */
+	///** Called when a player logs off while having an inventory open. */
+	/*
 	@SuppressWarnings("deprecation")
 	public static void setPlayerInv(Player player) {
 		if (player == null) return;
@@ -156,26 +133,87 @@ public class TRCommandAlc implements CommandExecutor {
 		
 		if (data != null) {
 			for (CraftPlayer current : data.keySet()){
-				if (Bukkit.getPlayerExact(current.getName()) == null) current.saveData();
+				if (Bukkit.getPlayerExact(current.getName()) == null) current.saveData(); //Save the player if he is offline.
 			}
-			for (AlchemyBagData current : data.values()) current.a();
+			for (AlchemyBagData current : data.values()) current.a(); //Save the alchemy bag.
 		} else return;
 		
 		player.updateInventory();
+	}*/
+	
+	public static void setPlayerInv(Player player, boolean inform) {
+		if (player == null) return;
+
+		String name = player.getName();
+		OpenAlcObj openAlc = OpenAlcObj.getOpenAlcByOwner(name);
+		
+		if (openAlc == null) openAlc = OpenAlcObj.getOpenAlcByViewer(name);
+		else { //A bagOwner has been found and he matches this player.
+			boolean bagOwnerOnline = (Bukkit.getPlayerExact(openAlc.getBagOwnerName()) != null);
+			if (bagOwnerOnline) return; //If the player that owns the bag is online, return to prevent unwanted closing.
+			
+			openAlc.getBagOwner().saveData();
+			openAlc.getBag().a();
+			
+			player = openAlc.getViewer();
+			player.openInventory(player.getInventory());
+			player.closeInventory();
+			
+			if (inform) player.sendMessage(ChatColor.BLUE + "Your own inventory was restored.");
+			return;
+		}
+		
+		if (openAlc == null) return;
+		else { //A viewer has been found and he matches this player.
+			boolean bagOwnerOnline = (Bukkit.getPlayerExact(openAlc.getBagOwnerName()) != null);
+			if (!bagOwnerOnline) openAlc.getBagOwner().saveData(); //If online, saving is not required.
+			
+			openAlc.getBag().a();
+			
+			player.openInventory(player.getInventory());
+			player.closeInventory();
+			
+			if (inform) player.sendMessage(ChatColor.BLUE + "Your own inventory was restored.");
+		}
 	}
 	
-	/** Called when a player closes his inventory. */
+	/**
+	 * Restore the inventory of the viewer.
+	 * @param player The viewer of the bag.
+	 */
+	public static void restoreViewerInventory(Player player, boolean inform) {
+		if (player == null) return;
+
+		String name = player.getName();
+		OpenAlcObj openAlc = OpenAlcObj.getOpenAlcByViewer(name);
+		
+		if (openAlc == null) return;
+		else { //A viewer has been found and he matches this player.
+			boolean bagOwnerOnline = (Bukkit.getPlayerExact(openAlc.getBagOwnerName()) != null);
+			if (!bagOwnerOnline) openAlc.getBagOwner().saveData(); //If online, saving is not required.
+			
+			openAlc.getBag().a();
+			
+			player.openInventory(player.getInventory());
+			player.closeInventory();
+			
+			if (inform) player.sendMessage(ChatColor.BLUE + "Your own inventory was restored.");
+		}
+	}
+	
+	///** Called when a player closes his inventory. */
+	/*
 	public static void setPlayerInv2(Player player) {
 		if (player == null) return;
-		
-		String name = player.getName();
-		String viewer = openAlc2.remove(name);
+		//First inv close is bagowner, second one is viewer
+		String name = player.getName();//First invclose: bagowner
+		String viewer = openAlc2.remove(name); //Remove bagowner (who is also online)
 		String tbr = "";
 		
 		if (viewer != null){
 			tbr = viewer;
 		} else {
-			if (openAlc3.remove(name)) tbr = name;
+			if (onlineBagOwners.remove(name)) tbr = name;
 			else return;
 		}
 		
@@ -193,7 +231,7 @@ public class TRCommandAlc implements CommandExecutor {
 
 			player.sendMessage(ChatColor.BLUE + "Your own inventory was restored.");
 		}
-	}
+	}*/
 	
 	/**
 	 * @param player The player that needs to see the inventory.
