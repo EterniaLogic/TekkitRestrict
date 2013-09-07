@@ -96,7 +96,7 @@ public class TRLimiter {
 		Location bloc = block.getLocation();
 		
 		int TLimit = getMax(event.getPlayer().getName(),thisid,thisdata, doBypassCheck);//Get the max for this player for id:data
-		tekkitrestrict.log.info("[DEBUG] getMax("+event.getPlayer().getName()+","+thisid+","+thisdata+") = "+TLimit);
+		//tekkitrestrict.log.info("[DEBUG] getMax("+event.getPlayer().getName()+","+thisid+","+thisdata+") = "+TLimit);
 		
 		if (TLimit != -1) {
 			// tekkitrestrict.log.info("limited?");
