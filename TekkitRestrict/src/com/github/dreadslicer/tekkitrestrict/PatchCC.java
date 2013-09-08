@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.github.dreadslicer.tekkitrestrict;
 
 import java.io.BufferedReader;
@@ -11,6 +8,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+
+import com.github.dreadslicer.tekkitrestrict.lib.RandomString;
 
 public class PatchCC {
 	static final String s = File.separator;
@@ -76,11 +75,13 @@ public class PatchCC {
 		
 		
 		if (rsCrashPatch) {
+			RandomString ran = new RandomString(10);
+			String extra = ran.nextString();
 			tekkitrestrict.log.info("[CCPatch] Adding redstone crash patch...");
-			lines.add("bypassAntiRedstoneCrashBug = rs.setOutput");
+			lines.add(extra+"bypassAntiRedstoneCrashBug = rs.setOutput");
 			lines.add("rs.setOutput = function(side, bool)");
 			lines.add("    sleep(0.05)");
-			lines.add("    bypassAntiRedstoneCrashBug(side, bool)");
+			lines.add("    "+extra+"bypassAntiRedstoneCrashBug(side, bool)");
 			lines.add("end");
 			tekkitrestrict.log.info("[CCPatch] Redstone crash patch added.");
 		} else {
