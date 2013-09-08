@@ -11,6 +11,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
+import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Listeners;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.TRClickType;
 
@@ -138,11 +139,35 @@ public class TRNoClick {
 	}
 
 	public static boolean errorLogged = false;
-	public static boolean isDisabled(PlayerInteractEvent e) {
+	public static boolean isDisabled(PlayerInteractEvent event) {
+		Player player = event.getPlayer();
+		if (player.hasPermission("tekkitrestrict.bypass.noclick")) return false;
+		if (Listeners.useNoCLickPerms){
+			Action action = event.getAction();
+			if (hasPerm(player, event.getItem(), action)){
+				
+				String lr = "", extra = "";
+				if (action == Action.LEFT_CLICK_AIR){
+					lr = "left-clicking";
+					extra = " in the air";
+				} else if (action == Action.LEFT_CLICK_BLOCK){
+					lr = "left-clicking";
+					extra = " on a block";
+				} else if (action == Action.RIGHT_CLICK_AIR){
+					lr = "right-clicking";
+					extra = " in the air";
+				} else if (action == Action.RIGHT_CLICK_BLOCK){
+					lr = "right-clicking";
+					extra = " on a block";
+				} else if (action == Action.PHYSICAL){
+					lr = "trampling";
+				}
+				player.sendMessage(ChatColor.RED + "Sorry, but "+lr+" with this item"+extra+" is disabled");
+			}
+		}
 		try {
-			Player player = e.getPlayer();
 			for (TRNoClick cia : disableClickItemActions) {
-				if (cia.compare(player, e.getClickedBlock(), player.getItemInHand(), e.getAction())) {
+				if (cia.compare(player, event.getClickedBlock(), player.getItemInHand(), event.getAction())) {
 					if (!cia.msg.equals("")) {
 						player.sendMessage(ChatColor.RED + cia.msg);
 					} else {
@@ -158,10 +183,49 @@ public class TRNoClick {
 		} catch (Exception ex){
 			if (!errorLogged){
 				tekkitrestrict.log.warning("Error: [ListenInteract TRNoClick] " + ex.getMessage());
+				Log.Exception(ex, false);
 				errorLogged = true;
 			}
 			TRLogger.Log("debug", "Error: [ListenInteract TRNoClick] " + ex.getMessage());
 		}
+		return false;
+	}
+	
+	private static boolean hasPerm(Player player, ItemStack item, Action action){
+		int id = item.getTypeId();
+		
+		//String base1 = new StringBuilder(28).append("tekkitrestrict.noclick.").append(id).toString();
+		//if (player.hasPermission(base1)) return true;
+		
+		int data = item.getDurability();
+		
+		String base2 = new StringBuilder(34).append("tekkitrestrict.noclick.").append(id).append(".").append(data).toString();
+		if (player.hasPermission(base2)) return true;
+		
+		String lr = "";
+		//String extra = "";
+		if (action == Action.LEFT_CLICK_AIR){
+			lr = ".left";
+			//extra = ".air";
+		} else if (action == Action.LEFT_CLICK_BLOCK){
+			lr = ".left";
+			//extra = ".block";
+		} else if (action == Action.RIGHT_CLICK_AIR){
+			lr = ".right";
+			//extra = ".air";
+		} else if (action == Action.RIGHT_CLICK_BLOCK){
+			lr = ".right";
+			//extra = ".block";
+		} else if (action == Action.PHYSICAL){
+			lr = ".trample";
+		}
+		
+		String perm1 = new StringBuilder(42).append(base2).append(lr).toString();
+		if (player.hasPermission(perm1)) return true;
+		
+		//String perm2 = new StringBuilder(46).append(perm1).append(extra).toString();
+		//if (player.hasPermission(perm2)) return true;
+		
 		return false;
 	}
 }

@@ -270,7 +270,7 @@ public class TRCommandTR implements CommandExecutor {
 		}
 		
 		if (largs[1].equals("update")) {
-			adminUpdate();
+			adminUpdate(largs);
 			return;
 		}
 		
@@ -316,7 +316,7 @@ public class TRCommandTR implements CommandExecutor {
 		send.msg("Tekkit Restrict Reloaded!");
 		return;
 	}
-	private void adminUpdate(){
+	private void adminUpdate(String largs[]){
 		if (send.noPerm("admin.update")) return;
 		
 		if (tekkitrestrict.updater == null){
@@ -324,12 +324,31 @@ public class TRCommandTR implements CommandExecutor {
 			return;
 		}
 		
+		boolean check = false;
+		if (largs.length == 3){
+			if (largs[2].equals("check")) check = true;
+			else if (largs[2].equals("download")) check = false;
+			else {
+				send.msg(ChatColor.RED + "Invalid argument: \""+largs[2]+"\"! Only \"check\" and \"download\" are allowed.");
+				return;
+			}
+		} else {
+			send.msg(ChatColor.RED + "Invalid syntaxis! Correct usage: /tr admin update <check|download>");
+			return;
+		}
+		
 		UpdateResult result = tekkitrestrict.updater.getResult();
 		if (result == UpdateResult.SUCCESS){
-			send.msg(ChatColor.GREEN + "TekkitRestrict will update to " + tekkitrestrict.updater.shortVersion + " on the next server start.");
+			send.msg(ChatColor.GREEN + "The update TekkitRestrict " + ChatColor.YELLOW + tekkitrestrict.updater.shortVersion + ChatColor.GREEN + " is available, and has already been downloaded.");
+			send.msg(ChatColor.GREEN + "This update will be installed on the next server start.");
 		} else if (result == UpdateResult.UPDATE_AVAILABLE){
-			send.msg(ChatColor.GREEN + "TekkitRestrict will now start downloading version " + tekkitrestrict.updater.shortVersion + ".");
-			tekkitrestrict.getInstance().Update();
+			if (check){
+				send.msg(ChatColor.GREEN + "The update TekkitRestrict " + ChatColor.YELLOW + tekkitrestrict.updater.shortVersion + ChatColor.GREEN + " is available.");
+				send.msg(ChatColor.YELLOW + "Use /tr admin update download to start downloading.");
+			} else {
+				send.msg(ChatColor.GREEN + "TekkitRestrict will now start downloading version " + ChatColor.YELLOW + tekkitrestrict.updater.shortVersion + ChatColor.GREEN + ".");
+				tekkitrestrict.getInstance().Update();
+			}
 		} else if (result == UpdateResult.NO_UPDATE){
 			send.msg(ChatColor.YELLOW + "There is no update available for TekkitRestrict.");
 		} else {
@@ -354,7 +373,8 @@ public class TRCommandTR implements CommandExecutor {
 			send.msg("/tr admin help <page>", "Show this help.");
 			send.msg("/tr admin reload", "Reload TekkitRestrict");
 			send.msg("/tr admin reinit", "Reload the server.");
-			send.msg("/tr admin update", "Check for updates.");
+			send.msg("/tr admin update check", "Check for updates.");
+			send.msg("/tr admin update download", "Download an update if it is available.");
 			send.msg("/tr admin limit clear <player>", "Clear a players limits.");
 			send.msg("/tr admin limit clear <player> <id[:data]>", "Clear a players limits for a specific item.");
 			send.msg("/tr admin limit list <player> [id]", "List a players limits.");

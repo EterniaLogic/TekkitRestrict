@@ -396,6 +396,7 @@ public class tekkitrestrict extends JavaPlugin {
 		Listeners.BlockCreativeContainer = config.getBoolean(ConfigFile.LimitedCreative, "LimitedCreativeNoContainer", true);
 		Listeners.UseNoItem = config.getBoolean(ConfigFile.General, "UseNoItem", true);
 		Listeners.UseLimitedCreative = config.getBoolean(ConfigFile.General, "UseLimitedCreative", true);
+		Listeners.useNoCLickPerms = config.getBoolean(ConfigFile.DisableClick, "UseNoClickPermissions", false);
 		
 		TRConfigCache.LogFilter.replaceList = config.getStringList(ConfigFile.Logging, "LogFilter");
 		TRConfigCache.LogFilter.splitLogs = config.getBoolean(ConfigFile.Logging, "SplitLogs", true);

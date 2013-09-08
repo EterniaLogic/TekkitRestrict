@@ -37,7 +37,7 @@ public class TRConfigCache {
 	
 	public static class Listeners {
 		public static boolean UseBlockLimit, BlockCreativeContainer;
-		public static boolean UseNoItem, UseLimitedCreative;
+		public static boolean UseNoItem, UseLimitedCreative, useNoCLickPerms;
 	}
 	
 	public static class LogFilter {

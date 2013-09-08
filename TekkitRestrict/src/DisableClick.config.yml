@@ -8,6 +8,13 @@
 ##########################################################################################
 ############################### DisableClick Configuration ###############################
 ##########################################################################################
+# UseNoClickPermissions
+# If you enable this, TekkitRestrict will check on every click action if the player that
+# clicked has the permission "tekkitrestrict.noclick.id.data[.left|right|trample]"
+# As this thus checks up to 2 permissions for each click action, it might cause some lag.
+
+# Default: false
+UseNoClickPermissions: false
 
 ###################### Disable the left or right click of the item. ######################
 #
