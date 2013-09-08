@@ -132,7 +132,7 @@ public class TRListener implements Listener {
 	}
 	
 	public static boolean errorBlockPlace = false;
-	@EventHandler(ignoreCancelled = true)
+	@EventHandler(priority=EventPriority.HIGH, ignoreCancelled = true)
 	public void onBlockPlace(BlockPlaceEvent event) {
 		Block block = event.getBlock();
 		int id = block.getTypeId();
@@ -147,35 +147,41 @@ public class TRListener implements Listener {
 		
 		try {
 			if (!TRLWCProtect.checkLWCAllowed(event)) return;
-
+			
 			int data = block.getData();
 			WorldServer ws = ((CraftWorld) block.getWorld()).getHandle();
 			
 			TileEntity te1 = ws.getTileEntity(block.getX(), block.getY(), block.getZ());
+			
+			String pname = player.getName();
+			if (!pname.equalsIgnoreCase("[BuildCraft]") && !pname.equalsIgnoreCase("[RedPower]")){
 
-			if (Listeners.UseBlockLimit && !player.hasPermission("tekkitrestrict.bypass.limiter")) {
-				TRLimiter il = TRLimiter.getOnlineLimiter(player);
-				if (!il.checkLimit(event, false)) {
-					
-					player.sendMessage(ChatColor.RED + "[TRItemLimiter] You cannot place down any more of that block!");
-					event.setCancelled(true);
-					if (te1 instanceof TileCovered) {
-						TileCovered tc = (TileCovered) te1;
-						for (int i = 0; i < 6; i++) {
-							if (tc.getCover(i) != -1 && tc.getCover(i) == data) {
-								tc.tryRemoveCover(i);
+				
+	
+				if (Listeners.UseBlockLimit && !player.hasPermission("tekkitrestrict.bypass.limiter")) {
+					TRLimiter il = TRLimiter.getOnlineLimiter(player);
+					if (!il.checkLimit(event, false)) {
+						
+						player.sendMessage(ChatColor.RED + "[TRItemLimiter] You cannot place down any more of that block!");
+						event.setCancelled(true);
+						if (te1 instanceof TileCovered) {
+							TileCovered tc = (TileCovered) te1;
+							for (int i = 0; i < 6; i++) {
+								if (tc.getCover(i) != -1 && tc.getCover(i) == data) {
+									tc.tryRemoveCover(i);
+								}
 							}
+							tc.updateBlockChange();
 						}
-						tc.updateBlockChange();
 					}
 				}
-			}
-
-			if (te1 != null && data == 0) {
-				if (te1 instanceof TileCovered) {
-					// TileCovered tc = (TileCovered)te1;
-					// tekkitrestrict.log.info("ar "+lastdata);
-					data = lastdata;
+	
+				if (te1 != null && data == 0) {
+					if (te1 instanceof TileCovered) {
+						// TileCovered tc = (TileCovered)te1;
+						// tekkitrestrict.log.info("ar "+lastdata);
+						data = lastdata;
+					}
 				}
 			}
 			boolean banned = false;

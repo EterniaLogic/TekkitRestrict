@@ -736,20 +736,53 @@ class DisableItemThread extends Thread {
 
 		List<String> meu = tekkitrestrict.config.getStringList("MaxEU");
 		for (String s : meu) {
-			if (s.contains(" ")) {
-				String[] sseu = s.split(" ");
-				int eu = Integer.parseInt(sseu[1]);
-				int chrate = Integer.parseInt(sseu[2]);
-				List<TRCacheItem> iss = TRCacheItem.processItemString("", sseu[0], -1);
-				for (TRCacheItem iss1 : iss) {
-					TRCharge gg = new TRCharge();
-					gg.id = iss1.id;
-					gg.data = iss1.data;
-					gg.maxcharge = eu;
-					gg.chargerate = chrate;
-					this.maxEU.add(gg);
-					this.maxEUStr.add("" + iss1.id);
+			if (!s.contains(" ")){
+				Log.Config.Warning("You have an error in your ModModifications.config in MaxEU!");
+				Log.Config.Warning("Invalid number of arguments in \""+s+"\". Required: 3");
+				continue;
+			}
+			
+			String[] sseu = s.split(" ");
+			if (sseu.length != 3){
+				Log.Config.Warning("You have an error in your ModModifications.config in MaxEU!");
+				Log.Config.Warning("Invalid number of arguments in \""+s+"\". Required: 3");
+				continue;
+			}
+			int eu, chrate;
+			
+			try {
+				eu = Integer.parseInt(sseu[1]);
+			} catch (NumberFormatException ex){
+				Log.Config.Warning("You have an error in your ModModifications.config in MaxEU!");
+				Log.Config.Warning("Invalid MaxEU value \""+sseu[1]+"\" in \""+s+"\"!");
+				continue;
+			}
+			try {
+				chrate = Integer.parseInt(sseu[2]);
+			} catch (NumberFormatException ex){
+				Log.Config.Warning("You have an error in your ModModifications.config in MaxEU!");
+				Log.Config.Warning("Invalid charge rate \""+sseu[2]+"\" in \""+s+"\"!");
+				continue;
+			}
+			
+			if (!sseu[0].matches("\\d+")){
+				int id = getIdFromIC2Name(sseu[0]);
+				if (id == -1){
+					Log.Config.Warning("You have an error in your ModModifications.config in MaxEU!");
+					Log.Config.Warning("Invalid name or id: \""+sseu[0]+"\" in \""+s+"\"!");
+					continue;
 				}
+			}
+			
+			List<TRCacheItem> iss = TRCacheItem.processItemString("", sseu[0], -1);
+			for (TRCacheItem iss1 : iss) {
+				TRCharge gg = new TRCharge();
+				gg.id = iss1.id;
+				gg.data = iss1.data;
+				gg.maxcharge = eu;
+				gg.chargerate = chrate;
+				this.maxEU.add(gg);
+				this.maxEUStr.add("" + iss1.id);
 			}
 		}
 
@@ -780,6 +813,95 @@ class DisableItemThread extends Thread {
 				this.MCharges.add(gg);
 				this.MChargeStr.add("" + gg.id);
 			}
+		}
+	}
+	
+	private int getIdFromIC2Name(String name){
+		name = name.toLowerCase();
+		switch (name){
+			case "quantumhelmet":
+				return 30171;
+			case "quantumchestplate":
+			case "quantumchest":
+			case "quantumbody":
+			case "quantumbodyarmor":
+				return 30172;
+			case "quantumleggings":
+			case "quantumpants":
+			case "quantumlegs":
+				return 30173;
+			case "quantumboots":
+			case "quantumshoes":
+				return 30174;
+				
+			case "nanohelmet":
+				return 30178;
+			case "nanochestplate":
+			case "nanochest":
+			case "nanobody":
+			case "nanobodyarmor":
+				return 30177;
+			case "nanoleggings":
+			case "nanolegs":
+			case "nanopants":
+				return 30176;
+			case "nanoboots":
+			case "nanoshoes":
+				return 30175;
+				
+			case "jetpack":
+			case "electricjetpack":
+				return 30209;
+				
+			case "batpack":
+			case "batterypack":
+				return 30180;
+			case "lappack":
+				return 30127;
+				
+			case "chainsaw":
+				return 30233;
+			case "miningdrill":
+			case "drill":
+				return 30235;
+			case "ddrill":
+			case "diamonddrill":
+				return 30234;
+				
+			case "electrichoe":
+				return 30119;
+			case "electricwrench":
+				return 30141;
+			case "electrictreetap":
+				return 30124;
+				
+			case "nanosaber":
+				return 30148;
+				
+			case "mininglaser":
+				return 30208;
+				
+			case "rebattery":
+			case "re-battery":
+				return 30242;
+			case "energycrystal":
+				return 30241;
+			case "lapatronctrystal":
+				return 30240;
+				
+			case "scanner":
+			case "od-scanner":
+			case "odscanner":
+				return 30220;
+			case "ov-scanner":
+			case "ovscanner":
+				return 30219;
+				
+			case "digitalthermometer":
+				return 31257;
+				
+			default:
+				return -1;
 		}
 	}
 
