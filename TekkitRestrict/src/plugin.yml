@@ -2,7 +2,7 @@ name: tekkitrestrict
 main: com.github.dreadslicer.tekkitrestrict.tekkitrestrict
 authors: [Taeir, DreadSlicer]
 prefix: TekkitRestrict
-version: 1.17 Dev 1
+version: 1.17
 
 permissions:
     tekkitrestrict.bypass.*:

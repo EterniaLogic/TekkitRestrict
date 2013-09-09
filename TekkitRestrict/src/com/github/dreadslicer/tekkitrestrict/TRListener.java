@@ -398,7 +398,7 @@ public class TRListener implements Listener {
 		if (player == null) return;
 		
 		TRNoDupeProjectTable.playerUnuse(player.getName());
-		TRCommandAlc.setPlayerInv(player, false);
+		TRCommandAlc.setPlayerInv(player, true);
 	}
 
 	private Map<String, Integer> PickupTick = Collections.synchronizedMap(new HashMap<String, Integer>());

@@ -156,6 +156,8 @@ public class TRCommandAlc implements CommandExecutor {
 			openAlc.getBag().a();
 			
 			player = openAlc.getViewer();
+			openAlc.delete();
+			
 			player.openInventory(player.getInventory());
 			player.closeInventory();
 			
@@ -170,6 +172,7 @@ public class TRCommandAlc implements CommandExecutor {
 			
 			openAlc.getBag().a();
 			
+			openAlc.delete();
 			player.openInventory(player.getInventory());
 			player.closeInventory();
 			
@@ -194,6 +197,7 @@ public class TRCommandAlc implements CommandExecutor {
 			
 			openAlc.getBag().a();
 			
+			openAlc.delete();
 			player.openInventory(player.getInventory());
 			player.closeInventory();
 			

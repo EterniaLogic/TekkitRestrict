@@ -63,4 +63,12 @@ public class OpenAlcObj {
 		if (getOpenAlcByOwner(player) != null) return true;
 		return false;
 	}
+
+	
+	public void delete() {
+		allOpenAlcs.remove(this);
+		this.viewer = null;
+		this.bagOwner = null;
+		this.bag = null;
+	}
 }
