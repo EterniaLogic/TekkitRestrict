@@ -18,6 +18,7 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import net.minecraft.server.RedPowerLogic;
+import net.minecraft.server.RedPowerMachine;
 
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.PluginManager;
@@ -157,6 +158,14 @@ public class tekkitrestrict extends JavaPlugin {
 			log.info("Log filter Placed!");
 		}
 		//#####################################################
+		
+		//BlockBreaker anti-dupe
+		try {
+			RedPowerMachine.breakerBlacklist.add(Integer.valueOf(-1 << 15 | 194));
+			log.info("Patched BlockBreaker + Auto Crafting Table MK II dupe!");
+		} catch (Exception ex){
+			loadWarning("Unable to patch BlockBreaker + Auto Crafting Table MK II dupe!");
+		}
 	}
 	@Override
 	public void onEnable() {
