@@ -63,17 +63,17 @@ public class Metrics {
     /**
      * The base url of the metrics domain
      */
-    private static final String BASE_URL = "http://report.mcstats.org";
+    private static final String BASE_URL = "http://mcstats.org";//report.mcstats.org/
 
     /**
      * The url used to report a server's status
      */
-    private static final String REPORT_URL = "/plugin/%s";
+    private static final String REPORT_URL = "/report/%s";
 
     /**
      * Interval of time to ping (in minutes)
      */
-    private static final int PING_INTERVAL = 15;
+    private static final int PING_INTERVAL = 10;
 
     /**
      * The plugin this metrics submits for

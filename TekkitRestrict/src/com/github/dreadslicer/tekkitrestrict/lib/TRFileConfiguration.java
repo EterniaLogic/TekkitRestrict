@@ -685,6 +685,16 @@ public class TRFileConfiguration extends FileConfiguration {
 		return (YamlConfigurationOptions) options;
 	}
 
+	public ConfigurationSection getConfigurationSection(ConfigFile file, String path) {
+	    Object val = get(file, path, null);
+	    if (val != null) {
+	        return (val instanceof ConfigurationSection) ? (ConfigurationSection) val : null;
+	    }
+
+	    val = get(file, path, getDefault(path));
+	    return (val instanceof ConfigurationSection) ? createSection(path) : null;
+	}
+	
 	protected static final String COMMENT_PREFIX = "# ";
 	protected static final String BLANK_CONFIG = "{}\n";
 	private final DumperOptions yamlOptions = new DumperOptions();

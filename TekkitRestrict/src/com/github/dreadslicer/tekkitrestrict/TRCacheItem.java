@@ -11,6 +11,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import com.github.dreadslicer.tekkitrestrict.annotations.Safe;
+import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
 
 public class TRCacheItem {
 	//Note:
@@ -113,22 +114,26 @@ public class TRCacheItem {
 		}
 
 		// pre-load variables
-		ConfigurationSection cs = tekkitrestrict.config.getConfigurationSection("MicroPermissions");
-		if (cs != null) {
-			ConfigurationSection cNoItem = cs.getConfigurationSection("NoItem");
-			ConfigurationSection cBlockLimiter = cs.getConfigurationSection("BlockLimiter");
-			ConfigurationSection cLimitedCreative = cs.getConfigurationSection("LimitedCreative");
+		ConfigurationSection groups = tekkitrestrict.config.getConfigurationSection(ConfigFile.GroupPermissions, "PermissionGroups");
+		if (groups != null) {
+			pstring("", groups);
+		}
+		/*
+		ConfigurationSection micro = tekkitrestrict.config.getConfigurationSection(ConfigFile.MicroPermissions, "MicroPermissions");
+		if (micro != null) {
+			ConfigurationSection cNoItem = micro.getConfigurationSection("NoItem");
+			//ConfigurationSection cBlockLimiter = micro.getConfigurationSection("BlockLimiter");
+			ConfigurationSection cLimitedCreative = micro.getConfigurationSection("LimitedCreative");
 			if (cNoItem != null) 
 				pstring("n", cNoItem);
-				//pstring("noitem", cNoItem);
 			
-			if (cBlockLimiter != null) 
-				pstring("l", cBlockLimiter);
-				//pstring("limiter", cBlockLimiter);
+			//if (cBlockLimiter != null) 
+			//	pstring("l", cBlockLimiter);
+
 			if (cLimitedCreative != null) 
 				pstring("c", cLimitedCreative);
-				//pstring("creative", cLimitedCreative);
 		}
+		*/
 	}
 
 	private static void pstring(String permType, ConfigurationSection cs) {
@@ -138,27 +143,29 @@ public class TRCacheItem {
 			try {
 				String key = keyIterator.next().toLowerCase();
 				String value = cs.getString(key);
-				//tekkitrestrict.log.info(k+" - "+d);
+
 				if (value == null || value.equals("")) continue;
 				
 				int i = -1;
 				if (value.contains(" ")) {
+					Log.Config.Warning("Invalid value in PermissionGroups: Invalid value \""+value+"\"!");
+					continue;
+					/*
 					try {
 						String[] c = value.split(" ");
 						i = Integer.parseInt(c[1]);
 						value = c[0];
-					} catch (Exception e) {
+					} catch (NumberFormatException e) {
+						
 					}
+					*/
 				}
-				//List<TRCacheItem> j = 
-				TRCacheItem.processMultiString(permType, key, value, i);
-				 //tekkitrestrict.log.info(permType+"."+k+" - "+d+" - s"+j.size()+" "+i);
-				//for (Object c1 : j) {
-				//	if (c1 instanceof TRCacheItem) {
-				//	}
-				//}
-			} catch (Exception e) {
-				//e.printStackTrace();
+				List<TRCacheItem> cacheItems = TRCacheItem.processMultiString(permType, key, value, i);
+				TRNoItem.aasdf(key, cacheItems);
+
+			} catch (Exception ex) {
+				tekkitrestrict.log.warning("Error in PermissionGroups: " + ex.getMessage());
+				Log.Exception(ex, false);
 			}
 		}
 	}

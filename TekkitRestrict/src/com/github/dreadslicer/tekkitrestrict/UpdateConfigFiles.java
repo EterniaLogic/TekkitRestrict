@@ -69,6 +69,15 @@ public class UpdateConfigFiles {
 		tekkitrestrict.log.info("The config files were successfully updated!");
 	}
 	
+	public static void v13(){
+		//System.out.println("Updating the config files from v1.1 to v1.3...");
+		tekkitrestrict.log.info("Updating the config files from v1.3 to v1.4...");
+		
+		
+		//System.out.println("The config files were successfully updated!");
+		tekkitrestrict.log.info("The config files were successfully updated!");
+	}
+	
 	private static void General11To13(){
 		//File genConfig = new File("C:\\Users\\Taico\\Desktop\\All Ozonelayer\\Ozonelayer 2\\plugins\\tekkitrestrict_old"+s+"General.config.yml");
 		File genConfig = new File("plugins"+s+"tekkitrestrict"+s+"General.config.yml");

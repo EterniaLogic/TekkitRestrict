@@ -523,7 +523,7 @@ public class tekkitrestrict extends JavaPlugin {
 		configList.add(reloadc("LimitedCreative.config.yml"));
 		configList.add(reloadc("Logging.config.yml"));
 		configList.add(reloadc("TPerformance.config.yml"));
-		configList.add(reloadc("MicroPermissions.config.yml"));
+		configList.add(reloadc("GroupPermissions.config.yml"));
 		configList.add(reloadc("SafeZones.config.yml"));
 		configList.add(reloadc("Database.config.yml"));
 		if (linkEEPatch()) configList.add(reloadc("EEPatch.config.yml"));
@@ -581,7 +581,7 @@ public class tekkitrestrict extends JavaPlugin {
 			saveResource("TPerformance.config.yml", false);
 		} catch (Exception e) {}
 		try {
-			saveResource("MicroPermissions.config.yml", false);
+			saveResource("GroupPermissions.config.yml", false);
 		} catch (Exception e) {}
 		try {
 			saveResource("SafeZones.config.yml", false);
@@ -627,7 +627,7 @@ public class tekkitrestrict extends JavaPlugin {
 			saveResource("TPerformance.config.yml", force);
 		} catch (Exception e) {}
 		try {
-			saveResource("MicroPermissions.config.yml", force);
+			saveResource("GroupPermissions.config.yml", force);
 		} catch (Exception e) {}
 		try {
 			saveResource("SafeZones.config.yml", force);
