@@ -7,11 +7,11 @@ public class TREnums {
 	
 	public enum TRClickType{
 		Left, Right, Both, Trample, All;
-		public boolean right(){return (this == TRClickType.Right);}
-		public boolean left(){return (this == TRClickType.Left);}
-		public boolean both(){return (this == TRClickType.Both);}
-		public boolean trample(){return (this == TRClickType.Trample);}
-		public boolean all(){return (this == TRClickType.All);}
+		public boolean right(){return (this.equals(TRClickType.Right));}
+		public boolean left(){return (this.equals(TRClickType.Left));}
+		public boolean both(){return (this.equals(TRClickType.Both));}
+		public boolean trample(){return (this.equals(TRClickType.Trample));}
+		public boolean all(){return (this.equals(TRClickType.All));}
 	}
 	
 	public enum ConfigFile {

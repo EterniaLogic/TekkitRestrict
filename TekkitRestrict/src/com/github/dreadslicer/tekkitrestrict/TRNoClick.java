@@ -30,8 +30,8 @@ public class TRNoClick {
 			}
 		} else if (TRNoItem.equalSet(id, data, iss.getTypeId(), iss.getDurability())) {
 
-			boolean insafezone = safezone ? TRSafeZone.isSafeZoneFor(player, true, true) : true;
-			if (insafezone) {
+			if (safezone) {
+				if (!TRSafeZone.isSafeZoneFor(player, true, true)) return false;
 				if (type.both()){
 					if (air && (action == Action.LEFT_CLICK_AIR || action == Action.RIGHT_CLICK_AIR)) return true;
 					if (block && (action == Action.LEFT_CLICK_BLOCK || action == Action.RIGHT_CLICK_BLOCK)) return true;
@@ -47,6 +47,27 @@ public class TRNoClick {
 					if (action == Action.PHYSICAL) return true;
 				} else if (type.trample()){
 					if (action == Action.PHYSICAL) return true;
+				} else {
+					tekkitrestrict.log.warning("Unknown action " + action.toString());
+				}
+			} else {
+				if (type.both()){
+					if (air && (action == Action.LEFT_CLICK_AIR || action == Action.RIGHT_CLICK_AIR)) return true;
+					if (block && (action == Action.LEFT_CLICK_BLOCK || action == Action.RIGHT_CLICK_BLOCK)) return true;
+				} else if (type.left()){
+					if (air && action == Action.LEFT_CLICK_AIR) return true;
+					if (block && action == Action.LEFT_CLICK_BLOCK) return true;
+				} else if (type.right()){
+					if (air && action == Action.RIGHT_CLICK_AIR) return true;
+					if (block && action == Action.RIGHT_CLICK_BLOCK) return true;
+				} else if (type.all()) {
+					if (air && (action == Action.LEFT_CLICK_AIR || action == Action.RIGHT_CLICK_AIR)) return true;
+					if (block && (action == Action.LEFT_CLICK_BLOCK || action == Action.RIGHT_CLICK_BLOCK)) return true;
+					if (action == Action.PHYSICAL) return true;
+				} else if (type.trample()){
+					if (action == Action.PHYSICAL) return true;
+				} else {
+					tekkitrestrict.log.warning("Unknown action " + action.toString());
 				}
 			}
 		}
@@ -161,13 +182,16 @@ public class TRNoClick {
 					extra = " on a block";
 				} else if (action == Action.PHYSICAL){
 					lr = "trampling";
+				} else {
+					tekkitrestrict.log.warning("Unknown action: " + action.toString());
 				}
 				player.sendMessage(ChatColor.RED + "Sorry, but "+lr+" with this item"+extra+" is disabled");
+				return true;
 			}
 		}
 		try {
 			for (TRNoClick cia : disableClickItemActions) {
-				if (cia.compare(player, event.getClickedBlock(), player.getItemInHand(), event.getAction())) {
+				if (cia.compare(player, event.getClickedBlock(), event.getItem(), event.getAction())) {
 					if (!cia.msg.equals("")) {
 						player.sendMessage(ChatColor.RED + cia.msg);
 					} else {

@@ -249,13 +249,13 @@ public class TRListener implements Listener {
 
 	public static boolean errorInteract = false;
 	// /////// START INTERACT //////////////
-	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
 		if (player == null) return;
 		
-		String pname = player.getName().toLowerCase(); // determine if this is Buildcraft or RedPower... Then exempt.
-		if (pname.equals("[buildcraft]") || pname.equals("[redpower]")) return;
+		String pname = player.getName(); // determine if this is Buildcraft or RedPower... Then exempt.
+		if (pname.equalsIgnoreCase("[BuildCraft]") || pname.equalsIgnoreCase("[RedPower]")) return;
 		
 		// lets do this based on a white-listed approach.
 		// First, lets loop through the DisableClick list to stop clicks.
