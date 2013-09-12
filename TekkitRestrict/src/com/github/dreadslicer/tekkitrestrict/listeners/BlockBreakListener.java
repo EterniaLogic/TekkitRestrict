@@ -24,6 +24,11 @@ public class BlockBreakListener implements Listener{
 		if (player == null) return;
 		String pname = player.getName();
 		if (pname.equalsIgnoreCase("[BuildCraft]") || pname.equalsIgnoreCase("[RedPower]")) return;
+		
+		if (pname.startsWith("[ComputerCraft] Turtle") && event.getBlock().getTypeId() == 194 && event.getBlock().getData() == 1){
+			event.setCancelled(true);
+			return;
+		}
 		try {
 			String blockPlayerName = TRLimiter.getPlayerAt(event.getBlock());
 			if (blockPlayerName != null) {
