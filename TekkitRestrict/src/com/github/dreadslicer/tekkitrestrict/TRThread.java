@@ -354,7 +354,7 @@ class TEntityRemover extends Thread {
 				List<Entity> entities = world.getEntities();
 				for (int i = 0;i<entities.size();i++){
 					Entity e = entities.get(i);
-					
+					tekkitrestrict.log.info("[DEBUG] " + e.getType().getName());
 					if (e instanceof Player || e instanceof org.bukkit.entity.Item || e instanceof Vehicle || e instanceof ExperienceOrb || e instanceof FallingSand || e instanceof Painting) continue;
 					//if (TRSafeZone.inXYZSafeZone(e.getLocation())) {
 					//	tbr.add(e);
@@ -1022,6 +1022,11 @@ class DisableItemThread extends Thread {
 class TWorldScrubber extends Thread {
 	@Override
 	public void run() {
+		try {
+			Thread.sleep(Threads.worldCleanerSpeed);//Don't trigger immediately, but sleep first.
+		} catch (InterruptedException ex) {
+			if (tekkitrestrict.disable) return; //If plugin is disabling, then stop the thread. The WorldScrubber thread shouldn't trigger again.
+		}
 		while (true) {
 			try {
 				doWScrub();
@@ -1042,6 +1047,7 @@ class TWorldScrubber extends Thread {
 	 * Runs TRChunkUnloader.unloadSChunks().<br>
 	 * Then if UseRPTimer or RemoveDisabledBlocks is turned on, it will execute those features.
 	 */
+	@SuppressWarnings("unused")
 	private void doWScrub() {
 		try {
 			TRChunkUnloader.unloadSChunks();
@@ -1079,7 +1085,7 @@ class TWorldScrubber extends Thread {
 						}
 					}
 				}
-
+				if (true) continue;//IMPORTANT TEST TO SEE IF THIS WORKS
 				if (!Threads.UseRPTimer) continue;
 				
 				try {

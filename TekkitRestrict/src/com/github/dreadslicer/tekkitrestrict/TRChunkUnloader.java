@@ -151,7 +151,7 @@ public class TRChunkUnloader {
 			}
 			
 			for (Chunk chunk : toRemove){
-				chunk.unload(true, false);
+				if (!chunk.unload(true, false)) amount++;
 			}
 			
 		} catch (Exception ex) {
@@ -192,7 +192,7 @@ public class TRChunkUnloader {
 			}
 			
 			for (Chunk chunk : toRemove){
-				chunk.unload(true, false);
+				if (!chunk.unload(true, false)) amount++;
 			}
 			
 		} catch (Exception ex) {
@@ -234,7 +234,12 @@ public class TRChunkUnloader {
 			}
 			
 			for (Chunk chunk : toRemove){
-				chunk.unload(true, false);
+				try {
+					if (!chunk.unload(true, false)) amount++;
+				} catch (Exception ex){
+					tekkitrestrict.log.warning("An error occurred while trying to unload a chunk: " + ex.getMessage() + "!");
+					amount++;
+				}
 			}
 			
 		} catch (Exception ex) {

@@ -1,5 +1,6 @@
 package com.github.dreadslicer.tekkitrestrict;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -133,6 +134,7 @@ public class TRNoItem {
 	public static boolean isItemBannedInCreative(Player player, int id, int data, boolean doBypassCheck) {
 		return Listeners.UseLimitedCreative ? isTypeCreativeBanned(player, id, data, doBypassCheck) : false;
 	}
+	
 	
 	/*
 	private static boolean isTypeBanned(String Type, String perm, List<TRCacheItem> tlist, Player player, int id, int data, boolean doBypassCheck) {
@@ -343,6 +345,18 @@ public class TRNoItem {
 		return false;
 	}
 
+	public static ArrayList<String> getDebugInfo(){
+		ArrayList<String> tbr = new ArrayList<String>();
+		for (TRCacheItem TRCI : DisabledItems){
+			tbr.add("N:"+TRCI.id+":"+TRCI.data);
+		}
+		for (TRCacheItem TRCI : DisabledCreativeItems){
+			tbr.add("C:"+TRCI.id+":"+TRCI.data);
+		}
+		
+		return tbr;
+	}
+	
 	/*private static String[] modItems = new String[] { "ee=27520-27599;126-130",
 		"buildcraft=153-174;4056-4066;4298-4324",
 		"additionalpipes=4299-4305;179",

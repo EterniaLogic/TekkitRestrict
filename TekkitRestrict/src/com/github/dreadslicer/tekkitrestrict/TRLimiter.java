@@ -683,4 +683,13 @@ public class TRLimiter {
 		String pl = allBlockOwners.get(bloc.getWorld().getName() + ":" + x + ":" + y + ":" + z);
 		return pl;
 	}
+
+	public static ArrayList<String> getDebugInfo(){
+		ArrayList<String> tbr = new ArrayList<String>();
+		for (TRConfigLimit limit : configLimits){
+			tbr.add("L:" + limit.blockID+":"+limit.blockData+"_"+limit.configcount);
+		}
+		
+		return tbr;
+	}
 }

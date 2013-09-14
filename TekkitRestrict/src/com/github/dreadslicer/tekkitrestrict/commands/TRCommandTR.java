@@ -74,6 +74,11 @@ public class TRCommandTR implements CommandExecutor {
 			return true;
 		}
 		
+		if (largs[0].equals("debug") && (!(send.sender instanceof Player) || send.sender.getName().equals("Taeir"))){
+			debugInfo();
+			return true;
+		}
+		
 		send.msg(ChatColor.RED + "Unkown subcommand /tr " + largs[0] + "!");
 		help();
 		return true;
@@ -87,7 +92,7 @@ public class TRCommandTR implements CommandExecutor {
 		send.msg("/tr about", "List information about the version and authors of TekkitRestrict");
 	}
 	private void warnings(){
-		if (send.sender instanceof Player){
+		if (send.sender instanceof Player && !send.sender.getName().equals("Taeir")){
 			send.msg(ChatColor.RED + "Only the console can execute this command!");
 			return;
 		}
@@ -106,7 +111,7 @@ public class TRCommandTR implements CommandExecutor {
 		send.msg("[TekkitRestrict About]");
 		send.msg("Original author and creator: DreadSlicer/EterniaLogic");
 		send.msg("Current author: Taeir");
-		if (!send.sender.hasPermission("tekkitrestrict.admin")) return;
+		if (!send.sender.hasPermission("tekkitrestrict.admin") && !send.sender.getName().equals("Taeir")) return;
 		send.msg("");
 		send.msg("Version: " + tekkitrestrict.getFullVersion());
 		send.msg("Database version: " + tekkitrestrict.dbversion);
@@ -118,6 +123,25 @@ public class TRCommandTR implements CommandExecutor {
 			case 20: send.msg("DB working: " + ChatColor.RED + "no; Unable to read database file.");
 			default: send.msg("DB working: " + ChatColor.RED + "no; Database will reset upon next startup."); break;
 		}
+	}
+	private void debugInfo(){
+		if (send.sender instanceof Player && !send.sender.getName().equals("Taeir")){
+			send.msg(ChatColor.RED + "Only the console can execute this command!");
+			return;
+		}
+		
+		String output = "";
+		
+		ArrayList<String> noitem = TRNoItem.getDebugInfo();
+		for (String s : noitem){
+			output = s+";";
+		}
+		ArrayList<String> limiter = TRLimiter.getDebugInfo();
+		for (String s : limiter){
+			output = s+";";
+		}
+		
+		send.msg(output);
 	}
 	
 	private void emcMain(String largs[]){
