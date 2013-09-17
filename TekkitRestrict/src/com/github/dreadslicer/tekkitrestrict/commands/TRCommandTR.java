@@ -26,6 +26,7 @@ import com.github.dreadslicer.tekkitrestrict.TRNoItem;
 import com.github.dreadslicer.tekkitrestrict.TRPerformance;
 import com.github.dreadslicer.tekkitrestrict.TRSafeZone;
 import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
+import com.github.dreadslicer.tekkitrestrict.Log.Warning;
 import com.github.dreadslicer.tekkitrestrict.Updater.UpdateResult;
 import com.github.dreadslicer.tekkitrestrict.api.SafeZones.SafeZoneCreate;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.SafeZone;
@@ -55,7 +56,7 @@ public class TRCommandTR implements CommandExecutor {
 		}
 		
 		if (largs[0].equals("warnings")){
-			warnings();
+			warnings(largs);
 			return true;
 		}
 		
@@ -91,20 +92,57 @@ public class TRCommandTR implements CommandExecutor {
 		if (send.sender.hasPermission("tekkitrestrict.admin")) send.msg("/tr admin", "list admin commands");
 		send.msg("/tr about", "List information about the version and authors of TekkitRestrict");
 	}
-	private void warnings(){
-		if (send.sender instanceof Player && !send.sender.getName().equals("Taeir")){
-			send.msg(ChatColor.RED + "Only the console can execute this command!");
+	private void warnings(String largs[]){
+		if (!send.sender.getName().equals("Taeir") && send.noPerm("warnings")){
+			//send.msg(ChatColor.RED + "Only the console can execute this command!");
 			return;
 		}
 		
-		ArrayList<String> msgs = tekkitrestrict.getInstance().msgCache;
-		if (msgs.isEmpty()){
-			send.msg("There were no warnings during load.");
+		if (largs.length == 1 || largs.length > 2){
+			send.msg("/tr warnings load", "display warnings during loading");
+			send.msg("/tr warnings config", "display config warnings");
+			send.msg("/tr warnings other", "display other warnings");
+			send.msg("/tr warnings all", "display all warnings");
 			return;
 		}
 		
-		for (String str : msgs){
-			send.msg(str);
+		if (largs[1].equals("load")){
+			ArrayList<String> msgs = Warning.loadWarnings;
+			if (msgs.isEmpty()){
+				send.msg("There were no warnings during load.");
+				return;
+			}
+			
+			for (String str : msgs){
+				send.msg(str);
+			}
+			return;
+		}
+		
+		if (largs[1].equals("config")){
+			ArrayList<String> msgs = Warning.configWarnings;
+			if (msgs.isEmpty()){
+				send.msg("There were no config warnings.");
+				return;
+			}
+			
+			for (String str : msgs){
+				send.msg(str);
+			}
+			return;
+		}
+		
+		if (largs[1].equals("other")){
+			ArrayList<String> msgs = Warning.otherWarnings;
+			if (msgs.isEmpty()){
+				send.msg("There were no other warnings.");
+				return;
+			}
+			
+			for (String str : msgs){
+				send.msg(str);
+			}
+			return;
 		}
 	}
 	private void about(){
@@ -134,11 +172,11 @@ public class TRCommandTR implements CommandExecutor {
 		
 		ArrayList<String> noitem = TRNoItem.getDebugInfo();
 		for (String s : noitem){
-			output = s+";";
+			output += s+";";
 		}
 		ArrayList<String> limiter = TRLimiter.getDebugInfo();
 		for (String s : limiter){
-			output = s+";";
+			output += s+";";
 		}
 		
 		send.msg(output);
@@ -312,8 +350,8 @@ public class TRCommandTR implements CommandExecutor {
 			try {
 				ssMain(largs);
 			} catch (Exception ex) {
-				send.msg(ChatColor.RED + "An error has occured processing your command!");
-				tekkitrestrict.log.warning("Error occured in /tr admin safezone! Please inform the author.");
+				send.msg(ChatColor.RED + "An error has occurred processing your command!");
+				tekkitrestrict.log.warning("Error occurred in /tr admin safezone! Please inform the author.");
 				Log.Exception(ex, false);
 			}
 			return;
@@ -323,8 +361,8 @@ public class TRCommandTR implements CommandExecutor {
 			try {
 				limitMain(largs);
 			} catch (Exception ex) {
-				send.msg(ChatColor.RED + "An error has occured processing your command!");
-				tekkitrestrict.log.warning("Error occured in /tr admin limit! Please inform the author.");
+				send.msg(ChatColor.RED + "An error has occurred processing your command!");
+				tekkitrestrict.log.warning("Error occurred in /tr admin limit! Please inform the author.");
 				Log.Exception(ex, false);
 			}
 			return;
@@ -376,7 +414,7 @@ public class TRCommandTR implements CommandExecutor {
 		} else if (result == UpdateResult.NO_UPDATE){
 			send.msg(ChatColor.YELLOW + "There is no update available for TekkitRestrict.");
 		} else {
-			send.msg(ChatColor.RED + "An error occured when trying to check for a new version.");
+			send.msg(ChatColor.RED + "An error occurred when trying to check for a new version.");
 		}
 	}
 	private void adminThreadLag(){
@@ -682,7 +720,7 @@ public class TRCommandTR implements CommandExecutor {
 		else if (response == SafeZoneCreate.Success)
 			send.msg(ChatColor.GREEN + "This claim is now a safezone!");
 		else 
-			send.msg(ChatColor.RED + "An undefined error occured!");
+			send.msg(ChatColor.RED + "An undefined error occurred!");
 
 	}
 	

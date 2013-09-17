@@ -15,8 +15,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.server.EntityHuman;
 import net.minecraft.server.Item;
 import net.minecraft.server.NBTTagCompound;
-import net.minecraft.server.TileEntity;
-import net.minecraft.server.WorldServer;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -24,19 +22,19 @@ import org.bukkit.GameMode;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
-import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.FallingSand;
 import org.bukkit.entity.Painting;
+import org.bukkit.entity.Pig;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.ItemStack;
 
+import com.github.dreadslicer.tekkitrestrict.Log.Warning;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Dupes;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Threads;
 import com.github.dreadslicer.tekkitrestrict.commands.TRCommandAlc;
@@ -46,7 +44,6 @@ import ee.AlchemyBagData;
 import ee.EEBase;
 import ee.ItemAlchemyBag;
 import ee.ItemEECharged;
-import eloraam.logic.TileLogicPointer;
 
 public class TRThread {
 	/** Thread will trigger again if interrupted. */
@@ -246,25 +243,25 @@ class TRBagCacheThread extends Thread {
 }
 
 class TGemArmorDisabler extends Thread {
-	//List<Player> bypassers = Collections.synchronizedList(new LinkedList<Player>());
-
 	@Override
 	public void run() {
 		int errors = 0;
 		while (true) {
 			try {
 				if (!tekkitrestrict.EEEnabled){
-					tekkitrestrict.log.warning("The GemArmorDisabler thread has stopped because EE is disabled.");
+					Warning.other("The GemArmorDisabler thread has stopped because EE is disabled.");
 					break; //If ee is disabled, stop the thread.
 				}
 				GemArmorDisabler();
 			} catch (Exception ex) {
 				errors++;
-				TRLogger.Log("debug", "Error: [GemArmor thread] " + ex.getMessage());
-				Log.debugEx(ex);
+				Warning.other("Error: [GemArmor thread] " + ex.getMessage());
+				if (errors < 5){
+					Log.Exception(ex, true);
+				}
 				
-				if (errors > 100){
-					tekkitrestrict.log.warning("The GemArmorDisabler thread has errord for more than 100 time now. It will now be disabled.");
+				if (errors > 50){
+					Warning.other("The GemArmorDisabler thread has errored for more than 50 time now. It will now be disabled.");
 					break;
 				}
 			}
@@ -277,14 +274,13 @@ class TGemArmorDisabler extends Thread {
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
-	private void GemArmorDisabler() {
+	private void GemArmorDisabler() throws Exception {
 		//TODO Change this one day
 		try {
 			if (!Threads.GAMovement) {
 				synchronized (EEBase.playerArmorMovementToggle) {
 					
-					Iterator it = EEBase.playerArmorMovementToggle.keySet().iterator();
+					Iterator<EntityHuman> it = EEBase.playerArmorMovementToggle.keySet().iterator();
 					ArrayList<EntityHuman> toremove = new ArrayList<EntityHuman>();
 					while (it.hasNext()){
 						EntityHuman human = (EntityHuman) it;
@@ -303,7 +299,7 @@ class TGemArmorDisabler extends Thread {
 			
 			if (!Threads.GAOffensive) {
 				synchronized (EEBase.playerArmorOffensiveToggle) {
-					Iterator it = EEBase.playerArmorOffensiveToggle.keySet().iterator();
+					Iterator<EntityHuman> it = EEBase.playerArmorOffensiveToggle.keySet().iterator();
 					ArrayList<EntityHuman> toremove = new ArrayList<EntityHuman>();
 					while (it.hasNext()){
 						EntityHuman human = (EntityHuman) it;
@@ -320,18 +316,25 @@ class TGemArmorDisabler extends Thread {
 					//EEBase.playerArmorOffensiveToggle.clear();
 				}
 			}
-		} catch (Exception ex) {}
+		} catch (Exception ex) {
+			throw ex;
+		}
 	}
 }
 
 class TEntityRemover extends Thread {
 	@Override
 	public void run() {
+		try {
+			Thread.sleep(Threads.SSEntityRemoverSpeed);
+		} catch (InterruptedException e) {
+			if (tekkitrestrict.disable) return; //If plugin is disabling, then stop the thread. The EntityRemoveThread shouldn't trigger again.
+		}
 		while (true) {
 			try {
 				disableEntities();
 			} catch (Exception ex) {
-				tekkitrestrict.log.warning("An error occured trying to disable entities!");
+				tekkitrestrict.log.warning("An error occurred trying to disable entities!");
 				Log.Exception(ex, false);
 			}
 			
@@ -343,6 +346,9 @@ class TEntityRemover extends Thread {
 		}
 	}
 
+	private boolean err1;
+	
+	@SuppressWarnings("rawtypes")
 	private void disableEntities() {
 		if (!Threads.SSDisableEntities) return;
 
@@ -354,16 +360,28 @@ class TEntityRemover extends Thread {
 				List<Entity> entities = world.getEntities();
 				for (int i = 0;i<entities.size();i++){
 					Entity e = entities.get(i);
-					tekkitrestrict.log.info("[DEBUG] " + e.getType().getName());
-					if (e instanceof Player || e instanceof org.bukkit.entity.Item || e instanceof Vehicle || e instanceof ExperienceOrb || e instanceof FallingSand || e instanceof Painting) continue;
-					//if (TRSafeZone.inXYZSafeZone(e.getLocation())) {
-					//	tbr.add(e);
-					//}
+					//e instanceof Vehicle = pig
+					if (e instanceof org.bukkit.entity.Item || e instanceof Player || e instanceof ExperienceOrb || e instanceof FallingSand || e instanceof Painting) continue;
+					if (e instanceof Vehicle && !(e instanceof Pig)) continue;
+					boolean blocked = false;
+					for (Class cl : TRConfigCache.Threads.SSClassBypasses){
+						if (cl.isInstance(e)){
+							blocked = true;
+							break;
+						}
+					}
+					if (blocked) continue;
+					
 					if (!TRSafeZone.getSafeZoneByLocation(e.getLocation(), true).equals("")) {
 						tbr.add(e);
 					}
 				}
 			} catch (Exception ex){
+				if (!err1){
+					Warning.other("An error occurred in the entities Disabler thread: " + ex.getMessage() + " (this error will only be logged once)");
+					Log.Exception(ex, false);
+					err1 = true;
+				}
 				//Entities list probably modified while iterating over it.
 			}
 		}
@@ -376,7 +394,6 @@ class TEntityRemover extends Thread {
 }
 
 class DisableItemThread extends Thread {
-	//private boolean throttle;
 	private List<TRCacheItem> SSDecharged = Collections.synchronizedList(new LinkedList<TRCacheItem>());
 	private List<TRCharge> MCharges = Collections.synchronizedList(new LinkedList<TRCharge>());
 	private List<TRCharge> maxEU = Collections.synchronizedList(new LinkedList<TRCharge>());
@@ -384,8 +401,7 @@ class DisableItemThread extends Thread {
 	private List<String> MChargeStr = Collections.synchronizedList(new LinkedList<String>());
 	private List<String> SSDechargedStr = Collections.synchronizedList(new LinkedList<String>());
 	private List<String> maxEUStr = Collections.synchronizedList(new LinkedList<String>());
-	//Player oos;
-	//ExecutorService exe = Executors.newCachedThreadPool();
+
 	@Override
 	public void run() {
 		while (true) {
@@ -394,28 +410,15 @@ class DisableItemThread extends Thread {
 				Player[] players = tekkitrestrict.getInstance().getServer().getOnlinePlayers();
 				for (Player player : players) {
 					try {
-						/*
-						if (throttle) {
-							oos = pp;
-							exe.execute((new Runnable() {
-								@Override
-								public void run() {
-									disableItems(oos);
-								}
-							}));
-						} else {
-							disableItems(pp);
-						}
-						*/
 						disableItems(player);
 					} catch (Exception ex) {
-						TRLogger.Log("debug", "Error: [ItemDisabler[1] thread] " + ex.getMessage());
+						Warning.other("Error: [ItemDisabler thread] (1 player) " + ex.getMessage());
 						Log.debugEx(ex);
 					}
 				}
 			} catch (Exception ex) {
-				TRLogger.Log("debug", "Error: [ItemDisabler thread] " + ex.getMessage());
-				Log.debugEx(ex);
+				Warning.other("Error: [ItemDisabler thread] (player loop) " + ex.getMessage());
+				Log.Exception(ex, true);
 			}
 			
 			try {
@@ -468,7 +471,7 @@ class DisableItemThread extends Thread {
 						if (checkEEArcanaSafeZone(st1[i]) || checkEEChargeSafeZone(st1[i])) changedInv = true;
 					}
 				} catch (Exception ex) {
-					TRLogger.Log("debug", "Error: [ItemDisabler[16] thread] ");
+					Warning.other("Error: [ItemDisabler thread] (check inv) " + ex.getMessage());
 					Log.debugEx(ex);
 				}
 			} //End of first for loop
@@ -501,8 +504,10 @@ class DisableItemThread extends Thread {
 						continue;
 					}
 					
-				} catch (Exception ex) {}
-				//Thread.sleep(3);
+				} catch (Exception ex) {
+					Warning.other("Error: [ItemDisabler thread] (check armor) " + ex.getMessage());
+					Log.debugEx(ex);
+				}
 			}
 			
 			// place new inventory back.
@@ -515,7 +520,7 @@ class DisableItemThread extends Thread {
 			}
 			
 		} catch (Exception ex) {
-			TRLogger.Log("debug", "Error: [ItemDisabler[2] thread] " + ex.getMessage());
+			Warning.other("Error: [ItemDisabler thread] " + ex.getMessage());
 			Log.debugEx(ex);
 		}
 	}
@@ -727,6 +732,16 @@ class DisableItemThread extends Thread {
 		
 		List<String> dechargeSS = tekkitrestrict.config.getStringList("DechargeInSS");
 		for (String s : dechargeSS) {
+			if (!s.contains("-") && !s.contains(";") && !s.contains(":")){
+				if (!s.matches("\\d+")){
+					String items = TRItemStringHandler.parseEEName(s);
+					if (items == null){
+						Log.Warning.config("You have an error in your ModModifications.config in DechargeInSS: Invalid EE Item name or id: \""+s+"\"!");
+						continue;
+					}
+					s = items;
+				}
+			}
 			List<TRCacheItem> iss = TRCacheItem.processItemString("", s, -1);
 			for (TRCacheItem iss1 : iss) {
 				SSDecharged.add(iss1);
@@ -737,15 +752,15 @@ class DisableItemThread extends Thread {
 		List<String> meu = tekkitrestrict.config.getStringList("MaxEU");
 		for (String s : meu) {
 			if (!s.contains(" ")){
-				Log.Config.Warning("You have an error in your ModModifications.config in MaxEU!");
-				Log.Config.Warning("Invalid number of arguments in \""+s+"\". Required: 3");
+				Log.Warning.config("You have an error in your ModModifications.config in MaxEU!");
+				Log.Warning.config("Invalid number of arguments in \""+s+"\". Required: 3");
 				continue;
 			}
 			
 			String[] sseu = s.split(" ");
 			if (sseu.length != 3){
-				Log.Config.Warning("You have an error in your ModModifications.config in MaxEU!");
-				Log.Config.Warning("Invalid number of arguments in \""+s+"\". Required: 3");
+				Log.Warning.config("You have an error in your ModModifications.config in MaxEU!");
+				Log.Warning.config("Invalid number of arguments in \""+s+"\". Required: 3");
 				continue;
 			}
 			int eu, chrate;
@@ -753,25 +768,41 @@ class DisableItemThread extends Thread {
 			try {
 				eu = Integer.parseInt(sseu[1]);
 			} catch (NumberFormatException ex){
-				Log.Config.Warning("You have an error in your ModModifications.config in MaxEU!");
-				Log.Config.Warning("Invalid MaxEU value \""+sseu[1]+"\" in \""+s+"\"!");
+				Log.Warning.config("You have an error in your ModModifications.config in MaxEU!");
+				Log.Warning.config("Invalid MaxEU value \""+sseu[1]+"\" in \""+s+"\"!");
 				continue;
 			}
 			try {
 				chrate = Integer.parseInt(sseu[2]);
 			} catch (NumberFormatException ex){
-				Log.Config.Warning("You have an error in your ModModifications.config in MaxEU!");
-				Log.Config.Warning("Invalid charge rate \""+sseu[2]+"\" in \""+s+"\"!");
+				Log.Warning.config("You have an error in your ModModifications.config in MaxEU!");
+				Log.Warning.config("Invalid charge rate \""+sseu[2]+"\" in \""+s+"\"!");
+				continue;
+			}
+			
+			if (sseu[0].contains("-") || sseu[0].contains(";")){
+				List<TRCacheItem> iss = TRCacheItem.processItemString("", sseu[0], -1);
+				for (TRCacheItem iss1 : iss) {
+					TRCharge gg = new TRCharge();
+					gg.id = iss1.id;
+					gg.data = iss1.data;
+					gg.maxcharge = eu;
+					gg.chargerate = chrate;
+					this.maxEU.add(gg);
+					this.maxEUStr.add("" + iss1.id);
+				}
 				continue;
 			}
 			
 			if (!sseu[0].matches("\\d+")){
-				int id = getIdFromIC2Name(sseu[0]);
-				if (id == -1){
-					Log.Config.Warning("You have an error in your ModModifications.config in MaxEU!");
-					Log.Config.Warning("Invalid name or id: \""+sseu[0]+"\" in \""+s+"\"!");
+				String items = TRItemStringHandler.parseIC2Name(sseu[0]);
+				if (items == null){
+					Log.Warning.config("You have an error in your ModModifications.config in MaxEU!");
+					Log.Warning.config("Invalid name or id: \""+sseu[0]+"\" in \""+s+"\"!");
 					continue;
 				}
+				
+				sseu[0] = items;
 			}
 			
 			List<TRCacheItem> iss = TRCacheItem.processItemString("", sseu[0], -1);
@@ -790,118 +821,52 @@ class DisableItemThread extends Thread {
 		List<String> MaxCharges = tekkitrestrict.config.getStringList("MaxCharge");
 		for (String charge : MaxCharges) {
 			if (!charge.contains(" ")) {
-				Log.Config.Warning("You have an error in your maxchare list in ModModifications.config: \""+charge+"\" does not follow the format: \"itemstr percentage\"");
+				Log.Warning.config("You have an error in your maxchare list in ModModifications.config: \""+charge+"\" does not follow the format: \"itemstr percentage\"");
 				continue;
 			}
 			
 			String[] sscharge = charge.replace("%", "").split(" ");
+			
 			int max = 0;
 			try {
 				max = Integer.parseInt(sscharge[1]);
 			} catch (NumberFormatException ex){
-				Log.Config.Warning("You have an error in your maxchare list in ModModifications.config: \""+sscharge[1]+"\" is not a valid number");
+				Log.Warning.config("You have an error in your maxchare list in ModModifications.config: \""+sscharge[1]+"\" is not a valid number");
 				continue;
 			}
-			// ItemStack[] gs = TRNoItem.getRangedItemValues(sscharge[0]);
+			
+			if (sscharge[0].contains("-") || sscharge[0].contains(";")){
+				List<TRCacheItem> iss = TRCacheItem.processItemString("", sscharge[0], -1);
+				for (TRCacheItem isr : iss) {
+					TRCharge gg = new TRCharge();
+					gg.id = isr.id;
+					gg.data = isr.data;
+					gg.maxcharge = max;
+					this.MCharges.add(gg);
+					this.MChargeStr.add("" + gg.id);
+				}
+				continue;
+			}
+			
+			if (!sscharge[0].matches("\\d+")){
+				String items = TRItemStringHandler.parseEEName(sscharge[0]);
+				if (items == null){
+					Log.Warning.config("You have an error in your maxchare list in ModModifications.config: \""+sscharge[0]+"\" is not a valid EE Item or id");
+					continue;
+				}
+				
+				sscharge[0] = items;
+			}
+			
 			List<TRCacheItem> iss = TRCacheItem.processItemString("", sscharge[0], -1);
 			for (TRCacheItem isr : iss) {
 				TRCharge gg = new TRCharge();
 				gg.id = isr.id;
 				gg.data = isr.data;
 				gg.maxcharge = max;
-				// tekkitrestrict.log.info(gg.id+":"+gg.data+" "+gg.maxcharge);
 				this.MCharges.add(gg);
 				this.MChargeStr.add("" + gg.id);
 			}
-		}
-	}
-	
-	private int getIdFromIC2Name(String name){
-		name = name.toLowerCase();
-		switch (name){
-			case "quantumhelmet":
-				return 30171;
-			case "quantumchestplate":
-			case "quantumchest":
-			case "quantumbody":
-			case "quantumbodyarmor":
-				return 30172;
-			case "quantumleggings":
-			case "quantumpants":
-			case "quantumlegs":
-				return 30173;
-			case "quantumboots":
-			case "quantumshoes":
-				return 30174;
-				
-			case "nanohelmet":
-				return 30178;
-			case "nanochestplate":
-			case "nanochest":
-			case "nanobody":
-			case "nanobodyarmor":
-				return 30177;
-			case "nanoleggings":
-			case "nanolegs":
-			case "nanopants":
-				return 30176;
-			case "nanoboots":
-			case "nanoshoes":
-				return 30175;
-				
-			case "jetpack":
-			case "electricjetpack":
-				return 30209;
-				
-			case "batpack":
-			case "batterypack":
-				return 30180;
-			case "lappack":
-				return 30127;
-				
-			case "chainsaw":
-				return 30233;
-			case "miningdrill":
-			case "drill":
-				return 30235;
-			case "ddrill":
-			case "diamonddrill":
-				return 30234;
-				
-			case "electrichoe":
-				return 30119;
-			case "electricwrench":
-				return 30141;
-			case "electrictreetap":
-				return 30124;
-				
-			case "nanosaber":
-				return 30148;
-				
-			case "mininglaser":
-				return 30208;
-				
-			case "rebattery":
-			case "re-battery":
-				return 30242;
-			case "energycrystal":
-				return 30241;
-			case "lapatronctrystal":
-				return 30240;
-				
-			case "scanner":
-			case "od-scanner":
-			case "odscanner":
-				return 30220;
-			case "ov-scanner":
-			case "ovscanner":
-				return 30219;
-				
-			case "digitalthermometer":
-				return 31257;
-				
-			default:
-				return -1;
 		}
 	}
 
@@ -1028,12 +993,7 @@ class TWorldScrubber extends Thread {
 			if (tekkitrestrict.disable) return; //If plugin is disabling, then stop the thread. The WorldScrubber thread shouldn't trigger again.
 		}
 		while (true) {
-			try {
-				doWScrub();
-			} catch (Exception ex) {
-				tekkitrestrict.log.warning("An error occured in the WorldScrubber!");
-				Log.Exception(ex, false);
-			}
+			doWScrub();
 
 			try {
 				Thread.sleep(Threads.worldCleanerSpeed);
@@ -1043,37 +1003,32 @@ class TWorldScrubber extends Thread {
 		}
 	}
 
+	private boolean err1, err2;
 	/**
 	 * Runs TRChunkUnloader.unloadSChunks().<br>
 	 * Then if UseRPTimer or RemoveDisabledBlocks is turned on, it will execute those features.
 	 */
-	@SuppressWarnings("unused")
 	private void doWScrub() {
 		try {
 			TRChunkUnloader.unloadSChunks();
 		} catch (Exception ex) {
-			tekkitrestrict.log.warning("An error occured in the ChunkUnloader!");
-			Log.Exception(ex, false);
-		}
-		
-		if (!Threads.RMDB && !Threads.UseRPTimer){
-			return;
-		}
-		
-		Server server = tekkitrestrict.getInstance().getServer();
-		if (Threads.UseRPTimer){
-			if (!server.getPluginManager().isPluginEnabled("mod_RedPowerLogic")) {
-				Threads.UseRPTimer = false;
-				if (!Threads.RMDB) return; //If both options are now false, nothing else has to be done.
+			if (!err1){
+				Warning.other("An error occurred in the ChunkUnloader! (This error will only be logged once)");
+				Log.Exception(ex, false);
+				err1 = true;
 			}
 		}
 		
-		List<World> worlds = server.getWorlds();
-		for (World bukkitWorld : worlds) { //For each world
-			Chunk[] loadedChunks = bukkitWorld.getLoadedChunks();
+		if (!Threads.RMDB) return;
+		
+		try {
+			Server server = tekkitrestrict.getInstance().getServer();
 			
-			for (Chunk c : loadedChunks) { //For each loaded chunk
-				if (Threads.RMDB) { // loop through all of the blocks in the chunk...
+			List<World> worlds = server.getWorlds();
+			for (World bukkitWorld : worlds) { //For each world
+				Chunk[] loadedChunks = bukkitWorld.getLoadedChunks();
+				
+				for (Chunk c : loadedChunks) { //For each loaded chunk
 					for (int x = 0; x < 16; x++) {
 						for (int z = 0; z < 16; z++) {
 							for (int y = 0; y < 256; y++) {
@@ -1085,52 +1040,68 @@ class TWorldScrubber extends Thread {
 						}
 					}
 				}
-				if (true) continue;//IMPORTANT TEST TO SEE IF THIS WORKS
-				if (!Threads.UseRPTimer) continue;
-				
-				try {
-					WorldServer worldServer = ((CraftWorld) bukkitWorld).getHandle();
-					BlockState[] tileEntities = c.getTileEntities();
-					for (BlockState gg : tileEntities) {
-						TileEntity te = worldServer.getTileEntity(gg.getX(), gg.getY(), gg.getZ());
-						if (te instanceof TileLogicPointer) {
-							TileLogicPointer timer = (TileLogicPointer) te;
-
-							if (timer.GetInterval() < Threads.RPTickTime) {
-								tekkitrestrict.log.info("[DEBUG] Set a timer at "+gg.getX()+","+gg.getY()+","+gg.getZ()+" from "+timer.GetInterval()+" to "+Threads.RPTickTime+".");
-								timer.SetInterval(Threads.RPTickTime);
-							}
-						}
-					}
-				} catch (Exception ex) {
-					tekkitrestrict.log.warning("An error occured in the RPTimerSetter!");
-					Log.Exception(ex, false);
-				}
+			}
+		} catch (Exception ex) {
+			if (!err2){
+				Warning.other("An error occurred in the BannedBlocksRemover! (This error will only be logged once)");
+				Log.Exception(ex, false);
+				err2 = true;
 			}
 		}
 	}
 }
 
 class TSaveThread extends Thread {
+	private boolean err1, err2, err3, err4;
 	@Override
 	public void run() {
+		try {
+			if (tekkitrestrict.disable) return; //If plugin is disabling, then stop the thread. The savethread triggers again if interrupted.
+			Thread.sleep(Threads.saveSpeed);
+		} catch (InterruptedException ex) {}
 		while (true) {
 			// runs save functions for both safezones and itemlimiter
 			try {
 				TRLimiter.saveLimiters();
-			} catch (Exception ex) {}
+			} catch (Exception ex) {
+				if (!err1){
+					Warning.other("An error occurred while trying to save the Limiter: " + ex.getMessage() + "! (This error will only be logged once)");
+					Log.Exception(ex, false);
+					err1 = true;
+				}
+			}
 			
 			try {
 				TRSafeZone.save();
-			} catch (Exception ex) {}
+			} catch (Exception ex) {
+				if (!err2){
+					Warning.other("An error occurred while trying to save the SafeZones: " + ex.getMessage() + "! (This error will only be logged once)");
+					Log.Exception(ex, false);
+					err2 = true;
+				}
+			}
 
-			TRLogger.saveLogs();
-			TRNoHack.clearMaps();
+			try {
+				TRLogger.saveLogs();
+			} catch (Exception ex) {
+				if (!err3){
+					Warning.other("An error occurred while trying to save the logs: " + ex.getMessage() + "! (This error will only be logged once)");
+					Log.Exception(ex, false);
+					err3 = true;
+				}
+			}
+			try {
+				TRNoHack.clearMaps();
+			} catch (Exception ex) {}
+			
 			try {
 				TRLimiter.manageData();
 			} catch(Exception ex){
-				TRLogger.Log("debug", "ManageData AutoSavethread Error: "+ex.getMessage());
-				Log.debugEx(ex);
+				if (!err4){
+					Warning.other("An error occurred with the Limiter Data Manager: " + ex.getMessage() + "! (This error will only be logged once)");
+					Log.Exception(ex, false);
+					err4 = true;
+				}
 			}
 
 			try {

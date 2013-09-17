@@ -47,7 +47,7 @@ public class TRPermHandler {
 				return p.hasPermission(perm);
 			}
 		} catch (Exception ex) {
-			tekkitrestrict.log.warning("An error occured in the PermHandler(0)! Please inform the author.");
+			tekkitrestrict.log.warning("An error occurred in the PermHandler(0)! Please inform the author.");
 			Log.Exception(ex, false);
 		}
 		return false;
@@ -76,7 +76,7 @@ public class TRPermHandler {
 				return p.hasPermission(perm);
 			}
 		} catch (Exception ex) {
-			tekkitrestrict.log.warning("An error occured in the PermHandler(1)! Please inform the author.");
+			tekkitrestrict.log.warning("An error occurred in the PermHandler(1)! Please inform the author.");
 			Log.Exception(ex, false);
 		}
 		return false;
@@ -109,7 +109,7 @@ public class TRPermHandler {
 				return p.hasPermission(perm);
 			}
 		} catch (Exception ex) {
-			tekkitrestrict.log.warning("An error occured in the PermHandler(2)! Please inform the author.");
+			tekkitrestrict.log.warning("An error occurred in the PermHandler(2)! Please inform the author.");
 			Log.Exception(ex, false);
 		}
 		return false;

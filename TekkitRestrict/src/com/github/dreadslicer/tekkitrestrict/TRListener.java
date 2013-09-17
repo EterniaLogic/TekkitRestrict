@@ -205,7 +205,7 @@ public class TRListener implements Listener {
 			lastdata = event.getBlock().getData();
 		} catch(Exception ex){
 			if (!errorBlockPlace){
-				tekkitrestrict.log.warning("An error occured in the BlockPlace Listener! Please inform the author (This error will only be logged once).");
+				tekkitrestrict.log.warning("An error occurred in the BlockPlace Listener! Please inform the author (This error will only be logged once).");
 				Log.Exception(ex, false);
 				errorBlockPlace = true;
 			}
@@ -240,7 +240,7 @@ public class TRListener implements Listener {
 			}
 		} catch (Exception ex) {
 			if (!errorDrop){
-				tekkitrestrict.log.warning("An error occured in the DropItem Listener! (This error is only logged once)");
+				tekkitrestrict.log.warning("An error occurred in the DropItem Listener! (This error is only logged once)");
 				Log.Exception(ex, false);
 				errorDrop = true;
 			}
@@ -279,7 +279,7 @@ public class TRListener implements Listener {
 					if (TRNoItem.isItemBannedInCreative(player, str.getTypeId(), str.getDurability(), true)) banned = true;
 				} catch (Exception ex) {
 					if (!errorInteract){
-						tekkitrestrict.log.warning("An error occured in the InteractListener for LimitedCreative!");
+						tekkitrestrict.log.warning("An error occurred in the InteractListener for LimitedCreative!");
 						Log.Exception(ex, false);
 						errorInteract = true;
 					}
@@ -352,7 +352,7 @@ public class TRListener implements Listener {
 			if (TRLimitedCreative.handleCreativeInvClick(event)) return;
 		} catch (Exception ex) {
 			if (!errorCreativeClick){
-				tekkitrestrict.log.warning("An error occured in the CreativeInvClickListener! Please inform the author.");
+				tekkitrestrict.log.warning("An error occurred in the CreativeInvClickListener! Please inform the author.");
 				Log.Exception(ex, false);
 				errorCreativeClick = true;
 			}
@@ -362,7 +362,7 @@ public class TRListener implements Listener {
 			if (handleCraftBlock(event)) return;
 		} catch (Exception ex) {
 			if (!errorCraft){
-				tekkitrestrict.log.warning("An error occured in the CraftBlockHandler! Please inform the author.");
+				tekkitrestrict.log.warning("An error occurred in the CraftBlockHandler! Please inform the author.");
 				Log.Exception(ex, false);
 				errorCraft = true;
 			}

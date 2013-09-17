@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
+import com.github.dreadslicer.tekkitrestrict.Log.Warning;
 import com.github.dreadslicer.tekkitrestrict.annotations.Safe;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
 
@@ -148,7 +149,7 @@ public class TRCacheItem {
 				
 				int i = -1;
 				if (value.contains(" ")) {
-					Log.Config.Warning("Invalid value in PermissionGroups: Invalid value \""+value+"\"!");
+					Log.Warning.config("Invalid value in PermissionGroups: Invalid value \""+value+"\"!");
 					continue;
 					/*
 					try {
@@ -492,82 +493,100 @@ public class TRCacheItem {
 		// converts a variable string into a list of data.
 		LinkedList<TRCacheItem> tci = new LinkedList<TRCacheItem>();
 
-		if (itemx.contains("-")) { // a range of items
+		//############################## RANGE OF ITEMS ###########################
+		if (itemx.contains("-")) {
 			// loop through this range and add each to the return stack.
+			int data1 = -1;
 			if (itemx.contains(":")) {
+				String dataString = itemx.split(":")[1];
+				if (dataString.equals("*")) data1 = -1;
+				else {
+					try {
+						data1 = Integer.parseInt(dataString);
+						if (data1 == 0){
+							data1 = -10;
+						}
+					} catch (NumberFormatException ex){
+						Warning.config("Invalid data value: \"" + dataString + "\" in \"" + itemx + "\"!");
+					}
+				}
+				
 				itemx = itemx.split(":")[0];
 			}
 			String[] t = itemx.split("-");
-			int from = 0, to = 0;
+			int fromId = 0, toId = 0;
 			try {
-				from = Integer.parseInt(t[0]);
-				to = Integer.parseInt(t[1]);
+				fromId = Integer.parseInt(t[0]);
+				toId = Integer.parseInt(t[1]);
 			} catch (NumberFormatException ex){
+				Warning.config("Invalid range: \"" + t[0]+"-"+t[1] + "\" of " +type);
+				return tci;
 			}
 
-			for (int i = from; i <= to; i++) {
+			for (int i = fromId; i <= toId; i++) {
 				try {
-					tci.add(cacheItem(type, i, 0, data2));
-				} catch (Exception e) {
-					//e.printStackTrace();
+					tci.add(cacheItem(type, i, data1, data2));
+				} catch (Exception ex) {
+					Log.Exception(ex, true);
+					return tci;
 				}
 			}
-		} else if (itemx.contains(":")) { // A single item with a datatype
+			
+			addCacheList(type, tci);
+			return tci;
+		}
+		
+		//############################## SINGLE ID WITH DATA ###########################
+		else if (itemx.contains(":")) {
 			String[] t = itemx.split(":");
 			int id = 0, data = 0;
 			try {
 				id = Integer.parseInt(t[0]);
 				data = Integer.parseInt(t[1].replace('=', '-'));
-			} catch (NumberFormatException | ArrayIndexOutOfBoundsException ex2){
-			}
-			
-			if (t[1].equals("0")) { //If :0, then :-10
-				data = -10;
-			}
-			try {
-				tci.add(cacheItem(type, id, data, data2));
-			} catch (Exception e) {
-				//e.printStackTrace();
-				addCacheList(type, tci);
+			} catch (NumberFormatException | ArrayIndexOutOfBoundsException ex){
+				Warning.config("Invalid entry: \"" + itemx + "\"!");
 				return tci;
 			}
-		} else { // Just a single item
-					// if(ins.contains(":")) ins = ins.split(":")[0];
-			//tekkitrestrict.log.info(item);
-			// determine whether the item string is a mod or list. If so,
-			// then... ?
-
+			
+			if (data == 0) { //If :0, then :-10
+				data = -10;
+			}
+			
 			try {
-				tci.add(cacheItem(type, Integer.parseInt(itemx), 0, data2));
-				// r.add(new ItemStack(Integer.parseInt(item), 1, 0));
-			} catch (Exception E) {
-				// E.printStackTrace();
-
-				// tekkitrestrict.log.info("=========="+type+item.toLowerCase());
-				// Iterator<String> ci1 = cacheMods.keySet().iterator();
-				/*
-				 * while(ci1.hasNext()){ tekkitrestrict.log.info(ci1.next()); }
-				 */
-				if(itemx.equals("*")){
-					tci.add(cacheItem(type, 99999, 99999, data2)); //Every single freaking item.
-					addCacheList(type, tci);
-					//tekkitrestrict.log.info("has infinite on "+type);
-					return tci;
-				}
-				
-				
+				tci.add(cacheItem(type, id, data, data2));
+				addCacheList(type, tci);
+				return tci;
+			} catch (Exception ex) {
+				Log.Exception(ex, true);
+				return tci;
+			}
+		}
+		
+		//############################## ALL ITEMS ###########################
+		else if(itemx.equals("*")) {
+			tci.add(cacheItem(type, 99999, 99999, data2)); //Every single freaking item.
+			addCacheList(type, tci);
+			return tci;
+		}
+		
+		//############################## SINGLE ID ###########################
+		else {
+			int id = 0;
+			try {
+				id = Integer.parseInt(itemx);
+			} catch (NumberFormatException ex){
 				if (cacheMods.containsKey(item.toLowerCase())) {
 					// modtypes
 					List<TRCacheItem> cc = cacheMods.get(item.toLowerCase());
 					for (TRCacheItem ci : cc) {
 						//tekkitrestrict.log.info(type+" <- "+ci.toString());
 						try{
-							TRCacheItem ci2 = (TRCacheItem)ci.clone();
+							TRCacheItem ci2 = (TRCacheItem) ci.clone();
 							ci2.setIntData(data2);
 							ci2.cacher = type+"="+ci2.id+":"+ci2.data;
 							cache.put(type+"="+ci2.id+":"+ci2.data, ci2);
 						}
-						catch(Exception e){}
+						catch(Exception ex2){}
 					}
 					//tekkitrestrict.log.info("place mod - "+item+" size: "+cc.size());
 					if(type.contains(";")){
@@ -580,9 +599,16 @@ public class TRCacheItem {
 				addCacheList(type, tci);
 				return tci;
 			}
+
+			try {
+				tci.add(cacheItem(type, id, -1, data2));
+				addCacheList(type, tci);
+				return tci;
+			} catch (Exception ex) {
+				Warning.config("Invalid entry: \"" + itemx + "\"!");
+				return tci;
+			}
 		}
-		addCacheList(type, tci);
-		return tci;
 	}
 
 	/** To be used exclusively for types that require a permission type. */
@@ -612,7 +638,7 @@ public class TRCacheItem {
 	 * Sdd an item to the cache with cacher: "type=id:data"
 	 */
 	private static TRCacheItem cacheItem(String type, int id, int data, int numdata) {
-		String key = type.toLowerCase() + "=" + id + ":" + data;
+		String key = type.toLowerCase() + "=" + id + ":" + data;//n=12:0
 		TRCacheItem m = cache.get(key);
 		if (m == null) {
 			TRCacheItem c = new TRCacheItem();

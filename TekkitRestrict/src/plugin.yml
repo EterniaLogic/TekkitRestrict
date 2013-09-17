@@ -2,7 +2,7 @@ name: tekkitrestrict
 main: com.github.dreadslicer.tekkitrestrict.tekkitrestrict
 authors: [Taeir, DreadSlicer]
 prefix: TekkitRestrict
-version: 1.18 dev 1
+version: 1.18 dev 2
 
 permissions:
     tekkitrestrict.bypass.*:
@@ -19,6 +19,7 @@ permissions:
             tekkitrestrict.bypass.flylimit: true
             tekkitrestrict.bypass.gemarmor.defensive: true
             tekkitrestrict.bypass.gemarmor.offensive: true
+            tekkitrestrict.bypass.blockactions: true
     tekkitrestrict.noitem.*:
         description: removes the ability to GET "*" by item ID. (Valid 111, datavalue 1111.11, range 111-222, MOD (ic2, ee, redpower))
     tekkitrestrict.limiter.*:
@@ -156,6 +157,69 @@ permissions:
         default: op
         children:
             tekkitrestrict.emc: true
+    
+    tekkitrestrict.bypass.blockactions:
+        description: Bypass all EEPatch blocks.
+        default: op
+        children:
+            tekkitrestrict.bypass.blockactions.rings: true
+            tekkitrestrict.bypass.blockactions.amulets: true
+            tekkitrestrict.bypass.blockactions.tools: true
+            tekkitrestrict.bypass.blockactions.destruction: true
+            tekkitrestrict.bypass.blockactions.other: true
+
+    tekkitrestrict.bypass.blockactions.amulets:
+        description: Bypass all EEPatch amulets blocks.
+        children:
+            tekkitrestrict.bypass.blockactions.evertideamulet: true
+            tekkitrestrict.bypass.blockactions.volcaniteamulet: true
+    tekkitrestrict.bypass.blockactions.evertideamulet:
+        description: Bypass all EEPatch Evertide Amulet blocks.
+    tekkitrestrict.bypass.blockactions.volcaniteamulet:
+        description: Bypass all EEPatch Volcanite Amulet blocks.
+        
+    tekkitrestrict.bypass.blockactions.destruction:
+        description: Bypass all EEPatch amulets blocks.
+        children:
+            tekkitrestrict.bypass.blockactions.destructioncatalyst: true
+            tekkitrestrict.bypass.blockactions.hyperkineticlens: true
+            tekkitrestrict.bypass.blockactions.catalyticlens: true
+    tekkitrestrict.bypass.blockactions.destructioncatalyst:
+        description: Bypass all EEPatch Destruction Catalyst blocks.
+    tekkitrestrict.bypass.blockactions.hyperkineticlens:
+        description: Bypass all EEPatch Hyperkinetic Lens blocks.
+    tekkitrestrict.bypass.blockactions.catalyticlens:
+        description: Bypass all EEPatch Catalytic Lens blocks.
+
+    tekkitrestrict.bypass.blockactions.rings:
+        description: Bypass all EEPatch ring blocks.
+        default: op
+        children:
+            tekkitrestrict.bypass.blockactions.arcanering: true
+            tekkitrestrict.bypass.blockactions.archangelring: true
+            tekkitrestrict.bypass.blockactions.blackholeband: true
+            tekkitrestrict.bypass.blockactions.harvestring: true
+            tekkitrestrict.bypass.blockactions.ignitionring: true
+            tekkitrestrict.bypass.blockactions.swiftwolfring: true
+            tekkitrestrict.bypass.blockactions.voidring: true
+            tekkitrestrict.bypass.blockactions.zeroring: true
+    tekkitrestrict.bypass.blockactions.arcanering:
+        description: Bypass all EEPatch Ring of Arcana blocks.
+    tekkitrestrict.bypass.blockactions.archangelring:
+        description: Bypass all EEPatch ArchangelRing blocks.
+    tekkitrestrict.bypass.blockactions.blackholeband:
+        description: Bypass all EEPatch Black Hole Band blocks.
+    tekkitrestrict.bypass.blockactions.harvestring:
+        description: Bypass all EEPatch Harvest Godess Band blocks.
+    tekkitrestrict.bypass.blockactions.ignitionring:
+        description: Bypass all EEPatch Ring of Ignition blocks.
+    tekkitrestrict.bypass.blockactions.swiftwolfring:
+        description: Bypass all EEPatch Swift Wolfs Rending Gale blocks.
+    tekkitrestrict.bypass.blockactions.voidring:
+        description: Bypass all EEPatch Void Ring blocks.
+    tekkitrestrict.bypass.blockactions.zeroring:
+        description: Bypass all EEPatch Zero Ring blocks.
+    
 
 commands:
     tekkitrestrict:

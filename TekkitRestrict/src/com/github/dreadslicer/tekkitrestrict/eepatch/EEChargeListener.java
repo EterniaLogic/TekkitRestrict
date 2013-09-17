@@ -28,8 +28,8 @@ public class EEChargeListener implements Listener {
 			}
 			return;
 		}
-		
-		if (nw > charge){
+
+		if (nw > charge.intValue()){
 			event.setCancelled(true);
 			player.sendMessage(ChatColor.RED + "You are not allowed to charge this tool to level " + charge + " or above.");
 		}

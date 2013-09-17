@@ -85,7 +85,7 @@ public class TRNoClick {
 			String temp[] = disableClick.split(" ");
 			if (temp[0].equalsIgnoreCase("block")){
 				if (temp.length == 1){
-					Log.Config.Warning("You have an error in your DisableClick config: \"block\" is not a valid itemstring");
+					Log.Warning.config("You have an error in your DisableClick config: \"block\" is not a valid itemstring");
 					continue;
 				}
 				
@@ -121,8 +121,8 @@ public class TRNoClick {
 							else if (current.equals("block")) noclick.block = true;
 							else if (current.equals("safezone")) noclick.safezone = true;
 							else {
-								Log.Config.Warning("You have an error in your DisableClick config: Invalid clicktype \""+current+"\"");
-								Log.Config.Warning("Valid types: left, right, both, trample, all, air, block, safezone");
+								Log.Warning.config("You have an error in your DisableClick config: Invalid clicktype \""+current+"\"");
+								Log.Warning.config("Valid types: left, right, both, trample, all, air, block, safezone");
 								continue;
 							}
 						}

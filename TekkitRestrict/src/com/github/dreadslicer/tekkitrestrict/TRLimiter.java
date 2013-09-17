@@ -405,7 +405,7 @@ public class TRLimiter {
 	@Safe(allownull = false)
 	private static void saveLimiter(TRLimiter lb) {
 		if (lb.player == null){
-			tekkitrestrict.log.warning("An error occured while saving the limits! Error: Null player name!");
+			tekkitrestrict.log.warning("An error occurred while saving the limits! Error: Null player name!");
 			return;
 		}
 		String player = lb.player.toLowerCase();
@@ -455,7 +455,7 @@ public class TRLimiter {
 			}
 		} catch (Exception ex) {
 			if (!logged){
-				tekkitrestrict.log.warning("An error occured while saving the limits! Error: Cannot create string to save to database!");
+				tekkitrestrict.log.warning("An error occurred while saving the limits! Error: Cannot create string to save to database!");
 				logged = true;
 			}
 		}
@@ -484,7 +484,7 @@ public class TRLimiter {
 			
 		} catch (SQLException ex) {
 			if (!logged2){
-				tekkitrestrict.log.warning("An error occured while saving the limits! Error: Cannot insert into database!");
+				tekkitrestrict.log.warning("An error occurred while saving the limits! Error: Cannot insert into database!");
 				logged2 = true;
 			}
 		}
@@ -554,7 +554,7 @@ public class TRLimiter {
 			try {
 				if (dbin != null) dbin.close();
 			} catch (SQLException ex2) {}
-			tekkitrestrict.log.severe("An error occured while loading the limiter!");
+			tekkitrestrict.log.severe("An error occurred while loading the limiter!");
 			Log.Exception(ex, true);
 		}
 	}

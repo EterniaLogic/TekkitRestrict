@@ -16,7 +16,7 @@ public class LoginListener implements Listener {
 			TRLimiter.removeExpire(playerName);
 			TRLimiter.getOnlineLimiter(e.getPlayer());
 		} catch(Exception ex){
-			tekkitrestrict.log.warning("An error occured in the LoginListener!");
+			tekkitrestrict.log.warning("An error occurred in the LoginListener!");
 			Log.Exception(ex, false);
 		}
 	}

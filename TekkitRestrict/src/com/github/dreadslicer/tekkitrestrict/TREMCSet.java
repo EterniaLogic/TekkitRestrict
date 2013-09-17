@@ -41,7 +41,7 @@ public class TREMCSet {
 		
 		for (String current : configEMC){
 			if (!current.contains(" ")){
-				Log.Config.Warning("You have an invalid value in SetEMC in ModModifications.config: \""+current+"\"");
+				Log.Warning.config("You have an invalid value in SetEMC in ModModifications.config: \""+current+"\"");
 				continue;
 			}
 			
@@ -52,7 +52,7 @@ public class TREMCSet {
 			try {
 				EMC = Integer.parseInt(values[1]);
 			} catch (NumberFormatException ex){
-				Log.Config.Warning("You have an invalid value in SetEMC in ModModifications.config: \""+current+"\"");
+				Log.Warning.config("You have an invalid value in SetEMC in ModModifications.config: \""+current+"\"");
 				continue;
 			}
 			
@@ -64,7 +64,7 @@ public class TREMCSet {
 				try {
 					id = Integer.parseInt(temp[0]);
 				} catch (NumberFormatException ex){
-					Log.Config.Warning("You have an invalid value in SetEMC in ModModifications.config: \""+current+"\"");
+					Log.Warning.config("You have an invalid value in SetEMC in ModModifications.config: \""+current+"\"");
 					continue;
 				}
 			} else {
@@ -74,7 +74,7 @@ public class TREMCSet {
 				try {
 					id = Integer.parseInt(values[0]);
 				} catch (NumberFormatException ex){
-					Log.Config.Warning("You have an invalid value in SetEMC in ModModifications.config: \""+current+"\"");
+					Log.Warning.config("You have an invalid value in SetEMC in ModModifications.config: \""+current+"\"");
 					continue;
 				}
 			}
@@ -122,7 +122,7 @@ public class TREMCSet {
 				if (current.contains("-")){
 					String temp2[] = current.split("-");
 					if (!temp2[0].matches("\\d+") || !temp2[1].matches("\\d+")){
-						Log.Config.Warning("The data value of '"+key+"' in SetEMC (ModModifications.config) is invalid!");
+						Log.Warning.config("The data value of '"+key+"' in SetEMC (ModModifications.config) is invalid!");
 						allData.clear();
 						allData.add(0);
 					} else {
@@ -133,7 +133,7 @@ public class TREMCSet {
 					}
 				} else {
 					if (!current.matches("\\d+")){
-						Log.Config.Warning("The data value of '"+key+"' in SetEMC (ModModifications.config) is invalid!");
+						Log.Warning.config("The data value of '"+key+"' in SetEMC (ModModifications.config) is invalid!");
 						allData.clear();
 						allData.add(0);
 					} else {
@@ -144,7 +144,7 @@ public class TREMCSet {
 		} else if (data.contains("-")){//No comma's, only a - so just 1 split needed.
 			String temp[] = data.split("-");
 			if (!temp[0].matches("\\d+") || !temp[1].matches("\\d+")){
-				Log.Config.Warning("The data value of '"+key+"' in SetEMC (ModModifications.config) is invalid!");
+				Log.Warning.config("The data value of '"+key+"' in SetEMC (ModModifications.config) is invalid!");
 				allData.clear();
 				allData.add(0);
 			} else {
@@ -155,7 +155,7 @@ public class TREMCSet {
 			}
 		} else { //Only 1 value. 
 			if (!data.matches("\\d+")){
-				Log.Config.Warning("The data value of '"+key+"' in SetEMC (ModModifications.config) is invalid!");
+				Log.Warning.config("The data value of '"+key+"' in SetEMC (ModModifications.config) is invalid!");
 				allData.clear();
 				allData.add(0);
 			} else {

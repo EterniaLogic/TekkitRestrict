@@ -276,8 +276,17 @@ Actions:
             
         Destruction:
             DestructionCatalyst:
+                # BreakRadius: Break a large amount of blocks at once with the destruction
+                # catalyst.
+                BreakRadius: true
             HyperKineticLens:
+                # BreakRadius: Break a large amount of blocks at once with the hyper
+                # kinetic lens.
+                BreakRadius: true
             CatalyticLens:
+                # BreakRadius: Break a large amount of blocks at once with the catalytic
+                # lens.
+                BreakRadius: true
     Amulets:
         Evertide:
         Volcanite:
@@ -444,6 +453,12 @@ Actions:
             Activate: true
             
         ArchangelsSmite:
+            # ShootArrows: If you activate the ArchangelsSmite, it will constantly shoot
+            # homing arrows (while using EMC).
+            ShootArrows: true
+            
+            # Activate: Defines whether a player can activate the ArchangelsSmite or not.
+            Activate: true
         
 
 # By default, the RM furnace doubles the amount of ingots you get from smelting

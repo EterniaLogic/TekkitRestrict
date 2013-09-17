@@ -53,6 +53,9 @@ public class TRConfigCache {
 		public static boolean RMDB, UseRPTimer;
 		public static int ChangeDisabledItemsIntoId;
 		public static int RPTickTime;
+		
+		@SuppressWarnings("rawtypes")
+		public static ArrayList<Class> SSClassBypasses = new ArrayList<Class>();
 	}
 	
 	public static class LWC {

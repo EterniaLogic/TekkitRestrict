@@ -103,7 +103,7 @@ public class TRCommandAlc implements CommandExecutor {
 			World world = ((CraftWorld) player.getWorld()).getHandle();
 			AlchemyBagData alcdata = openGui(looker, holder, mod_EE.getInstance(), 56, world, color, (int) looker.locY, (int) looker.locZ);
 			if (alcdata == null){
-				tekkitrestrict.log.warning("An error occured. " + OName + "'s bag will not save properly if he is offline.");
+				tekkitrestrict.log.warning("An error occurred. " + OName + "'s bag will not save properly if he is offline.");
 			}
 			
 			new OpenAlcObj(alcdata, OPlayer, player); //Add new OpenAlcObject
@@ -115,7 +115,7 @@ public class TRCommandAlc implements CommandExecutor {
 			tekkitrestrict.log.info(player.getName() + " opened " + OName + "'s " + strcolor + " Alchemy Bag!");
 			
 		} catch (Exception e) {
-			sender.sendMessage(ChatColor.RED + "An error has occured processing your command.");
+			sender.sendMessage(ChatColor.RED + "An error has occurred processing your command.");
 			tekkitrestrict.log.warning("Exception in OpenAlc : " + e.getMessage());
 		}
 
@@ -150,7 +150,7 @@ public class TRCommandAlc implements CommandExecutor {
 		if (openAlc == null) openAlc = OpenAlcObj.getOpenAlcByViewer(name);
 		else { //A bagOwner has been found and he matches this player.
 			boolean bagOwnerOnline = (Bukkit.getPlayerExact(openAlc.getBagOwnerName()) != null);
-			if (bagOwnerOnline) return; //If the player that owns the bag is online, return to prevent unwanted closing.
+			if (bagOwnerOnline && openAlc.getBagOwner() != openAlc.getViewer()) return; //If the player that owns the bag is online, return to prevent unwanted closing.
 			
 			openAlc.getBagOwner().saveData();
 			openAlc.getBag().a();

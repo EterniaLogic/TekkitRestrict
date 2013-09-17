@@ -6,7 +6,9 @@ import java.util.List;
 
 import com.github.dreadslicer.tekkitrestrict.Log;
 import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
+import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
 
+import ee.events.EEEnums.EEAction2;
 import ee.events.EEEnums.EERingAction;
 
 public class EEPSettings {
@@ -169,11 +171,11 @@ public class EEPSettings {
 	public static void loadMaxCharge(){
 		MaxCharge.clear();
 		
-		List<String> mc = tekkitrestrict.config.getStringList("EEMaxCharge");
+		List<String> mc = tekkitrestrict.config.getStringList(ConfigFile.EEPatch, "EEMaxCharge");
 		for (String current : mc){
 			if (current == null) continue;
 			if (!current.contains(" ")){
-				Log.Config.Warning("There is an invalid value in the MaxCharge list in EEPatch.config.yml: \""+current+"\"");
+				Log.Warning.config("There is an invalid value in the MaxCharge list in EEPatch.config.yml: \""+current+"\"");
 				continue;
 			}
 			
@@ -183,7 +185,7 @@ public class EEPSettings {
 			try {
 				charge = Integer.parseInt(temp[1]);
 			} catch (NumberFormatException ex){
-				Log.Config.Warning("\""+temp[1]+"\" is not a valid chargelevel in the MaxCharge list in EEPatch.config.yml");
+				Log.Warning.config("\""+temp[1]+"\" is not a valid chargelevel in the MaxCharge list in EEPatch.config.yml");
 				continue;
 			}
 			
@@ -191,7 +193,7 @@ public class EEPSettings {
 			if (id == null){
 				ArrayList<Integer> ids = getGroup(temp[0]);
 				if (ids == null){
-					Log.Config.Warning("\""+temp[0]+"\" is not a valid itemname or itemgroup in the MaxCharge list in EEPatch.config.yml");
+					Log.Warning.config("\""+temp[0]+"\" is not a valid itemname or itemgroup in the MaxCharge list in EEPatch.config.yml");
 					continue;
 				}
 				
@@ -206,7 +208,9 @@ public class EEPSettings {
 	}
 	
 	public static void loadAllDisabledActions(){
+		tekkitrestrict.log.info("[DEBUG] " + "loading EEPatch Settings...");
 		loadDisabledRingActions();
+		loadDisabledDestActions();
 	}
 	
 	public static ArrayList<Integer> zeroring = new ArrayList<Integer>();
@@ -217,6 +221,7 @@ public class EEPSettings {
 	public static ArrayList<Integer> arcanering = new ArrayList<Integer>();
 	public static ArrayList<Integer> blackholeband = new ArrayList<Integer>();
 	public static ArrayList<Integer> voidring = new ArrayList<Integer>();
+	public static ArrayList<Integer> archangelring = new ArrayList<Integer>();
 	public static void loadDisabledRingActions(){
 		zeroring.clear();
 		firering.clear();
@@ -225,6 +230,7 @@ public class EEPSettings {
 		arcanering.clear();
 		blackholeband.clear();
 		voidring.clear();
+		archangelring.clear();
 		
 		//tekkitrestrict.config.getConfigurationSection("Actions.Rings");
 		if (!tekkitrestrict.config.getBoolean("Actions.Rings.ZeroRing.FreezeRadius", true))
@@ -297,5 +303,26 @@ public class EEPSettings {
 			voidring.add(EERingAction.Condense.ordinal());
 		if (!tekkitrestrict.config.getBoolean("Actions.Rings.VoidRing.Activate", true))
 			voidring.add(EERingAction.Activate.ordinal());
+		
+		if (!tekkitrestrict.config.getBoolean("Actions.Rings.ArchangelsSmite.ShootArrows", true))
+			archangelring.add(EERingAction.ShootArrows.ordinal());
+		if (!tekkitrestrict.config.getBoolean("Actions.Rings.ArchangelsSmite.Activate", true))
+			archangelring.add(EERingAction.Activate.ordinal());
+	}
+
+	public static ArrayList<Integer> dest1 = new ArrayList<Integer>();
+	public static ArrayList<Integer> dest2 = new ArrayList<Integer>();
+	public static ArrayList<Integer> dest3 = new ArrayList<Integer>();
+	public static void loadDisabledDestActions(){
+		dest1.clear();
+		dest2.clear();
+		dest3.clear();
+		
+		if (!tekkitrestrict.config.getBoolean("Actions.Destruction.DestructionCatalyst.BreakRadius", true))
+			dest1.add(EEAction2.BreakRadius.ordinal());
+		if (!tekkitrestrict.config.getBoolean("Actions.Destruction.HyperKineticLens.BreakRadius", true))
+			dest2.add(EEAction2.BreakRadius.ordinal());
+		if (!tekkitrestrict.config.getBoolean("Actions.Destruction.CatalyticLens.BreakRadius", true))
+			dest3.add(EEAction2.BreakRadius.ordinal());
 	}
 }

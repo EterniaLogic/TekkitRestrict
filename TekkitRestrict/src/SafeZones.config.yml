@@ -21,6 +21,13 @@ InSafeZones:
     # - If a mob enters a SafeZone, it is removed.
     # Default: true
     DisableEntities: true
+    
+    # WARNING: Case Sensitive!
+    # Tries to exclude org.bukkit.entity.[name] entities from SafeZone entity removal.
+    # Examples:
+    # "Arrow", "Animals", "EnderDragon", "EnderPearl", "Fish", "IronGolem", "Pig",
+    # "Projectile", "ThrownPotion", "TNTPrimed", "Snowball"
+    ExemptEntityTypes: []
 
     # If you turn DechargeEE on, then
     # - All EE items specified in the ModModifications config will be decharged

@@ -37,7 +37,7 @@ public class TRBans {
 			String[] temp = current.split(":");
 			
 			if (!temp[0].matches("\\d+")){
-				Log.Config.Warning("Invalid value in DisableItems: \""+current+"\"!");
+				Log.Warning.config("Invalid value in DisableItems: \""+current+"\"!");
 				continue;
 			}
 			
@@ -61,12 +61,12 @@ public class TRBans {
 				if (current.contains("-")){
 					String temp2[] = current.split("-");
 					if (!temp2[0].matches("\\d+") || !temp2[1].matches("\\d+")){
-						Log.Config.Warning("The data range of '"+key+"' in "+type+" is invalid!");
+						Log.Warning.config("The data range of '"+key+"' in "+type+" is invalid!");
 						return false;
 					}
 				} else {
 					if (!current.matches("\\d+")){
-						Log.Config.Warning("The data range of '"+key+"' in "+type+" is invalid!");
+						Log.Warning.config("The data range of '"+key+"' in "+type+" is invalid!");
 						return false;
 					}
 				}
@@ -74,12 +74,12 @@ public class TRBans {
 		} else if (range.contains("-")){//No comma's, only a - so just 1 split needed.
 			String temp[] = range.split("-");
 			if (!temp[0].matches("\\d+") || !temp[1].matches("\\d+")){
-				Log.Config.Warning("The data range of '"+key+"' in "+type+" is invalid!");
+				Log.Warning.config("The data range of '"+key+"' in "+type+" is invalid!");
 				return false;
 			}
 		} else { //Only 1 value. 
 			if (!range.matches("\\d+")){
-				Log.Config.Warning("The data range of '"+key+"' in "+type+" is invalid!");
+				Log.Warning.config("The data range of '"+key+"' in "+type+" is invalid!");
 				return false;
 			}
 		}
@@ -94,12 +94,12 @@ public class TRBans {
 				if (current.contains("-")){
 					String temp2[] = current.split("-");
 					if (!temp2[0].matches("\\d+") || !temp2[1].matches("\\d+")){
-						Log.Config.Warning("The data range of '"+key+"' in "+type+" is invalid!");
+						Log.Warning.config("The data range of '"+key+"' in "+type+" is invalid!");
 						return false;
 					}
 				} else {
 					if (!current.matches("\\d+")){
-						Log.Config.Warning("The data range of '"+key+"' in "+type+" is invalid!");
+						Log.Warning.config("The data range of '"+key+"' in "+type+" is invalid!");
 						return false;
 					}
 				}
@@ -107,12 +107,12 @@ public class TRBans {
 		} else if (range.contains("-")){//No comma's, only a - so just 1 split needed.
 			String temp[] = range.split("-");
 			if (!temp[0].matches("\\d+") || !temp[1].matches("\\d+")){
-				Log.Config.Warning("The data range of '"+key+"' in "+type+" is invalid!");
+				Log.Warning.config("The data range of '"+key+"' in "+type+" is invalid!");
 				return false;
 			}
 		} else { //Only 1 value. 
 			if (!range.matches("\\d+")){
-				Log.Config.Warning("The data range of '"+key+"' in "+type+" is invalid!");
+				Log.Warning.config("The data range of '"+key+"' in "+type+" is invalid!");
 				return false;
 			}
 		}

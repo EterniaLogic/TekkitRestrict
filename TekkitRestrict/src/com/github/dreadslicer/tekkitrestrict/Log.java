@@ -1,5 +1,6 @@
 package com.github.dreadslicer.tekkitrestrict;
 
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -51,8 +52,10 @@ public class Log {
 		}
 	}
 	public static class Config {
+		@Deprecated
 		public static void Warning(String message){
 			tekkitrestrict.log.warning("[Config] " + message);
+			Warning.configWarnings.add(message);
 		}
 		public static void Notice(String message){
 			tekkitrestrict.log.log(Level.parse("Notice"), "[Config] " + message);
@@ -128,6 +131,28 @@ public class Log {
 		str = str.replace("&o", ChatColor.ITALIC + "");
 		str = str.replace("&r", ChatColor.RESET + "");
 		return str;
+	}
+
+	public static class Warning {
+		public static void config(String message){
+			tekkitrestrict.log.warning("[Config] " + message);
+			configWarnings.add(message);
+		}
+		public static void load(String message){
+			tekkitrestrict.log.warning(message);
+			loadWarnings.add(message);
+		}
+		public static void other(String message){
+			tekkitrestrict.log.warning(message);
+			otherWarnings.add(message);
+		}
+		
+		public static ArrayList<String> loadWarnings = new ArrayList<String>();
+		public static ArrayList<String> configWarnings = new ArrayList<String>();
+		public static ArrayList<String> otherWarnings = new ArrayList<String>();
+		public static boolean loadWarnings(){
+			return !loadWarnings.isEmpty();
+		}
 	}
 }
 

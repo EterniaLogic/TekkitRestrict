@@ -100,8 +100,8 @@ public class TRChunkUnloader {
 				if (nr > 0) nr = unloadNetherChunks(nr, true);
 				if (nr > 0) nr = unloadEndChunks(nr, true);
 			} else {
-				Log.Config.Warning("Invalid value " + ChunkUnloader.unloadOrder + " for UnloadOrder in TPerformance.config.yml!");
-				Log.Config.Warning("Valid: 0, 1, 2, 3, 4 or 5.");
+				Log.Warning.config("Invalid value " + ChunkUnloader.unloadOrder + " for UnloadOrder in TPerformance.config.yml!");
+				Log.Warning.config("Valid: 0, 1, 2, 3, 4 or 5.");
 				ChunkUnloader.unloadOrder = 0;
 			}
 			
@@ -152,10 +152,13 @@ public class TRChunkUnloader {
 			
 			for (Chunk chunk : toRemove){
 				if (!chunk.unload(true, false)) amount++;
+				try {
+					Thread.sleep(10);
+				} catch (Exception ex){}
 			}
 			
 		} catch (Exception ex) {
-			tekkitrestrict.log.warning("An error occured in the Chunk Unloader [End]! Please inform the author.");
+			tekkitrestrict.log.warning("An error occurred in the Chunk Unloader [End]! Please inform the author.");
 			Log.Exception(ex, false);
 		}
 		return amount;
@@ -193,10 +196,13 @@ public class TRChunkUnloader {
 			
 			for (Chunk chunk : toRemove){
 				if (!chunk.unload(true, false)) amount++;
+				try {
+					Thread.sleep(10);
+				} catch (Exception ex){}
 			}
 			
 		} catch (Exception ex) {
-			tekkitrestrict.log.warning("An error occured in the Chunk Unloader [Nether]! Please inform the author.");
+			tekkitrestrict.log.warning("An error occurred in the Chunk Unloader [Nether]! Please inform the author.");
 			Log.Exception(ex, false);
 		}
 		
@@ -234,16 +240,15 @@ public class TRChunkUnloader {
 			}
 			
 			for (Chunk chunk : toRemove){
+				if (!chunk.unload(true, false)) amount++;
 				try {
-					if (!chunk.unload(true, false)) amount++;
-				} catch (Exception ex){
-					tekkitrestrict.log.warning("An error occurred while trying to unload a chunk: " + ex.getMessage() + "!");
-					amount++;
-				}
+					Thread.sleep(10);
+				} catch (Exception ex){}
+
 			}
 			
 		} catch (Exception ex) {
-			tekkitrestrict.log.warning("An error occured in the Chunk Unloader [Normal]! Please inform the author.");
+			tekkitrestrict.log.warning("An error occurred in the Chunk Unloader [Normal]! Please inform the author.");
 			Log.Exception(ex, false);
 		}
 		

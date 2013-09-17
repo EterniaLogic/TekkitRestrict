@@ -29,7 +29,7 @@ public class TRLimitedCreative {
 				}
 			}
 		} catch (Exception ex) {
-			tekkitrestrict.log.warning("An error occured in TRLimitedCreative ContainerCheck! Please inform the author.");
+			tekkitrestrict.log.warning("An error occurred in TRLimitedCreative ContainerCheck! Please inform the author.");
 			Log.Exception(ex, false);
 		}
 		//Dont ban items in creative inventory. They cant rightclick anyway and it causes crashes.
@@ -52,7 +52,7 @@ public class TRLimitedCreative {
 			}
 			
 		} catch (Exception ex) {
-			tekkitrestrict.log.warning("An error occured in TRLimitedCreative BannedCreativeItem! Please inform the author.");
+			tekkitrestrict.log.warning("An error occurred in TRLimitedCreative BannedCreativeItem! Please inform the author.");
 			Log.Exception(ex, false);
 		}
 		*/

@@ -24,6 +24,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.github.dreadslicer.tekkitrestrict.Log.Warning;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.ChunkUnloader;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Dupes;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Global;
@@ -70,16 +71,14 @@ public class tekkitrestrict extends JavaPlugin {
 	private static TRThread ttt = null;
 	private static TRLogFilter filter = null;
 	public static LinkedList<YamlConfiguration> configList = new LinkedList<YamlConfiguration>();
-
-	public ArrayList<String> msgCache = new ArrayList<String>();
 	
 	/**
 	 * Log a warning while the plugin is still loading.
 	 * If you type /tr warnings, you will see the warnings again.
 	 */
 	public static void loadWarning(String warning){
+		Warning.loadWarnings.add(warning);
 		log.warning(warning);
-		instance.msgCache.add(warning);
 	}
 	
 	@Override
@@ -212,6 +211,8 @@ public class tekkitrestrict extends JavaPlugin {
 		log.info("Linking with EEPatch for extended functionality ...");
 		if (linkEEPatch()){
 			boolean success = true;
+			EEPSettings.loadMaxCharge();
+			EEPSettings.loadAllDisabledActions();
 			try {
 				Assigner.assignEEPatch();
 				//TODO add more here
@@ -246,9 +247,9 @@ public class tekkitrestrict extends JavaPlugin {
 			}
 		}
 		
-		if (!msgCache.isEmpty()){
+		if (Warning.loadWarnings()){
 			log.warning("There were some warnings while loading TekkitRestrict!");
-			log.warning("Use /tr warnings to view them again (in case you missed them).");
+			log.warning("Use /tr warnings load to view them again (in case you missed them).");
 		}
 		
 		log.info("TekkitRestrict v" + version + " Enabled!");
@@ -368,6 +369,7 @@ public class tekkitrestrict extends JavaPlugin {
 		}
 	}
 	
+	@SuppressWarnings("rawtypes")
 	public static void loadConfigCache(){
 		Hacks.broadcast = config.getStringList(ConfigFile.Hack, "HackBroadcasts");
 		Hacks.broadcastFormat = config.getString(ConfigFile.Hack, "HackBroadcastString", "{PLAYER} tried to {TYPE}-hack!"); //TODO add colors
@@ -426,6 +428,22 @@ public class tekkitrestrict extends JavaPlugin {
 		Threads.SSDisableEntities = config.getBoolean(ConfigFile.SafeZones, "InSafeZones.DisableEntities", false);
 		Threads.SSDechargeEE = config.getBoolean(ConfigFile.SafeZones, "InSafeZones.DechargeEE", true);
 		Threads.SSDisableArcane = config.getBoolean(ConfigFile.SafeZones, "InSafeZones.DisableRingOfArcana", true);
+		List<String> exempt = config.getStringList(ConfigFile.SafeZones, "InSafeZones.ExemptEntityTypes");
+		Threads.SSClassBypasses = new ArrayList<Class>();
+		for (String s : exempt){
+			try {
+				Class cl = Class.forName("org.bukkit.entity."+s);
+				Threads.SSClassBypasses.add(cl);
+			} catch (Exception ex){
+				try {
+					Class cl = Class.forName("org.bukkit.entity."+Character.toUpperCase(s.charAt(0)) + s.substring(1));
+					Threads.SSClassBypasses.add(cl);
+				} catch (Exception ex2){
+					Warning.config("Invalid value in ExemptEntityTypes in SafeZones.config: cannot find class org.bukkit.entity."+ s + "!");
+					continue;
+				}
+			}
+		}
 		
 		Threads.RMDB = config.getBoolean(ConfigFile.DisableItems, "RemoveDisabledItemBlocks", false);
 		Threads.UseRPTimer = config.getBoolean(ConfigFile.General, "UseAutoRPTimer", false);

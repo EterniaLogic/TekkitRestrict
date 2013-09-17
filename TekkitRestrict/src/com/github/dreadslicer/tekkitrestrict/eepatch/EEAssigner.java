@@ -4,6 +4,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
 
 import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
+import com.github.dreadslicer.tekkitrestrict.eepatch.destlisteners.EEDest1Listener;
+import com.github.dreadslicer.tekkitrestrict.eepatch.destlisteners.EEDest2Listener;
+import com.github.dreadslicer.tekkitrestrict.eepatch.destlisteners.EEDest3Listener;
 import com.github.dreadslicer.tekkitrestrict.eepatch.ringlisteners.EEArcaneRingListener;
 import com.github.dreadslicer.tekkitrestrict.eepatch.ringlisteners.EEBHBListener;
 import com.github.dreadslicer.tekkitrestrict.eepatch.ringlisteners.EEHarvestRingListener;
@@ -36,6 +39,13 @@ public class EEAssigner {
 		
 		if (!EEPSettings.zeroring.isEmpty())
 			PM.registerEvents(new EEZeroRingListener(), tr);
+		
+		if (!EEPSettings.dest1.isEmpty())
+			PM.registerEvents(new EEDest1Listener(), tr);
+		if (!EEPSettings.dest2.isEmpty())
+			PM.registerEvents(new EEDest2Listener(), tr);
+		if (!EEPSettings.dest3.isEmpty())
+			PM.registerEvents(new EEDest3Listener(), tr);
 		
 		
 		if (!tekkitrestrict.config.getBoolean("AllowRMFurnaceOreDuplication", true))
