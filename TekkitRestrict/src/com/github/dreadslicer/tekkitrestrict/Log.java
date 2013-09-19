@@ -66,6 +66,10 @@ public class Log {
 		}
 	}
 	
+	public static void TempDebug(String msg){
+		//IMPORTANT Remove this line when releasing
+		tekkitrestrict.log.info("[DEBUG] " + msg);
+	}
 	public static void Debug(String msg){
 		TRLogger.Log("debug", msg);
 	}
