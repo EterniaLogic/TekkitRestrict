@@ -1,5 +1,7 @@
 package com.github.dreadslicer.tekkitrestrict;
 
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.bukkit.ChatColor;
@@ -9,46 +11,51 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.plugin.PluginManager;
 
+import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
 import com.griefcraft.lwc.LWC;
 import com.griefcraft.lwc.LWCPlugin;
 import com.griefcraft.model.Permission;
 import com.griefcraft.model.Protection;
 
 public class TRLWCProtect {
+	public static List<TRCacheItem> lwcBlocked = Collections.synchronizedList(new LinkedList<TRCacheItem>());
+	
+	public static void reload(){
+		List<String> blockedList = tekkitrestrict.config.getStringList(ConfigFile.Advanced, "LWCPreventNearLocked");
+		for (String str : blockedList){
+			lwcBlocked.addAll(TRCacheItem.processItemStringNoCache(str));
+		}
+	}
+	
 	/**
 	 * Checks tekkitrestrict.bypass.lwc permission.
 	 * @return False if the event was cancelled.
 	 */
 	public static boolean checkLWCAllowed(BlockPlaceEvent event) {
+		if (TRConfigCache.LWC.lwcPlugin == null){
+			PluginManager PM = tekkitrestrict.getInstance().getServer().getPluginManager();
+			if (PM.isPluginEnabled("LWC")) TRConfigCache.LWC.lwcPlugin = (LWCPlugin) PM.getPlugin("LWC");
+			
+			if (TRConfigCache.LWC.lwcPlugin == null) return true;
+		}
+		
 		Player player = event.getPlayer();
-		// link up with LWC!
+
 		if (player.hasPermission("tekkitrestrict.bypass.lwc")) return true;
 		
 		Block block = event.getBlock();
 		int id = block.getTypeId();
 		byte data = block.getData();
-		
-		boolean istype = false;
-		// tekkitrestrict.log.info(b.getTypeId()+":"+b.getData());
-		blockedloop:
-			for (int i = 0; i < TRConfigCache.LWC.blocked.size(); i++) {
-				List<TRCacheItem> iss = TRCacheItem.processItemString("", TRConfigCache.LWC.blocked.get(i), -1);
-				for (TRCacheItem ist : iss) {
-					if (ist.compare(id, data)) {
-						istype = true;
-						break blockedloop;
-					}
-				}
+
+		boolean blocked = false;
+		for (TRCacheItem tci : lwcBlocked){
+			if (tci.compare(id, data)){
+				blocked = true;
+				break;
 			}
-		
-		if (!istype) return true;
-		
-		if (TRConfigCache.LWC.lwcPlugin == null){
-			PluginManager PM = tekkitrestrict.getInstance().getServer().getPluginManager();
-			if (PM.isPluginEnabled("LWC")) TRConfigCache.LWC.lwcPlugin = (LWCPlugin) PM.getPlugin("LWC");
 		}
 		
-		if (TRConfigCache.LWC.lwcPlugin == null) return true;
+		if (!blocked) return true;
 		
 		LWC LWC = TRConfigCache.LWC.lwcPlugin.getLWC();
 		String playername = player.getName().toLowerCase();

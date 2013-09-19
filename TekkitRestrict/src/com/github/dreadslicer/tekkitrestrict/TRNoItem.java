@@ -25,13 +25,13 @@ public class TRNoItem {
 	/** A list of all the (by config) banned creative items. */
 	private static LinkedList<TRCacheItem> DisabledCreativeItems = new LinkedList<TRCacheItem>();
 	
-	public static Map<String, List<TRCacheItem>> modItemDat = Collections.synchronizedMap(new HashMap<String, List<TRCacheItem>>());
+	public static Map<String, List<TRCacheItem>> groups = Collections.synchronizedMap(new HashMap<String, List<TRCacheItem>>());
 
 	/**	Clear all Lists and maps in this class (no items will be banned any more) */
 	public static void clear() {
 		DisabledItems.clear();
 		DisabledCreativeItems.clear();
-		modItemDat.clear();
+		groups.clear();
 	}
 	
 	/**
@@ -52,7 +52,7 @@ public class TRNoItem {
 	private static void allocateDisabledItems() {
 		List<String> di = tekkitrestrict.config.getStringList(ConfigFile.DisableItems, "DisableItems");
 		for (String str : di) {
-			DisabledItems.addAll(TRCacheItem.processItemString("n", "", str, -1));
+			DisabledItems.addAll(TRCacheItem.processItemStringNoCache(str));
 			//DisabledItems.addAll(TRCacheItem.processItemString("n", "", str));
 			//DisabledItems.addAll(TRCacheItem.processItemString("noitem", "", str));
 		}
@@ -60,15 +60,15 @@ public class TRNoItem {
 	private static void allocateDisabledCreativeItems() {
 		List<String> di = tekkitrestrict.config.getStringList(ConfigFile.LimitedCreative, "LimitedCreative");
 		for (String str : di) {
-			DisabledCreativeItems.addAll(TRCacheItem.processItemString("c", "afsd90ujpj", str, -1));
+			DisabledCreativeItems.addAll(TRCacheItem.processItemStringNoCache(str));
 			//DisabledCreativeItems.addAll(TRCacheItem.processItemString("c", "afsd90ujpj", str));
 			//DisabledCreativeItems.addAll(TRCacheItem.processItemString("creative", "afsd90ujpj", str));			
 		}
 	}
 	
-	/** Puts (a, b) in modItemDat */
-	public static void aasdf(String a, List<TRCacheItem> b){
-		modItemDat.put(a, b);
+	/** Adds the given list to the groups Map with the given name. */
+	public static void addGroup(String name, List<TRCacheItem> items){
+		groups.put(name, items);
 	}
 
 	/**
@@ -172,29 +172,8 @@ public class TRNoItem {
 	}*/
 	
 	private static boolean isTypeCreativeBanned(Player player, int id, int data, boolean doBypassCheck) {
+		if (id < 8) return false;
 		if (doBypassCheck && player.hasPermission("tekkitrestrict.bypass.creative")) return false;
-
-		TRCacheItem ci1 = TRCacheItem.getPermCacheItem(player, "c", "creative", id, data, false); //FIXME Also checks bypass permission..
-		if (ci1 != null) return true;
-		
-		String idStr = "tekkitrestrict.creative."+id;
-		
-		//if hasPerm (tekkitrestrict.creative.id[.data] return true.
-		if (player.hasPermission(idStr+"."+data)) return true;
-		else if (player.hasPermission(idStr)) return true;
-		else {
-			Iterator<String> keys = modItemDat.keySet().iterator();
-			while (keys.hasNext()) {
-				String key = keys.next();
-				if (TRPermHandler.hasPermission(player, "creative", key)) {
-					List<TRCacheItem> mi = modItemDat.get(key);
-					for(TRCacheItem c:mi){
-						if (c == null) continue;
-						if (c.compare(id, data)) return true;
-					}
-				}
-			}
-		}
 		
 		if (DisabledCreativeItems != null) {
 			for (TRCacheItem cc : DisabledCreativeItems){
@@ -202,26 +181,21 @@ public class TRNoItem {
 			}
 		}
 		
-		return false;
-	}
-	
-	private static boolean isTypeNoItemBanned(Player player, int id, int data, boolean doBypassCheck) {
-		if (doBypassCheck && player.hasPermission("tekkitrestrict.bypass.noitem")) return false;
+		if (player.hasPermission("tekkitrestrict.creative.blockall")) return true;
 
-		TRCacheItem ci1 = TRCacheItem.getPermCacheItem(player, "n", "noitem", id, data, false); //FIXME Also checks bypass permission..
-		if (ci1 != null) return true;
+		//TRCacheItem ci1 = TRCacheItem.getPermCacheItem(player, "c", "creative", id, data, false);
+		//if (ci1 != null) return true;
 		
-		String idStr = "tekkitrestrict.noitem."+id;
+		String idStr = "tekkitrestrict.creative."+id;
 		
-		//if hasPerm (tekkitrestrict.noitem.id[.data] return true.
 		if (player.hasPermission(idStr+"."+data)) return true;
 		else if (player.hasPermission(idStr)) return true;
 		else {
-			Iterator<String> keys = modItemDat.keySet().iterator();
+			Iterator<String> keys = groups.keySet().iterator();
 			while (keys.hasNext()) {
 				String key = keys.next();
-				if (TRPermHandler.hasPermission(player, "noitem", key)) {
-					List<TRCacheItem> mi = modItemDat.get(key);
+				if (TRPermHandler.hasPermission(player, "creative", key)) {
+					List<TRCacheItem> mi = groups.get(key);
 					for(TRCacheItem c:mi){
 						if (c == null) continue;
 						if (c.compare(id, data)) return true;
@@ -230,11 +204,43 @@ public class TRNoItem {
 			}
 		}
 		
+		return false;
+	}
+	
+	private static boolean isTypeNoItemBanned(Player player, int id, int data, boolean doBypassCheck) {
+		if (id < 8) return false;
+		if (doBypassCheck && player.hasPermission("tekkitrestrict.bypass.noitem")) return false;
+
 		if (DisabledItems != null) {
 			for (TRCacheItem cc : DisabledItems){
 				if (cc.compare(id, data)) return true;
 			}
 		}
+		
+		if (player.hasPermission("tekkitrestrict.noitem.blockall")) return true;
+		
+		//TRCacheItem ci1 = TRCacheItem.getPermCacheItem(player, "n", "noitem", id, data, false);//Perms and cache??
+		//if (ci1 != null) return true;
+		
+		String idStr = "tekkitrestrict.noitem."+id;
+		
+		if (player.hasPermission(idStr+"."+data)) return true;
+		else if (player.hasPermission(idStr)) return true;
+		else {
+			Iterator<String> keys = groups.keySet().iterator();
+			while (keys.hasNext()) {
+				String key = keys.next();
+				if (player.hasPermission("tekkitrestrict.noitem."+key)) {
+					List<TRCacheItem> mi = groups.get(key);
+					for(TRCacheItem c:mi){
+						if (c == null) continue;
+						if (c.compare(id, data)) return true;
+					}
+				}
+			}
+		}
+		
+		
 		
 		return false;
 	}
@@ -330,7 +336,7 @@ public class TRNoItem {
 	/** @return True if: id1 == id2 and (data1 = 0 or data1 == data2 or (data1 = -10 and data2 = 0)) */
 	public static boolean equalSet(int id1, int data1, int id2, int data2) {
 		if (id1 != id2) return false;
-		if (data1 == 0 || data1 == data2 || (data1 == -10 && data2 == 0)) {
+		if (data1 == -1 || data1 == data2 || (data1 == -10 && data2 == 0)) {
 			return true;
 		}
 		return false;

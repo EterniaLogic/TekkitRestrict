@@ -12,13 +12,13 @@ import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
 
 public class BlockBreakListener implements Listener{
 	/** @return <b>True</b> if id < 8 or id = 12, 13, 17, 24, 35, 44, 98 or 142. <b>False</b> otherwise. */
-	private static boolean Exempt(int id){
+	private static boolean exempt(int id){
 		return (id < 8 || id == 12 || id == 13 || id == 17 || id == 24 || id == 35 || id == 44 || id == 98 || id == 142);
 	}
 	
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void onBlockBreak(BlockBreakEvent event) {
-		if (Exempt(event.getBlock().getTypeId())) return;
+		if (exempt(event.getBlock().getTypeId())) return;
 		
 		Player player = event.getPlayer();
 		if (player == null) return;

@@ -11,6 +11,7 @@ import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
 
+import com.github.dreadslicer.tekkitrestrict.Log.Warning;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
 
 public class TRRecipeBlock {
@@ -22,29 +23,29 @@ public class TRRecipeBlock {
 		// config
 		List<String> ssr = tekkitrestrict.config.getStringList(ConfigFile.Advanced, "RecipeBlock");
 		for (String s : ssr) {
-			List<TRCacheItem> iss = TRCacheItem.processItemString("", s, -1);
+			List<TRCacheItem> iss = TRCacheItem.processItemStringNoCache(s);
 			for (TRCacheItem ir : iss) {
 				try {
 					blockRecipeVanilla(ir.id, ir.data);
 				} catch (Exception e) {
-					TRLogger.Log("debug", "Error! [TRRecipe-RecipeBlockVanilla] " + e.getMessage());
+					Warning.other("Error! [TRRecipe-RecipeBlockVanilla] " + e.getMessage());
 				}
 				try {
 					blockRecipeForge(ir.id, ir.data);
 				} catch (Exception e) {
-					TRLogger.Log("debug", "Error! [TRRecipe-RecipeBlockForge] " + e.getMessage());
+					Warning.other("Error! [TRRecipe-RecipeBlockForge] " + e.getMessage());
 				}
 			}
 		}
 
 		ssr = tekkitrestrict.config.getStringList(ConfigFile.Advanced, "RecipeFurnaceBlock");
 		for (String s : ssr) {
-			List<TRCacheItem> iss = TRCacheItem.processItemString("", s, -1);
+			List<TRCacheItem> iss = TRCacheItem.processItemStringNoCache(s);
 			for (TRCacheItem ir : iss) {
 				try {
 					blockFurnaceRecipe(ir.id, ir.data);
-				} catch (Exception e) {
-					TRLogger.Log("debug", "Error! [TRRecipe-Furnace Block] " + e.getMessage());
+				} catch (Exception ex) {
+					Warning.other("Error! [TRRecipe-Furnace Block] " + ex.getMessage());
 				}
 			}
 		}
@@ -57,7 +58,7 @@ public class TRRecipeBlock {
 
 		while (recipes.hasNext()) {
 			if ((recipe = recipes.next()) != null) {
-				int tid = recipe.getResult().getData().getItemTypeId();
+				int tid = recipe.getResult().getData().getItemTypeId();//TODO .getTypeId()?
 				int tdata = recipe.getResult().getDurability();
 				if (tid == id && (tdata == data || data == 0)) {
 					recipes.remove();

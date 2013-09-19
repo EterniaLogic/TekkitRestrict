@@ -742,7 +742,7 @@ class DisableItemThread extends Thread {
 					s = items;
 				}
 			}
-			List<TRCacheItem> iss = TRCacheItem.processItemString("", s, -1);
+			List<TRCacheItem> iss = TRCacheItem.processItemStringNoCache(s);
 			for (TRCacheItem iss1 : iss) {
 				SSDecharged.add(iss1);
 				SSDechargedStr.add("" + iss1.id);
@@ -781,7 +781,7 @@ class DisableItemThread extends Thread {
 			}
 			
 			if (sseu[0].contains("-") || sseu[0].contains(";")){
-				List<TRCacheItem> iss = TRCacheItem.processItemString("", sseu[0], -1);
+				List<TRCacheItem> iss = TRCacheItem.processItemStringNoCache(sseu[0]);
 				for (TRCacheItem iss1 : iss) {
 					TRCharge gg = new TRCharge();
 					gg.id = iss1.id;
@@ -805,7 +805,7 @@ class DisableItemThread extends Thread {
 				sseu[0] = items;
 			}
 			
-			List<TRCacheItem> iss = TRCacheItem.processItemString("", sseu[0], -1);
+			List<TRCacheItem> iss = TRCacheItem.processItemStringNoCache(sseu[0]);
 			for (TRCacheItem iss1 : iss) {
 				TRCharge gg = new TRCharge();
 				gg.id = iss1.id;
@@ -836,7 +836,7 @@ class DisableItemThread extends Thread {
 			}
 			
 			if (sscharge[0].contains("-") || sscharge[0].contains(";")){
-				List<TRCacheItem> iss = TRCacheItem.processItemString("", sscharge[0], -1);
+				List<TRCacheItem> iss = TRCacheItem.processItemStringNoCache(sscharge[0]);
 				for (TRCacheItem isr : iss) {
 					TRCharge gg = new TRCharge();
 					gg.id = isr.id;
@@ -858,7 +858,7 @@ class DisableItemThread extends Thread {
 				sscharge[0] = items;
 			}
 			
-			List<TRCacheItem> iss = TRCacheItem.processItemString("", sscharge[0], -1);
+			List<TRCacheItem> iss = TRCacheItem.processItemStringNoCache(sscharge[0]);
 			for (TRCacheItem isr : iss) {
 				TRCharge gg = new TRCharge();
 				gg.id = isr.id;

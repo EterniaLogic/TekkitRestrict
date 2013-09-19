@@ -11,6 +11,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
+import com.github.dreadslicer.tekkitrestrict.Log.Warning;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Listeners;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.TRClickType;
@@ -29,7 +30,6 @@ public class TRNoClick {
 				if (action == Action.RIGHT_CLICK_BLOCK || action == Action.RIGHT_CLICK_AIR) return true;
 			}
 		} else if (TRNoItem.equalSet(id, data, iss.getTypeId(), iss.getDurability())) {
-
 			if (safezone) {
 				if (!TRSafeZone.isSafeZoneFor(player, true, true)) return false;
 				if (type.both()){
@@ -89,7 +89,7 @@ public class TRNoClick {
 					continue;
 				}
 				
-				List<TRCacheItem> iss = TRCacheItem.processItemString("", temp[1], -1);
+				List<TRCacheItem> iss = TRCacheItem.processItemStringNoCache(temp[1]);
 				for (TRCacheItem item : iss) {
 					TRNoClick noclick = new TRNoClick();
 					noclick.id = item.id;
@@ -101,7 +101,7 @@ public class TRNoClick {
 			} else {
 				//###########################################################################
 				//Id's and data
-				List<TRCacheItem> iss = TRCacheItem.processItemString("", temp[0], -1);
+				List<TRCacheItem> iss = TRCacheItem.processItemStringNoCache(temp[0]);
 				for (TRCacheItem item : iss){
 					TRNoClick noclick = new TRNoClick();
 					
@@ -162,6 +162,7 @@ public class TRNoClick {
 	public static boolean errorLogged = false;
 	public static boolean isDisabled(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
+		if (event.getItem() == null) return false;
 		if (player.hasPermission("tekkitrestrict.bypass.noclick")) return false;
 		if (Listeners.useNoCLickPerms){
 			Action action = event.getAction();
@@ -206,7 +207,7 @@ public class TRNoClick {
 			}
 		} catch (Exception ex){
 			if (!errorLogged){
-				tekkitrestrict.log.warning("Error: [ListenInteract TRNoClick] " + ex.getMessage());
+				Warning.other("Error: [ListenInteract TRNoClick] " + ex.getMessage());
 				Log.Exception(ex, false);
 				errorLogged = true;
 			}

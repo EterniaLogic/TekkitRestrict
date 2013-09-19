@@ -236,7 +236,7 @@ public class TRCommandTR implements CommandExecutor {
 		}
 		
 		try {
-			List<TRCacheItem> iss = TRCacheItem.processItemString("", largs[2], -1);
+			List<TRCacheItem> iss = TRCacheItem.processItemStringNoCache(largs[2]);
 			for (TRCacheItem isr : iss) {
 				int data = isr.data;
 				if (emc > 0) ee.EEMaps.addEMC(isr.id, data, emc);
@@ -270,7 +270,7 @@ public class TRCommandTR implements CommandExecutor {
 		
 		boolean found = false;
 		try {
-			List<TRCacheItem> iss = TRCacheItem.processItemString("", largs[2], -1);
+			List<TRCacheItem> iss = TRCacheItem.processItemStringNoCache(largs[2]);
 			for (TRCacheItem isr : iss) {
 				HashMap<Integer, Integer> hm = (HashMap<Integer, Integer>) ee.EEMaps.alchemicalValues.get(isr.id);
 				if (hm == null) continue;
@@ -774,11 +774,11 @@ public class TRCommandTR implements CommandExecutor {
 		}
 		
 		try {
-			List<TRCacheItem> iss = TRCacheItem.processItemString("", largs[4], -1);
+			List<TRCacheItem> iss = TRCacheItem.processItemStringNoCache(largs[4]);
 			for (TRCacheItem isr : iss) {
 				for (TRLimit trl : cc.itemlimits) {
 					//tekkitrestrict.log.info(isr.id+":"+isr.getData()+" ?= "+trl.blockID+":"+trl.blockData);
-					if (TRNoItem.equalSet(isr.id, isr.data, trl.blockID, trl.blockData)) {
+					if (TRNoItem.equalSet(isr.id, isr.data, trl.id, trl.data)) {
 						if(trl.placedBlock != null)
 							trl.placedBlock.clear();
 						else
@@ -810,6 +810,12 @@ public class TRCommandTR implements CommandExecutor {
 			return;
 		}
 		
+		Player target = Bukkit.getPlayer(cc.player);
+		if (target == null){
+			send.msg("Unknown player!");
+			return;
+		}
+		
 		if (largs.length == 5){
 			int id;
 			try {
@@ -820,17 +826,16 @@ public class TRCommandTR implements CommandExecutor {
 			}
 			
 			for (TRLimit l : cc.itemlimits) {
-				if (l.blockID != id) continue;
-				int cccl = cc.getMax(cc.player, l.blockID, l.blockData, true);
+				if (l.id != id) continue;
+				int cccl = cc.getMax(target, l.id, l.data);
 				cccl = cccl == -1 ? 0 : cccl;
-				send.msg("[" + l.blockID + ":" + l.blockData + "] - " + l.placedBlock.size() + "/" + cccl + " blocks");
+				send.msg("[" + l.id + ":" + l.data + "] - " + l.placedBlock.size() + "/" + cccl + " blocks");
 			}
-			
 		} else {
 			for (TRLimit l : cc.itemlimits) {
-				int cccl = cc.getMax(cc.player, l.blockID, l.blockData, true);
+				int cccl = cc.getMax(target, l.id, l.data);
 				cccl = cccl == -1 ? 0 : cccl;
-				send.msg("[" + l.blockID + ":" + l.blockData + "] - " + l.placedBlock.size()+"/"+cccl+" blocks");
+				send.msg("[" + l.id + ":" + l.data + "] - " + l.placedBlock.size()+"/"+cccl+" blocks");
 			}
 		}
 	}

@@ -59,7 +59,6 @@ public class TRConfigCache {
 	}
 	
 	public static class LWC {
-		public static List<String> blocked;
 		public static LWCPlugin lwcPlugin;
 	}
 	

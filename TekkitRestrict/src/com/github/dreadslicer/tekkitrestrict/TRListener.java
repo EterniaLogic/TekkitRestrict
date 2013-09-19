@@ -127,7 +127,7 @@ public class TRListener implements Listener {
 	private int lastdata = 0;
 
 	/** @return <b>True</b> if id < 8 or id = 12, 13, 17, 24, 35, 44, 98 or 142. <b>False</b> otherwise. */
-	private static boolean Exempt(int id){
+	private static boolean exempt(int id){
 		return (id < 8 || id == 12 || id == 13 || id == 17 || id == 24 || id == 35 || id == 44 || id == 98 || id == 142);
 	}
 	
@@ -136,7 +136,7 @@ public class TRListener implements Listener {
 	public void onBlockPlace(BlockPlaceEvent event) {
 		Block block = event.getBlock();
 		int id = block.getTypeId();
-		if (Exempt(id)) return;
+		if (exempt(id)) return;
 		
 		Player player = event.getPlayer();
 		
@@ -295,7 +295,7 @@ public class TRListener implements Listener {
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
 	public void onInteractEvent2(PlayerInteractEvent event){
 		if (!tekkitrestrict.EEEnabled) return;
 		

@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,7 +28,6 @@ import com.github.dreadslicer.tekkitrestrict.TRConfigCache.ChunkUnloader;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Dupes;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Global;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Hacks;
-import com.github.dreadslicer.tekkitrestrict.TRConfigCache.LWC;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Listeners;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.SafeZones;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Threads;
@@ -161,9 +159,12 @@ public class tekkitrestrict extends JavaPlugin {
 		//BlockBreaker anti-dupe
 		try {
 			RedPowerMachine.breakerBlacklist.add(Integer.valueOf(-1 << 15 | 194));
-			log.info("Patched BlockBreaker + Auto Crafting Table MK II dupe!");
+			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(0 << 15 | 6362));
+			log.info("Patched BlockBreaker + Auto Crafting Table MK II dupe.");
+			log.info("Patched Deployer + REP Crash Bug.");
 		} catch (Exception ex){
 			loadWarning("Unable to patch BlockBreaker + Auto Crafting Table MK II dupe!");
+			loadWarning("Unable to patch Deployer + REP Crash Bug!");
 		}
 	}
 	@Override
@@ -314,12 +315,12 @@ public class tekkitrestrict extends JavaPlugin {
 						int size = 0;
 						List<String> ssr = tekkitrestrict.config.getStringList("RecipeBlock");
 						for (int i = 0; i < ssr.size(); i++) {
-							List<TRCacheItem> iss = TRCacheItem.processItemString("", ssr.get(i), -1);
+							List<TRCacheItem> iss = TRCacheItem.processItemStringNoCache(ssr.get(i));
 							size += iss.size();
 						}
 						ssr = tekkitrestrict.config.getStringList("RecipeFurnaceBlock");
 						for (int i = 0; i < ssr.size(); i++) {
-							List<TRCacheItem> iss = TRCacheItem.processItemString("", ssr.get(i), -1);
+							List<TRCacheItem> iss = TRCacheItem.processItemStringNoCache(ssr.get(i));
 							size += iss.size();
 						}
 						return size;
@@ -449,10 +450,6 @@ public class tekkitrestrict extends JavaPlugin {
 		Threads.UseRPTimer = config.getBoolean(ConfigFile.General, "UseAutoRPTimer", false);
 		Threads.ChangeDisabledItemsIntoId = config.getInt(ConfigFile.DisableItems, "ChangeDisabledItemsIntoId", 3);
 		Threads.RPTickTime = (int) Math.round((config.getDouble(ConfigFile.ModModifications, "RPTimerMin", 0.2)-0.1d) * 20d);
-		
-		List<String> lwcblocked = config.getStringList(ConfigFile.Advanced, "LWCPreventNearLocked");
-		if (lwcblocked == null) LWC.blocked = Collections.synchronizedList(new LinkedList<String>());
-		else LWC.blocked = Collections.synchronizedList(lwcblocked);
 		
 		SafeZones.UseSafeZones = config.getBoolean(ConfigFile.SafeZones, "UseSafeZones", true);
 		SafeZones.UseFactions = config.getBoolean(ConfigFile.SafeZones, "SSEnabledPlugins.Factions", true);
