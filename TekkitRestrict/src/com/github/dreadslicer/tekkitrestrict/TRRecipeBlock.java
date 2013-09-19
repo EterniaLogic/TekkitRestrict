@@ -13,6 +13,7 @@ import org.bukkit.inventory.ShapelessRecipe;
 
 import com.github.dreadslicer.tekkitrestrict.Log.Warning;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
+import com.github.dreadslicer.tekkitrestrict.objects.TRItem;
 
 public class TRRecipeBlock {
 	public static void reload() {
@@ -23,8 +24,8 @@ public class TRRecipeBlock {
 		// config
 		List<String> ssr = tekkitrestrict.config.getStringList(ConfigFile.Advanced, "RecipeBlock");
 		for (String s : ssr) {
-			List<TRCacheItem> iss = TRCacheItem.processItemStringNoCache(s);
-			for (TRCacheItem ir : iss) {
+			List<TRItem> iss = TRCacheItem.processItemStringNoCache(s);
+			for (TRItem ir : iss) {
 				try {
 					blockRecipeVanilla(ir.id, ir.data);
 				} catch (Exception e) {
@@ -40,8 +41,8 @@ public class TRRecipeBlock {
 
 		ssr = tekkitrestrict.config.getStringList(ConfigFile.Advanced, "RecipeFurnaceBlock");
 		for (String s : ssr) {
-			List<TRCacheItem> iss = TRCacheItem.processItemStringNoCache(s);
-			for (TRCacheItem ir : iss) {
+			List<TRItem> iss = TRCacheItem.processItemStringNoCache(s);
+			for (TRItem ir : iss) {
 				try {
 					blockFurnaceRecipe(ir.id, ir.data);
 				} catch (Exception ex) {

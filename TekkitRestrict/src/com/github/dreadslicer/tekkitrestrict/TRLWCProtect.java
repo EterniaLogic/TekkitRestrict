@@ -12,13 +12,14 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.plugin.PluginManager;
 
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
+import com.github.dreadslicer.tekkitrestrict.objects.TRItem;
 import com.griefcraft.lwc.LWC;
 import com.griefcraft.lwc.LWCPlugin;
 import com.griefcraft.model.Permission;
 import com.griefcraft.model.Protection;
 
 public class TRLWCProtect {
-	public static List<TRCacheItem> lwcBlocked = Collections.synchronizedList(new LinkedList<TRCacheItem>());
+	public static List<TRItem> lwcBlocked = Collections.synchronizedList(new LinkedList<TRItem>());
 	
 	public static void reload(){
 		List<String> blockedList = tekkitrestrict.config.getStringList(ConfigFile.Advanced, "LWCPreventNearLocked");
@@ -48,7 +49,7 @@ public class TRLWCProtect {
 		byte data = block.getData();
 
 		boolean blocked = false;
-		for (TRCacheItem tci : lwcBlocked){
+		for (TRItem tci : lwcBlocked){
 			if (tci.compare(id, data)){
 				blocked = true;
 				break;

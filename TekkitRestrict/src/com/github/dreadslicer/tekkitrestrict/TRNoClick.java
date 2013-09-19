@@ -15,6 +15,7 @@ import com.github.dreadslicer.tekkitrestrict.Log.Warning;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Listeners;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.TRClickType;
+import com.github.dreadslicer.tekkitrestrict.objects.TRItem;
 
 
 public class TRNoClick {
@@ -89,8 +90,8 @@ public class TRNoClick {
 					continue;
 				}
 				
-				List<TRCacheItem> iss = TRCacheItem.processItemStringNoCache(temp[1]);
-				for (TRCacheItem item : iss) {
+				List<TRItem> iss = TRCacheItem.processItemStringNoCache(temp[1]);
+				for (TRItem item : iss) {
 					TRNoClick noclick = new TRNoClick();
 					noclick.id = item.id;
 					noclick.data = item.data;
@@ -101,8 +102,8 @@ public class TRNoClick {
 			} else {
 				//###########################################################################
 				//Id's and data
-				List<TRCacheItem> iss = TRCacheItem.processItemStringNoCache(temp[0]);
-				for (TRCacheItem item : iss){
+				List<TRItem> iss = TRCacheItem.processItemStringNoCache(temp[0]);
+				for (TRItem item : iss){
 					TRNoClick noclick = new TRNoClick();
 					
 					noclick.id = item.id;

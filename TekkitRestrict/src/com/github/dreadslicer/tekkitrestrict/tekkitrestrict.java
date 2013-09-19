@@ -43,6 +43,7 @@ import com.github.dreadslicer.tekkitrestrict.listeners.Assigner;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.DBType;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.SSMode;
+import com.github.dreadslicer.tekkitrestrict.objects.TRItem;
 
 public class tekkitrestrict extends JavaPlugin {
 	
@@ -315,12 +316,12 @@ public class tekkitrestrict extends JavaPlugin {
 						int size = 0;
 						List<String> ssr = tekkitrestrict.config.getStringList("RecipeBlock");
 						for (int i = 0; i < ssr.size(); i++) {
-							List<TRCacheItem> iss = TRCacheItem.processItemStringNoCache(ssr.get(i));
+							List<TRItem> iss = TRCacheItem.processItemStringNoCache(ssr.get(i));
 							size += iss.size();
 						}
 						ssr = tekkitrestrict.config.getStringList("RecipeFurnaceBlock");
 						for (int i = 0; i < ssr.size(); i++) {
-							List<TRCacheItem> iss = TRCacheItem.processItemStringNoCache(ssr.get(i));
+							List<TRItem> iss = TRCacheItem.processItemStringNoCache(ssr.get(i));
 							size += iss.size();
 						}
 						return size;

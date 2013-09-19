@@ -39,6 +39,7 @@ import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Dupes;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Threads;
 import com.github.dreadslicer.tekkitrestrict.commands.TRCommandAlc;
 import com.github.dreadslicer.tekkitrestrict.objects.TRCharge;
+import com.github.dreadslicer.tekkitrestrict.objects.TRItem;
 
 import ee.AlchemyBagData;
 import ee.EEBase;
@@ -394,7 +395,7 @@ class TEntityRemover extends Thread {
 }
 
 class DisableItemThread extends Thread {
-	private List<TRCacheItem> SSDecharged = Collections.synchronizedList(new LinkedList<TRCacheItem>());
+	private List<TRItem> SSDecharged = Collections.synchronizedList(new LinkedList<TRItem>());
 	private List<TRCharge> MCharges = Collections.synchronizedList(new LinkedList<TRCharge>());
 	private List<TRCharge> maxEU = Collections.synchronizedList(new LinkedList<TRCharge>());
 	//private List<TRCharge> originalEU = Collections.synchronizedList(new LinkedList<TRCharge>());
@@ -670,7 +671,7 @@ class DisableItemThread extends Thread {
 		
 		if (index < 0) return false;
 		try {
-			TRCacheItem g = SSDecharged.get(index);
+			TRItem g = SSDecharged.get(index);
 			if (g.id != id) return false;
 			
 			net.minecraft.server.ItemStack mcItemStack = ((CraftItemStack) is).getHandle();
@@ -710,7 +711,7 @@ class DisableItemThread extends Thread {
 	}
 	
 	public void reload() {
-		if (SSDecharged == null) SSDecharged = Collections.synchronizedList(new LinkedList<TRCacheItem>());
+		if (SSDecharged == null) SSDecharged = Collections.synchronizedList(new LinkedList<TRItem>());
 		else SSDecharged.clear();
 	
 		if (SSDechargedStr == null) SSDechargedStr = Collections.synchronizedList(new LinkedList<String>());
@@ -742,8 +743,8 @@ class DisableItemThread extends Thread {
 					s = items;
 				}
 			}
-			List<TRCacheItem> iss = TRCacheItem.processItemStringNoCache(s);
-			for (TRCacheItem iss1 : iss) {
+			List<TRItem> iss = TRCacheItem.processItemStringNoCache(s);
+			for (TRItem iss1 : iss) {
 				SSDecharged.add(iss1);
 				SSDechargedStr.add("" + iss1.id);
 			}
@@ -781,8 +782,8 @@ class DisableItemThread extends Thread {
 			}
 			
 			if (sseu[0].contains("-") || sseu[0].contains(";")){
-				List<TRCacheItem> iss = TRCacheItem.processItemStringNoCache(sseu[0]);
-				for (TRCacheItem iss1 : iss) {
+				List<TRItem> iss = TRCacheItem.processItemStringNoCache(sseu[0]);
+				for (TRItem iss1 : iss) {
 					TRCharge gg = new TRCharge();
 					gg.id = iss1.id;
 					gg.data = iss1.data;
@@ -805,8 +806,8 @@ class DisableItemThread extends Thread {
 				sseu[0] = items;
 			}
 			
-			List<TRCacheItem> iss = TRCacheItem.processItemStringNoCache(sseu[0]);
-			for (TRCacheItem iss1 : iss) {
+			List<TRItem> iss = TRCacheItem.processItemStringNoCache(sseu[0]);
+			for (TRItem iss1 : iss) {
 				TRCharge gg = new TRCharge();
 				gg.id = iss1.id;
 				gg.data = iss1.data;
@@ -836,8 +837,8 @@ class DisableItemThread extends Thread {
 			}
 			
 			if (sscharge[0].contains("-") || sscharge[0].contains(";")){
-				List<TRCacheItem> iss = TRCacheItem.processItemStringNoCache(sscharge[0]);
-				for (TRCacheItem isr : iss) {
+				List<TRItem> iss = TRCacheItem.processItemStringNoCache(sscharge[0]);
+				for (TRItem isr : iss) {
 					TRCharge gg = new TRCharge();
 					gg.id = isr.id;
 					gg.data = isr.data;
@@ -858,8 +859,8 @@ class DisableItemThread extends Thread {
 				sscharge[0] = items;
 			}
 			
-			List<TRCacheItem> iss = TRCacheItem.processItemStringNoCache(sscharge[0]);
-			for (TRCacheItem isr : iss) {
+			List<TRItem> iss = TRCacheItem.processItemStringNoCache(sscharge[0]);
+			for (TRItem isr : iss) {
 				TRCharge gg = new TRCharge();
 				gg.id = isr.id;
 				gg.data = isr.data;

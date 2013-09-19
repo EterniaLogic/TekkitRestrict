@@ -24,6 +24,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import com.github.dreadslicer.tekkitrestrict.Log.Warning;
 import com.github.dreadslicer.tekkitrestrict.annotations.Safe;
 import com.github.dreadslicer.tekkitrestrict.objects.TRConfigLimit;
+import com.github.dreadslicer.tekkitrestrict.objects.TRItem;
 import com.github.dreadslicer.tekkitrestrict.objects.TRLimit;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
 
@@ -60,7 +61,7 @@ public class TRLimiter {
 					continue;
 				}
 				
-				for (TRCacheItem ci : TRCacheItem.processItemStringNoCache(temp[0])){
+				for (TRItem ci : TRCacheItem.processItemStringNoCache(temp[0])){
 					TRConfigLimit cLimit = new TRConfigLimit();
 					cLimit.id = ci.id;
 					cLimit.data = ci.data;

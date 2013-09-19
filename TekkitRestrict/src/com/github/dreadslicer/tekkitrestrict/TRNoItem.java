@@ -12,6 +12,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Listeners;
+import com.github.dreadslicer.tekkitrestrict.objects.TRItem;
 import com.github.dreadslicer.tekkitrestrict.objects.TRItemStack;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
 
@@ -21,11 +22,11 @@ import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
  */
 public class TRNoItem {
 	/** A list of all the (by config) banned items. */
-	private static LinkedList<TRCacheItem> DisabledItems = new LinkedList<TRCacheItem>();
+	private static LinkedList<TRItem> DisabledItems = new LinkedList<TRItem>();
 	/** A list of all the (by config) banned creative items. */
-	private static LinkedList<TRCacheItem> DisabledCreativeItems = new LinkedList<TRCacheItem>();
+	private static LinkedList<TRItem> DisabledCreativeItems = new LinkedList<TRItem>();
 	
-	public static Map<String, List<TRCacheItem>> groups = Collections.synchronizedMap(new HashMap<String, List<TRCacheItem>>());
+	public static Map<String, List<TRItem>> groups = Collections.synchronizedMap(new HashMap<String, List<TRItem>>());
 
 	/**	Clear all Lists and maps in this class (no items will be banned any more) */
 	public static void clear() {
@@ -67,7 +68,7 @@ public class TRNoItem {
 	}
 	
 	/** Adds the given list to the groups Map with the given name. */
-	public static void addGroup(String name, List<TRCacheItem> items){
+	public static void addGroup(String name, List<TRItem> items){
 		groups.put(name, items);
 	}
 
@@ -81,7 +82,7 @@ public class TRNoItem {
 		
 		int id = block.getTypeId();
 		byte data = block.getData();
-		for (TRCacheItem bannedItem : DisabledItems) {
+		for (TRItem bannedItem : DisabledItems) {
 			if (bannedItem.compare(id, data)) return true;
 		}
 		
@@ -117,7 +118,7 @@ public class TRNoItem {
 	public static boolean isItemGloballyBanned(int id, int data) {
 		if (!Listeners.UseNoItem) return false;
 		
-		for (TRCacheItem bannedItem : DisabledItems) {
+		for (TRItem bannedItem : DisabledItems) {
 			if (bannedItem.compare(id, data)) return true;
 		}
 		
@@ -176,7 +177,7 @@ public class TRNoItem {
 		if (doBypassCheck && player.hasPermission("tekkitrestrict.bypass.creative")) return false;
 		
 		if (DisabledCreativeItems != null) {
-			for (TRCacheItem cc : DisabledCreativeItems){
+			for (TRItem cc : DisabledCreativeItems){
 				if (cc.compare(id, data)) return true;
 			}
 		}
@@ -194,9 +195,9 @@ public class TRNoItem {
 			Iterator<String> keys = groups.keySet().iterator();
 			while (keys.hasNext()) {
 				String key = keys.next();
-				if (TRPermHandler.hasPermission(player, "creative", key)) {
-					List<TRCacheItem> mi = groups.get(key);
-					for(TRCacheItem c:mi){
+				if (player.hasPermission("tekkitrestrict.creative."+key)) {
+					List<TRItem> mi = groups.get(key);
+					for(TRItem c:mi){
 						if (c == null) continue;
 						if (c.compare(id, data)) return true;
 					}
@@ -212,7 +213,7 @@ public class TRNoItem {
 		if (doBypassCheck && player.hasPermission("tekkitrestrict.bypass.noitem")) return false;
 
 		if (DisabledItems != null) {
-			for (TRCacheItem cc : DisabledItems){
+			for (TRItem cc : DisabledItems){
 				if (cc.compare(id, data)) return true;
 			}
 		}
@@ -231,8 +232,8 @@ public class TRNoItem {
 			while (keys.hasNext()) {
 				String key = keys.next();
 				if (player.hasPermission("tekkitrestrict.noitem."+key)) {
-					List<TRCacheItem> mi = groups.get(key);
-					for(TRCacheItem c:mi){
+					List<TRItem> mi = groups.get(key);
+					for(TRItem c:mi){
 						if (c == null) continue;
 						if (c.compare(id, data)) return true;
 					}
@@ -353,10 +354,10 @@ public class TRNoItem {
 
 	public static ArrayList<String> getDebugInfo(){
 		ArrayList<String> tbr = new ArrayList<String>();
-		for (TRCacheItem TRCI : DisabledItems){
+		for (TRItem TRCI : DisabledItems){
 			tbr.add("N:"+TRCI.id+":"+TRCI.data);
 		}
-		for (TRCacheItem TRCI : DisabledCreativeItems){
+		for (TRItem TRCI : DisabledCreativeItems){
 			tbr.add("C:"+TRCI.id+":"+TRCI.data);
 		}
 		

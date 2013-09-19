@@ -30,6 +30,7 @@ import com.github.dreadslicer.tekkitrestrict.Log.Warning;
 import com.github.dreadslicer.tekkitrestrict.Updater.UpdateResult;
 import com.github.dreadslicer.tekkitrestrict.api.SafeZones.SafeZoneCreate;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.SafeZone;
+import com.github.dreadslicer.tekkitrestrict.objects.TRItem;
 import com.github.dreadslicer.tekkitrestrict.objects.TRLimit;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -236,8 +237,8 @@ public class TRCommandTR implements CommandExecutor {
 		}
 		
 		try {
-			List<TRCacheItem> iss = TRCacheItem.processItemStringNoCache(largs[2]);
-			for (TRCacheItem isr : iss) {
+			List<TRItem> iss = TRCacheItem.processItemStringNoCache(largs[2]);
+			for (TRItem isr : iss) {
 				int data = isr.data;
 				if (emc > 0) ee.EEMaps.addEMC(isr.id, data, emc);
 				else {
@@ -270,8 +271,8 @@ public class TRCommandTR implements CommandExecutor {
 		
 		boolean found = false;
 		try {
-			List<TRCacheItem> iss = TRCacheItem.processItemStringNoCache(largs[2]);
-			for (TRCacheItem isr : iss) {
+			List<TRItem> iss = TRCacheItem.processItemStringNoCache(largs[2]);
+			for (TRItem isr : iss) {
 				HashMap<Integer, Integer> hm = (HashMap<Integer, Integer>) ee.EEMaps.alchemicalValues.get(isr.id);
 				if (hm == null) continue;
 				
@@ -774,8 +775,8 @@ public class TRCommandTR implements CommandExecutor {
 		}
 		
 		try {
-			List<TRCacheItem> iss = TRCacheItem.processItemStringNoCache(largs[4]);
-			for (TRCacheItem isr : iss) {
+			List<TRItem> iss = TRCacheItem.processItemStringNoCache(largs[4]);
+			for (TRItem isr : iss) {
 				for (TRLimit trl : cc.itemlimits) {
 					//tekkitrestrict.log.info(isr.id+":"+isr.getData()+" ?= "+trl.blockID+":"+trl.blockData);
 					if (TRNoItem.equalSet(isr.id, isr.data, trl.id, trl.data)) {

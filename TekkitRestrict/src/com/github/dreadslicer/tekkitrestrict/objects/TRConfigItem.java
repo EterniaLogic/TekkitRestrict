@@ -1,6 +1,6 @@
 package com.github.dreadslicer.tekkitrestrict.objects;
 
-public class TRConfigItem {
+public class TRConfigItem extends TRItem {
 	public int id = -1;
 	public int data = 0;
 	
