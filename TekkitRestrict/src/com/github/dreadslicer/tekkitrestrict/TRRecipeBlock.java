@@ -24,7 +24,7 @@ public class TRRecipeBlock {
 		// config
 		List<String> ssr = tekkitrestrict.config.getStringList(ConfigFile.Advanced, "RecipeBlock");
 		for (String s : ssr) {
-			List<TRItem> iss = TRCacheItem.processItemStringNoCache(s);
+			List<TRItem> iss = TRCacheItem.processItemString(s, true);
 			for (TRItem ir : iss) {
 				try {
 					blockRecipeVanilla(ir.id, ir.data);
@@ -41,7 +41,7 @@ public class TRRecipeBlock {
 
 		ssr = tekkitrestrict.config.getStringList(ConfigFile.Advanced, "RecipeFurnaceBlock");
 		for (String s : ssr) {
-			List<TRItem> iss = TRCacheItem.processItemStringNoCache(s);
+			List<TRItem> iss = TRCacheItem.processItemString(s, true);
 			for (TRItem ir : iss) {
 				try {
 					blockFurnaceRecipe(ir.id, ir.data);

@@ -22,9 +22,18 @@ public class TRItem {
 		return false;
 	}
 	
+	/** @return A string representation of this Cache Item: "id:data" */
 	@Override
-	public String toString(){
-		return ""+id+":"+data;
+	public String toString() {
+		return new StringBuilder(12).append(id).append(":").append(data).toString();
+	}
+	
+	@Override
+	public Object clone(){
+		TRItem ti = new TRItem();
+		ti.id = this.id;
+		ti.data = this.data;
+		return ti;
 	}
 	
 	/**

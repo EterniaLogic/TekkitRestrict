@@ -24,7 +24,7 @@ public class TRLWCProtect {
 	public static void reload(){
 		List<String> blockedList = tekkitrestrict.config.getStringList(ConfigFile.Advanced, "LWCPreventNearLocked");
 		for (String str : blockedList){
-			lwcBlocked.addAll(TRCacheItem.processItemStringNoCache(str));
+			lwcBlocked.addAll(TRCacheItem.processItemString(str, true));
 		}
 	}
 	

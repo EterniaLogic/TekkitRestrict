@@ -4,12 +4,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.configuration.ConfigurationSection;
 
 import com.github.dreadslicer.tekkitrestrict.Log.Warning;
-import com.github.dreadslicer.tekkitrestrict.annotations.Safe;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
 import com.github.dreadslicer.tekkitrestrict.objects.TRItem;
 
@@ -20,9 +18,6 @@ public class TRCacheItem {
 	//Block Dmg values: 0-15 (4bits)
 	//Item Dmg values: 0-65536 (2 bytes)
 	//Data: 5 chars
-	
-	// Pre-caches items into a range.
-	private static ConcurrentHashMap<String, List<TRItem>> cacheMods = new ConcurrentHashMap<String, List<TRItem>>();
 	
 	private static String[] modItems = new String[] {
 		"ee=27520-27599;126-130",
@@ -49,60 +44,7 @@ public class TRCacheItem {
 		"chunkloaders=4095;214;7303;179"
 	};
 
-	protected TRCacheItem() {}
-
-	public int id = -1;
-	public int data;
-	//private String cacher = "";
-	//private int Data1 = -1;
-	//private Object Data2 = -1;
-
-	//public int getIntData() {
-	//	return Data1;
-	//}
-	//public void setIntData(int x) {
-	//	Data1 = x;
-	//}
-	//public Object getObjectData() {
-	//	return Data2;
-	//}
-	//public void setObjectData(Object x) {
-	//	Data2 = x;
-	//}
-
-	/**
-	 * Compare this CacheObject with the given id and data
-	 * @return True if:<br>
-	 * <ul>
-	 * <li>this.id == -11</li>
-	 * <li>this.id == id AND this.data == data</li>
-	 * <li>this.id == id AND this.data == -1</li>
-	 * <li>this.id == id AND this.data == -10 AND data == 0</li>
-	 * </ul>
-	 */
-	@Safe
-	public boolean compare(int id, int data) {
-		//boolean isAllDataTypes = (this.data == -10 && data == 0);
-		//boolean isALL = (this.id == -11);
-		return (this.id == -11) || ((this.id == id && (this.data == data || this.data == -1 || (this.data == -10 && data == 0))));
-	}
-
-	/** @return A string representation of this Cache Item: "id:data" */
-	@Override
-	public String toString() {
-		return new StringBuilder(12).append(id).append(":").append(data).toString();
-	}
-	
-	@Override
-	public Object clone(){
-		TRCacheItem tci = new TRCacheItem();
-		tci.id = this.id;
-		tci.data = this.data;
-		return tci;
-	}
-
 	public static void reload() {
-		clearCache();
 		for (String s : modItems) {
 			if (s.contains("=")) {
 				String[] gg = s.split("=");
@@ -142,7 +84,7 @@ public class TRCacheItem {
 		}
 	}
 	
-	public static List<TRItem> processItemStringNoCache(String item) {
+	public static List<TRItem> processItemString(String item, boolean warn) {
 		String itemx = item.replace(":-", ":=");
 		// converts a variable string into a list of data.
 		LinkedList<TRItem> tci = new LinkedList<TRItem>();
@@ -161,7 +103,7 @@ public class TRCacheItem {
 							data1 = -10;
 						}
 					} catch (NumberFormatException ex){
-						Warning.config("Invalid data value: \"" + dataString + "\" in \"" + itemx + "\"!");
+						if (warn) Warning.config("Invalid data value: \"" + dataString + "\" in \"" + itemx + "\"!");
 					}
 				}
 				
@@ -173,7 +115,7 @@ public class TRCacheItem {
 				fromId = Integer.parseInt(t[0]);
 				toId = Integer.parseInt(t[1]);
 			} catch (NumberFormatException ex){
-				Warning.config("Invalid range: \"" + t[0]+"-"+t[1] + "\"");
+				if (warn) Warning.config("Invalid range: \"" + t[0]+"-"+t[1] + "\"");
 				return tci;
 			}
 
@@ -200,7 +142,7 @@ public class TRCacheItem {
 				else
 					data = Integer.parseInt(t[1].replace('=', '-'));
 			} catch (NumberFormatException | ArrayIndexOutOfBoundsException ex){
-				Warning.config("Invalid entry: \"" + itemx + "\"!");
+				if (warn) Warning.config("Invalid entry: \"" + itemx + "\"!");
 				return tci;
 			}
 			
@@ -229,11 +171,7 @@ public class TRCacheItem {
 			try {
 				id = Integer.parseInt(itemx);
 			} catch (NumberFormatException ex){
-				if (cacheMods.containsKey(item.toLowerCase())) {
-					List<TRItem> cc = cacheMods.get(item.toLowerCase());
-					return cc;
-				}
-				Warning.config("You have an error in your Config: \""+itemx+"\" is not a valid item string.");
+				if (warn) Warning.config("You have an error in your Config: \""+itemx+"\" is not a valid item string.");
 				return tci;
 			}
 
@@ -241,7 +179,7 @@ public class TRCacheItem {
 				tci.add(TRItem.parseItem(id, -1));
 				return tci;
 			} catch (Exception ex) {
-				Warning.config("Invalid entry: \"" + itemx + "\"!");
+				if (warn) Warning.config("Invalid entry: \"" + itemx + "\"!");
 				return tci;
 			}
 		}
@@ -252,26 +190,12 @@ public class TRCacheItem {
 			String[] itemsStr = ins.split(";");
 			List<TRItem> l = new LinkedList<TRItem>();
 			for (String itemStr : itemsStr) {
-				l.addAll(processItemStringNoCache(itemStr));
+				l.addAll(processItemString(itemStr, true));
 			}
 			return l;
 		} else if (ins.length() > 0) {
-			return processItemStringNoCache(ins);
+			return processItemString(ins, true);
 		}
 		return new LinkedList<TRItem>();
 	}
-
-	/** Clears the cache so new perms can be added. */
-	private static void clearCache() {
-		synchronized (cacheMods) {
-			for (String s : cacheMods.keySet()){
-				List<TRItem> cis = cacheMods.get(s);
-				for (TRItem ci : cis){
-					Log.Debug("cacheMods.get("+s+"): " + ci.toString());
-				}
-			}
-			cacheMods.clear();
-		}
-	}
-
 }

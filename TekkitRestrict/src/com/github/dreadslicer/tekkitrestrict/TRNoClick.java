@@ -90,7 +90,7 @@ public class TRNoClick {
 					continue;
 				}
 				
-				List<TRItem> iss = TRCacheItem.processItemStringNoCache(temp[1]);
+				List<TRItem> iss = TRCacheItem.processItemString(temp[1], true);
 				for (TRItem item : iss) {
 					TRNoClick noclick = new TRNoClick();
 					noclick.id = item.id;
@@ -102,7 +102,7 @@ public class TRNoClick {
 			} else {
 				//###########################################################################
 				//Id's and data
-				List<TRItem> iss = TRCacheItem.processItemStringNoCache(temp[0]);
+				List<TRItem> iss = TRCacheItem.processItemString(temp[0], true);
 				for (TRItem item : iss){
 					TRNoClick noclick = new TRNoClick();
 					

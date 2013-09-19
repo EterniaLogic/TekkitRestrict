@@ -237,7 +237,7 @@ public class TRCommandTR implements CommandExecutor {
 		}
 		
 		try {
-			List<TRItem> iss = TRCacheItem.processItemStringNoCache(largs[2]);
+			List<TRItem> iss = TRCacheItem.processItemString(largs[2], false);
 			for (TRItem isr : iss) {
 				int data = isr.data;
 				if (emc > 0) ee.EEMaps.addEMC(isr.id, data, emc);
@@ -271,7 +271,7 @@ public class TRCommandTR implements CommandExecutor {
 		
 		boolean found = false;
 		try {
-			List<TRItem> iss = TRCacheItem.processItemStringNoCache(largs[2]);
+			List<TRItem> iss = TRCacheItem.processItemString(largs[2], false);
 			for (TRItem isr : iss) {
 				HashMap<Integer, Integer> hm = (HashMap<Integer, Integer>) ee.EEMaps.alchemicalValues.get(isr.id);
 				if (hm == null) continue;
@@ -775,7 +775,7 @@ public class TRCommandTR implements CommandExecutor {
 		}
 		
 		try {
-			List<TRItem> iss = TRCacheItem.processItemStringNoCache(largs[4]);
+			List<TRItem> iss = TRCacheItem.processItemString(largs[4], false);
 			for (TRItem isr : iss) {
 				for (TRLimit trl : cc.itemlimits) {
 					//tekkitrestrict.log.info(isr.id+":"+isr.getData()+" ?= "+trl.blockID+":"+trl.blockData);

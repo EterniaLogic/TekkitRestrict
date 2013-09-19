@@ -61,7 +61,7 @@ public class TRLimiter {
 					continue;
 				}
 				
-				for (TRItem ci : TRCacheItem.processItemStringNoCache(temp[0])){
+				for (TRItem ci : TRCacheItem.processItemString(temp[0], true)){
 					TRConfigLimit cLimit = new TRConfigLimit();
 					cLimit.id = ci.id;
 					cLimit.data = ci.data;

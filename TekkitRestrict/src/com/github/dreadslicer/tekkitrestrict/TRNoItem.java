@@ -53,7 +53,7 @@ public class TRNoItem {
 	private static void allocateDisabledItems() {
 		List<String> di = tekkitrestrict.config.getStringList(ConfigFile.DisableItems, "DisableItems");
 		for (String str : di) {
-			DisabledItems.addAll(TRCacheItem.processItemStringNoCache(str));
+			DisabledItems.addAll(TRCacheItem.processItemString(str, true));
 			//DisabledItems.addAll(TRCacheItem.processItemString("n", "", str));
 			//DisabledItems.addAll(TRCacheItem.processItemString("noitem", "", str));
 		}
@@ -61,7 +61,7 @@ public class TRNoItem {
 	private static void allocateDisabledCreativeItems() {
 		List<String> di = tekkitrestrict.config.getStringList(ConfigFile.LimitedCreative, "LimitedCreative");
 		for (String str : di) {
-			DisabledCreativeItems.addAll(TRCacheItem.processItemStringNoCache(str));
+			DisabledCreativeItems.addAll(TRCacheItem.processItemString(str, true));
 			//DisabledCreativeItems.addAll(TRCacheItem.processItemString("c", "afsd90ujpj", str));
 			//DisabledCreativeItems.addAll(TRCacheItem.processItemString("creative", "afsd90ujpj", str));			
 		}

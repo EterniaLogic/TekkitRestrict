@@ -743,7 +743,7 @@ class DisableItemThread extends Thread {
 					s = items;
 				}
 			}
-			List<TRItem> iss = TRCacheItem.processItemStringNoCache(s);
+			List<TRItem> iss = TRCacheItem.processItemString(s, true);
 			for (TRItem iss1 : iss) {
 				SSDecharged.add(iss1);
 				SSDechargedStr.add("" + iss1.id);
@@ -782,7 +782,7 @@ class DisableItemThread extends Thread {
 			}
 			
 			if (sseu[0].contains("-") || sseu[0].contains(";")){
-				List<TRItem> iss = TRCacheItem.processItemStringNoCache(sseu[0]);
+				List<TRItem> iss = TRCacheItem.processItemString(sseu[0], true);
 				for (TRItem iss1 : iss) {
 					TRCharge gg = new TRCharge();
 					gg.id = iss1.id;
@@ -806,7 +806,7 @@ class DisableItemThread extends Thread {
 				sseu[0] = items;
 			}
 			
-			List<TRItem> iss = TRCacheItem.processItemStringNoCache(sseu[0]);
+			List<TRItem> iss = TRCacheItem.processItemString(sseu[0], true);
 			for (TRItem iss1 : iss) {
 				TRCharge gg = new TRCharge();
 				gg.id = iss1.id;
@@ -837,7 +837,7 @@ class DisableItemThread extends Thread {
 			}
 			
 			if (sscharge[0].contains("-") || sscharge[0].contains(";")){
-				List<TRItem> iss = TRCacheItem.processItemStringNoCache(sscharge[0]);
+				List<TRItem> iss = TRCacheItem.processItemString(sscharge[0], true);
 				for (TRItem isr : iss) {
 					TRCharge gg = new TRCharge();
 					gg.id = isr.id;
@@ -859,7 +859,7 @@ class DisableItemThread extends Thread {
 				sscharge[0] = items;
 			}
 			
-			List<TRItem> iss = TRCacheItem.processItemStringNoCache(sscharge[0]);
+			List<TRItem> iss = TRCacheItem.processItemString(sscharge[0], true);
 			for (TRItem isr : iss) {
 				TRCharge gg = new TRCharge();
 				gg.id = isr.id;
