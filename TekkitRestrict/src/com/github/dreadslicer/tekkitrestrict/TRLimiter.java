@@ -48,7 +48,7 @@ public class TRLimiter {
 			try {
 				String[] temp = limBlock.split(" ");
 				if (temp.length!=2){
-					Warning.config("You have an error in your Advanced.config.yml in LimitBlocks!");
+					Warning.config("You have an error in your Advanced.config.yml in LimitBlocks:");
 					Warning.config("\""+limBlock+"\" does not follow the syntaxis \"itemIndex limit\"!");
 					continue;
 				}
@@ -56,27 +56,27 @@ public class TRLimiter {
 				try {
 					limit = Integer.parseInt(temp[1]);
 				} catch (NumberFormatException ex){
-					Warning.config("You have an error in your Advanced.config.yml in LimitBlocks!");
+					Warning.config("You have an error in your Advanced.config.yml in LimitBlocks:");
 					Warning.config("\""+temp[1]+"\" is not a valid number!");
 					continue;
 				}
+				List<TRItem> items;
+				try {
+					items = TRItemProcesser.processItemString(temp[0]);
+				} catch (TRException ex) {
+					Warning.config("You have an error in your Advanced.config.yml in LimitBlocks:");
+					Warning.config(ex.getMessage());
+					continue;
+				}
 				
-				for (TRItem ci : TRCacheItem.processItemString(temp[0], true)){
+				for (TRItem ci : items){
 					TRConfigLimit cLimit = new TRConfigLimit();
 					cLimit.id = ci.id;
 					cLimit.data = ci.data;
 					cLimit.configcount = limit;
 					configLimits.add(cLimit);
 				}
-				//TRCacheItem.processItemString("limiter", "afsd90ujpj", temp[0], limit);
-				/*
-				 * ItemStack[] ar = TRNoItem.getRangedItemValues(g[0]); int
-				 * limit = Integer.valueOf(g[1]); for (ItemStack iss : ar) {
-				 * TRLimit ccr = new TRLimit(); for (int i = 0; i < limit; i++)
-				 * { ccr.placedBlock.add(null); } ccr.blockID = iss.id;
-				 * ccr.blockData = iss.getData(); configLimits.add(ccr); }
-				 */
-			} catch (Exception e) {
+			} catch (Exception ex) {
 				Warning.config("LimitBlocks: has an error!");
 			}
 		}

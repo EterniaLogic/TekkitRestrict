@@ -1,16 +1,14 @@
 package com.github.dreadslicer.tekkitrestrict;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
+import com.github.dreadslicer.tekkitrestrict.Log.Warning;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Listeners;
 import com.github.dreadslicer.tekkitrestrict.objects.TRItem;
 import com.github.dreadslicer.tekkitrestrict.objects.TRItemStack;
@@ -26,13 +24,12 @@ public class TRNoItem {
 	/** A list of all the (by config) banned creative items. */
 	private static LinkedList<TRItem> DisabledCreativeItems = new LinkedList<TRItem>();
 	
-	public static Map<String, List<TRItem>> groups = Collections.synchronizedMap(new HashMap<String, List<TRItem>>());
+	
 
 	/**	Clear all Lists and maps in this class (no items will be banned any more) */
 	public static void clear() {
 		DisabledItems.clear();
 		DisabledCreativeItems.clear();
-		groups.clear();
 	}
 	
 	/**
@@ -53,25 +50,28 @@ public class TRNoItem {
 	private static void allocateDisabledItems() {
 		List<String> di = tekkitrestrict.config.getStringList(ConfigFile.DisableItems, "DisableItems");
 		for (String str : di) {
-			DisabledItems.addAll(TRCacheItem.processItemString(str, true));
-			//DisabledItems.addAll(TRCacheItem.processItemString("n", "", str));
-			//DisabledItems.addAll(TRCacheItem.processItemString("noitem", "", str));
+			try {
+				DisabledItems.addAll(TRItemProcesser.processItemString(str));
+			} catch (TRException ex) {
+				Warning.config("You have an error in your DisableItems.config.yml in DisableItems:");
+				Warning.config(ex.getMessage());
+				continue;
+			}
 		}
 	}
 	private static void allocateDisabledCreativeItems() {
 		List<String> di = tekkitrestrict.config.getStringList(ConfigFile.LimitedCreative, "LimitedCreative");
 		for (String str : di) {
-			DisabledCreativeItems.addAll(TRCacheItem.processItemString(str, true));
-			//DisabledCreativeItems.addAll(TRCacheItem.processItemString("c", "afsd90ujpj", str));
-			//DisabledCreativeItems.addAll(TRCacheItem.processItemString("creative", "afsd90ujpj", str));			
+			try {
+				DisabledCreativeItems.addAll(TRItemProcesser.processItemString(str));
+			} catch (TRException ex) {
+				Warning.config("You have an error in your LimitedCreative.config.yml in LimitedCreative:");
+				Warning.config(ex.getMessage());
+				continue;
+			}	
 		}
 	}
 	
-	/** Adds the given list to the groups Map with the given name. */
-	public static void addGroup(String name, List<TRItem> items){
-		groups.put(name, items);
-	}
-
 	/**
 	 * Goes through all banned items and checks if the id and data match.
 	 * 
@@ -192,11 +192,11 @@ public class TRNoItem {
 		if (player.hasPermission(idStr+"."+data)) return true;
 		else if (player.hasPermission(idStr)) return true;
 		else {
-			Iterator<String> keys = groups.keySet().iterator();
+			Iterator<String> keys = TRItemProcesser.groups.keySet().iterator();
 			while (keys.hasNext()) {
 				String key = keys.next();
 				if (player.hasPermission("tekkitrestrict.creative."+key)) {
-					List<TRItem> mi = groups.get(key);
+					List<TRItem> mi = TRItemProcesser.groups.get(key);
 					for(TRItem c:mi){
 						if (c == null) continue;
 						if (c.compare(id, data)) return true;
@@ -228,11 +228,11 @@ public class TRNoItem {
 		if (player.hasPermission(idStr+"."+data)) return true;
 		else if (player.hasPermission(idStr)) return true;
 		else {
-			Iterator<String> keys = groups.keySet().iterator();
+			Iterator<String> keys = TRItemProcesser.groups.keySet().iterator();
 			while (keys.hasNext()) {
 				String key = keys.next();
 				if (player.hasPermission("tekkitrestrict.noitem."+key)) {
-					List<TRItem> mi = groups.get(key);
+					List<TRItem> mi = TRItemProcesser.groups.get(key);
 					for(TRItem c:mi){
 						if (c == null) continue;
 						if (c.compare(id, data)) return true;

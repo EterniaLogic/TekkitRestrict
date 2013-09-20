@@ -21,10 +21,16 @@ public class TRRecipeBlock {
 	}
 
 	public static void blockConfigRecipes() {
-		// config
 		List<String> ssr = tekkitrestrict.config.getStringList(ConfigFile.Advanced, "RecipeBlock");
 		for (String s : ssr) {
-			List<TRItem> iss = TRCacheItem.processItemString(s, true);
+			List<TRItem> iss;
+			try {
+				iss = TRItemProcesser.processItemString(s);
+			} catch (TRException ex) {
+				Warning.config("You have an error in your Advanced.config.yml in RecipeBlock:");
+				Warning.config(ex.getMessage());
+				continue;
+			}
 			for (TRItem ir : iss) {
 				try {
 					blockRecipeVanilla(ir.id, ir.data);
@@ -41,7 +47,14 @@ public class TRRecipeBlock {
 
 		ssr = tekkitrestrict.config.getStringList(ConfigFile.Advanced, "RecipeFurnaceBlock");
 		for (String s : ssr) {
-			List<TRItem> iss = TRCacheItem.processItemString(s, true);
+			List<TRItem> iss;
+			try {
+				iss = TRItemProcesser.processItemString(s);
+			} catch (TRException ex) {
+				Warning.config("You have an error in your Advanced.config.yml in RecipeFurnaceBlock:");
+				Warning.config(ex.getMessage());
+				continue;
+			}
 			for (TRItem ir : iss) {
 				try {
 					blockFurnaceRecipe(ir.id, ir.data);

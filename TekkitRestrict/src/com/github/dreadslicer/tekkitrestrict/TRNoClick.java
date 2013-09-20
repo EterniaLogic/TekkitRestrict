@@ -86,11 +86,18 @@ public class TRNoClick {
 			String temp[] = disableClick.split(" ");
 			if (temp[0].equalsIgnoreCase("block")){
 				if (temp.length == 1){
-					Log.Warning.config("You have an error in your DisableClick config: \"block\" is not a valid itemstring");
+					Warning.config("You have an error in your DisableClick config: \"block\" is not a valid itemstring");
 					continue;
 				}
 				
-				List<TRItem> iss = TRCacheItem.processItemString(temp[1], true);
+				List<TRItem> iss;
+				try {
+					iss = TRItemProcesser.processItemString(temp[1]);
+				} catch (TRException ex) {
+					Warning.config("You have an error in your DisableClick.config.yml in DisableClick:");
+					Warning.config(ex.getMessage());
+					continue;
+				}
 				for (TRItem item : iss) {
 					TRNoClick noclick = new TRNoClick();
 					noclick.id = item.id;
@@ -102,7 +109,15 @@ public class TRNoClick {
 			} else {
 				//###########################################################################
 				//Id's and data
-				List<TRItem> iss = TRCacheItem.processItemString(temp[0], true);
+				List<TRItem> iss;
+				try {
+					iss = TRItemProcesser.processItemString(temp[0]);
+				} catch (TRException ex) {
+					Warning.config("You have an error in your DisableClick.config.yml in DisableClick:");
+					Warning.config(ex.getMessage());
+					continue;
+				}
+				
 				for (TRItem item : iss){
 					TRNoClick noclick = new TRNoClick();
 					

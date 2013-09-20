@@ -90,10 +90,6 @@ public class TRThread {
 		instance.disableItemThread.reload();
 		if (initialized && tekkitrestrict.EEEnabled && Dupes.alcBag && !instance.bagCacheThread.isAlive()) instance.bagCacheThread.start();
 	}
-
-	public static void originalEUEnd() {
-		instance.disableItemThread.originalEUEnd();
-	}
 }
 
 class TRLimitFlyThread extends Thread {
@@ -541,7 +537,6 @@ class DisableItemThread extends Thread {
 			if (si instanceof ItemArmorElectric) {
 				ItemArmorElectric ci = (ItemArmorElectric) si;
 				if (ci.maxCharge != s.maxcharge || ci.transferLimit != s.chargerate) {
-					this.addOriginalEU(ci.id, ci.maxCharge, ci.transferLimit, mcItemStack);
 					// tekkitrestrict.log.info(ci.maxCharge+" dur: "+var1.i()+" mc: "+ci.getMaxCharge());
 					double charge = nbttagcompound.getInt("charge");
 					double newcharge = (charge * s.maxcharge) / ci.maxCharge;
@@ -564,7 +559,6 @@ class DisableItemThread extends Thread {
 			} else if (si instanceof ItemElectricTool) {
 				ItemElectricTool ci = (ItemElectricTool) si;
 				if (ci.maxCharge != s.maxcharge || ci.transferLimit != s.chargerate) {
-					this.addOriginalEU(ci.id, ci.maxCharge, ci.transferLimit, mcItemStack);
 					// tekkitrestrict.log.info(ci.maxCharge+" dur: "+var1.i()+" mc: "+ci.getMaxCharge());
 					double charge = nbttagcompound.getInt("charge");
 					double newcharge = (charge * s.maxcharge) / ci.maxCharge;
@@ -733,17 +727,15 @@ class DisableItemThread extends Thread {
 		
 		List<String> dechargeSS = tekkitrestrict.config.getStringList("DechargeInSS");
 		for (String s : dechargeSS) {
-			if (!s.contains("-") && !s.contains(";") && !s.contains(":")){
-				if (!s.matches("\\d+")){
-					String items = TRItemStringHandler.parseEEName(s);
-					if (items == null){
-						Log.Warning.config("You have an error in your ModModifications.config in DechargeInSS: Invalid EE Item name or id: \""+s+"\"!");
-						continue;
-					}
-					s = items;
-				}
+			List<TRItem> iss;
+			try {
+				iss = TRItemProcesser.processItemString(s);
+			} catch (TRException ex) {
+				Warning.config("You have an error in your ModModifications.config in DechargeInSS:");
+				Warning.config(ex.getMessage());
+				continue;
 			}
-			List<TRItem> iss = TRCacheItem.processItemString(s, true);
+			
 			for (TRItem iss1 : iss) {
 				SSDecharged.add(iss1);
 				SSDechargedStr.add("" + iss1.id);
@@ -753,15 +745,15 @@ class DisableItemThread extends Thread {
 		List<String> meu = tekkitrestrict.config.getStringList("MaxEU");
 		for (String s : meu) {
 			if (!s.contains(" ")){
-				Log.Warning.config("You have an error in your ModModifications.config in MaxEU!");
-				Log.Warning.config("Invalid number of arguments in \""+s+"\". Required: 3");
+				Warning.config("You have an error in your ModModifications.config in MaxEU!");
+				Warning.config("Invalid number of arguments in \""+s+"\". Required: 3");
 				continue;
 			}
 			
 			String[] sseu = s.split(" ");
 			if (sseu.length != 3){
-				Log.Warning.config("You have an error in your ModModifications.config in MaxEU!");
-				Log.Warning.config("Invalid number of arguments in \""+s+"\". Required: 3");
+				Warning.config("You have an error in your ModModifications.config in MaxEU!");
+				Warning.config("Invalid number of arguments in \""+s+"\". Required: 3");
 				continue;
 			}
 			int eu, chrate;
@@ -769,44 +761,26 @@ class DisableItemThread extends Thread {
 			try {
 				eu = Integer.parseInt(sseu[1]);
 			} catch (NumberFormatException ex){
-				Log.Warning.config("You have an error in your ModModifications.config in MaxEU!");
-				Log.Warning.config("Invalid MaxEU value \""+sseu[1]+"\" in \""+s+"\"!");
+				Warning.config("You have an error in your ModModifications.config in MaxEU!");
+				Warning.config("Invalid MaxEU value \""+sseu[1]+"\" in \""+s+"\"!");
 				continue;
 			}
 			try {
 				chrate = Integer.parseInt(sseu[2]);
 			} catch (NumberFormatException ex){
-				Log.Warning.config("You have an error in your ModModifications.config in MaxEU!");
-				Log.Warning.config("Invalid charge rate \""+sseu[2]+"\" in \""+s+"\"!");
+				Warning.config("You have an error in your ModModifications.config in MaxEU!");
+				Warning.config("Invalid charge rate \""+sseu[2]+"\" in \""+s+"\"!");
 				continue;
 			}
-			
-			if (sseu[0].contains("-") || sseu[0].contains(";")){
-				List<TRItem> iss = TRCacheItem.processItemString(sseu[0], true);
-				for (TRItem iss1 : iss) {
-					TRCharge gg = new TRCharge();
-					gg.id = iss1.id;
-					gg.data = iss1.data;
-					gg.maxcharge = eu;
-					gg.chargerate = chrate;
-					this.maxEU.add(gg);
-					this.maxEUStr.add("" + iss1.id);
-				}
+
+			List<TRItem> iss;
+			try {
+				iss = TRItemProcesser.processItemString(sseu[0]);
+			} catch (TRException ex) {
+				Warning.config("You have an error in your ModModifications.config in MaxEU:");
+				Warning.config(ex.getMessage());
 				continue;
 			}
-			
-			if (!sseu[0].matches("\\d+")){
-				String items = TRItemStringHandler.parseIC2Name(sseu[0]);
-				if (items == null){
-					Log.Warning.config("You have an error in your ModModifications.config in MaxEU!");
-					Log.Warning.config("Invalid name or id: \""+sseu[0]+"\" in \""+s+"\"!");
-					continue;
-				}
-				
-				sseu[0] = items;
-			}
-			
-			List<TRItem> iss = TRCacheItem.processItemString(sseu[0], true);
 			for (TRItem iss1 : iss) {
 				TRCharge gg = new TRCharge();
 				gg.id = iss1.id;
@@ -832,34 +806,18 @@ class DisableItemThread extends Thread {
 			try {
 				max = Integer.parseInt(sscharge[1]);
 			} catch (NumberFormatException ex){
-				Log.Warning.config("You have an error in your maxchare list in ModModifications.config: \""+sscharge[1]+"\" is not a valid number");
+				Warning.config("You have an error in your maxchare list in ModModifications.config: \""+sscharge[1]+"\" is not a valid number");
 				continue;
 			}
 			
-			if (sscharge[0].contains("-") || sscharge[0].contains(";")){
-				List<TRItem> iss = TRCacheItem.processItemString(sscharge[0], true);
-				for (TRItem isr : iss) {
-					TRCharge gg = new TRCharge();
-					gg.id = isr.id;
-					gg.data = isr.data;
-					gg.maxcharge = max;
-					this.MCharges.add(gg);
-					this.MChargeStr.add("" + gg.id);
-				}
+			List<TRItem> iss;
+			try {
+				iss = TRItemProcesser.processItemString(sscharge[0]);
+			} catch (TRException ex) {
+				Warning.config("You have an error in your ModModifications.config in MaxCharge:");
+				Warning.config(ex.getMessage());
 				continue;
 			}
-			
-			if (!sscharge[0].matches("\\d+")){
-				String items = TRItemStringHandler.parseEEName(sscharge[0]);
-				if (items == null){
-					Log.Warning.config("You have an error in your maxchare list in ModModifications.config: \""+sscharge[0]+"\" is not a valid EE Item or id");
-					continue;
-				}
-				
-				sscharge[0] = items;
-			}
-			
-			List<TRItem> iss = TRCacheItem.processItemString(sscharge[0], true);
 			for (TRItem isr : iss) {
 				TRCharge gg = new TRCharge();
 				gg.id = isr.id;
@@ -869,69 +827,6 @@ class DisableItemThread extends Thread {
 				this.MChargeStr.add("" + gg.id);
 			}
 		}
-	}
-
-	private void addOriginalEU(int id, int mcharge, int tlimit, Object store) {
-		//TRCharge trcc = new TRCharge();
-		//trcc.id = id;
-		//trcc.maxcharge = mcharge;
-		//trcc.chargerate = tlimit;
-		//trcc.itemstack = store;
-		//originalEU.add(trcc);
-	}
-
-	public void originalEUEnd() {
-		// returns the affected items back to their normal rates... so they are
-		// saved correctly.
-		/*
-		 * for(TRCharge s:originalEU){ if(s.itemstack != null){ try{
-		 * net.minecraft.server.ItemStack var1 =
-		 * (net.minecraft.server.ItemStack)s.itemstack; Item si =
-		 * var1.getItem(); int k = s.maxcharge; NBTTagCompound nbttagcompound =
-		 * StackUtil.getOrCreateNbtData(var1); if(si instanceof
-		 * ItemArmorElectric){ ItemArmorElectric ci = (ItemArmorElectric) si;
-		 * if(ci.maxCharge != s.maxcharge || ci.transferLimit != s.chargerate){
-		 * this.addOriginalEU(ci.id,ci.maxCharge,ci.transferLimit,var1);
-		 * tekkitrestrict
-		 * .log.info(ci.maxCharge+" dur: "+var1.i()+" mc: "+ci.getMaxCharge());
-		 * double charge = nbttagcompound.getInt("charge"); Double newcharge =
-		 * (new Double(charge)*new Double(s.maxcharge))/new
-		 * Double(ci.maxCharge);
-		 * tekkitrestrict.log.info("charge: "+charge+" newcharge: "+newcharge);
-		 * ci.maxCharge = s.maxcharge; ci.transferLimit = s.chargerate;
-		 * nbttagcompound.setInt("charge",newcharge.intValue());
-		 * 
-		 * ElectricItem.charge(var1, 10, 9999, true, false); /*if (var1.i() > 2)
-		 * var1.setData(1 + ((s.maxcharge - newcharge) * (var1.i() - 2)) /
-		 * s.maxcharge); else var1.setData(0);* / } } else if(si instanceof
-		 * ItemElectricTool){ ItemElectricTool ci = (ItemElectricTool) si;
-		 * if(ci.maxCharge != s.maxcharge || ci.transferLimit != s.chargerate){
-		 * this.addOriginalEU(ci.id,ci.maxCharge,ci.transferLimit,var1);
-		 * //tekkitrestrict
-		 * .log.info(ci.maxCharge+" dur: "+var1.i()+" mc: "+ci.getMaxCharge());
-		 * int charge = nbttagcompound.getInt("charge"); int newcharge =
-		 * (charge*s.maxcharge)/ci.maxCharge; ci.maxCharge = s.maxcharge;
-		 * ci.transferLimit = s.chargerate;
-		 * nbttagcompound.setInt("charge",newcharge);
-		 * 
-		 * ElectricItem.charge(var1, 10, 9999, true, false); /*if (var1.i() > 2)
-		 * var1.setData(1 + ((ci.getMaxCharge() - k) * (var1.i() - 2)) /
-		 * ci.getMaxCharge()); else var1.setData(0);* / } } else if(si
-		 * instanceof ElectricItem){ ElectricItem ci = (ElectricItem) si;
-		 * if(ci.maxCharge != s.maxcharge || ci.transferLimit != s.chargerate){
-		 * this.addOriginalEU(ci.id,ci.maxCharge,ci.transferLimit,var1);
-		 * //tekkitrestrict
-		 * .log.info(ci.maxCharge+" dur: "+var1.i()+" mc: "+ci.getMaxCharge());
-		 * int charge = nbttagcompound.getInt("charge"); int newcharge =
-		 * (charge*s.maxcharge)/ci.maxCharge; ci.maxCharge = s.maxcharge;
-		 * ci.transferLimit = s.chargerate;
-		 * nbttagcompound.setInt("charge",newcharge);
-		 * 
-		 * ElectricItem.charge(var1, 10, 9999, true, false); /*if (var1.i() > 2)
-		 * var1.setData(1 + ((ci.getMaxCharge() - k) * (var1.i() - 2)) /
-		 * ci.getMaxCharge()); else var1.setData(0);* / } } } catch(Exception
-		 * es){ es.printStackTrace(); } } }
-		 */
 	}
 
 	/**

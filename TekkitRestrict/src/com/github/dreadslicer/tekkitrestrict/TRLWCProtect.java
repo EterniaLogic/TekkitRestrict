@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.plugin.PluginManager;
 
+import com.github.dreadslicer.tekkitrestrict.Log.Warning;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
 import com.github.dreadslicer.tekkitrestrict.objects.TRItem;
 import com.griefcraft.lwc.LWC;
@@ -24,7 +25,13 @@ public class TRLWCProtect {
 	public static void reload(){
 		List<String> blockedList = tekkitrestrict.config.getStringList(ConfigFile.Advanced, "LWCPreventNearLocked");
 		for (String str : blockedList){
-			lwcBlocked.addAll(TRCacheItem.processItemString(str, true));
+			try {
+				lwcBlocked.addAll(TRItemProcesser.processItemString(str));
+			} catch (TRException ex) {
+				Warning.config("You have an error in your Advanced.config.yml in LWCPreventNearLocked:");
+				Warning.config(ex.getMessage());
+				continue;
+			}
 		}
 	}
 	

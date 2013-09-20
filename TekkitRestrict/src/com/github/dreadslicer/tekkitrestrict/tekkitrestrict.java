@@ -316,12 +316,22 @@ public class tekkitrestrict extends JavaPlugin {
 						int size = 0;
 						List<String> ssr = tekkitrestrict.config.getStringList("RecipeBlock");
 						for (int i = 0; i < ssr.size(); i++) {
-							List<TRItem> iss = TRCacheItem.processItemString(ssr.get(i), false);
+							List<TRItem> iss;
+							try {
+								iss = TRItemProcesser.processItemString(ssr.get(i));
+							} catch (TRException e) {
+								continue;
+							}
 							size += iss.size();
 						}
 						ssr = tekkitrestrict.config.getStringList("RecipeFurnaceBlock");
 						for (int i = 0; i < ssr.size(); i++) {
-							List<TRItem> iss = TRCacheItem.processItemString(ssr.get(i), false);
+							List<TRItem> iss;
+							try {
+								iss = TRItemProcesser.processItemString(ssr.get(i));
+							} catch (TRException e) {
+								continue;
+							}
 							size += iss.size();
 						}
 						return size;
@@ -494,7 +504,7 @@ public class tekkitrestrict extends JavaPlugin {
 		config = this.getConfigx();
 		loadConfigCache();
 		TRNoItem.clear(); //TRNI
-		TRCacheItem.reload();
+		TRItemProcesser.reload();
 		try {
 			TRNoItem.reload(); //TRNI2 FIXME errors
 		} catch (Exception ex) {

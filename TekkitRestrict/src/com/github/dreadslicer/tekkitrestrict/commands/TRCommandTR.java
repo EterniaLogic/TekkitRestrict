@@ -19,8 +19,9 @@ import org.bukkit.plugin.PluginManager;
 
 import com.github.dreadslicer.tekkitrestrict.Log;
 import com.github.dreadslicer.tekkitrestrict.Send;
-import com.github.dreadslicer.tekkitrestrict.TRCacheItem;
+import com.github.dreadslicer.tekkitrestrict.TRItemProcesser;
 import com.github.dreadslicer.tekkitrestrict.TRDB;
+import com.github.dreadslicer.tekkitrestrict.TRException;
 import com.github.dreadslicer.tekkitrestrict.TRLimiter;
 import com.github.dreadslicer.tekkitrestrict.TRNoItem;
 import com.github.dreadslicer.tekkitrestrict.TRPerformance;
@@ -237,7 +238,14 @@ public class TRCommandTR implements CommandExecutor {
 		}
 		
 		try {
-			List<TRItem> iss = TRCacheItem.processItemString(largs[2], false);
+			List<TRItem> iss;
+			try {
+				iss = TRItemProcesser.processItemString(largs[2]);
+			} catch (TRException ex) {
+				send.msg(ChatColor.RED + "Invalid item string:");
+				send.msg(ChatColor.RED + ex.getMessage());
+				return;
+			}
 			for (TRItem isr : iss) {
 				int data = isr.data;
 				if (emc > 0) ee.EEMaps.addEMC(isr.id, data, emc);
@@ -270,8 +278,16 @@ public class TRCommandTR implements CommandExecutor {
 		}
 		
 		boolean found = false;
+		
 		try {
-			List<TRItem> iss = TRCacheItem.processItemString(largs[2], false);
+			List<TRItem> iss;
+			try {
+				iss = TRItemProcesser.processItemString(largs[2]);
+			} catch (TRException ex) {
+				send.msg(ChatColor.RED + "Invalid item string:");
+				send.msg(ChatColor.RED + ex.getMessage());
+				return;
+			}
 			for (TRItem isr : iss) {
 				HashMap<Integer, Integer> hm = (HashMap<Integer, Integer>) ee.EEMaps.alchemicalValues.get(isr.id);
 				if (hm == null) continue;
@@ -775,7 +791,15 @@ public class TRCommandTR implements CommandExecutor {
 		}
 		
 		try {
-			List<TRItem> iss = TRCacheItem.processItemString(largs[4], false);
+			List<TRItem> iss;
+			try {
+				iss = TRItemProcesser.processItemString(largs[4]);
+			} catch (TRException ex) {
+				send.msg(ChatColor.RED + "Invalid item string:");
+				send.msg(ChatColor.RED + ex.getMessage());
+				return;
+			}
+			
 			for (TRItem isr : iss) {
 				for (TRLimit trl : cc.itemlimits) {
 					//tekkitrestrict.log.info(isr.id+":"+isr.getData()+" ?= "+trl.blockID+":"+trl.blockData);
