@@ -61,22 +61,31 @@ public class TRPermHandler {
 		return false;
 	}
 
+	private static boolean logged = false;
 	public static int getPermNumeral(Player p, String permBase, int id, int data) {
 
 		String negPerms[] = getPermissions(p, "-"+permBase);
 		for (int i = 0; i < negPerms.length; i++) {
-			String gp[] = negPerms[i].replace('.', ';').split(";");//tekkitrestrict;limiter;id
+			String gp[] = negPerms[i].replace('.', ';').split(";");//tekkitrestrict;limiter;id;data
 			String gs[] = permBase.replace('.', ';').split(";");//tekkitrestrict;limiter
 			if (gp.length < 2 || gs.length < 2) continue;
-			if (gp[1] == null || gs[1] == null) continue;
-			if (!gp[1].equals(gs[1])) continue;
+			if (gp[1].equals("") || gs[1].equals("")) continue;
+			if (!gp[1].equals(gs[1])) continue;//limiter
 			try {
-				if (gp.length != 5){
-					if (TRNoItem.isInRanged(gp[2]+":-10", id, data)) return -1;
-				} else {
-					if (TRNoItem.isInRanged(gp[2]+":"+gp[3], id, data)) return -1;
+				if (gp.length == 5){
+					if (TRItemProcessor.isInRange(gp[2]+":"+gp[3], id, data, negPerms[i])) return -1;//id:data
+				} else if (gp.length == 4){
+					if (TRItemProcessor.isInRange(gp[2], id, data, negPerms[i])) return -1;//id:-1
 				}
-			} catch (Exception ex){}
+			} catch (Exception ex){
+				if (!logged){
+					Warning.other("You have set an invalid limiter permission \""+negPerms[i]+"\":");
+					Warning.other("Unexpected error occurred! Please inform the author of this error.");
+					Warning.other(ex.getMessage());
+					Log.Exception(ex, true);
+					logged = true;
+				}
+			}
 		}
 
 		String perms[] = getPermissions(p, permBase);
@@ -84,16 +93,40 @@ public class TRPermHandler {
 			String gp[] = perms[i].replace('.', ';').split(";");//tekkitrestrict;limiter;id
 			String gs[] = permBase.replace('.', ';').split(";");//tekkitrestrict;limiter
 			if (gp.length < 2 || gs.length < 2) continue;
-			if (gp[1] == null || gs[1] == null) continue;
+			if (gp[1].equals("") || gs[1].equals("")) continue;
 			if (!gp[1].equals(gs[1])) continue;
 			
 			try {
-				if (gp.length != 5){
-					if (TRNoItem.isInRanged(gp[2], id, data)) return Integer.parseInt(gp[3]);
-				} else {
-					if (TRNoItem.isInRanged(gp[2]+":"+gp[3], id, data)) return Integer.parseInt(gp[4]);
+				if (gp.length == 5){
+					if (TRItemProcessor.isInRange(gp[2]+":"+gp[3], id, data, perms[i])){
+						try {
+							return Integer.parseInt(gp[4]);
+						} catch (NumberFormatException ex){
+							Warning.other("You have set an invalid limiter permission \""+perms[i]+"\":");
+							Warning.other("Invalid max amount: \""+gp[4]+"\"");
+							return -1;
+						}
+					}
+				} else if (gp.length == 4) {
+					if (TRItemProcessor.isInRange(gp[2], id, data, perms[i])){
+						try {
+							return Integer.parseInt(gp[3]);
+						} catch (NumberFormatException ex){
+							Warning.other("You have set an invalid limiter permission \""+perms[i]+"\":");
+							Warning.other("Invalid max amount: \""+gp[3]+"\"");
+							return -1;
+						}
+					}
 				}
-			} catch (Exception ex){}
+			} catch (Exception ex){
+				if (!logged){
+					Warning.other("You have set an invalid limiter permission \""+perms[i]+"\":");
+					Warning.other("Unexpected error occurred! Please inform the author of this error.");
+					Warning.other(ex.getMessage());
+					Log.Exception(ex, true);
+					logged = true;
+				}
+			}
 		}
 
 		return -1;

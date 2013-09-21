@@ -19,7 +19,7 @@ import org.bukkit.plugin.PluginManager;
 
 import com.github.dreadslicer.tekkitrestrict.Log;
 import com.github.dreadslicer.tekkitrestrict.Send;
-import com.github.dreadslicer.tekkitrestrict.TRItemProcesser;
+import com.github.dreadslicer.tekkitrestrict.TRItemProcessor;
 import com.github.dreadslicer.tekkitrestrict.TRDB;
 import com.github.dreadslicer.tekkitrestrict.TRException;
 import com.github.dreadslicer.tekkitrestrict.TRLimiter;
@@ -240,7 +240,7 @@ public class TRCommandTR implements CommandExecutor {
 		try {
 			List<TRItem> iss;
 			try {
-				iss = TRItemProcesser.processItemString(largs[2]);
+				iss = TRItemProcessor.processItemString(largs[2]);
 			} catch (TRException ex) {
 				send.msg(ChatColor.RED + "Invalid item string:");
 				send.msg(ChatColor.RED + ex.getMessage());
@@ -282,7 +282,7 @@ public class TRCommandTR implements CommandExecutor {
 		try {
 			List<TRItem> iss;
 			try {
-				iss = TRItemProcesser.processItemString(largs[2]);
+				iss = TRItemProcessor.processItemString(largs[2]);
 			} catch (TRException ex) {
 				send.msg(ChatColor.RED + "Invalid item string:");
 				send.msg(ChatColor.RED + ex.getMessage());
@@ -793,7 +793,7 @@ public class TRCommandTR implements CommandExecutor {
 		try {
 			List<TRItem> iss;
 			try {
-				iss = TRItemProcesser.processItemString(largs[4]);
+				iss = TRItemProcessor.processItemString(largs[4]);
 			} catch (TRException ex) {
 				send.msg(ChatColor.RED + "Invalid item string:");
 				send.msg(ChatColor.RED + ex.getMessage());

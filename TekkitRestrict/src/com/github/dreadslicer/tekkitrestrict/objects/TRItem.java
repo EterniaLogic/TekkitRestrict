@@ -40,14 +40,21 @@ public class TRItem {
 	 * Compare this TRItem with the given id and data
 	 * @return True if:<br>
 	 * <ul>
-	 * <li>this.id == -11</li>
 	 * <li>this.id == id AND this.data == data</li>
 	 * <li>this.id == id AND this.data == -1</li>
-	 * <li>this.id == id AND this.data == -10 AND data == 0</li>
+	 * <li>this.id == id AND data == 0 AND this.data == -10</li>
 	 * </ul>
 	 */
 	@Safe
 	public boolean compare(int id, int data) {
-		return this.id == -11 || this.id == id && (this.data == data || this.data == -1 || this.data == -10 && data == 0);
+		return this.id == id && (this.data == data || this.data == -1 || (data == 0 && this.data == -10));
+	}
+	
+	public static boolean compare(int id, int data, TRItem mainItem){
+		return id == mainItem.id && (data == mainItem.data || mainItem.data == -1 || (data == 0 && mainItem.data == -10));
+	}
+	
+	public static boolean compare(int id, int data, int mainId, int mainData){
+		return id == mainId && (data == mainData || mainData == -1 || (data == 0 && mainData == -10));
 	}
 }

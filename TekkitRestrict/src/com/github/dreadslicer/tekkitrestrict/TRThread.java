@@ -729,7 +729,7 @@ class DisableItemThread extends Thread {
 		for (String s : dechargeSS) {
 			List<TRItem> iss;
 			try {
-				iss = TRItemProcesser.processItemString(s);
+				iss = TRItemProcessor.processItemString(s);
 			} catch (TRException ex) {
 				Warning.config("You have an error in your ModModifications.config in DechargeInSS:");
 				Warning.config(ex.getMessage());
@@ -775,7 +775,7 @@ class DisableItemThread extends Thread {
 
 			List<TRItem> iss;
 			try {
-				iss = TRItemProcesser.processItemString(sseu[0]);
+				iss = TRItemProcessor.processItemString(sseu[0]);
 			} catch (TRException ex) {
 				Warning.config("You have an error in your ModModifications.config in MaxEU:");
 				Warning.config(ex.getMessage());
@@ -812,7 +812,7 @@ class DisableItemThread extends Thread {
 			
 			List<TRItem> iss;
 			try {
-				iss = TRItemProcesser.processItemString(sscharge[0]);
+				iss = TRItemProcessor.processItemString(sscharge[0]);
 			} catch (TRException ex) {
 				Warning.config("You have an error in your ModModifications.config in MaxCharge:");
 				Warning.config(ex.getMessage());

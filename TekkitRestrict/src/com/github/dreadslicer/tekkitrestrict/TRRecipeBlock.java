@@ -25,7 +25,7 @@ public class TRRecipeBlock {
 		for (String s : ssr) {
 			List<TRItem> iss;
 			try {
-				iss = TRItemProcesser.processItemString(s);
+				iss = TRItemProcessor.processItemString(s);
 			} catch (TRException ex) {
 				Warning.config("You have an error in your Advanced.config.yml in RecipeBlock:");
 				Warning.config(ex.getMessage());
@@ -49,7 +49,7 @@ public class TRRecipeBlock {
 		for (String s : ssr) {
 			List<TRItem> iss;
 			try {
-				iss = TRItemProcesser.processItemString(s);
+				iss = TRItemProcessor.processItemString(s);
 			} catch (TRException ex) {
 				Warning.config("You have an error in your Advanced.config.yml in RecipeFurnaceBlock:");
 				Warning.config(ex.getMessage());

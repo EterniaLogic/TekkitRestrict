@@ -92,7 +92,7 @@ public class TRNoClick {
 				
 				List<TRItem> iss;
 				try {
-					iss = TRItemProcesser.processItemString(temp[1]);
+					iss = TRItemProcessor.processItemString(temp[1]);
 				} catch (TRException ex) {
 					Warning.config("You have an error in your DisableClick.config.yml in DisableClick:");
 					Warning.config(ex.getMessage());
@@ -111,7 +111,7 @@ public class TRNoClick {
 				//Id's and data
 				List<TRItem> iss;
 				try {
-					iss = TRItemProcesser.processItemString(temp[0]);
+					iss = TRItemProcessor.processItemString(temp[0]);
 				} catch (TRException ex) {
 					Warning.config("You have an error in your DisableClick.config.yml in DisableClick:");
 					Warning.config(ex.getMessage());

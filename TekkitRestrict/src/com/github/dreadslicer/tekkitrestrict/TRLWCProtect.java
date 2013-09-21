@@ -26,7 +26,7 @@ public class TRLWCProtect {
 		List<String> blockedList = tekkitrestrict.config.getStringList(ConfigFile.Advanced, "LWCPreventNearLocked");
 		for (String str : blockedList){
 			try {
-				lwcBlocked.addAll(TRItemProcesser.processItemString(str));
+				lwcBlocked.addAll(TRItemProcessor.processItemString(str));
 			} catch (TRException ex) {
 				Warning.config("You have an error in your Advanced.config.yml in LWCPreventNearLocked:");
 				Warning.config(ex.getMessage());

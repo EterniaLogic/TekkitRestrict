@@ -318,7 +318,7 @@ public class tekkitrestrict extends JavaPlugin {
 						for (int i = 0; i < ssr.size(); i++) {
 							List<TRItem> iss;
 							try {
-								iss = TRItemProcesser.processItemString(ssr.get(i));
+								iss = TRItemProcessor.processItemString(ssr.get(i));
 							} catch (TRException e) {
 								continue;
 							}
@@ -328,7 +328,7 @@ public class tekkitrestrict extends JavaPlugin {
 						for (int i = 0; i < ssr.size(); i++) {
 							List<TRItem> iss;
 							try {
-								iss = TRItemProcesser.processItemString(ssr.get(i));
+								iss = TRItemProcessor.processItemString(ssr.get(i));
 							} catch (TRException e) {
 								continue;
 							}
@@ -504,7 +504,7 @@ public class tekkitrestrict extends JavaPlugin {
 		config = this.getConfigx();
 		loadConfigCache();
 		TRNoItem.clear(); //TRNI
-		TRItemProcesser.reload();
+		TRItemProcessor.reload();
 		try {
 			TRNoItem.reload(); //TRNI2 FIXME errors
 		} catch (Exception ex) {

@@ -62,7 +62,7 @@ public class TRLimiter {
 				}
 				List<TRItem> items;
 				try {
-					items = TRItemProcesser.processItemString(temp[0]);
+					items = TRItemProcessor.processItemString(temp[0]);
 				} catch (TRException ex) {
 					Warning.config("You have an error in your Advanced.config.yml in LimitBlocks:");
 					Warning.config(ex.getMessage());
@@ -95,7 +95,7 @@ public class TRLimiter {
 		try {
 			for (int i = 0; i < configLimits.size(); i++) {
 				TRConfigLimit cc = configLimits.get(i);
-				if (cc.equals(thisid, thisdata)) {
+				if (cc.compare(thisid, thisdata)) {
 					max = cc.configcount;
 					if (max != -1) return max;
 				}

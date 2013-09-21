@@ -6,7 +6,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-
 import com.github.dreadslicer.tekkitrestrict.Log;
 import com.github.dreadslicer.tekkitrestrict.TRNoItem;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Dupes;
@@ -21,8 +20,7 @@ public class InventoryClickListener implements Listener {
 		int data1 = 0;
 		int id2 = 0;
 		
-		if (event.getCurrentItem() != null)
-		{
+		if (event.getCurrentItem() != null) {
 			id1 = event.getCurrentItem().getTypeId();
 			data1 = event.getCurrentItem().getDurability();
 			if (!player.hasPermission("tekkitrestrict.bypass.noitem")) {
@@ -38,8 +36,7 @@ public class InventoryClickListener implements Listener {
 			}
 		}
 		
-		if (event.getCursor() != null)
-		{
+		if (event.getCursor() != null) {
 			id2 = event.getCursor().getTypeId();
 		}
 		

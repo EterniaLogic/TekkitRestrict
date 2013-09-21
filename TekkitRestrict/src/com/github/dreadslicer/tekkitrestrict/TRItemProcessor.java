@@ -14,7 +14,7 @@ import com.github.dreadslicer.tekkitrestrict.Log.Warning;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
 import com.github.dreadslicer.tekkitrestrict.objects.TRItem;
 
-public class TRItemProcesser {
+public class TRItemProcessor {
 	//Block ID's Forge: 0-4095
 	//Item ID's: 4096-32000
 	//ID's: 5 chars
@@ -116,7 +116,7 @@ public class TRItemProcesser {
 				if (dataString.equals("*")) data = -1;
 				else {
 					try {
-						data = Integer.parseInt(dataString);
+						data = Integer.parseInt(dataString.replace("=", "-"));
 						if (data == 0) data = -10;
 					} catch (NumberFormatException ex){
 						throw new TRException("Invalid data value: \"" + dataString + "\" in \"" + itemx + "\"!");//Throw exception
@@ -151,6 +151,7 @@ public class TRItemProcesser {
 					data = -1;
 				else
 					data = Integer.parseInt(t[1].replace('=', '-'));
+				
 			} catch (NumberFormatException ex){
 				throw new TRException("Invalid data value in \""+itemx+"\"!");
 			}
@@ -201,6 +202,131 @@ public class TRItemProcesser {
 
 			tci.add(TRItem.parseItem(id, -1));
 			return tci;
+		}
+	}
+	
+	public static boolean isInRange(String range, int id, int data, String perm){
+		String itemx = range.replace(":-", ":=");
+		if (itemx.contains("-")) {
+			// loop through this range and add each to the return stack.
+			int data2;
+			if (itemx.contains(":")) {
+				String dataString = itemx.split(":")[1];
+				if (dataString.equals("*")) data2 = -1;
+				else {
+					try {
+						data2 = Integer.parseInt(dataString.replace("=", "-"));
+						if (data2 == 0) data2 = -10;
+					} catch (NumberFormatException ex){
+						Warning.other("You have set an invalid limiter permission \""+perm+"\":");
+						Warning.other("Invalid data value: \"" + dataString.replace("=", "-") + "\"!");
+						return false;
+					}
+				}
+				
+				itemx = itemx.split(":")[0];
+			} else {
+				data2 = -1;
+			}
+			
+			if (data2 != -1 && data2 != data && !(data2 == -10 && data == 0)) return false;
+			
+			String[] t = itemx.split("-");
+			int fromId = 0, toId = 0;
+			try {
+				fromId = Integer.parseInt(t[0]);
+				toId = Integer.parseInt(t[1]);
+			} catch (NumberFormatException ex){
+				Warning.other("You have set an invalid limiter permission \""+perm+"\":");
+				Warning.other("Invalid range: \"" + t[0]+"-"+t[1] + "\"");
+				return false;
+			}
+			
+			if (id >= fromId || id <= toId) return true;
+			return false;
+		}
+		//############################## SINGLE ID WITH DATA ###########################
+		else if (itemx.contains(":")) {
+			String[] t = itemx.split(":");
+			int id2 = 0, data2 = 0;
+			
+			try {
+				if (t[1].equals("*")) data2 = -1;
+				else data2 = Integer.parseInt(t[1].replace('=', '-'));
+				
+				if (data2 == 0) data2 = -10;
+			} catch (NumberFormatException ex){
+				Warning.other("You have set an invalid limiter permission \""+perm+"\":");
+				Warning.other("Invalid data value in \""+itemx+"\"!");
+				return false;
+			}
+			
+			if (data2 != -1 && data2 != data && !(data2 == -10 && data == 0)) return false;
+			
+			if (t[0].matches("\\d+")){//ID
+				try {
+					id2 = Integer.parseInt(t[0]);
+				} catch (NumberFormatException ex){
+					Warning.other("You have set an invalid limiter permission \""+perm+"\":");
+					Warning.other("Invalid entry: \"" + itemx + "\"!");
+					return false;
+				}
+				
+				if (id2 == id) return true;
+				return false;
+			} else {//GROUP / NAME
+				List<TRItem> items = groups.get(t[0]);
+				if (items != null){
+					for (TRItem item : items){
+						if (item.compare(id, data)) return true;
+					}
+				}
+				
+				try {
+					items = processItemName(t[0], data2);
+				} catch (TRException ex) {}
+				
+				if (items != null){
+					for (TRItem item : items){
+						if (item.compare(id, data)) return true;
+					}
+				}
+				
+				Warning.other("You have set an invalid limiter permission \""+perm+"\":");
+				Warning.other("\""+t[0]+"\" is not a valid modgroup, permissiongroup, EE or IC2 itemname!");
+				return false;
+			}
+		}
+		
+		//############################## SINGLE ID ###########################
+		else {
+			int id2 = 0;
+			try {
+				id2 = Integer.parseInt(itemx);
+				if (id2 == id) return true;
+				return false;
+			} catch (NumberFormatException ex){
+				List<TRItem> items = groups.get(itemx);
+				if (items != null){
+					for (TRItem item : items){
+						if (item.compare(id, data)) return true;
+					}
+				}
+				
+				try {
+				items = processItemName(itemx, -1);
+				} catch (TRException ex2) {}
+				
+				if (items != null){
+					for (TRItem item : items){
+						if (item.compare(id, data)) return true;
+					}
+				}
+				
+				Warning.other("You have set an invalid limiter permission \""+perm+"\":");
+				Warning.other("\""+itemx+"\" is not a valid ID, modgroup, permissiongroup, EE itemname or IC2 itemname!");
+				return false;
+			}
 		}
 	}
 
