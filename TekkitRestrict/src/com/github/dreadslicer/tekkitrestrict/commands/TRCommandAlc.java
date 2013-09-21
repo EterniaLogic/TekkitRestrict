@@ -1,7 +1,6 @@
 package com.github.dreadslicer.tekkitrestrict.commands;
 
 import java.io.File;
-import java.util.logging.Level;
 
 import net.minecraft.server.BaseMod;
 import net.minecraft.server.Container;
@@ -22,6 +21,8 @@ import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.event.CraftEventFactory;
 import org.bukkit.entity.Player;
 
+import com.github.dreadslicer.tekkitrestrict.Log;
+import com.github.dreadslicer.tekkitrestrict.Log.Warning;
 import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
 import com.github.dreadslicer.tekkitrestrict.objects.OpenAlcObj;
 
@@ -103,7 +104,7 @@ public class TRCommandAlc implements CommandExecutor {
 			World world = ((CraftWorld) player.getWorld()).getHandle();
 			AlchemyBagData alcdata = openGui(looker, holder, mod_EE.getInstance(), 56, world, color, (int) looker.locY, (int) looker.locZ);
 			if (alcdata == null){
-				tekkitrestrict.log.warning("An error occurred. " + OName + "'s bag will not save properly if he is offline.");
+				Warning.other("An error occurred. " + OName + "'s bag will not save properly if he is offline.");
 			}
 			
 			new OpenAlcObj(alcdata, OPlayer, player); //Add new OpenAlcObject
@@ -114,9 +115,9 @@ public class TRCommandAlc implements CommandExecutor {
 			
 			tekkitrestrict.log.info(player.getName() + " opened " + OName + "'s " + strcolor + " Alchemy Bag!");
 			
-		} catch (Exception e) {
+		} catch (Exception ex) {
 			sender.sendMessage(ChatColor.RED + "An error has occurred processing your command.");
-			tekkitrestrict.log.warning("Exception in OpenAlc : " + e.getMessage());
+			Warning.other("Exception in OpenAlc : " + ex.getMessage());
 		}
 
 			return true;
@@ -266,23 +267,11 @@ public class TRCommandAlc implements CommandExecutor {
 		try {
 			test = (AlchemyBagData) container.getInventory();
 		} catch (Exception ex){
-			tekkitrestrict.log.warning("Cannot Cast: ");
-			ex.printStackTrace();
+			Warning.other("Cannot Cast: ");
+			Log.Exception(ex, false);
 			test = null;
 		}
 		return test;
-	}
-	
-	public static void sendMessage(Player player, String[] message) {
-		if (player != null) {
-			for (int k = 0; k < message.length; k++) {
-				player.sendRawMessage(message[k]);
-			}
-		} else {
-			for (int k = 0; k < message.length; k++) {
-				tekkitrestrict.log.log(Level.OFF, message[k]);
-			}
-		}
 	}
 
 	private static int getColor(String color) {
@@ -359,10 +348,10 @@ public class TRCommandAlc implements CommandExecutor {
 				return target;
 			}
 			sender.sendMessage(ChatColor.RED + "Player " + name + " can not be found!");
-		} catch (Exception e) {
+		} catch (Exception ex) {
 			sender.sendMessage("Error while retrieving offline player data!");
-			tekkitrestrict.log.warning("Exception in TRCommandAlc.Playerz: ");
-			e.printStackTrace();
+			Warning.other("Exception in TRCommandAlc.Playerz: ");
+			Log.Exception(ex, false);
 			return null;
 		}
 		return target;

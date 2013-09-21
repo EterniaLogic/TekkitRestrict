@@ -8,7 +8,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 
 import com.github.dreadslicer.tekkitrestrict.Log;
 import com.github.dreadslicer.tekkitrestrict.TRLimiter;
-import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
+import com.github.dreadslicer.tekkitrestrict.Log.Warning;
 
 public class BlockBreakListener implements Listener{
 	/** @return <b>True</b> if id < 8 or id = 12, 13, 17, 24, 35, 44, 98 or 142. <b>False</b> otherwise. */
@@ -36,7 +36,7 @@ public class BlockBreakListener implements Listener{
 				il.checkBreakLimit(event);
 			}
 		} catch(Exception ex){
-			tekkitrestrict.log.warning("Error in onBlockBreak, Block limiter!");
+			Warning.other("Error in onBlockBreak, Block limiter!");
 			Log.Exception(ex, false);
 		}
 	}

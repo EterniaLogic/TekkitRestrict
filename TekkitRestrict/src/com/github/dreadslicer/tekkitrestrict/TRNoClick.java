@@ -49,7 +49,7 @@ public class TRNoClick {
 				} else if (type.trample()){
 					if (action == Action.PHYSICAL) return true;
 				} else {
-					tekkitrestrict.log.warning("Unknown action " + action.toString());
+					Warning.other("An error occurred in TRNoClick: Unknown action " + action.toString());
 				}
 			} else {
 				if (type.both()){
@@ -68,7 +68,7 @@ public class TRNoClick {
 				} else if (type.trample()){
 					if (action == Action.PHYSICAL) return true;
 				} else {
-					tekkitrestrict.log.warning("Unknown action " + action.toString());
+					Warning.other("An error occurred in TRNoClick: Unknown action " + action.toString());
 				}
 			}
 		}
@@ -200,7 +200,7 @@ public class TRNoClick {
 				} else if (action == Action.PHYSICAL){
 					lr = "trampling";
 				} else {
-					tekkitrestrict.log.warning("Unknown action: " + action.toString());
+					Warning.other("An error occurred in TRNoClick: Unknown action: " + action.toString());
 				}
 				player.sendMessage(ChatColor.RED + "Sorry, but "+lr+" with this item"+extra+" is disabled");
 				return true;
@@ -212,7 +212,6 @@ public class TRNoClick {
 					if (!cia.msg.equals("")) {
 						player.sendMessage(ChatColor.RED + cia.msg);
 					} else {
-						// tekkitrestrict.log.info(cia.id+"|"+cia.data+" - "+cia.clicktype);
 						String t = (cia.type.both() || cia.type.all()) ? "" : " " + cia.type.name();
 						String a = (cia.air && !cia.block) ? " in the air" : ((cia.block && !cia.air) ? " on blocks" : "");
 						String s = (cia.safezone) ? " inside a safezone." : ".";
@@ -223,11 +222,11 @@ public class TRNoClick {
 			}
 		} catch (Exception ex){
 			if (!errorLogged){
-				Warning.other("Error: [ListenInteract TRNoClick] " + ex.getMessage());
+				Warning.other("An error occurred in the [ListenInteract TRNoClick]:" + ex.getMessage());
+				Warning.other("This error will only be logged once.");
 				Log.Exception(ex, false);
 				errorLogged = true;
 			}
-			TRLogger.Log("debug", "Error: [ListenInteract TRNoClick] " + ex.getMessage());
 		}
 		return false;
 	}

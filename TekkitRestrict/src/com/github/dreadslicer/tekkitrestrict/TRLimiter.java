@@ -115,9 +115,6 @@ public class TRLimiter {
 	 */
 	public boolean checkLimit(BlockPlaceEvent event, boolean doBypassCheck) {
 		boolean r = true;
-		// list.addAll(getPermLimits(event.getPlayer()));
-		// tekkitrestrict.log.info(list.toString());
-		// get list of permission-based limits for this player
 		if (doBypassCheck && event.getPlayer().hasPermission("tekkitrestrict.bypass.limiter")) return true;
 		Block block = event.getBlock();
 		int thisid = block.getTypeId();
@@ -126,10 +123,8 @@ public class TRLimiter {
 		Location bloc = block.getLocation();
 		
 		int TLimit = getMax(event.getPlayer(), thisid, thisdata);//Get the max for this player for id:data
-		//tekkitrestrict.log.info("[DEBUG] getMax("+event.getPlayer().getName()+","+thisid+","+thisdata+") = "+TLimit);
 		
 		if (TLimit != -1) {
-			// tekkitrestrict.log.info("limited?");
 			for (int i = 0; i < itemlimits.size(); i++) {
 				TRLimit limit = itemlimits.get(i);
 
@@ -664,9 +659,9 @@ public class TRLimiter {
 			if (il.expire == -1) continue;
 			if (il.expire == 0) { // do expire
 				tbr.add(il);
-				// tekkitrestrict.log.info("Expired limiter");
+				//Expired limiter
 			} else {
-				// tekkitrestrict.log.info("Age limiter");
+				// Age limiter
 				il.expire--;
 			}
 		}

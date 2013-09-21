@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
 
+import com.github.dreadslicer.tekkitrestrict.Log.Warning;
 import com.github.dreadslicer.tekkitrestrict.database.DBException;
 import com.github.dreadslicer.tekkitrestrict.database.MySQL;
 import com.github.dreadslicer.tekkitrestrict.database.SQLite;
@@ -36,14 +37,19 @@ public class TRDB {
 			try {
 				tekkitrestrict.db = new MySQL(host, port, database, user, password);
 			} catch (DBException ex){
-				tekkitrestrict.log.severe("[MySQL] Error: " + ex.getMessage());
+				String msg = "[MySQL] Error: " + ex.getMessage();
+				Warning.otherWarnings.add("[SEVERE] "+msg);
+				tekkitrestrict.log.severe(msg);
+				
 				return false;
 			}
 			
 			return tekkitrestrict.db.open();
 		} else {
 			tekkitrestrict.dbtype = DBType.Unknown;
-			tekkitrestrict.log.severe("[DB] You set an unknown/unsupported database type! Supported: SQLite and MySQL.");
+			String msg = "[DB] You set an unknown/unsupported database type! Supported: SQLite and MySQL.";
+			Warning.otherWarnings.add("[SEVERE] "+msg);
+			tekkitrestrict.log.severe(msg);
 			return false;
 		}
 		

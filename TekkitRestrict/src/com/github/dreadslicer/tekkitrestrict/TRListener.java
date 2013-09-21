@@ -24,6 +24,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 
+import com.github.dreadslicer.tekkitrestrict.Log.Warning;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Listeners;
 import com.github.dreadslicer.tekkitrestrict.commands.TRCommandAlc;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
@@ -205,7 +206,7 @@ public class TRListener implements Listener {
 			lastdata = event.getBlock().getData();
 		} catch(Exception ex){
 			if (!errorBlockPlace){
-				tekkitrestrict.log.warning("An error occurred in the BlockPlace Listener! Please inform the author (This error will only be logged once).");
+				Warning.other("An error occurred in the BlockPlace Listener! Please inform the author (This error will only be logged once).");
 				Log.Exception(ex, false);
 				errorBlockPlace = true;
 			}
@@ -240,7 +241,7 @@ public class TRListener implements Listener {
 			}
 		} catch (Exception ex) {
 			if (!errorDrop){
-				tekkitrestrict.log.warning("An error occurred in the DropItem Listener! (This error is only logged once)");
+				Warning.other("An error occurred in the DropItem Listener! (This error is only logged once)");
 				Log.Exception(ex, false);
 				errorDrop = true;
 			}
@@ -279,7 +280,7 @@ public class TRListener implements Listener {
 					if (TRNoItem.isItemBannedInCreative(player, str.getTypeId(), str.getDurability(), true)) banned = true;
 				} catch (Exception ex) {
 					if (!errorInteract){
-						tekkitrestrict.log.warning("An error occurred in the InteractListener for LimitedCreative!");
+						Warning.other("An error occurred in the InteractListener for LimitedCreative!");
 						Log.Exception(ex, false);
 						errorInteract = true;
 					}
@@ -352,7 +353,7 @@ public class TRListener implements Listener {
 			if (TRLimitedCreative.handleCreativeInvClick(event)) return;
 		} catch (Exception ex) {
 			if (!errorCreativeClick){
-				tekkitrestrict.log.warning("An error occurred in the CreativeInvClickListener! Please inform the author.");
+				Warning.other("An error occurred in the CreativeInvClickListener! Please inform the author.");
 				Log.Exception(ex, false);
 				errorCreativeClick = true;
 			}
@@ -362,7 +363,7 @@ public class TRListener implements Listener {
 			if (handleCraftBlock(event)) return;
 		} catch (Exception ex) {
 			if (!errorCraft){
-				tekkitrestrict.log.warning("An error occurred in the CraftBlockHandler! Please inform the author.");
+				Warning.other("An error occurred in the CraftBlockHandler! Please inform the author.");
 				Log.Exception(ex, false);
 				errorCraft = true;
 			}

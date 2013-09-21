@@ -9,6 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import com.github.dreadslicer.tekkitrestrict.Log.Warning;
 import com.github.dreadslicer.tekkitrestrict.lib.RandomString;
 
 public class PatchCC {
@@ -104,7 +105,7 @@ public class PatchCC {
 		try {
 			patched.createNewFile();
 		} catch (IOException e) {
-			tekkitrestrict.log.warning("[CCPatch] Unable to write patched file!");
+			Warning.other("[CCPatch] Unable to write patched file!");
 			return;
 		}
 		tekkitrestrict.log.info("[CCPatch] Patching completed!");

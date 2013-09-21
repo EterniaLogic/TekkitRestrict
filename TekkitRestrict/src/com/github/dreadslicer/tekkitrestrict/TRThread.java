@@ -331,7 +331,7 @@ class TEntityRemover extends Thread {
 			try {
 				disableEntities();
 			} catch (Exception ex) {
-				tekkitrestrict.log.warning("An error occurred trying to disable entities!");
+				Warning.other("An error occurred trying to disable entities!");
 				Log.Exception(ex, false);
 			}
 			
