@@ -21,7 +21,7 @@ public class TRChunkUnloader {
 		if (!ChunkUnloader.enabled) return;
 		int tot = getTotalChunks();
 		if (tot > ChunkUnloader.maxChunksTotal) {
-			int nr = tot - ChunkUnloader.maxChunksTotal;
+			int nr = tot - ChunkUnloader.maxChunksTotal - 1;
 			if (ChunkUnloader.unloadOrder == 0){
 				nr = unloadEndChunks(nr, true);
 				if (nr > 0) nr = unloadNetherChunks(nr, true);
@@ -104,14 +104,16 @@ public class TRChunkUnloader {
 					net.minecraft.server.Chunk mcChunk = mcWorld.chunkProviderServer.getOrCreateChunk(x, z);
 
 					if (!(mcChunk instanceof EmptyChunk)) {
-						mcChunk.removeEntities();
-						mcWorld.chunkProviderServer.saveChunk(mcChunk);
-						mcWorld.chunkProviderServer.saveChunkNOP(mcChunk);
+						if (!force) mcWorld.chunkProviderServer.queueUnload(x, z);
+						else mcWorld.chunkProviderServer.unloadQueue.add(x, z);
+						//mcChunk.removeEntities();
+						//mcWorld.chunkProviderServer.saveChunk(mcChunk);
+						//mcWorld.chunkProviderServer.saveChunkNOP(mcChunk);
 					}
 
-					mcWorld.chunkProviderServer.unloadQueue.remove(x, z);
-					mcWorld.chunkProviderServer.chunks.remove(x, z);
-					mcWorld.chunkProviderServer.chunkList.remove(mcChunk);
+					//mcWorld.chunkProviderServer.unloadQueue.remove(x, z);
+					//mcWorld.chunkProviderServer.chunks.remove(x, z);
+					//mcWorld.chunkProviderServer.chunkList.remove(mcChunk);
 				} catch (Exception ex){
 					Log.Debug("Unable to unload chunk at ["+x+","+z+"] in world " + chunk.getWorld().getName());
 					amount++;
@@ -163,14 +165,16 @@ public class TRChunkUnloader {
 					net.minecraft.server.Chunk mcChunk = mcWorld.chunkProviderServer.getOrCreateChunk(x, z);
 
 					if (!(mcChunk instanceof EmptyChunk)) {
-						mcChunk.removeEntities();
-						mcWorld.chunkProviderServer.saveChunk(mcChunk);
-						mcWorld.chunkProviderServer.saveChunkNOP(mcChunk);
+						if (!force) mcWorld.chunkProviderServer.queueUnload(x, z);
+						else mcWorld.chunkProviderServer.unloadQueue.add(x, z);
+						//mcChunk.removeEntities();
+						//mcWorld.chunkProviderServer.saveChunk(mcChunk);
+						//mcWorld.chunkProviderServer.saveChunkNOP(mcChunk);
 					}
 
-					mcWorld.chunkProviderServer.unloadQueue.remove(x, z);
-					mcWorld.chunkProviderServer.chunks.remove(x, z);
-					mcWorld.chunkProviderServer.chunkList.remove(mcChunk);
+					//mcWorld.chunkProviderServer.unloadQueue.remove(x, z);
+					//mcWorld.chunkProviderServer.chunks.remove(x, z);
+					//mcWorld.chunkProviderServer.chunkList.remove(mcChunk);
 				} catch (Exception ex){
 					Log.Debug("Unable to unload chunk at ["+x+","+z+"] in world " + chunk.getWorld().getName());
 					amount++;
@@ -222,14 +226,16 @@ public class TRChunkUnloader {
 					net.minecraft.server.Chunk mcChunk = mcWorld.chunkProviderServer.getOrCreateChunk(x, z);
 
 					if (!(mcChunk instanceof EmptyChunk)) {
-						mcChunk.removeEntities();
-						mcWorld.chunkProviderServer.saveChunk(mcChunk);
-						mcWorld.chunkProviderServer.saveChunkNOP(mcChunk);
+						if (!force) mcWorld.chunkProviderServer.queueUnload(x, z);
+						else mcWorld.chunkProviderServer.unloadQueue.add(x, z);
+						//mcChunk.removeEntities();
+						//mcWorld.chunkProviderServer.saveChunk(mcChunk);
+						//mcWorld.chunkProviderServer.saveChunkNOP(mcChunk);
 					}
 
-					mcWorld.chunkProviderServer.unloadQueue.remove(x, z);
-					mcWorld.chunkProviderServer.chunks.remove(x, z);
-					mcWorld.chunkProviderServer.chunkList.remove(mcChunk);
+					//mcWorld.chunkProviderServer.unloadQueue.remove(x, z);
+					//mcWorld.chunkProviderServer.chunks.remove(x, z);
+					//mcWorld.chunkProviderServer.chunkList.remove(mcChunk);
 				} catch (Exception ex){
 					Log.Debug("Unable to unload chunk at ["+x+","+z+"] in world " + chunk.getWorld().getName());
 					amount++;

@@ -19,10 +19,14 @@ import org.bukkit.plugin.PluginManager;
 
 import com.github.dreadslicer.tekkitrestrict.Log;
 import com.github.dreadslicer.tekkitrestrict.Send;
+import com.github.dreadslicer.tekkitrestrict.TRConfigCache.LogFilter;
+import com.github.dreadslicer.tekkitrestrict.TREMCSet;
 import com.github.dreadslicer.tekkitrestrict.TRItemProcessor;
 import com.github.dreadslicer.tekkitrestrict.TRDB;
 import com.github.dreadslicer.tekkitrestrict.TRException;
 import com.github.dreadslicer.tekkitrestrict.TRLimiter;
+import com.github.dreadslicer.tekkitrestrict.TRLogger;
+import com.github.dreadslicer.tekkitrestrict.TRNoClick;
 import com.github.dreadslicer.tekkitrestrict.TRNoItem;
 import com.github.dreadslicer.tekkitrestrict.TRPerformance;
 import com.github.dreadslicer.tekkitrestrict.TRSafeZone;
@@ -30,6 +34,7 @@ import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
 import com.github.dreadslicer.tekkitrestrict.Log.Warning;
 import com.github.dreadslicer.tekkitrestrict.Updater.UpdateResult;
 import com.github.dreadslicer.tekkitrestrict.api.SafeZones.SafeZoneCreate;
+import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.SafeZone;
 import com.github.dreadslicer.tekkitrestrict.objects.TRItem;
 import com.github.dreadslicer.tekkitrestrict.objects.TRLimit;
@@ -344,7 +349,7 @@ public class TRCommandTR implements CommandExecutor {
 		}
 		
 		if (largs[1].equals("reload")) {
-			adminReload();
+			adminReload(largs);
 			return;
 		}
 		
@@ -388,8 +393,46 @@ public class TRCommandTR implements CommandExecutor {
 		send.msg(ChatColor.RED + "Unknown subcommand /tr admin " + largs[1] + "!");
 		send.msg("Use /tr admin help to see all subcommands.");
 	}
-	private void adminReload(){
+	private void adminReload(String largs[]){
 		if (send.noPerm("admin.reload")) return;
+		
+		if (largs.length == 3){
+			tekkitrestrict.getInstance().reloadConfig();
+			tekkitrestrict.config = tekkitrestrict.getInstance().getConfigx();
+			if (largs[2].equals("limiter")){
+				TRLimiter.reload();
+				send.msg("Limiter Reloaded!");
+			} else if (largs[2].equals("noitem")){
+				TRNoItem.reload();
+				send.msg("NoItem (Banned Items) Reloaded!");
+			} else if (largs[2].equals("creative") || largs[2].equals("limitedcreative")){
+				TRNoItem.reload();
+				send.msg("Limited Creative Banned Items Reloaded!");
+			} else if (largs[2].equals("noclick")){
+				TRNoClick.reload();
+				send.msg("NoClick (disabled interactions) Reloaded!");
+			} else if (largs[2].equals("Logger") || largs[2].equals("logfilter") || largs[2].equals("logsplitter")){
+				LogFilter.replaceList = tekkitrestrict.config.getStringList(ConfigFile.Logging, "LogFilter");
+				LogFilter.splitLogs = tekkitrestrict.config.getBoolean(ConfigFile.Logging, "SplitLogs", true);
+				LogFilter.filterLogs = tekkitrestrict.config.getBoolean(ConfigFile.Logging, "FilterLogs", true);
+				LogFilter.logLocation = tekkitrestrict.config.getString(ConfigFile.Logging, "SplitLogsLocation", "log");
+				LogFilter.fileFormat = tekkitrestrict.config.getString(ConfigFile.Logging, "FilenameFormat", "{TYPE}-{DAY}-{MONTH}-{YEAR}.log");
+				LogFilter.logFormat = tekkitrestrict.config.getString(ConfigFile.Logging, "LogStringFormat", "[{HOUR}:{MINUTE}:{SECOND}] {INFO}");
+				TRLogger.reload();
+				send.msg("Log Filter/Splitter Reloaded!");
+			} else if (largs[2].equals("emcset")){
+				TREMCSet.reload();
+				send.msg("EMC setter Reloaded!");
+			} else {
+				if (largs[2].equals("help"))
+					send.msg(ChatColor.YELLOW + "Possible subcommands: ");
+				else
+					send.msg(ChatColor.RED + "Unknown subcommand! Possible subcommands: ");
+				
+				send.msg(ChatColor.YELLOW + "Limiter, Noitem, LimitedCreative, NoClick, Logger and EMCSet");
+			}
+			return;
+		}
 
 		tekkitrestrict.getInstance().reload(true, false);
 		send.msg("Tekkit Restrict Reloaded!");
@@ -448,23 +491,26 @@ public class TRCommandTR implements CommandExecutor {
 	}
 	private void adminHelp(int page) {
 		if (page == 1) {
-			send.msg(ChatColor.YELLOW + "[TekkitRestrict " + tekkitrestrict.version + " Admin Commands] Page 1 / 2");
+			send.msg(ChatColor.YELLOW + "[TekkitRestrict " + tekkitrestrict.version + " Admin Commands] Page 1 / 3");
 			send.msg("/tr admin help <page>", "Show this help.");
 			send.msg("/tr admin reload", "Reload TekkitRestrict");
-			send.msg("/tr admin reinit", "Reload the server.");
+			send.msg("/tr admin reload help", "View Reload subcommands");
 			send.msg("/tr admin update check", "Check for updates.");
 			send.msg("/tr admin update download", "Download an update if it is available.");
-			send.msg("/tr admin limit clear <player>", "Clear a players limits.");
-			send.msg("/tr admin limit clear <player> <id[:data]>", "Clear a players limits for a specific item.");
-			send.msg("/tr admin limit list <player> [id]", "List a players limits.");
-		} else if (page >= 2) {
-			send.msg(ChatColor.YELLOW + "[TekkitRestrict " + tekkitrestrict.version + " Admin Commands] Page 2 / 2");
+			send.msg("/tr admin threadlag", "Display threadlag information.");
+		} else if (page == 2) {
+			send.msg(ChatColor.YELLOW + "[TekkitRestrict " + tekkitrestrict.version + " Admin Commands] Page 2 / 3");
 			send.msg("/tr admin safezone list [page]", "List safezones.");
 			send.msg("/tr admin safezone check [player]", "Check if a player is in a safezone.");
 			send.msg("/tr admin safezone addwg <region>", "Add a safezone using WorldGuard.");
 			send.msg("/tr admin safezone addgp <name>", "Add a safezone using GriefPrevention.");
 			send.msg("/tr admin safezone rem <name>", "Remove a safezone.");
-			send.msg("/tr admin threadlag", "Display threadlag information.");
+			send.msg(ChatColor.STRIKETHROUGH + "/tr admin reinit", ChatColor.STRIKETHROUGH + "Reload the server.");
+		} else if (page >= 3){
+			send.msg(ChatColor.YELLOW + "[TekkitRestrict " + tekkitrestrict.version + " Admin Commands] Page 3 / 3");
+			send.msg("/tr admin limit clear <player>", "Clear a players limits.");
+			send.msg("/tr admin limit clear <player> <id[:data]>", "Clear a players limits for a specific item.");
+			send.msg("/tr admin limit list <player> [id]", "List a players limits.");
 		} else {
 			send.msg(ChatColor.RED + "Page " + page + " doesn't exist. ");
 		}
@@ -836,10 +882,6 @@ public class TRCommandTR implements CommandExecutor {
 		}
 		
 		Player target = Bukkit.getPlayer(cc.player);
-		if (target == null){
-			send.msg("Unknown player!");
-			return;
-		}
 		
 		if (largs.length == 5){
 			int id;
@@ -850,17 +892,33 @@ public class TRCommandTR implements CommandExecutor {
 				return;
 			}
 			
-			for (TRLimit l : cc.itemlimits) {
-				if (l.id != id) continue;
-				int cccl = cc.getMax(target, l.id, l.data);
-				cccl = cccl == -1 ? 0 : cccl;
-				send.msg("[" + l.id + ":" + l.data + "] - " + l.placedBlock.size() + "/" + cccl + " blocks");
+			if (target != null){
+				for (TRLimit l : cc.itemlimits) {
+					if (l.id != id) continue;
+					int cccl = cc.getMax(target, l.id, l.data);
+					cccl = cccl == -1 ? 0 : cccl;
+					send.msg("[" + l.id + ":" + l.data + "] - " + l.placedBlock.size() + "/" + cccl + " blocks");
+				}
+			} else {
+				send.msg("As "+cc.player+" is offline, his/her max limits cannot be listed.");
+				for (TRLimit l : cc.itemlimits) {
+					if (l.id != id) continue;
+					send.msg("[" + l.id + ":" + l.data + "] - " + l.placedBlock.size()+"/? blocks");
+				}
 			}
+			
 		} else {
-			for (TRLimit l : cc.itemlimits) {
-				int cccl = cc.getMax(target, l.id, l.data);
-				cccl = cccl == -1 ? 0 : cccl;
-				send.msg("[" + l.id + ":" + l.data + "] - " + l.placedBlock.size()+"/"+cccl+" blocks");
+			if (target != null){
+				for (TRLimit l : cc.itemlimits) {
+					int cccl = cc.getMax(target, l.id, l.data);
+					cccl = cccl == -1 ? 0 : cccl;
+					send.msg("[" + l.id + ":" + l.data + "] - " + l.placedBlock.size()+"/"+cccl+" blocks");
+				}
+			} else {
+				send.msg("As "+cc.player+" is offline, his/her max limits cannot be listed.");
+				for (TRLimit l : cc.itemlimits) {
+					send.msg("[" + l.id + ":" + l.data + "] - " + l.placedBlock.size()+"/? blocks");
+				}
 			}
 		}
 	}

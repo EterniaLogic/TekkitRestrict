@@ -23,20 +23,17 @@ public class TRNoItem {
 	/** A list of all the (by config) banned creative items. */
 	private static LinkedList<TRItem> DisabledCreativeItems = new LinkedList<TRItem>();
 	
-	/**	Clear all Lists and maps in this class (no items will be banned any more) */
-	public static void clear() {
-		DisabledItems.clear();
-		DisabledCreativeItems.clear();
-	}
-	
 	/**
 	 * Uses allocateDisabledItems() and allocateDisabledCreativeItems()<br>
-	 * Also rechecks if TekkitRestrict should use noItem and/or LimitedCreative
+	 * Also rechecks if TekkitRestrict should use noItem and/or LimitedCreative<br>
+	 * Also clears all currently banned items.
 	 * 
 	 * @see #allocateDisabledCreativeItems()
 	 * @see #allocateDisabledItems()
 	 */
 	public static void reload() {
+		DisabledItems.clear();
+		DisabledCreativeItems.clear();
 		allocateDisabledItems();
 		allocateDisabledCreativeItems();
 	}

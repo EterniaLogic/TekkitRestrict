@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Future;
 
@@ -27,7 +28,7 @@ import com.github.dreadslicer.tekkitrestrict.objects.TRConfigLimit;
 import com.github.dreadslicer.tekkitrestrict.objects.TRItem;
 import com.github.dreadslicer.tekkitrestrict.objects.TRLimit;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
-
+import com.github.dreadslicer.tekkitrestrict.objects.TRPermLimit;
 
 public class TRLimiter {
 	private int expire = -1;
@@ -40,8 +41,16 @@ public class TRLimiter {
 	//private static List<TRLimiter> limiters = Collections.synchronizedList(new LinkedList<TRLimiter>());
 	private static List<TRConfigLimit> configLimits = Collections.synchronizedList(new LinkedList<TRConfigLimit>());
 	private static Map<String, String> allBlockOwners = Collections.synchronizedMap(new HashMap<String, String>());
-
+	private static ConcurrentHashMap<String, List<TRPermLimit>> limiterPermCache = new ConcurrentHashMap<String, List<TRPermLimit>>();
+	
 	public static void reload() {
+		//for (String str : limiterPermCache.keySet()){
+		//	for (TRPermLimit t : limiterPermCache.get(str)){
+		//		tekkitrestrict.log.info("[DEBUG] limiterPermCache.get("+str+"): " + t.id + ":" + t.data + " max="+t.max);
+		//	}
+		//}
+		limiterPermCache.clear();
+		
 		List<String> limitedBlocks = tekkitrestrict.config.getStringList(ConfigFile.Advanced, "LimitBlocks");
 		configLimits.clear();
 		for (String limBlock : limitedBlocks) {
@@ -88,22 +97,41 @@ public class TRLimiter {
 			ll.placedBlock.clear();
 		}
 		itemlimits.clear();
+		saveLimiter(this);
 	}
 	
 	public int getMax(Player player, int thisid, int thisdata){
 		int max = -1;
 		try {
-			for (int i = 0; i < configLimits.size(); i++) {
-				TRConfigLimit cc = configLimits.get(i);
-				if (cc.compare(thisid, thisdata)) {
-					max = cc.configcount;
-					if (max != -1) return max;
+			List<TRPermLimit> cached = limiterPermCache.get(player.getName());
+			if (cached == null) cached = new ArrayList<TRPermLimit>();
+			boolean found = false;
+			for (TRPermLimit lim : cached){
+				if (lim.compare(thisid, thisdata)){
+					if (lim.max == -2) return -1;
+					if (lim.max != -1) return lim.max;
+					found = true;
 				}
 			}
+			if (found) return -1;
 			
-			max = TRPermHandler.getPermNumeral(player, "tekkitrestrict.limiter", thisid, thisdata);
+			TRPermLimit pl = TRPermHandler.getPermLimitFromPerm(player, "tekkitrestrict.limiter", thisid, thisdata);
+			if (pl != null) {
+				cached.add(pl);
+				limiterPermCache.put(player.getName(), cached);
+				if (pl.max == -2) return -1;
+				return pl.max;
+			} else {
+				for (int i = 0; i < configLimits.size(); i++) {
+					TRConfigLimit cc = configLimits.get(i);
+					if (cc.compare(thisid, thisdata)) {
+						return cc.configcount;
+					}
+				}
+			}
 		} catch (Exception ex){
-			ex.printStackTrace();
+			Warning.other("An error occurred in TRLimiter in getMax: "+ ex.getMessage());
+			Log.Exception(ex, false);
 		}
 		return max;
 	}
@@ -365,9 +393,11 @@ public class TRLimiter {
 				} else {
 					try {
 						l.id = Integer.parseInt(item);
+						l.data = 0;
 					} catch (NumberFormatException ex){
 						Warning.config("Invalid limiter value in database: \""+item+"\"!");
 						l.id = 0;
+						l.data = 0;
 					}
 				}
 
@@ -445,7 +475,7 @@ public class TRLimiter {
 			return;
 		}
 		String player = lb.player.toLowerCase();
-		String blockdata = "";
+		String blockdata = null;
 		
 		try {
 			int size = lb.itemlimits.size();
@@ -489,8 +519,10 @@ public class TRLimiter {
 				if (size2 > 0) {
 					datarr = block + "&" + DATA + suf;
 				}
+				if (blockdata == null) blockdata = "";
 				blockdata += datarr;
 			}
+			if (blockdata == null) blockdata = "";
 		} catch (Exception ex) {
 			if (!logged){
 				Warning.other("An error occurred while saving the limits! Error: Cannot create string to save to database!");
@@ -505,7 +537,7 @@ public class TRLimiter {
 			estID += Character.getNumericValue(c);
 		}
 		*/
-		if (blockdata.equals("")) return;
+		if (blockdata == null) return;
 		try {
 				//tekkitrestrict.db.query("INSERT OR REPLACE INTO `tr_limiter` (`id`,`player`,`blockdata`) VALUES ("
 				//						+ estID

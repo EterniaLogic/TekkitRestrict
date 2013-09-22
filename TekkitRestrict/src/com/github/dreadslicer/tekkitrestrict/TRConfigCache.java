@@ -50,9 +50,9 @@ public class TRConfigCache {
 		public static int saveSpeed, worldCleanerSpeed, inventorySpeed, SSEntityRemoverSpeed, gemArmorSpeed;
 		public static boolean GAMovement, GAOffensive;
 		public static boolean SSDisableEntities, SSDechargeEE, SSDisableArcane;
-		public static boolean RMDB, UseRPTimer;
+		public static boolean RMDB;//, UseRPTimer;
 		public static int ChangeDisabledItemsIntoId;
-		public static int RPTickTime;
+		//public static int RPTickTime;
 		
 		@SuppressWarnings("rawtypes")
 		public static ArrayList<Class> SSClassBypasses = new ArrayList<Class>();

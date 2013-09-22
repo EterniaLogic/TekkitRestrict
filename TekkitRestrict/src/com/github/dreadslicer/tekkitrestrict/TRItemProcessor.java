@@ -275,11 +275,13 @@ public class TRItemProcessor {
 				if (id2 == id) return true;
 				return false;
 			} else {//GROUP / NAME
+				boolean found = false;
 				List<TRItem> items = groups.get(t[0]);
 				if (items != null){
 					for (TRItem item : items){
 						if (item.compare(id, data)) return true;
 					}
+					found = true;
 				}
 				
 				try {
@@ -290,7 +292,10 @@ public class TRItemProcessor {
 					for (TRItem item : items){
 						if (item.compare(id, data)) return true;
 					}
+					found = true;
 				}
+				
+				if (found) return false;
 				
 				Warning.other("You have set an invalid limiter permission \""+perm+"\":");
 				Warning.other("\""+t[0]+"\" is not a valid modgroup, permissiongroup, EE or IC2 itemname!");
@@ -306,11 +311,13 @@ public class TRItemProcessor {
 				if (id2 == id) return true;
 				return false;
 			} catch (NumberFormatException ex){
+				boolean found = false;
 				List<TRItem> items = groups.get(itemx);
 				if (items != null){
 					for (TRItem item : items){
 						if (item.compare(id, data)) return true;
 					}
+					found = true;
 				}
 				
 				try {
@@ -321,7 +328,10 @@ public class TRItemProcessor {
 					for (TRItem item : items){
 						if (item.compare(id, data)) return true;
 					}
+					found = true;
 				}
+				
+				if (found) return false;
 				
 				Warning.other("You have set an invalid limiter permission \""+perm+"\":");
 				Warning.other("\""+itemx+"\" is not a valid ID, modgroup, permissiongroup, EE itemname or IC2 itemname!");

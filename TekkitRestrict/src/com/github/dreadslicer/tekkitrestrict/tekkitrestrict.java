@@ -458,9 +458,9 @@ public class tekkitrestrict extends JavaPlugin {
 		}
 		
 		Threads.RMDB = config.getBoolean(ConfigFile.DisableItems, "RemoveDisabledItemBlocks", false);
-		Threads.UseRPTimer = config.getBoolean(ConfigFile.General, "UseAutoRPTimer", false);
+		//Threads.UseRPTimer = config.getBoolean(ConfigFile.General, "UseAutoRPTimer", false);
 		Threads.ChangeDisabledItemsIntoId = config.getInt(ConfigFile.DisableItems, "ChangeDisabledItemsIntoId", 3);
-		Threads.RPTickTime = (int) Math.round((config.getDouble(ConfigFile.ModModifications, "RPTimerMin", 0.2)-0.1d) * 20d);
+		//Threads.RPTickTime = (int) Math.round((config.getDouble(ConfigFile.ModModifications, "RPTimerMin", 0.2)-0.1d) * 20d);
 		
 		SafeZones.UseSafeZones = config.getBoolean(ConfigFile.SafeZones, "UseSafeZones", true);
 		SafeZones.UseFactions = config.getBoolean(ConfigFile.SafeZones, "SSEnabledPlugins.Factions", true);
@@ -503,13 +503,8 @@ public class tekkitrestrict extends JavaPlugin {
 		this.reloadConfig();
 		config = this.getConfigx();
 		loadConfigCache();
-		TRNoItem.clear(); //TRNI
 		TRItemProcessor.reload();
-		try {
-			TRNoItem.reload(); //TRNI2 FIXME errors
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
+		TRNoItem.reload(); //Banned items and limited creative.
 		TRThread.reload(); // branches out
 		TRListener.reload();
 		TRLimiter.reload();
@@ -530,7 +525,7 @@ public class tekkitrestrict extends JavaPlugin {
 		if (!silent) log.info("TekkitRestrict Reloaded!");
 	}
 
-	private TRFileConfiguration getConfigx() {
+	public TRFileConfiguration getConfigx() {
 		if (configList.size() == 0) {
 			reloadConfig();
 		}

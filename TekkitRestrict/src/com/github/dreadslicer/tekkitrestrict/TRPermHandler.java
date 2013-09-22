@@ -14,6 +14,7 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
 import com.github.dreadslicer.tekkitrestrict.Log.Warning;
+import com.github.dreadslicer.tekkitrestrict.objects.TRPermLimit;
 
 import ru.tehkode.permissions.PermissionGroup;
 import ru.tehkode.permissions.PermissionManager;
@@ -130,6 +131,92 @@ public class TRPermHandler {
 		}
 
 		return -1;
+	}
+	
+	public static TRPermLimit getPermLimitFromPerm(Player p, String permBase, int id, int data) {
+		TRPermLimit t = new TRPermLimit();
+		String negPerms[] = getPermissions(p, "-"+permBase);
+		for (int i = 0; i < negPerms.length; i++) {
+			String gp[] = negPerms[i].replace('.', ';').split(";");//tekkitrestrict;limiter;id;data
+			String gs[] = permBase.replace('.', ';').split(";");//tekkitrestrict;limiter
+			if (gp.length < 2 || gs.length < 2) continue;
+			if (gp[1].equals("") || gs[1].equals("")) continue;
+			if (!gp[1].equals(gs[1])) continue;//limiter
+			try {
+				if (gp.length == 5){
+					if (TRItemProcessor.isInRange(gp[2]+":"+gp[3], id, data, negPerms[i])){
+						t.id = id;
+						t.data = Integer.parseInt(gp[3]);
+						t.max = -2;
+						return t;
+					}
+				} else if (gp.length == 4){
+					if (TRItemProcessor.isInRange(gp[2], id, data, negPerms[i])){
+						t.id = id;
+						t.data = -1;
+						t.max = -2;
+						return t;
+					}
+				}
+			} catch (Exception ex){
+				if (!logged){
+					Warning.other("You have set an invalid limiter permission \""+negPerms[i]+"\":");
+					Warning.other("Unexpected error occurred! Please inform the author of this error.");
+					Warning.other(ex.getMessage());
+					Log.Exception(ex, true);
+					logged = true;
+				}
+			}
+		}
+
+		String perms[] = getPermissions(p, permBase);
+		for (int i = 0; i < perms.length; i++) {
+			String gp[] = perms[i].replace('.', ';').split(";");//tekkitrestrict;limiter;id
+			String gs[] = permBase.replace('.', ';').split(";");//tekkitrestrict;limiter
+			if (gp.length < 2 || gs.length < 2) continue;
+			if (gp[1].equals("") || gs[1].equals("")) continue;
+			if (!gp[1].equals(gs[1])) continue;
+			
+			try {
+				if (gp.length == 5){
+					if (TRItemProcessor.isInRange(gp[2]+":"+gp[3], id, data, perms[i])){
+						try {
+							t.id = id;
+							t.data = Integer.parseInt(gp[3]);
+							t.max = Integer.parseInt(gp[4]);
+							return t;
+						} catch (NumberFormatException ex){
+							Warning.other("You have set an invalid limiter permission \""+perms[i]+"\":");
+							Warning.other("Invalid max amount: \""+gp[4]+"\"");
+							return null;
+						}
+					}
+				} else if (gp.length == 4) {
+					if (TRItemProcessor.isInRange(gp[2], id, data, perms[i])){
+						try {
+							t.id = id;
+							t.data = -1;
+							t.max = Integer.parseInt(gp[3]);
+							return t;
+						} catch (NumberFormatException ex){
+							Warning.other("You have set an invalid limiter permission \""+perms[i]+"\":");
+							Warning.other("Invalid max amount: \""+gp[3]+"\"");
+							return null;
+						}
+					}
+				}
+			} catch (Exception ex){
+				if (!logged){
+					Warning.other("You have set an invalid limiter permission \""+perms[i]+"\":");
+					Warning.other("Unexpected error occurred! Please inform the author of this error.");
+					Warning.other(ex.getMessage());
+					Log.Exception(ex, true);
+					logged = true;
+				}
+			}
+		}
+
+		return null;
 	}
 
 	private static String[] getPermissions(Player player, String s) {
