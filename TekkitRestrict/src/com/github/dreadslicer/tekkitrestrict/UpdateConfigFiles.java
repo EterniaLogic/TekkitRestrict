@@ -56,6 +56,7 @@ public class UpdateConfigFiles {
 		
 		//System.out.println("The config files were successfully updated!");
 		tekkitrestrict.log.info("The config files were successfully updated!");
+		v13();
 	}
 	
 	public static void v12(){
@@ -67,26 +68,27 @@ public class UpdateConfigFiles {
 		
 		//System.out.println("The config files were successfully updated!");
 		tekkitrestrict.log.info("The config files were successfully updated!");
+		
+		v13();
 	}
 	
 	public static void v13(){
 		//System.out.println("Updating the config files from v1.1 to v1.3...");
 		tekkitrestrict.log.info("Updating the config files from v1.3 to v1.4...");
-		
+		General13To14();
+		SafeZones13To14();
 		
 		//System.out.println("The config files were successfully updated!");
 		tekkitrestrict.log.info("The config files were successfully updated!");
 	}
 	
 	private static void General11To13(){
-		//File genConfig = new File("C:\\Users\\Taico\\Desktop\\All Ozonelayer\\Ozonelayer 2\\plugins\\tekkitrestrict_old"+s+"General.config.yml");
 		File genConfig = new File("plugins"+s+"tekkitrestrict"+s+"General.config.yml");
 		tekkitrestrict.getInstance().backupConfig(genConfig.getPath(), "plugins"+s+"tekkitrestrict"+s+"General.config_backup.yml");
 		BufferedReader input = null;
 		try {
 			input = new BufferedReader(new FileReader(genConfig));
 		} catch (FileNotFoundException e2) {
-			//System.out.println("[UpdateConfig] Cannot Find General.config.yml! (" + genConfig.getAbsolutePath() + ")");
 			tekkitrestrict.loadWarning("Cannot Find General.config.yml! (" + genConfig.getAbsolutePath() + ")");
 			return;
 		}
@@ -99,7 +101,6 @@ public class UpdateConfigFiles {
 			}
 			input.close();
 		} catch (IOException e) {
-			//System.out.println("[UpdateConfig] Cannot read General.config.yml! (" + genConfig.getAbsolutePath() + ")");
 			tekkitrestrict.loadWarning("Cannot read General.config.yml! (" + genConfig.getAbsolutePath() + ")");
 			try {
 				input.close();
@@ -134,7 +135,6 @@ public class UpdateConfigFiles {
 			}
 			output.close();
 		} catch (IOException e) {
-			//System.out.println("Unable to write changes to General.config.yml!");
 			tekkitrestrict.loadWarning("Unable to write changes to General.config.yml!");
 			return;
 		}
@@ -148,8 +148,8 @@ public class UpdateConfigFiles {
 		try {
 			input = new BufferedReader(new FileReader(genConfig));
 		} catch (FileNotFoundException e2) {
-			System.out.println("Cannot Find General.config.yml! (" + genConfig.getAbsolutePath() + ")");
-			//tekkitrestrict.loadWarning("Cannot Find General.config.yml! (" + genConfig.getAbsolutePath() + ")");
+			//System.out.println("Cannot Find General.config.yml! (" + genConfig.getAbsolutePath() + ")");
+			tekkitrestrict.loadWarning("Cannot Find General.config.yml! (" + genConfig.getAbsolutePath() + ")");
 			return;
 		}
 		
@@ -161,8 +161,8 @@ public class UpdateConfigFiles {
 			}
 			input.close();
 		} catch (IOException e) {
-			System.out.println("Cannot read General.config.yml! (" + genConfig.getAbsolutePath() + ")");
-			//tekkitrestrict.loadWarning("Cannot read General.config.yml! (" + genConfig.getAbsolutePath() + ")");
+			//System.out.println("Cannot read General.config.yml! (" + genConfig.getAbsolutePath() + ")");
+			tekkitrestrict.loadWarning("Cannot read General.config.yml! (" + genConfig.getAbsolutePath() + ")");
 			try {
 				input.close();
 			} catch (IOException e1) {}
@@ -176,10 +176,10 @@ public class UpdateConfigFiles {
 			}
 		}
 		if (veroption == 0){
-			System.out.println("General.config.yml is malformed and cannot be patched!");
-			System.out.println("Please make a backup of the file, delete it and restart the server to let a new one generate.");
-			//tekkitrestrict.loadWarning("General.config.yml is malformed and cannot be patched!");
-			//tekkitrestrict.loadWarning("Please make a backup of the file, delete it and restart the server to let a new one generate.");
+			//System.out.println("General.config.yml is malformed and cannot be patched!");
+			//System.out.println("Please make a backup of the file, delete it and restart the server to let a new one generate.");
+			tekkitrestrict.loadWarning("General.config.yml is malformed and cannot be patched!");
+			tekkitrestrict.loadWarning("Please make a backup of the file, delete it and restart the server to let a new one generate.");
 			return;
 		}
 		lines.remove(veroption);
@@ -194,21 +194,20 @@ public class UpdateConfigFiles {
 			}
 			output.close();
 		} catch (IOException e) {
-			System.out.println("Unable to write changes to General.config.yml!");
-			//tekkitrestrict.loadWarning("Unable to write changes to General.config.yml!");
+			//System.out.println("Unable to write changes to General.config.yml!");
+			tekkitrestrict.loadWarning("Unable to write changes to General.config.yml!");
 			return;
 		}
 	}
 	
-	private static void TPerformance11To13(){
-		File perfConfig = new File("plugins"+s+"tekkitrestrict"+s+"TPerformance.config.yml");
-		tekkitrestrict.getInstance().backupConfig(perfConfig.getPath(), "plugins"+s+"tekkitrestrict"+s+"TPerformance.config_backup.yml");
+	private static void General13To14(){
+		File genConfig = new File("plugins"+s+"tekkitrestrict"+s+"General.config.yml");
+		tekkitrestrict.getInstance().backupConfig(genConfig.getPath(), "plugins"+s+"tekkitrestrict"+s+"General.config_backup.yml");
 		BufferedReader input = null;
 		try {
-			input = new BufferedReader(new FileReader(perfConfig));
+			input = new BufferedReader(new FileReader(genConfig));
 		} catch (FileNotFoundException e2) {
-			System.out.println("Cannot Find TPerformance.config.yml! (" + perfConfig.getAbsolutePath() + ")");
-			//tekkitrestrict.loadWarning("Cannot Find TPerformance.config.yml! (" + perfConfig.getAbsolutePath() + ")");
+			tekkitrestrict.loadWarning("Cannot Find General.config.yml! (" + genConfig.getAbsolutePath() + ")");
 			return;
 		}
 		
@@ -220,8 +219,132 @@ public class UpdateConfigFiles {
 			}
 			input.close();
 		} catch (IOException e) {
-			System.out.println("Cannot read TPerformance.config.yml! (" + perfConfig.getAbsolutePath() + ")");
-			//tekkitrestrict.loadWarning("Cannot read TPerformance.config.yml! (" + perfConfig.getAbsolutePath() + ")");
+			tekkitrestrict.loadWarning("Cannot read General.config.yml! (" + genConfig.getAbsolutePath() + ")");
+			try {
+				input.close();
+			} catch (IOException e1) {}
+			return;
+		}
+		
+		int veroption = 0;
+		for (int i = 0;i < lines.size();i++){
+			if (lines.get(i).contains("ConfigVersion:")) {
+				veroption = i;
+			}
+		}
+		if (veroption == 0){
+			tekkitrestrict.loadWarning("General.config.yml is malformed and cannot be patched!");
+			tekkitrestrict.loadWarning("Please make a backup of the file, delete it and restart the server to let a new one generate.");
+			return;
+		}
+		lines.remove(veroption);
+		lines.add(veroption, "ConfigVersion: 1.4");
+		
+		BufferedWriter output = null;
+		try {
+			output = new BufferedWriter(new FileWriter(genConfig));
+			for (String line2 : lines){
+				output.append(line2);
+				output.newLine();
+			}
+			output.close();
+		} catch (IOException e) {
+			tekkitrestrict.loadWarning("Unable to write changes to General.config.yml!");
+			return;
+		}
+	}
+	
+	private static void SafeZones13To14(){
+		File ssConfig = new File("plugins"+s+"tekkitrestrict"+s+"SafeZones.config.yml");
+		tekkitrestrict.getInstance().backupConfig(ssConfig.getPath(), "plugins"+s+"tekkitrestrict"+s+"SafeZones.config_backup.yml");
+		BufferedReader input = null;
+		try {
+			input = new BufferedReader(new FileReader(ssConfig));
+		} catch (FileNotFoundException e2) {
+			tekkitrestrict.loadWarning("Cannot Find SafeZones.config.yml! (" + ssConfig.getAbsolutePath() + ")");
+			return;
+		}
+		
+		String line;
+		ArrayList<String> lines = new ArrayList<String>();
+		try {
+			while ((line = input.readLine()) != null){
+				lines.add(line);
+			}
+			input.close();
+		} catch (IOException e) {
+			tekkitrestrict.loadWarning("Cannot read SafeZones.config.yml! (" + ssConfig.getAbsolutePath() + ")");
+			try {
+				input.close();
+			} catch (IOException e1) {}
+			return;
+		}
+		
+		int mcoption = 0;
+		for (int i = 0;i < lines.size();i++){
+			String l = lines.get(i);
+			if (l.contains("# If you turn DechargeEE on, then")){
+				mcoption = i-1;
+			} else if (l.contains("# - All EE items specified in the ModModifications config will be decharged")) {
+				if (mcoption != i-2){
+					tekkitrestrict.loadWarning("SafeZones.config.yml is malformed and cannot be patched!");
+					tekkitrestrict.loadWarning("Please make a backup of the file, delete it and restart the server to let a new one generate.");
+					return;
+				}
+			}
+		}
+		if (mcoption == 0){
+			tekkitrestrict.loadWarning("SafeZones.config.yml is malformed and cannot be patched!");
+			tekkitrestrict.loadWarning("Please make a backup of the file, delete it and restart the server to let a new one generate.");
+			return;
+		}
+		
+		//lines.remove(mcoption);
+		//lines.remove(mcoption);
+		lines.add(mcoption, "\n    # WARNING: Case Sensitive!\n"
+				+ "    # Tries to exclude org.bukkit.entity.[name] entities from SafeZone entity removal.\n"
+				+ "    # Examples:\n"
+				+ "    # \"Arrow\", \"Animals\", \"EnderDragon\", \"EnderPearl\", \"Fish\", \"IronGolem\", \"Pig\",\n"
+				+ "    # \"Projectile\", \"ThrownPotion\", \"TNTPrimed\", \"Snowball\"\n"
+				+ "    ExemptEntityTypes: []");
+		
+		
+		BufferedWriter output = null;
+		try {
+			output = new BufferedWriter(new FileWriter(ssConfig));
+			for (String line2 : lines){
+				output.append(line2);
+				output.newLine();
+			}
+			output.close();
+		} catch (IOException e) {
+			tekkitrestrict.loadWarning("Unable to write changes to SafeZones.config.yml!");
+			return;
+		}
+	}
+	
+	private static void TPerformance11To13(){
+		File perfConfig = new File("plugins"+s+"tekkitrestrict"+s+"TPerformance.config.yml");
+		tekkitrestrict.getInstance().backupConfig(perfConfig.getPath(), "plugins"+s+"tekkitrestrict"+s+"TPerformance.config_backup.yml");
+		BufferedReader input = null;
+		try {
+			input = new BufferedReader(new FileReader(perfConfig));
+		} catch (FileNotFoundException e2) {
+			//System.out.println("Cannot Find TPerformance.config.yml! (" + perfConfig.getAbsolutePath() + ")");
+			tekkitrestrict.loadWarning("Cannot Find TPerformance.config.yml! (" + perfConfig.getAbsolutePath() + ")");
+			return;
+		}
+		
+		String line;
+		ArrayList<String> lines = new ArrayList<String>();
+		try {
+			while ((line = input.readLine()) != null){
+				lines.add(line);
+			}
+			input.close();
+		} catch (IOException e) {
+			//System.out.println("Cannot read TPerformance.config.yml! (" + perfConfig.getAbsolutePath() + ")");
+			tekkitrestrict.loadWarning("Cannot read TPerformance.config.yml! (" + perfConfig.getAbsolutePath() + ")");
 			try {
 				input.close();
 			} catch (IOException e1) {}
@@ -235,10 +358,10 @@ public class UpdateConfigFiles {
 				mcoption = i;
 			} else if (l.contains("MaxChunks: ")) {
 				if (mcoption != i-1){
-					System.out.println("TPerformance.config.yml is malformed and cannot be patched!");
-					System.out.println("Please make a backup of the file, delete it and restart the server to let a new one generate.");
-					//tekkitrestrict.loadWarning("TPerformance.config.yml is malformed and cannot be patched!");
-					//tekkitrestrict.loadWarning("Please make a backup of the file, delete it and restart the server to let a new one generate.");
+					//System.out.println("TPerformance.config.yml is malformed and cannot be patched!");
+					//System.out.println("Please make a backup of the file, delete it and restart the server to let a new one generate.");
+					tekkitrestrict.loadWarning("TPerformance.config.yml is malformed and cannot be patched!");
+					tekkitrestrict.loadWarning("Please make a backup of the file, delete it and restart the server to let a new one generate.");
 					return;
 				}
 			} else if (l.contains("# The default is 128 blocks (8 chunks).")){
@@ -246,10 +369,10 @@ public class UpdateConfigFiles {
 			}
 		}
 		if (mcoption == 0 || radoption == 0){
-			System.out.println("TPerformance.config.yml is malformed and cannot be patched!");
-			System.out.println("Please make a backup of the file, delete it and restart the server to let a new one generate.");
-			//tekkitrestrict.loadWarning("TPerformance.config.yml is malformed and cannot be patched!");
-			//tekkitrestrict.loadWarning("Please make a backup of the file, delete it and restart the server to let a new one generate.");
+			//System.out.println("TPerformance.config.yml is malformed and cannot be patched!");
+			//System.out.println("Please make a backup of the file, delete it and restart the server to let a new one generate.");
+			tekkitrestrict.loadWarning("TPerformance.config.yml is malformed and cannot be patched!");
+			tekkitrestrict.loadWarning("Please make a backup of the file, delete it and restart the server to let a new one generate.");
 			return;
 		}
 		
@@ -308,8 +431,8 @@ public class UpdateConfigFiles {
 			}
 			output.close();
 		} catch (IOException e) {
-			System.out.println("Unable to write changes to TPerformance.config.yml!");
-			//tekkitrestrict.loadWarning("Unable to write changes to TPerformance.config.yml!");
+			//System.out.println("Unable to write changes to TPerformance.config.yml!");
+			tekkitrestrict.loadWarning("Unable to write changes to TPerformance.config.yml!");
 			return;
 		}
 	}

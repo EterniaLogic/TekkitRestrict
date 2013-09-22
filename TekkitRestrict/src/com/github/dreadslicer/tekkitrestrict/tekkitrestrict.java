@@ -92,9 +92,13 @@ public class tekkitrestrict extends JavaPlugin {
 		config = this.getConfigx(); //Load the configuration files
 		double configVer = config.getDouble("ConfigVersion", 0.9);
 		if (configVer < 1.1)
-			UpdateConfigFiles.v09();
+			UpdateConfigFiles.v09();//0 --> 14
 		else if (configVer < 1.2)
-			UpdateConfigFiles.v11();
+			UpdateConfigFiles.v11();//11 --> 13 --> 14
+		else if (configVer < 1.3)
+			UpdateConfigFiles.v12();//12 --> 13 --> 14
+		else if (configVer < 1.4)
+			UpdateConfigFiles.v13();//13 --> 14
 		
 		loadConfigCache();
 		//#####################################################
