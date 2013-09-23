@@ -82,7 +82,7 @@ public class TRCommandTR implements CommandExecutor {
 			return true;
 		}
 		
-		if (largs[0].equals("debug") && (!(send.sender instanceof Player) || send.sender.getName().equals("Taeir"))){
+		if (largs[0].equals("debug") && !(send.sender instanceof Player)){
 			debugInfo();
 			return true;
 		}
@@ -100,10 +100,8 @@ public class TRCommandTR implements CommandExecutor {
 		send.msg("/tr about", "List information about the version and authors of TekkitRestrict");
 	}
 	private void warnings(String largs[]){
-		if (!send.sender.getName().equals("Taeir") && send.noPerm("warnings")){
-			//send.msg(ChatColor.RED + "Only the console can execute this command!");
-			return;
-		}
+		if (send.noPerm("warnings")) return;
+		
 		
 		if (largs.length == 1 || largs.length > 2){
 			send.msg("/tr warnings load", "display warnings during loading");
@@ -156,7 +154,7 @@ public class TRCommandTR implements CommandExecutor {
 		send.msg("[TekkitRestrict About]");
 		send.msg("Original author and creator: DreadSlicer/EterniaLogic");
 		send.msg("Current author: Taeir");
-		if (!send.sender.hasPermission("tekkitrestrict.admin") && !send.sender.getName().equals("Taeir")) return;
+		if (!send.sender.hasPermission("tekkitrestrict.admin")) return;
 		send.msg("");
 		send.msg("Version: " + tekkitrestrict.getFullVersion());
 		send.msg("Database version: " + tekkitrestrict.dbversion);
@@ -170,7 +168,7 @@ public class TRCommandTR implements CommandExecutor {
 		}
 	}
 	private void debugInfo(){
-		if (send.sender instanceof Player && !send.sender.getName().equals("Taeir")){
+		if (send.sender instanceof Player){
 			send.msg(ChatColor.RED + "Only the console can execute this command!");
 			return;
 		}

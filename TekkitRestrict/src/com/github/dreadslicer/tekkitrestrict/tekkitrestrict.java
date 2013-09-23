@@ -234,7 +234,7 @@ public class tekkitrestrict extends JavaPlugin {
 			log.info("EEPatch is not available. Extended functionality disabled.");
 		}
 		
-		initMetrics();
+		//initMetrics(); //Disabled because metrics
 		
 		version = getDescription().getVersion();
 		
@@ -291,10 +291,11 @@ public class tekkitrestrict extends JavaPlugin {
 		return instance;
 	}
 	
+	@SuppressWarnings("unused")
 	private void initMetrics(){
 		try {
-			Metrics metrics2 = new Metrics(this);
-			Metrics.Graph g = metrics2.createGraph("TekkitRestrict Stats");
+			TaeirMetrics metrics = new TaeirMetrics(this);
+			TaeirMetrics.Graph g = metrics.createGraph("TekkitRestrict Stats");
 			/*
 			 * g.addPlotter(new Metrics.Plotter("Total Safezones") {
 			 * 
@@ -313,7 +314,7 @@ public class tekkitrestrict extends JavaPlugin {
 					}
 				}
 			});*/
-			g.addPlotter(new Metrics.Plotter("Recipe blocks") {
+			g.addPlotter(new TaeirMetrics.Plotter("Recipe blocks") {
 				@Override
 				public int getValue() {
 					try{
@@ -356,7 +357,7 @@ public class tekkitrestrict extends JavaPlugin {
 					}
 				}
 			});*/
-			g.addPlotter(new Metrics.Plotter("Disabled items") {
+			g.addPlotter(new TaeirMetrics.Plotter("Disabled items") {
 				@Override
 				public int getValue() {
 					try {
@@ -366,7 +367,7 @@ public class tekkitrestrict extends JavaPlugin {
 					}
 				}
 			});
-			metrics2.start();
+			metrics.start();
 		} catch (IOException e) {
 			log.info("Metrics failed to start!");
 			// Failed to submit the stats :-(

@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.util.Vector;
 
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Hacks;
@@ -20,6 +21,7 @@ public class NoHackForcefield implements Listener {
 	@EventHandler
 	private void onEntityDamage(EntityDamageByEntityEvent e) {
 		if (!(e.getDamager() instanceof Player)) return;
+		if (e.getCause() == DamageCause.PROJECTILE || e.getCause() == DamageCause.MAGIC) return;
 
 		Player damager = (Player) e.getDamager();
 
