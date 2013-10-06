@@ -192,7 +192,7 @@ public class HackDupeConfig extends TRConfig {
 					str = str.split(" ")[0];
 				}
 				Object obj = tekkitrestrict.config.get(str, null);
-				if (fromold && obj == null){
+				if (fromold && obj == null && oldname != null){
 					obj = tekkitrestrict.config.get(oldname, null);
 				}
 				if (obj == null){
