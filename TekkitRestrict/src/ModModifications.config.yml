@@ -13,7 +13,7 @@
 # NOTE: This feature is currently not working.
 # Default: false
 LimitFlightTime: false
-FlyLimitDailyMinutes: 99999999999
+FlyLimitDailyMinutes: 9999999
 
 # Should offensive powers of gemarmor be allowed? (explosion, lightning)
 # Default: false
@@ -24,8 +24,8 @@ AllowGemArmorOffensive: false
 AllowGemArmorDefensive: true
 
 # Set RedPower timers minimum time in seconds
-# Default: 1.1
-RPTimerMin: 1.1
+# Default: 1.0
+RPTimerMin: 1.0
 
 ##########################################################################################
 ######################################### Set EMC ########################################
@@ -78,7 +78,7 @@ MaxEU: []
 MaxCharge: []
 
 # This will automatically decharge set EE items when a player enters a safezone.
-# NOTE: Requires SSDischargeEE to be true
+# NOTE: Requires DechargeEE in SafeZones.config to be true
 DechargeInSS: 
 - 27526
 - 27527

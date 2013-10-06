@@ -1,0 +1,118 @@
+##############################################################################################
+## Configuration file for TekkitRestrict                                                    ##
+## Authors: Taeir, DreadEnd (aka DreadSlicer)                                               ##
+## BukkitDev: http://dev.bukkit.org/server-mods/tekkit-restrict/                            ##
+## Please ask questions/report issues on the BukkitDev page.                                ##
+##############################################################################################
+
+##############################################################################################
+################################ Anti-Hack Configuration #####################################
+##############################################################################################
+# Block hackers from screwing your server up!
+# BroadcastString:  The formatting of the BroadcastString.
+#                   {PLAYER} will be replaced by the playername.
+#                   {TYPE} will be replaced with the hacktype.
+#                   Default: "{PLAYER} tried to {TYPE}-hack!"
+#
+# Enabled:          Do you want to enable Anti-Hack for this kind of hack?
+#                   Default: All true
+#
+# Tolerance:        The amount of ticks the player has to hack before he is kicked.
+#                   If you set this too low, innocent people might get kicked for connection
+#                   problems.
+#                   Default:
+#                       MoveSpeed: 30
+#                       Fly: 40
+#                       Forcefield: 20
+#
+# MaxMoveSpeed:     The maximum speed a player can have (in blocks per second).
+#                   Speeds above this are considered hacking.
+#                   People with quantum armor will have 3 times this limit.
+#                   Default: 2.5
+#
+# MinHeight:        Minimal Height for the flycheck to kick in.
+#                   If you set this too low, people might get kicked for jumping.
+#                   Default: 3
+#
+# Angle:            The maximum angle you are allowed to hit a player with.
+#                   Default: 40
+#
+# Broadcast:        Should a message be broadcast to all players with the 
+#                   tekkitrestrict.notify.hack permission
+#                   Default: All true
+#
+# Kick:             Should a player get kicked if he hacks?
+# ExecuteCommand:
+#    Enable:        Should a command be executed when someone hacks for a certain amount
+#                   of times?
+#                   Default: All true
+#
+#    Command:       The command to execute.
+#                   Default: ""
+#
+#    TriggerAfter:  Set the amount of times the player has to hack before the command is
+#                   executed. (Might implement save feature later. Currently only on
+#                   the current server session.)
+#                   Default: All 1
+Anti-Hacks:
+    BroadcastString: "{PLAYER} tried to {TYPE}-hack!"
+    MoveSpeed:
+        Enabled: true
+        Tolerance: 30
+        MaxMoveSpeed: 2.5
+        Broadcast: true
+        Kick: true
+        ExecuteCommand:
+            Enabled: false
+            Command: ""
+            TriggerAfter: 1
+    Fly:
+        Enabled: true
+        Tolerance: 40
+        MinHeight: 3
+        Broadcast: true
+        Kick: true
+        ExecuteCommand:
+            Enabled: false
+            Command: ""
+            TriggerAfter: 1
+    Forcefield:
+        Enabled: true
+        Tolerance: 20
+        Angle: 40
+        Broadcast: true
+        Kick: true
+        ExecuteCommand:
+            Enabled: false
+            Command: ""
+            TriggerAfter: 1
+
+##############################################################################################
+################################## Anti-Dupe Configuration ###################################
+##############################################################################################
+# BroadcastString: The formatting of the BroadcastString for dupes.
+# Default: "{PLAYER} tried to dupe using {TYPE}!"
+#
+# Broadcast:    If someone tries to dupe and the dupetype is in this list, it is broadcast
+#               to players on the server with the tekkitrestrict.notify.dupe permission.
+#               Possible: "rmfurnace", "alc", "transmute", "tankcart"
+#               Default: ["rmfurnace", "alc", "tankcart"]
+#
+# Kick:         If a player dupes with a dupetype listed here, he will be kicked.
+#               NOTE: It is not recommended to kick players on attempting to dupe. In most
+#                     cases it was not the players intention to dupe.
+#               Possible: ["rmfurnace", "alc", "transmute", "tankcart"]
+#               Default: []
+Anti-Dupes:
+    PreventAlchemyBagDupe: true
+    PreventRMFurnaceDupe: true
+    PreventTransmuteDupe: true
+    PreventTankCartDupe: true
+    PreventTankCartGlitch: true
+    PreventTeleportDupe: true
+    PreventPedestalEmcGen: true
+    BroadcastString: "{PLAYER} tried to dupe using {TYPE}!"
+    Broadcast: ["rmfurnace", "alc", "tankcart"]
+    Kick: []
+
+##############################################################################################

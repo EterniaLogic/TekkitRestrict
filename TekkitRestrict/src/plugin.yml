@@ -2,7 +2,8 @@ name: tekkitrestrict
 main: com.github.dreadslicer.tekkitrestrict.tekkitrestrict
 authors: [Taeir, DreadSlicer]
 prefix: TekkitRestrict
-version: 1.18 dev 2
+version: 1.18 dev 3
+description: TekkitRestrict gives server owners alot of features to prevent and block unwanted tekkit features.
 
 permissions:
     tekkitrestrict.bypass.*:
@@ -35,6 +36,9 @@ permissions:
     tekkitrestrict.openalc:
         description: adds the ability to use /alc [player] [bagcolor].
         default: op
+    tekkitrestrict.checklimits:
+        description: Allows the user to use /checklimits
+        default: true
     tekkitrestrict.bypass.creative:
         description: Enables the use of any block in creative. 
     tekkitrestrict.bypass.safezone:
@@ -236,3 +240,6 @@ commands:
     tpic:
         description: Teleports you to an area where a cluster of items is sitting on the ground.
         usage: /<command> [Min Items Threshhold] [Thorough]
+    checklimits:
+        description: Tells you how many blocks you can still place
+        usage: /<command> [blockid]

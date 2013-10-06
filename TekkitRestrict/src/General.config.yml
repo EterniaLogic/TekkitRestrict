@@ -15,7 +15,6 @@
 ## Have fun, Play safe. Good luck.                                  ##
 ## * DreadEnd * out.                                                ##
 ######################################################################
-
 # Patch ComputerCraft once to prevent some server crashes with
 # ComputerCraft computers.
 # Default: true
@@ -38,13 +37,6 @@ UseNoItem: true
 # Useful if you want to log kicks or use a different bansystem.
 # Default: false
 KickFromConsole: false
-
-# Should the new banned items system be used?
-# WARNING: This feature is still in development. If you turn this on,
-#          banned items and interacts might not get loaded correctly
-#          and micropermissions will NOT work.
-# Default: false
-# UseNewBannedItemsSystem: false
 
 ######################################################################
 ############################## Updater ###############################
