@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.SSMode;
+import com.github.dreadslicer.tekkitrestrict.objects.TRHackSettings;
 import com.griefcraft.lwc.LWCPlugin;
 
 public class TRConfigCache {
@@ -12,12 +13,13 @@ public class TRConfigCache {
 	}
 	
 	public static class Hacks {
+		public static TRHackSettings flys, forcefields, speeds;
 		public static List<String> broadcast = new ArrayList<String>(), kick = new ArrayList<String>();
 		public static String broadcastFormat;
 		
 		public static boolean forcefield, speed, fly;
-		public static int flyTolerance, flyMinHeight, ffTolerance, speedTolerance;
-		public static double ffVangle, speedMaxSpeed;
+		public static int flyTolerance, ffTolerance, speedTolerance;
+		public static double ffVangle, speedMaxSpeed, flyMinHeight;
 	}
 	
 	public static class Dupes {

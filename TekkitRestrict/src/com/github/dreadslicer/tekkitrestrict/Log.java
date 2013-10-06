@@ -9,6 +9,9 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.Command;
 
+import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Hacks;
+import com.github.dreadslicer.tekkitrestrict.objects.TREnums.HackType;
+
 public class Log {
 	/**
 	 * Creates 2 custom levels and assigns the loggers.
@@ -77,13 +80,22 @@ public class Log {
 		McLogger.log(Level.parse("TRDupe"), message);
 		if (TRConfigCache.Dupes.broadcast.contains(type)) Bukkit.broadcast("[TRDupe] " + message, "tekkitrestrict.notify.dupe");
 	}
-	public static void Hack(String type, String playername){
+	public static void Hack(HackType type, String playername){
 		String message = TRConfigCache.Hacks.broadcastFormat;
 		message = replaceColors(message);
 		message = message.replace("{PLAYER}", playername);
-		message = message.replace("{TYPE}", type);
+		message = message.replace("{TYPE}", type.toString());
 		McLogger.log(Level.parse("TRHack"), message);
-		if (TRConfigCache.Hacks.broadcast.contains(type)) Bukkit.broadcast("[TRHack] " + message, "tekkitrestrict.notify.hack");
+		boolean broadcast = false;
+		if (type == HackType.fly){
+			if (Hacks.flys.broadcast) broadcast = true; 
+		} else if (type == HackType.forcefield) {
+			if (Hacks.forcefields.broadcast) broadcast = true;
+		} else if (type == HackType.speed){
+			if (Hacks.speeds.broadcast) broadcast = true;
+		}
+		
+		if (broadcast) Bukkit.broadcast("[TRHack] " + message, "tekkitrestrict.notify.hack");
 	}
 	public static void Glitch(String type, String playername) {
 		String message = playername + " tried to glitch using a " + type + ".";

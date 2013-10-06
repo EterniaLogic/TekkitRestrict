@@ -395,8 +395,8 @@ public class TRCommandTR implements CommandExecutor {
 		if (send.noPerm("admin.reload")) return;
 		
 		if (largs.length == 3){
+			tekkitrestrict.getInstance().saveDefaultConfig(false);
 			tekkitrestrict.getInstance().reloadConfig();
-			tekkitrestrict.config = tekkitrestrict.getInstance().getConfigx();
 			if (largs[2].equals("limiter")){
 				TRLimiter.reload();
 				send.msg("Limiter Reloaded!");

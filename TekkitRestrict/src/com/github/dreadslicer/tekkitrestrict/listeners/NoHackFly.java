@@ -8,6 +8,7 @@ import net.minecraft.server.TileEntity;
 
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
@@ -19,14 +20,14 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import com.github.dreadslicer.tekkitrestrict.Log;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Hacks;
 import com.github.dreadslicer.tekkitrestrict.TRNoHack;
+import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.HackType;
 
 public class NoHackFly implements Listener {
-	private static ConcurrentHashMap<String, Integer> tickTolerance = new ConcurrentHashMap<String, Integer>(),
-			tickLastLoc = new ConcurrentHashMap<String, Integer>();
+	private static ConcurrentHashMap<String, Integer> tickTolerance = new ConcurrentHashMap<String, Integer>();
+	private static ConcurrentHashMap<String, Double> tickLastLoc = new ConcurrentHashMap<String, Double>();
 
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	private void handleFly(PlayerMoveEvent event) {
@@ -40,13 +41,21 @@ public class NoHackFly implements Listener {
 		TRNoHack.handleHack(player, HackType.fly);
 	}
 
+	private static LinkedList<Integer> nearBlocks = new LinkedList<Integer>();
+	static {
+		nearBlocks.add(220);//Scaffold
+		nearBlocks.add(235);//Iron scaffold
+		nearBlocks.add(212);//Ladder rail
+		nearBlocks.add(106);//Vine
+		nearBlocks.add(65);//Ladder
+	}
+	
 	/**
 	 * @return If the player is flying.
 	 */
 	public static boolean isFlying(Player player) {
-		int flyTolerance = Hacks.flyTolerance;
+		int flyTolerance = Hacks.flys.tolerance;
 		PlayerInventory inventory = player.getInventory();
-		
 		ItemStack boots = inventory.getBoots();
 		if (boots != null){
 			//checks if the player is wearing boots before deciding whether or not they are flyhacking
@@ -79,29 +88,23 @@ public class NoHackFly implements Listener {
 			if (id == 27536 || id == 27584) return false;
 		}
 		
-		LinkedList<Integer> nearBlocks = new LinkedList<Integer>();
-		nearBlocks.add(220);//Scaffold
-		nearBlocks.add(235);//Iron scaffold
-		nearBlocks.add(212);//Ladder rail
-		nearBlocks.add(106);//Vine
-		nearBlocks.add(65);//Ladder
-		
 		EntityPlayer Eplayer = ((CraftPlayer) player).getHandle();
 		if (player.isInsideVehicle()) return false;
 		if (Eplayer.vehicle != null) {
-			Log.Debug(ChatColor.RED + "player.isInsideVehicle()==false, but Eplayer.vehicle != null!");
+			tekkitrestrict.log.info("[DEBUG] "+ChatColor.RED + "player.isInsideVehicle()==false, but Eplayer.vehicle != null!");
 			return false;
 		}
 		
 		String name = player.getName();
 		if (!Eplayer.abilities.isFlying) {
 			if (!player.isSneaking()) {
-				int x = player.getLocation().getBlockX();
-				int z = player.getLocation().getBlockZ();
-				int y = player.getLocation().getBlockY();
+				Location loc = player.getLocation();
+				int x = loc.getBlockX();
+				int z = loc.getBlockZ();
+				int y = loc.getBlockY();
 				// checks min height...
 				boolean flight = true;
-				for (int j = 0; j < Hacks.flyMinHeight + 1; j++) {
+				for (int j = 0; j < Hacks.flys.value + 1; j++) {
 					Block b1 = player.getWorld().getBlockAt(x, y, z);//Get the block at the players position.
 					if (!b1.isEmpty()){
 						flight = false; //If there is a block, flight = false.
@@ -118,14 +121,9 @@ public class NoHackFly implements Listener {
 				}
 				
 				if (flight) {
-					Integer ticks = tickTolerance.get(name);
-					if (ticks == null) ticks = 1;
-					else ticks = ticks + 1;
-					tickTolerance.put(name, ticks);//Make if not exist, increase otherwise.
+					Double oldY = tickLastLoc.get(name);
 					
-					Integer oldY = tickLastLoc.get(name);
-					
-					int velo, playery = player.getLocation().getBlockY();
+					double velo, playery = loc.getY();
 					if (oldY == null)
 						velo = 0;
 					else
@@ -133,34 +131,51 @@ public class NoHackFly implements Listener {
 					
 					tickLastLoc.put(name, playery);
 					
-					if (velo != 0) Log.Debug("velo: " + velo);
+					//if (velo != 0) tekkitrestrict.log.info("[DEBUG] velo: " + velo);
 
 					// they are constant 0 or are going upwards
 					if (velo >= 0) {
-						Block cb = player.getWorld().getBlockAt(player.getLocation());
+						Block cb = player.getLocation().getBlock();
 						for (BlockFace bf : BlockFace.values()) {
 							if (!nearBlocks.contains(cb.getRelative(bf).getTypeId())) continue;
-							resetScore(name);
+							lowerScore(name, 1);
 							return false;
 						}
-
+						
+						Integer ticks = tickTolerance.get(name);
+						if (ticks == null) ticks = 1;
+						else ticks = ticks + 1;
+						
 						if (ticks >= flyTolerance) {
 							resetScore(name);
 							return true;
 						} else {
+							tickTolerance.put(name, ticks);//Make if not exist, increase otherwise.
 							return false;
 						}
 					} else {
 						return false;
 					}
+				} else {
+					lowerScore(name, 1);
+					return false;
 				}
 			}
-			resetScore(name); // is not flying.
 			return false;
 		} else {
-			resetScore(name);
+			lowerScore(name, 2);
 			return true;
 		}
+	}
+	
+	private static void lowerScore(String name, int amount){
+		Integer ticks = tickTolerance.get(name);
+		if (ticks == null) ticks = 0;
+		else if (ticks > 0) ticks = ticks - amount;
+		else if (ticks == 0) return;
+		
+		if (ticks < 0 ) ticks = 0;
+		tickTolerance.put(name, ticks);
 	}
 	
 	private static void resetScore(String name){

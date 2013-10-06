@@ -35,11 +35,11 @@ public class NoHackSpeed implements Listener{
 			double xe = xOld - xNew, ze = zOld - zNew;
 			double velo = Math.sqrt(Math.pow(xe, 2D) + Math.pow(ze, 2D));
 
-			if (velo >= Hacks.speedMaxSpeed && velo <= maxmove) {
+			if (velo >= Hacks.speeds.value && velo <= maxmove) {
 				Integer oldValue = tickTolerance.get(name);
 				if (oldValue == null) tickTolerance.put(name, 1);
 				else {
-					if ((oldValue + 1) > Hacks.speedTolerance) {
+					if ((oldValue + 1) > Hacks.speeds.tolerance) {
 						TRNoHack.handleHack(player, HackType.speed);
 						tickTolerance.remove(name);
 						player.teleport(player.getWorld().getHighestBlockAt(new Double(xOld).intValue(), new Double(zOld).intValue()).getLocation());

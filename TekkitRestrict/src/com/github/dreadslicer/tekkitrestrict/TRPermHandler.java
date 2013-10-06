@@ -1,9 +1,11 @@
 package com.github.dreadslicer.tekkitrestrict;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.List;
+import java.util.Set;
 
 import org.anjocaido.groupmanager.GroupManager;
 import org.anjocaido.groupmanager.data.Group;
@@ -14,6 +16,7 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
 import com.github.dreadslicer.tekkitrestrict.Log.Warning;
+import com.github.dreadslicer.tekkitrestrict.objects.TRItem;
 import com.github.dreadslicer.tekkitrestrict.objects.TRPermLimit;
 
 import ru.tehkode.permissions.PermissionGroup;
@@ -24,10 +27,8 @@ import de.bananaco.bpermissions.api.util.CalculableType;
 import de.bananaco.bpermissions.api.util.Permission;
 
 public class TRPermHandler {
-
-	public TRPermHandler() {}
+	public static PermissionManager permEx;
 	private static RegisteredServiceProvider<net.milkbowl.vault.permission.Permission> v;
-	
 
 	/**
 	 * @deprecated Unnecessary, use player.hasPermission("tekkitrestrict."+type+"."+node1) instead
@@ -46,7 +47,8 @@ public class TRPermHandler {
 		        	return permission.has(player, perm);
 		        }
 			} else if (pm.isPluginEnabled("PermissionsEx")) {
-				return ((PermissionManager) tekkitrestrict.perm).getUser(player).has(perm);
+				if (permEx == null) permEx = ru.tehkode.permissions.bukkit.PermissionsEx.getPermissionManager();
+				return permEx.getUser(player).has(perm);
 			} else if (pm.isPluginEnabled("bPermissions")) {
 				return ApiLayer.hasPermission(player.getWorld().getName(), CalculableType.USER, player.getName(), perm);
 			} else if (pm.isPluginEnabled("GroupManager")) {
@@ -63,95 +65,28 @@ public class TRPermHandler {
 	}
 
 	private static boolean logged = false;
-	public static int getPermNumeral(Player p, String permBase, int id, int data) {
-
-		String negPerms[] = getPermissions(p, "-"+permBase);
-		for (int i = 0; i < negPerms.length; i++) {
-			String gp[] = negPerms[i].replace('.', ';').split(";");//tekkitrestrict;limiter;id;data
-			String gs[] = permBase.replace('.', ';').split(";");//tekkitrestrict;limiter
-			if (gp.length < 2 || gs.length < 2) continue;
-			if (gp[1].equals("") || gs[1].equals("")) continue;
-			if (!gp[1].equals(gs[1])) continue;//limiter
-			try {
-				if (gp.length == 5){
-					if (TRItemProcessor.isInRange(gp[2]+":"+gp[3], id, data, negPerms[i])) return -1;//id:data
-				} else if (gp.length == 4){
-					if (TRItemProcessor.isInRange(gp[2], id, data, negPerms[i])) return -1;//id:-1
-				}
-			} catch (Exception ex){
-				if (!logged){
-					Warning.other("You have set an invalid limiter permission \""+negPerms[i]+"\":");
-					Warning.other("Unexpected error occurred! Please inform the author of this error.");
-					Warning.other(ex.getMessage());
-					Log.Exception(ex, true);
-					logged = true;
-				}
-			}
-		}
-
-		String perms[] = getPermissions(p, permBase);
-		for (int i = 0; i < perms.length; i++) {
-			String gp[] = perms[i].replace('.', ';').split(";");//tekkitrestrict;limiter;id
-			String gs[] = permBase.replace('.', ';').split(";");//tekkitrestrict;limiter
-			if (gp.length < 2 || gs.length < 2) continue;
-			if (gp[1].equals("") || gs[1].equals("")) continue;
-			if (!gp[1].equals(gs[1])) continue;
-			
-			try {
-				if (gp.length == 5){
-					if (TRItemProcessor.isInRange(gp[2]+":"+gp[3], id, data, perms[i])){
-						try {
-							return Integer.parseInt(gp[4]);
-						} catch (NumberFormatException ex){
-							Warning.other("You have set an invalid limiter permission \""+perms[i]+"\":");
-							Warning.other("Invalid max amount: \""+gp[4]+"\"");
-							return -1;
-						}
-					}
-				} else if (gp.length == 4) {
-					if (TRItemProcessor.isInRange(gp[2], id, data, perms[i])){
-						try {
-							return Integer.parseInt(gp[3]);
-						} catch (NumberFormatException ex){
-							Warning.other("You have set an invalid limiter permission \""+perms[i]+"\":");
-							Warning.other("Invalid max amount: \""+gp[3]+"\"");
-							return -1;
-						}
-					}
-				}
-			} catch (Exception ex){
-				if (!logged){
-					Warning.other("You have set an invalid limiter permission \""+perms[i]+"\":");
-					Warning.other("Unexpected error occurred! Please inform the author of this error.");
-					Warning.other(ex.getMessage());
-					Log.Exception(ex, true);
-					logged = true;
-				}
-			}
-		}
-
-		return -1;
-	}
-	
-	public static TRPermLimit getPermLimitFromPerm(Player p, String permBase, int id, int data) {
+	public static TRPermLimit getPermLimitFromPerm(Player player, String permBase, int id, int data) {
+		//String gs[] = permBase.replace('.', ';').split(";");
+		//if (gs.length < 2) return null;
+		
 		TRPermLimit t = new TRPermLimit();
-		String negPerms[] = getPermissions(p, "-"+permBase);
-		for (int i = 0; i < negPerms.length; i++) {
-			String gp[] = negPerms[i].replace('.', ';').split(";");//tekkitrestrict;limiter;id;data
-			String gs[] = permBase.replace('.', ';').split(";");//tekkitrestrict;limiter
-			if (gp.length < 2 || gs.length < 2) continue;
-			if (gp[1].equals("") || gs[1].equals("")) continue;
-			if (!gp[1].equals(gs[1])) continue;//limiter
+		Set<String> negPerms = getNegPermissions(player, permBase);
+		
+		for (String negPerm : negPerms) {
+			String gp[] = negPerm.split("\\.");//tekkitrestrict;limiter;id;data
+			//if (gp.length < 2) continue;//TODO not needed?
+
+			//if (!gp[1].equals(gs[1])) continue;//TODO not needed?
 			try {
 				if (gp.length == 5){
-					if (TRItemProcessor.isInRange(gp[2]+":"+gp[3], id, data, negPerms[i])){
+					if (TRItemProcessor.isInRange(gp[2]+":"+gp[3], id, data, negPerm)){
 						t.id = id;
 						t.data = Integer.parseInt(gp[3]);
 						t.max = -2;
 						return t;
 					}
 				} else if (gp.length == 4){
-					if (TRItemProcessor.isInRange(gp[2], id, data, negPerms[i])){
+					if (TRItemProcessor.isInRange(gp[2], id, data, negPerm)){
 						t.id = id;
 						t.data = -1;
 						t.max = -2;
@@ -160,7 +95,7 @@ public class TRPermHandler {
 				}
 			} catch (Exception ex){
 				if (!logged){
-					Warning.other("You have set an invalid limiter permission \""+negPerms[i]+"\":");
+					Warning.other("You have set an invalid limiter permission \""+negPerm+"\":");
 					Warning.other("Unexpected error occurred! Please inform the author of this error.");
 					Warning.other(ex.getMessage());
 					Log.Exception(ex, true);
@@ -169,37 +104,56 @@ public class TRPermHandler {
 			}
 		}
 
-		String perms[] = getPermissions(p, permBase);
-		for (int i = 0; i < perms.length; i++) {
-			String gp[] = perms[i].replace('.', ';').split(";");//tekkitrestrict;limiter;id
-			String gs[] = permBase.replace('.', ';').split(";");//tekkitrestrict;limiter
-			if (gp.length < 2 || gs.length < 2) continue;
-			if (gp[1].equals("") || gs[1].equals("")) continue;
-			if (!gp[1].equals(gs[1])) continue;
+		Set<String> perms = getPermissions(player, permBase);
+		
+		if (perms == null){
+			perms = new HashSet<String>();
+			for (int i = 0; i <= 20; i++){
+				if (player.hasPermission("tekkitrestrict.limiter."+id+"."+data+"."+i)) {
+					t.id = id;
+					t.data = data;
+					t.max = i;
+					return t;
+				}
+				
+				if (player.hasPermission("tekkitrestrict.limiter."+id+"."+i)){
+					t.id = id;
+					t.data = -1;
+					t.max = i;
+					return t;
+				}
+			}
+		}
+		
+		for (String perm : perms) {
+			String gp[] = perm.split("\\.");//tekkitrestrict;limiter;id
+			//if (gp.length < 2) continue;//TODO not needed?
+			
+			//if (!gp[1].equals(gs[1])) continue;//TODO not needed?
 			
 			try {
 				if (gp.length == 5){
-					if (TRItemProcessor.isInRange(gp[2]+":"+gp[3], id, data, perms[i])){
+					if (TRItemProcessor.isInRange(gp[2]+":"+gp[3], id, data, perm)){
 						try {
 							t.id = id;
 							t.data = Integer.parseInt(gp[3]);
 							t.max = Integer.parseInt(gp[4]);
 							return t;
 						} catch (NumberFormatException ex){
-							Warning.other("You have set an invalid limiter permission \""+perms[i]+"\":");
+							Warning.other("You have set an invalid limiter permission \""+perm+"\":");
 							Warning.other("Invalid max amount: \""+gp[4]+"\"");
 							return null;
 						}
 					}
 				} else if (gp.length == 4) {
-					if (TRItemProcessor.isInRange(gp[2], id, data, perms[i])){
+					if (TRItemProcessor.isInRange(gp[2], id, data, perm)){
 						try {
 							t.id = id;
 							t.data = -1;
 							t.max = Integer.parseInt(gp[3]);
 							return t;
 						} catch (NumberFormatException ex){
-							Warning.other("You have set an invalid limiter permission \""+perms[i]+"\":");
+							Warning.other("You have set an invalid limiter permission \""+perm+"\":");
 							Warning.other("Invalid max amount: \""+gp[3]+"\"");
 							return null;
 						}
@@ -207,7 +161,7 @@ public class TRPermHandler {
 				}
 			} catch (Exception ex){
 				if (!logged){
-					Warning.other("You have set an invalid limiter permission \""+perms[i]+"\":");
+					Warning.other("You have set an invalid limiter permission \""+perm+"\":");
 					Warning.other("Unexpected error occurred! Please inform the author of this error.");
 					Warning.other(ex.getMessage());
 					Log.Exception(ex, true);
@@ -219,39 +173,201 @@ public class TRPermHandler {
 		return null;
 	}
 
-	private static String[] getPermissions(Player player, String s) {
+	public static List<TRPermLimit> getAllLimiterPerms(Player player){
+		ArrayList<TRPermLimit> tbr = new ArrayList<TRPermLimit>();
+		
+		Set<String> negPerms = getNegPermissions(player, "tekkitrestrict.limiter");
+		for (String negPerm : negPerms) {
+			String gp[] = negPerm.split("\\.");//tekkitrestrict;limiter;id;data
+
+			//if (gp.length < 2) continue;//TODO not needed?
+			
+			//if (!gp[1].equals("limiter")) continue;//TODO not needed?
+			try {
+				if (gp.length == 5){
+					List<TRItem> items = TRItemProcessor.processItemString(gp[2]+":"+gp[3]);
+					for (TRItem item : items){
+						TRPermLimit t = new TRPermLimit();
+						t.id = item.id;
+						t.data = item.data;
+						t.max = -2;
+						tbr.add(t);
+					}
+				} else if (gp.length == 4){
+					List<TRItem> items = TRItemProcessor.processItemString(gp[2]);
+					for (TRItem item : items){
+						TRPermLimit t = new TRPermLimit();
+						t.id = item.id;
+						t.data = item.data;
+						t.max = -2;
+						tbr.add(t);
+					}
+				}
+			} catch (Exception ex){
+				if (!logged){
+					Warning.other("You have set an invalid limiter permission \""+negPerm+"\":");
+					Warning.other("Unexpected error occurred! Please inform the author of this error.");
+					Warning.other(ex.getMessage());
+					Log.Exception(ex, true);
+					logged = true;
+				}
+			}
+		}
+
+		Set<String> perms = getPermissions(player, "tekkitrestrict.limiter");
+		if (perms == null) perms = new HashSet<String>();
+		for (String perm : perms) {
+			String gp[] = perm.split("\\.");//tekkitrestrict;limiter;id
+
+			//if (gp.length < 2) continue;//TODO not needed?
+			//if (!gp[1].equals("limiter")) continue;//TODO not needed?
+			try {
+				if (gp.length == 5){
+					int max;
+					
+					try {
+						max = Integer.parseInt(gp[4]);
+					} catch (NumberFormatException ex){
+						Warning.other("You have set an invalid limiter permission \""+perm+"\":");
+						Warning.other("Invalid max amount: \""+gp[4]+"\"");
+						continue;
+					}
+					
+					List<TRItem> items = TRItemProcessor.processItemString(gp[2]+":"+gp[3]);
+					for (TRItem item : items){
+						TRPermLimit t = new TRPermLimit();
+						t.id = item.id;
+						t.data = item.data;
+						t.max = max;
+						tbr.add(t);
+					}
+				} else if (gp.length == 4) {
+					int max;
+					
+					try {
+						max = Integer.parseInt(gp[3]);
+					} catch (NumberFormatException ex){
+						Warning.other("You have set an invalid limiter permission \""+perm+"\":");
+						Warning.other("Invalid max amount: \""+gp[3]+"\"");
+						continue;
+					}
+					
+					List<TRItem> items = TRItemProcessor.processItemString(gp[2]);
+					for (TRItem item : items){
+						TRPermLimit t = new TRPermLimit();
+						t.id = item.id;
+						t.data = item.data;
+						t.max = max;
+						tbr.add(t);
+					}
+				}
+			} catch (Exception ex){
+				if (!logged){
+					Warning.other("You have set an invalid limiter permission \""+perm+"\":");
+					Warning.other("Unexpected error occurred! Please inform the author of this error.");
+					Warning.other(ex.getMessage());
+					Log.Exception(ex, true);
+					logged = true;
+				}
+			}
+		}
+		
+		HashSet<TRPermLimit> removals = new HashSet<TRPermLimit>();
+		for (int i = 0; i<tbr.size(); i++){
+			TRPermLimit t = tbr.get(i);
+			for (int j = 0; j < tbr.size(); j++){
+				TRPermLimit t2 = tbr.get(j);
+				if (t == t2) continue;
+				if (t.compare_Perm(t2)){
+					if (t.max == -2){
+						removals.add(t2);
+					} else if (t2.max == -2){
+						removals.add(t);
+					}
+				}
+			}
+		}
+		tbr.removeAll(removals);
+		
+		return tbr;
+	}
+	
+	/**
+	 * @return A String Array of negated permissions, or a <code>new String[0]</code> if permissions plugin is not found.
+	 */
+	private static Set<String> getNegPermissions(Player player, String permBase) {
+		PluginManager pm = Bukkit.getPluginManager();
+		if (pm.isPluginEnabled("PermissionsEx")) {
+			return getAllPEXPlayerPerms(player, "-"+permBase);
+		}
+		
+		if (pm.isPluginEnabled("bPermissions")) {
+			Permission ps[] = ApiLayer.getPermissions(player.getWorld().getName(), CalculableType.USER, player.getName());
+			HashSet<String> sr = new HashSet<String>();
+			Permission apermission[];
+			int k = (apermission = ps).length;
+			for (int j = 0; j < k; j++) {
+				Permission px = apermission[j];
+				if (px.isTrue()) continue;//Only negated ones.
+				String perm = px.nameLowerCase();
+				if (!perm.startsWith(permBase)) continue;
+				sr.add(perm);
+			}
+
+			return sr;
+		}
+		
+		if (pm.isPluginEnabled("GroupManager")) {
+			GroupManager ps = (GroupManager) pm.getPlugin("GroupManager");
+			HashSet<String> sr = new HashSet<String>();
+			User user = ps.getWorldsHolder().getWorldData(player).getUser(player.getName());
+			sr.addAll(user.getPermissionList());
+			for (Group group : user.subGroupListCopy()){
+				sr.addAll(group.getPermissionList());
+			}
+			sr.addAll(user.getGroup().getPermissionList());
+			//String a;
+			for (String inherit: user.getGroup().getInherits()){
+				Group gi = ps.getWorldsHolder().getWorldData(player).getGroup(inherit);
+				if (gi == null) continue;
+				
+				sr.addAll(gi.getPermissionList());
+			}
+			permBase = "-"+permBase;
+			Iterator<String> it = sr.iterator();
+			while (it.hasNext()){
+				String str = it.next();
+				if (!str.startsWith(permBase)) it.remove();
+			}
+
+			return sr;
+		}
+		
+		return new HashSet<String>();
+	}
+	
+	private static Set<String> getPermissions(Player player, String s) {
 		PluginManager pm = Bukkit.getPluginManager();
 		if (pm.isPluginEnabled("PermissionsEx")) {
 			return getAllPEXPlayerPerms(player, s);
 		}
 		
-		if (pm.isPluginEnabled("PermissionsBukkit")) {
-			return new String[0];
-		}
-		
 		if (pm.isPluginEnabled("bPermissions")) {
 			Permission ps[] = ApiLayer.getPermissions(player.getWorld().getName(), CalculableType.USER, player.getName());
-			LinkedList<String> sr = new LinkedList<String>();
+			HashSet<String> sr = new HashSet<String>();
 			Permission apermission[];
 			int k = (apermission = ps).length;
 			for (int j = 0; j < k; j++) {
 				Permission px = apermission[j];
+				if (!px.isTrue()) continue; //Only positive permissions
 				String perm = px.nameLowerCase();
 				if (!perm.startsWith(s)) continue;
 				sr.add(perm);
 			}
 
-			for (int i = 0; i < sr.size(); i++) {
-				if (!sr.get(i).startsWith(s)) {
-					sr.remove(i);
-					i--;
-				}
-			}
-
-			String lz[] = sr.toArray(new String[0]);
-			//sr.clear();
-			return lz;
+			return sr;
 		}
+		
 		if (pm.isPluginEnabled("GroupManager")) {
 			GroupManager ps = (GroupManager) pm.getPlugin("GroupManager");
 			HashSet<String> sr = new HashSet<String>();
@@ -277,89 +393,64 @@ public class TRPermHandler {
 				}
 			}
 
-			String lz[] = sr.toArray(new String[0]);
-			return lz;
-		} else {
-			return new String[0];
+			return sr;
 		}
+		
+		return null;
 	}
 
-	private static String[] getAllPEXPlayerPerms(Player p, String sss) {
-		LinkedList<String> l = new LinkedList<String>();
-		PermissionUser pu = ((PermissionManager) tekkitrestrict.perm).getUser(p);
-		String as[];
-		int j = (as = pu.getPermissions(p.getWorld().getName())).length;
-		for (int i = 0; i < j; i++) {
-			String sg = as[i];
-			if (sg.startsWith(sss)) {
-				l.add(sg);
+	private static Set<String> getAllPEXPlayerPerms(Player player, String permBase) {
+		HashSet<String> tbr = new HashSet<String>();
+		PermissionUser user = permEx.getUser(player);
+		
+		String world = player.getWorld().getName();
+		String userPerms[] = user.getPermissions(world);
+		for (String perm : userPerms) {
+			if (!perm.startsWith(permBase)) continue;
+			tbr.add(perm);
+		}
+		
+		Collection<String[]> allPermissions = user.getAllPermissions().values();
+		for (String[] perms : allPermissions){
+			if (perms == null) continue;
+			for (String perm : perms){
+				if (!perm.startsWith(permBase)) continue;
+				tbr.add(perm);
 			}
 		}
 
-		Map<String, String[]> sssrr = pu.getAllPermissions();
-		for (Iterator<String> iterator = sssrr.keySet().iterator(); iterator.hasNext();) {
-			String ssworld = iterator.next();
-			if (ssworld == null || ssworld.equals("null")) {
-				String as1[];
-				int k1 = (as1 = sssrr.get(ssworld)).length;
-				for (int j1 = 0; j1 < k1; j1++) {
-					String value = as1[j1];
-					if (value.startsWith(sss)) {
-						l.add(value);
-					}
-				}
-
-			}
-		}
-
-		PermissionGroup apermissiongroup[];
-		int i1 = (apermissiongroup = pu.getGroups()).length;
-		for (int k = 0; k < i1; k++) {
-			PermissionGroup P1 = apermissiongroup[k];
-			// l.addAll(LoopPEXGroups(p.getWorld().getName(), P1));
-			{
-				String as2[];
-				int j2 = (as2 = P1.getPermissions(p.getWorld().getName())).length;
-				for (int l1 = 0; l1 < j2; l1++) {
-					String sr = as2[l1];
-					if (sr.startsWith(sss)) {
-						l.add(sr);
-					}
-				}
-
-				j2 = (as2 = P1.getPermissions(null)).length;
-				for (int i2 = 0; i2 < j2; i2++) {
-					String sr = as2[i2];
-					if (sr.startsWith(sss)) {
-						l.add(sr);
-					}
-				}
+		PermissionGroup groups[] = user.getGroups();
+		for (PermissionGroup group : groups) {
+			String groupPerms[] = group.getPermissions(world);
+			for (String perm : groupPerms) {
+				if (!perm.startsWith(permBase)) continue;
+				tbr.add(perm);
 			}
 
-			PermissionGroup pgr[] = P1.getChildGroups();
-			for (int i = 0; i < pgr.length; i++) {
-				String as2[];
-				int j2 = (as2 = P1.getPermissions(p.getWorld().getName())).length;
-				for (int l1 = 0; l1 < j2; l1++) {
-					String sr = as2[l1];
-					if (sr.startsWith(sss)) {
-						l.add(sr);
-					}
+			groupPerms = group.getPermissions(null);
+			for (String perm : groupPerms) {
+				if (!perm.startsWith(permBase)) continue;
+				tbr.add(perm);
+			}
+			
+
+			PermissionGroup childrenGroups[] = group.getChildGroups();
+			for (int i = 0; i < childrenGroups.length; i++) {
+				String perms[] = group.getPermissions(world);
+				for (String perm : perms) {
+					if (!perm.startsWith(permBase)) continue;
+					tbr.add(perm);
 				}
 
-				j2 = (as2 = P1.getPermissions(null)).length;
-				for (int i2 = 0; i2 < j2; i2++) {
-					String sr = as2[i2];
-					if (sr.startsWith(sss)) {
-						l.add(sr);
-					}
+				perms = group.getPermissions(null);
+				for (String perm : perms) {
+					if (!perm.startsWith(permBase)) continue;
+					tbr.add(perm);
 				}
 			}
 		}
 
-		String lsst[] = l.toArray(new String[0]);
-		//l.clear();
-		return lsst;
+		return tbr;
 	}
 
 }

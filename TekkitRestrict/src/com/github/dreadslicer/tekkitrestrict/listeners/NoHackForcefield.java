@@ -11,7 +11,6 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.util.Vector;
 
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Hacks;
-import com.github.dreadslicer.tekkitrestrict.TRLogger;
 import com.github.dreadslicer.tekkitrestrict.TRNoHack;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.HackType;
 
@@ -68,10 +67,10 @@ public class NoHackForcefield implements Listener {
 			angle = 360 - angle;
 		}
 		// tekkitrestrict.log.info("proj:  "+pdir+" / "+angle);
-		TRLogger.Log("debug", "Angle: " + angle);
+		//TRLogger.Log("debug", "Angle: " + angle);
 		// change between 0 and 360.
-		double cr1 = ((pdir + Hacks.ffVangle) > 360) ? pdir + Hacks.ffVangle - 360 : pdir + Hacks.ffVangle;
-		double cr2 = ((pdir - Hacks.ffVangle) < 0) ? 360 - Math.abs(pdir - Hacks.ffVangle) : pdir - Hacks.ffVangle;
+		double cr1 = ((pdir + Hacks.forcefields.value) > 360) ? pdir + Hacks.forcefields.value - 360 : pdir + Hacks.forcefields.value;
+		double cr2 = ((pdir - Hacks.forcefields.value) < 0) ? 360 - Math.abs(pdir - Hacks.forcefields.value) : pdir - Hacks.forcefields.value;
 		// r1 = 360 r2 = 5
 		// 360 + 30 = 390 - 360 = 30 < 5 false
 		// r1 = 5 r2 = 360
@@ -82,7 +81,7 @@ public class NoHackForcefield implements Listener {
 			Integer oldValue = tickTolerance.get(name);
 			if (oldValue == null) tickTolerance.put(name, 1);//If not exist yet, make one
 			else {//Otherwise, check if it exeeds the limit.
-				if ((oldValue+1) > Hacks.ffTolerance) {
+				if ((oldValue+1) > Hacks.forcefields.tolerance) {
 					TRNoHack.handleHack(damager, HackType.forcefield);
 					tickTolerance.remove(name);
 				} else

@@ -156,9 +156,6 @@ public class TRListener implements Listener {
 			
 			String pname = player.getName();
 			if (!pname.equalsIgnoreCase("[BuildCraft]") && !pname.equalsIgnoreCase("[RedPower]")){
-
-				
-	
 				if (Listeners.UseBlockLimit && !player.hasPermission("tekkitrestrict.bypass.limiter")) {
 					TRLimiter il = TRLimiter.getOnlineLimiter(player);
 					if (!il.checkLimit(event, false)) {
