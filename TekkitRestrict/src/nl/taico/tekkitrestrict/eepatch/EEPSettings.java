@@ -1,4 +1,4 @@
-package com.github.dreadslicer.tekkitrestrict.eepatch;
+package nl.taico.tekkitrestrict.eepatch;
 
 import java.util.ArrayList;
 import java.util.HashMap;

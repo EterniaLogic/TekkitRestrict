@@ -1,19 +1,20 @@
-package com.github.dreadslicer.tekkitrestrict.eepatch;
+package nl.taico.tekkitrestrict.eepatch;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
 
+import nl.taico.tekkitrestrict.eepatch.destlisteners.EEDest1Listener;
+import nl.taico.tekkitrestrict.eepatch.destlisteners.EEDest2Listener;
+import nl.taico.tekkitrestrict.eepatch.destlisteners.EEDest3Listener;
+import nl.taico.tekkitrestrict.eepatch.ringlisteners.EEArcaneRingListener;
+import nl.taico.tekkitrestrict.eepatch.ringlisteners.EEBHBListener;
+import nl.taico.tekkitrestrict.eepatch.ringlisteners.EEHarvestRingListener;
+import nl.taico.tekkitrestrict.eepatch.ringlisteners.EEIgnitionRingListener;
+import nl.taico.tekkitrestrict.eepatch.ringlisteners.EESWRGListener;
+import nl.taico.tekkitrestrict.eepatch.ringlisteners.EEVoidRingListener;
+import nl.taico.tekkitrestrict.eepatch.ringlisteners.EEZeroRingListener;
+
 import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
-import com.github.dreadslicer.tekkitrestrict.eepatch.destlisteners.EEDest1Listener;
-import com.github.dreadslicer.tekkitrestrict.eepatch.destlisteners.EEDest2Listener;
-import com.github.dreadslicer.tekkitrestrict.eepatch.destlisteners.EEDest3Listener;
-import com.github.dreadslicer.tekkitrestrict.eepatch.ringlisteners.EEArcaneRingListener;
-import com.github.dreadslicer.tekkitrestrict.eepatch.ringlisteners.EEBHBListener;
-import com.github.dreadslicer.tekkitrestrict.eepatch.ringlisteners.EEHarvestRingListener;
-import com.github.dreadslicer.tekkitrestrict.eepatch.ringlisteners.EEIgnitionRingListener;
-import com.github.dreadslicer.tekkitrestrict.eepatch.ringlisteners.EESWRGListener;
-import com.github.dreadslicer.tekkitrestrict.eepatch.ringlisteners.EEVoidRingListener;
-import com.github.dreadslicer.tekkitrestrict.eepatch.ringlisteners.EEZeroRingListener;
 
 public class EEAssigner {
 	public static void assign(){

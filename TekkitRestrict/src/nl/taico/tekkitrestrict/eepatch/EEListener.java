@@ -1,4 +1,4 @@
-package com.github.dreadslicer.tekkitrestrict.eepatch;
+package nl.taico.tekkitrestrict.eepatch;
 
 import org.bukkit.event.Listener;
 

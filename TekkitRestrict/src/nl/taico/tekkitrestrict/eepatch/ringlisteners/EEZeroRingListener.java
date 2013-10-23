@@ -1,24 +1,24 @@
-package com.github.dreadslicer.tekkitrestrict.eepatch.ringlisteners;
+package nl.taico.tekkitrestrict.eepatch.ringlisteners;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-import com.github.dreadslicer.tekkitrestrict.eepatch.EEPSettings;
+import nl.taico.tekkitrestrict.eepatch.EEPSettings;
 
-import ee.events.ring.EEArchangelRingEvent;
+import ee.events.ring.EEZeroRingEvent;
 
-public class EEArchangelistener implements Listener {
+public class EEZeroRingListener implements Listener {
 	@EventHandler
-	public void ArchangelRingEvent(EEArchangelRingEvent event){
+	public void ZeroRingEvent(EEZeroRingEvent event){
 		Player player = event.getPlayer();
-		if (player.hasPermission("tekkitrestrict.bypass.blockactions.archangelring")) return;
+		if (player.hasPermission("tekkitrestrict.bypass.blockactions.zeroring")) return;
 		
 		int action = event.getExtraInfo().ordinal();
 		String name = event.getExtraInfo().getName();
 		
-		for (Integer blocked : EEPSettings.archangelring){
+		for (Integer blocked : EEPSettings.zeroring){
 			if (blocked == null) continue;
 			if (blocked.intValue() == action){
 				event.setCancelled(true);

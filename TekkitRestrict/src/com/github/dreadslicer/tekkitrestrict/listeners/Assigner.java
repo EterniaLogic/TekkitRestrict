@@ -4,10 +4,11 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
 
+import nl.taico.tekkitrestrict.eepatch.EEAssigner;
+
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Dupes;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Hacks;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Listeners;
-import com.github.dreadslicer.tekkitrestrict.eepatch.EEAssigner;
 import com.github.dreadslicer.tekkitrestrict.TRListener;
 import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
 

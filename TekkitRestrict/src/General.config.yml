@@ -61,6 +61,6 @@ UpdateToDevelopmentVersions: false
 ######################################################################
 ######################################################################
 # Do NOT change this. It will reset the config files if you do.
-ConfigVersion: 1.4
+ConfigVersion: 1.5
 
 ######################################################################

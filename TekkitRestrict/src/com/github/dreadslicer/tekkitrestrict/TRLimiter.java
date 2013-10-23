@@ -22,8 +22,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 
+import nl.taico.tekkitrestrict.annotations.Safe;
+
 import com.github.dreadslicer.tekkitrestrict.Log.Warning;
-import com.github.dreadslicer.tekkitrestrict.annotations.Safe;
 import com.github.dreadslicer.tekkitrestrict.objects.TRConfigLimit;
 import com.github.dreadslicer.tekkitrestrict.objects.TRItem;
 import com.github.dreadslicer.tekkitrestrict.objects.TRLimit;

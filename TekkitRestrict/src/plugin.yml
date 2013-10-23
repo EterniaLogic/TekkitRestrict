@@ -2,7 +2,7 @@ name: tekkitrestrict
 main: com.github.dreadslicer.tekkitrestrict.tekkitrestrict
 authors: [Taeir, DreadSlicer]
 prefix: TekkitRestrict
-version: 1.18 Dev 3
+version: 1.18
 description: TekkitRestrict gives server owners alot of features to prevent and block unwanted tekkit features.
 
 permissions:

@@ -1,11 +1,11 @@
-package com.github.dreadslicer.tekkitrestrict.eepatch.destlisteners;
+package nl.taico.tekkitrestrict.eepatch.destlisteners;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-import com.github.dreadslicer.tekkitrestrict.eepatch.EEPSettings;
+import nl.taico.tekkitrestrict.eepatch.EEPSettings;
 
 import ee.events.destruction.EEDestructionCatalystEvent;
 

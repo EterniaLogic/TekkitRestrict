@@ -1,6 +1,6 @@
 package com.github.dreadslicer.tekkitrestrict.objects;
 
-import com.github.dreadslicer.tekkitrestrict.annotations.Safe;
+import nl.taico.tekkitrestrict.annotations.Safe;
 
 public class TRItem {
 	public int id;
