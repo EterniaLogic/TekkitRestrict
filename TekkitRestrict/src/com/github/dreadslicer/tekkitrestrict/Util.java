@@ -4,8 +4,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Global;
-import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Hacks;
-import com.github.dreadslicer.tekkitrestrict.objects.TREnums.HackType;
 
 public class Util {
 	public static void kick(Player player, String message){
@@ -13,21 +11,6 @@ public class Util {
 			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "kick " + player.getName() + " " + message);
 		else
 			player.kickPlayer(message);
-	}
-	
-	public static boolean kickHack(HackType type){
-		if (type == HackType.fly) return Hacks.kick.contains("fly");
-		else if (type == HackType.forcefield) return Hacks.kick.contains("forcefield");
-		else if (type == HackType.speed) return Hacks.kick.contains("speed");
-		else return false;
-	}
-	/**
-	 * Kick a player if the kick for that hacktype is enabled.<br>
-	 * The kick message will be:
-	 * <code>Kicked for [type]-Hacking!</code>
-	 */
-	public static void kickHacker(HackType type, Player player){
-		if (Util.kickHack(type)) Util.kick(player, "Kicked for " + type.toString() + "-Hacking!");
 	}
 	
 	public static String inGroup(int id){

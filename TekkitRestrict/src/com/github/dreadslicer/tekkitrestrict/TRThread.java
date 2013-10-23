@@ -22,7 +22,6 @@ import org.bukkit.GameMode;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ExperienceOrb;
@@ -35,15 +34,11 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.ItemStack;
 
 import com.github.dreadslicer.tekkitrestrict.Log.Warning;
-import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Dupes;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Threads;
-import com.github.dreadslicer.tekkitrestrict.commands.TRCommandAlc;
 import com.github.dreadslicer.tekkitrestrict.objects.TRCharge;
 import com.github.dreadslicer.tekkitrestrict.objects.TRItem;
 
-import ee.AlchemyBagData;
 import ee.EEBase;
-import ee.ItemAlchemyBag;
 import ee.ItemEECharged;
 
 public class TRThread {
@@ -57,10 +52,8 @@ public class TRThread {
 	public TGemArmorDisabler gemArmorThread = new TGemArmorDisabler();
 	/** Thread will NOT trigger again if interrupted. */
 	public TEntityRemover entityRemoveThread = new TEntityRemover();
-	public TRBagCacheThread bagCacheThread = new TRBagCacheThread();
 	//public TRLimitFlyThread limitFlyThread = new TRLimitFlyThread();
 	private static TRThread instance;
-	private static boolean initialized = false;
 	public TRThread() {
 		instance = this;
 	}
@@ -72,7 +65,6 @@ public class TRThread {
 		worldScrubThread.setName("TekkitRestrict_BlockScrubberThread");
 		gemArmorThread.setName("TekkitRestrict_GemArmorThread");
 		entityRemoveThread.setName("TekkitRestrict_EntityRemoverThread");
-		bagCacheThread.setName("TekkitRestrict_BagCacheThread");
 		//limitFlyThread.setName("TekkitRestrict_LimitFlyThread_Unused");
 		saveThread.start();
 		disableItemThread.start();
@@ -80,15 +72,11 @@ public class TRThread {
 		gemArmorThread.start();
 		entityRemoveThread.start();
 		//if (tekkitrestrict.config.getBoolean("LimitFlightTime", false)) limitFlyThread.start();
-		
-		if (tekkitrestrict.EEEnabled && Dupes.alcBag && !bagCacheThread.isAlive()) bagCacheThread.start();
-		initialized = true;
 	}
 	
 	public static void reload() {
 		// reloads the variables in each thread...
 		instance.disableItemThread.reload();
-		if (initialized && tekkitrestrict.EEEnabled && Dupes.alcBag && !instance.bagCacheThread.isAlive()) instance.bagCacheThread.start();
 	}
 }
 
@@ -150,92 +138,6 @@ class TRLimitFlyThread extends Thread {
 	
 	public static void reload() {
 		groundTime = tekkitrestrict.config.getInt("FlyLimitDailyMinutes");
-	}
-}
-
-class TRBagCacheThread extends Thread {
-	@Override
-	public void run(){
-		while (true) {
-			try {
-				// We want to loop through all of their alchemy bags HERE.
-				// This function will also clean up the ones with non-players.
-	
-				// loop through all of teh players
-				Player[] players = tekkitrestrict.getInstance().getServer().getOnlinePlayers();
-				for (int i = 0; i < players.length; i++) {
-					try {
-						setCheck(players[i]); // checks and sets the vars.
-					} catch (Exception e) {
-					}
-				}
-	
-				// remove offline players!
-				int to = TRNoDupe_BagCache.watchers.size();
-				for (int i = 0; i < to; i++) {
-					try {
-						TRNoDupe_BagCache cc = TRNoDupe_BagCache.watchers.get(i);
-						if (!cc.isOnline()) {
-							TRNoDupe_BagCache.watchers.remove(i);
-							to--;
-							i--;
-						}
-					} catch (Exception e) {
-					}
-				}
-	
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					if (tekkitrestrict.disable) break;
-				}
-			} catch (Exception ex){
-				Log.Exception(ex, false);
-				
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					if (tekkitrestrict.disable) break;
-				}
-			}
-		}
-	}
-	
-	public static void setCheck(Player player) {
-		if (player.hasPermission("tekkitrestrict.bypass.dupe.alcbag")) return;
-		
-		for (int i = 0; i < 16; i++) {
-			try {
-				EntityHuman H = ((CraftPlayer) player).getHandle();
-				AlchemyBagData ABD = ItemAlchemyBag.getBagData(i, H, H.world);
-				// ok, now we search!
-				net.minecraft.server.ItemStack[] iss = ABD.items;
-
-				for (int j = 0; j < iss.length; j++) {
-					if (iss[j] == null) continue;
-					if (iss[j].id != 27532 && iss[j].id != 27593) continue;
-					if (!player.isOnline()) return;
-					
-					// they are attempting to dupe?
-					
-					TRNoDupe_BagCache cache = TRNoDupe_BagCache.watchers.get(player);
-					if (cache == null) cache = new TRNoDupe_BagCache();
-
-					cache.player = player;
-					cache.inBagColor = TRCommandAlc.getColor(i);
-					cache.dupeItem = (iss[j].id == 27532) ? "Black Hole Band" : "Void Ring";
-					cache.hasBHBInBag = true;
-					// tekkitrestrict.log.info("has in bag!");
-					TRNoDupe_BagCache.watchers.put(player, cache);
-					// player.kickPlayer("[TRDupe] you have a Black Hole Band in your ["+Color+"] Alchemy Bag! Please remove it NOW!");
-
-					// lastPlayer = player.getName();
-					
-				}
-			} catch (Exception ex) {
-				// This alc bag does not exist
-			}
-		}
 	}
 }
 

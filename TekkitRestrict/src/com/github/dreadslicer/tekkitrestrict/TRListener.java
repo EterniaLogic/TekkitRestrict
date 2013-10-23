@@ -17,11 +17,9 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.github.dreadslicer.tekkitrestrict.Log.Warning;
@@ -224,25 +222,6 @@ public class TRListener implements Listener {
 				return;
 			}
 		}
-		
-		try {
-			TRNoDupe_BagCache cache;
-			if ((cache = TRNoDupe_BagCache.check(player)) != null) {
-				if (cache.hasBHBInBag) {
-					cache.expire();
-					event.setCancelled(true);
-					player.kickPlayer("[TRDupe] you have a " + cache.dupeItem + " in your [" + cache.inBagColor + "] Alchemy Bag!");
-					Log.Dupe("a " + cache.inBagColor + " Alchemy Bag and a " + cache.dupeItem, "alc", player.getName());
-					return;
-				}
-			}
-		} catch (Exception ex) {
-			if (!errorDrop){
-				Warning.other("An error occurred in the DropItem Listener! (This error is only logged once)");
-				Log.Exception(ex, false);
-				errorDrop = true;
-			}
-		}
 	}
 
 	public static boolean errorInteract = false;
@@ -340,56 +319,6 @@ public class TRListener implements Listener {
 
 	// /////////// END INTERACT /////////////
 
-	// /////////// START INVClicks/////////////
-	public static boolean errorCreativeClick, errorCraft;
-	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-	public void eventInventoryClick(InventoryClickEvent event) {
-		if (event.getWhoClicked() == null) return;
-		
-		try {
-			if (TRLimitedCreative.handleCreativeInvClick(event)) return;
-		} catch (Exception ex) {
-			if (!errorCreativeClick){
-				Warning.other("An error occurred in the CreativeInvClickListener! Please inform the author.");
-				Log.Exception(ex, false);
-				errorCreativeClick = true;
-			}
-		}
-		try {
-			// Determine if they are crafting a banned item.
-			if (handleCraftBlock(event)) return;
-		} catch (Exception ex) {
-			if (!errorCraft){
-				Warning.other("An error occurred in the CraftBlockHandler! Please inform the author.");
-				Log.Exception(ex, false);
-				errorCraft = true;
-			}
-		}
-	}
-
-	private boolean handleCraftBlock(InventoryClickEvent event) {
-		if (!Listeners.UseNoItem) return false;
-		Player player = (Player) event.getWhoClicked();
-		ItemStack item = event.getCurrentItem();
-		if (item == null) return false;
-		
-		if (player.hasPermission("tekkitrestrict.bypass.noitem")) return false;
-		
-		boolean banned = false;
-		
-		if (TRNoItem.isItemBanned(player, item.getTypeId(), item.getDurability(), false)) banned = true;
-		
-		if (banned) {
-			player.sendMessage(ChatColor.RED + "[TRItemDisabler] You cannot obtain/modify this Item type!");
-			event.setCancelled(true);
-			return true;
-		}
-		return false;
-		
-	}
-
-	// ////////////////END INVClicks //////////////////////////
-
 	@EventHandler
 	public void onInventoryCloseEvent(InventoryCloseEvent e) {
 		Player player = (Player) e.getPlayer();
@@ -399,43 +328,4 @@ public class TRListener implements Listener {
 		TRCommandAlc.setPlayerInv(player, true);
 	}
 
-	private Map<String, Integer> PickupTick = Collections.synchronizedMap(new HashMap<String, Integer>());
-
-	@EventHandler
-	public void onPlayerPickupEvent(PlayerPickupItemEvent e) {
-		//IMPORTANT Fix this in the next version to the new version.
-		Player player = e.getPlayer();
-		try {
-			TRNoDupe_BagCache cache;
-			if ((cache = TRNoDupe_BagCache.check(player)) != null) {
-				e.setCancelled(true);
-				// player.kickPlayer("[TRDupe] you have a Black Hole Band in your ["+Color+"] Alchemy Bag! Please remove it NOW!");
-
-				// if(showDupesOnConsole)
-				// tekkitrestrict.log.info(player.getName()+" ["+cache.inBagColor+" bag] attempted to dupe with the "+cache.dupeItem+"!");
-				// TRLogger.Log("Dupe", player.getName()+" ["+cache.inBagColor+" bag] attempted to dupe with the "+cache.dupeItem+"!");
-				// TRLogger.broadcastDupe(player.getName(), "the Alchemy Bag and "+cache.dupeItem);
-				String playerName = player.getName();
-				Integer tick = PickupTick.get(playerName);
-				if (tick != null) {
-					if (tick >= 40) {
-						// player.sendMessage("You may not pick that up while a "+cache.dupeItem+" is in your ["+cache.inBagColor+" bag]");
-						player.kickPlayer("[TRDupe] A " + cache.dupeItem + " has been removed from your [" + cache.inBagColor + "] Alchemy Bag!");
-						Log.Dupe("a "+ cache.inBagColor + " Alchemy Bag and " + cache.dupeItem, "alc", player.getName());
-
-						// remove the BHB / Void ring!!!
-						cache.removeAlc();
-						PickupTick.put(playerName, 1);
-					} else {
-						PickupTick.put(playerName, tick + 1);
-					}
-				} else
-					PickupTick.put(playerName, 1);
-				
-			}
-		} catch (Exception ex) {
-			TRLogger.Log("debug", "Error! [TRNoDupePickup] : " + ex.getMessage());
-			Log.debugEx(ex);
-		}
-	}
 }

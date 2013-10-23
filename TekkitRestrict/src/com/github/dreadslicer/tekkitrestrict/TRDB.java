@@ -75,14 +75,18 @@ public class TRDB {
 			
 			prev.close();
 			
+			if (verX == tekkitrestrict.dbversion){
+				tekkitrestrict.db.query("DROP TABLE IF EXISTS tr_limiter_old");
+			}
+			
 			//Change version to 1.3 if it is lower
 			if(verX != -1d && verX < tekkitrestrict.dbversion){
-				tekkitrestrict.db.query("DELETE FROM 'tr_dbversion'");//clear table
-				tekkitrestrict.db.query("INSERT INTO 'tr_dbversion' (version) VALUES(" + tekkitrestrict.dbversion + ");");//Insert new version
+				tekkitrestrict.db.query("DELETE FROM tr_dbversion");//clear table
+				tekkitrestrict.db.query("INSERT INTO tr_dbversion (version) VALUES(" + tekkitrestrict.dbversion + ");");//Insert new version
 				transferSQLite12To13();//Transfer to version 1.3
 			} else if (!purged) {
-				tekkitrestrict.db.query("DELETE FROM 'tr_dbversion'");//clear table
-				tekkitrestrict.db.query("INSERT INTO 'tr_dbversion' (version) VALUES(" + tekkitrestrict.dbversion + ");");//Insert new version
+				tekkitrestrict.db.query("DELETE FROM tr_dbversion");//clear table
+				tekkitrestrict.db.query("INSERT INTO tr_dbversion (version) VALUES(" + tekkitrestrict.dbversion + ");");//Insert new version
 			}
 			
 		} catch(Exception ex1){
@@ -117,11 +121,11 @@ public class TRDB {
 			
 			//Change version to 1.3 if it is lower
 			if(verX != -1d && verX < tekkitrestrict.dbversion){
-				tekkitrestrict.db.query("DELETE FROM 'tr_dbversion';");//clear table
-				tekkitrestrict.db.query("INSERT INTO 'tr_dbversion' (version) VALUES(" + tekkitrestrict.dbversion + ");");//Insert new version
+				tekkitrestrict.db.query("DELETE FROM tr_dbversion;");//clear table
+				tekkitrestrict.db.query("INSERT INTO tr_dbversion (version) VALUES(" + tekkitrestrict.dbversion + ");");//Insert new version
 			} else if (!purged) {
-				tekkitrestrict.db.query("DELETE FROM 'tr_dbversion';");//clear table
-				tekkitrestrict.db.query("INSERT INTO 'tr_dbversion' (version) VALUES(" + tekkitrestrict.dbversion + ");");//Insert new version
+				tekkitrestrict.db.query("DELETE FROM tr_dbversion;");//clear table
+				tekkitrestrict.db.query("INSERT INTO tr_dbversion (version) VALUES(" + tekkitrestrict.dbversion + ");");//Insert new version
 			}
 			
 		} catch(Exception ex1){
@@ -139,8 +143,8 @@ public class TRDB {
 		tekkitrestrict.dbworking = 0;
 		tekkitrestrict.log.info("[SQLite] Creating new database...");
 		try {
-			tekkitrestrict.db.query("CREATE TABLE IF NOT EXISTS 'tr_dbversion' (version NUMERIC);");
-			tekkitrestrict.db.query("INSERT OR REPLACE INTO 'tr_dbversion' (version) VALUES("+tekkitrestrict.dbversion+");");
+			tekkitrestrict.db.query("CREATE TABLE IF NOT EXISTS tr_dbversion (version NUMERIC);");
+			tekkitrestrict.db.query("INSERT OR REPLACE INTO tr_dbversion (version) VALUES("+tekkitrestrict.dbversion+");");
 		} catch (Exception ex) {
 			tekkitrestrict.loadWarning("[SQLite] Unable to write version to database!");
 			for (StackTraceElement cur : ex.getStackTrace()){
@@ -150,12 +154,12 @@ public class TRDB {
 		}
 	
 		try {
-			tekkitrestrict.db.query("CREATE TABLE IF NOT EXISTS 'tr_saferegion' ( "
-					+ "'id' INTEGER PRIMARY KEY AUTOINCREMENT,"
-					+ "'name' TEXT,"
-					+ "'mode' INT,"
-					+ "'data' TEXT,"
-					+ "'world' TEXT);");
+			tekkitrestrict.db.query("CREATE TABLE IF NOT EXISTS tr_saferegion ( "
+					+ "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+					+ "name TEXT,"
+					+ "mode INT,"
+					+ "data TEXT,"
+					+ "world TEXT);");
 		} catch (Exception ex) {
 			tekkitrestrict.loadWarning("[SQLite] Unable to create safezones table!");
 			for (StackTraceElement cur : ex.getStackTrace()){
@@ -166,9 +170,9 @@ public class TRDB {
 		}
 		
 		try {
-			tekkitrestrict.db.query("CREATE TABLE IF NOT EXISTS 'tr_limiter' ( "
-					+ "'player' TEXT UNIQUE,"
-					+ "'blockdata' TEXT);");
+			tekkitrestrict.db.query("CREATE TABLE IF NOT EXISTS tr_limiter ( "
+					+ "player TEXT UNIQUE,"
+					+ "blockdata TEXT);");
 		} catch (Exception ex) {
 			tekkitrestrict.loadWarning("[SQLite] Unable to create limiter table!");
 			for (StackTraceElement cur : ex.getStackTrace()){
@@ -187,8 +191,8 @@ public class TRDB {
 		tekkitrestrict.dbworking = 0;
 		tekkitrestrict.log.info("[MySQL] Creating new database...");
 		try {
-			tekkitrestrict.db.query("CREATE TABLE IF NOT EXISTS 'tr_dbversion' (version NUMERIC(3,2);");
-			tekkitrestrict.db.query("INSERT OR REPLACE INTO 'tr_dbversion' (version) VALUES("+tekkitrestrict.dbversion+");");
+			tekkitrestrict.db.query("CREATE TABLE IF NOT EXISTS tr_dbversion (version NUMERIC(3,2));");
+			tekkitrestrict.db.query("INSERT OR REPLACE INTO tr_dbversion VALUES ("+tekkitrestrict.dbversion+");");
 		} catch (Exception ex) {
 			tekkitrestrict.loadWarning("[MySQL] Unable to write version to database!");
 			for (StackTraceElement cur : ex.getStackTrace()){
@@ -198,12 +202,12 @@ public class TRDB {
 		}
 	
 		try {
-			tekkitrestrict.db.query("CREATE TABLE IF NOT EXISTS 'tr_saferegion' ( "
-					+ "'id' INTEGER PRIMARY KEY AUTO_INCREMENT,"
-					+ "'name' TINYTEXT,"
-					+ "'mode' TINYINT UNSIGNED,"
-					+ "'data' TINYTEXT,"
-					+ "'world' TINYTEXT) CHARACTER SET latin1 COLLATE latin1_swedish_ci;");
+			tekkitrestrict.db.query("CREATE TABLE IF NOT EXISTS tr_saferegion ( "
+					+ "id INTEGER PRIMARY KEY AUTO_INCREMENT,"
+					+ "name TINYTEXT,"
+					+ "mode TINYINT UNSIGNED,"
+					+ "data TINYTEXT,"
+					+ "world TINYTEXT) CHARACTER SET latin1 COLLATE latin1_swedish_ci;");
 		} catch (Exception ex) {
 			tekkitrestrict.loadWarning("[MySQL] Unable to create safezones table!");
 			for (StackTraceElement cur : ex.getStackTrace()){
@@ -214,9 +218,9 @@ public class TRDB {
 		}
 		
 		try {
-			tekkitrestrict.db.query("CREATE TABLE IF NOT EXISTS 'tr_limiter' ( "
-					+ "'player' VARCHAR(16) UNIQUE,"
-					+ "'blockdata' TEXT) CHARACTER SET latin1 COLLATE latin1_swedish_ci;");
+			tekkitrestrict.db.query("CREATE TABLE IF NOT EXISTS tr_limiter ( "
+					+ "player VARCHAR(16) UNIQUE,"
+					+ "blockdata TEXT) CHARACTER SET latin1 COLLATE latin1_swedish_ci;");
 		} catch (Exception ex) {
 			tekkitrestrict.loadWarning("[MySQL] Unable to create limiter table!");
 			for (StackTraceElement cur : ex.getStackTrace()){
@@ -253,13 +257,13 @@ public class TRDB {
 		}
 		
 		//Delete old tables
-		try{tekkitrestrict.db.query("DROP TABLE `tr_saferegion`;");} catch(Exception ex){}
-		try{tekkitrestrict.db.query("DROP TABLE `tr_limiter`;");} catch(Exception ex){}
+		try{tekkitrestrict.db.query("DROP TABLE tr_saferegion;");} catch(Exception ex){}
+		try{tekkitrestrict.db.query("DROP TABLE tr_limiter;");} catch(Exception ex){}
 		
 		//################################### VERSION ###################################
 		try {
-			tekkitrestrict.db.query("CREATE TABLE IF NOT EXISTS 'tr_dbversion' (version NUMERIC);");
-			tekkitrestrict.db.query("INSERT OR REPLACE INTO 'tr_dbversion' (version) VALUES("+tekkitrestrict.dbversion+");");
+			tekkitrestrict.db.query("CREATE TABLE IF NOT EXISTS tr_dbversion (version NUMERIC);");
+			tekkitrestrict.db.query("INSERT OR REPLACE INTO tr_dbversion (version) VALUES("+tekkitrestrict.dbversion+");");
 		} catch (Exception ex) {
 			tekkitrestrict.loadWarning("[SQLite] Unable to write version to database!");
 			for (StackTraceElement cur : ex.getStackTrace()){
@@ -271,12 +275,12 @@ public class TRDB {
 		
 		//################################## SAFEZONES ##################################
 		try {
-			tekkitrestrict.db.query("CREATE TABLE IF NOT EXISTS 'tr_saferegion' ( "
-					+ "'id' INTEGER PRIMARY KEY AUTOINCREMENT,"
-					+ "'name' TEXT,"
-					+ "'mode' INT,"
-					+ "'data' TEXT,"
-					+ "'world' TEXT); ");
+			tekkitrestrict.db.query("CREATE TABLE IF NOT EXISTS tr_saferegion ( "
+					+ "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+					+ "name TEXT,"
+					+ "mode INT,"
+					+ "data TEXT,"
+					+ "world TEXT); ");
 		} catch (Exception ex) {
 			tekkitrestrict.loadWarning("[SQLite] Unable to create safezones table!");
 			for (StackTraceElement cur : ex.getStackTrace()){
@@ -294,7 +298,7 @@ public class TRDB {
 					for(String str:vals) toadd+=","+str;
 					//toadd = toadd.replace("null", "''");
 					if(toadd.startsWith(",")) toadd=toadd.substring(1, toadd.length());
-					tekkitrestrict.db.query("INSERT INTO 'tr_saferegion' VALUES("+toadd+");");
+					tekkitrestrict.db.query("INSERT INTO tr_saferegion VALUES("+toadd+");");
 				}
 				
 				tekkitrestrict.log.info("[SQLite] Transferred " + srvals.size() + " safezones.");
@@ -309,9 +313,9 @@ public class TRDB {
 		
 		//################################### LIMITER ###################################
 		try {
-			tekkitrestrict.db.query("CREATE TABLE IF NOT EXISTS 'tr_limiter' ( "
-						+ "'player' TEXT UNIQUE,"
-						+ "'blockdata' TEXT);");
+			tekkitrestrict.db.query("CREATE TABLE IF NOT EXISTS tr_limiter ( "
+						+ "player TEXT UNIQUE,"
+						+ "blockdata TEXT);");
 		} catch (Exception ex) {
 			tekkitrestrict.loadWarning("[SQLite] Unable to create limiter table!");
 			for (StackTraceElement cur : ex.getStackTrace()){
@@ -326,7 +330,7 @@ public class TRDB {
 					String toadd = "";
 					for(String str:vals) toadd+=","+str;
 					if(toadd.startsWith(",")) toadd=toadd.substring(1, toadd.length());
-					tekkitrestrict.db.query("INSERT INTO 'tr_limiter' VALUES("+toadd+");");
+					tekkitrestrict.db.query("INSERT INTO tr_limiter VALUES("+toadd+");");
 				}
 				
 				tekkitrestrict.log.info("[SQLite] Transferred "+ limvals.size() + " limits.");
@@ -348,11 +352,12 @@ public class TRDB {
 	private static void transferSQLite12To13(){
 		tekkitrestrict.log.info("[SQLite] Updating Database to new format...");
 		try {
-			tekkitrestrict.db.query("ALTER TABLE 'tr_limiter' RENAME TO 'tr_limiter_old'");
-			tekkitrestrict.db.query("CREATE TABLE 'tr_limiter' ("
-						+ "'player' TEXT UNIQUE,"
-						+ "'blockdata' TEXT);");
-			tekkitrestrict.db.query("INSERT INTO 'tr_limiter' (player, blockdata) SELECT player, blockdata FROM tr_limiter_old ORDER BY player ASC");
+			tekkitrestrict.db.query("ALTER TABLE tr_limiter RENAME TO tr_limiter_old");
+			tekkitrestrict.db.query("CREATE TABLE tr_limiter ("
+						+ "player TEXT UNIQUE,"
+						+ "blockdata TEXT);");
+			tekkitrestrict.db.query("INSERT INTO tr_limiter (player, blockdata) SELECT player, blockdata FROM tr_limiter_old ORDER BY player ASC");
+			tekkitrestrict.db.query("DROP TABLE IF EXISTS tr_limiter_old");
 		} catch (SQLException ex) {
 			tekkitrestrict.loadWarning("[SQLite] Error while updating db!");
 			for (StackTraceElement st : ex.getStackTrace()){

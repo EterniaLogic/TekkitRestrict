@@ -29,6 +29,7 @@ import nl.taico.tekkitrestrict.config.GeneralConfig;
 import nl.taico.tekkitrestrict.config.HackDupeConfig;
 import nl.taico.tekkitrestrict.config.ModModificationsConfig;
 import nl.taico.tekkitrestrict.config.SafeZonesConfig;
+import nl.taico.tekkitrestrict.config.TPerformanceConfig;
 
 import com.github.dreadslicer.tekkitrestrict.Log.Warning;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.ChunkUnloader;
@@ -48,6 +49,7 @@ import com.github.dreadslicer.tekkitrestrict.eepatch.EEPSettings;
 import com.github.dreadslicer.tekkitrestrict.lib.TRFileConfiguration;
 import com.github.dreadslicer.tekkitrestrict.lib.YamlConfiguration;
 import com.github.dreadslicer.tekkitrestrict.listeners.Assigner;
+import com.github.dreadslicer.tekkitrestrict.objects.TRDupeSettings;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.DBType;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.SSMode;
@@ -108,6 +110,7 @@ public class tekkitrestrict extends JavaPlugin {
 			HackDupeConfig.upgradeOldHackFile();
 			ModModificationsConfig.upgradeFile();
 			SafeZonesConfig.upgradeFile();
+			TPerformanceConfig.upgradeFile();
 			reloadConfig();
 		}
 		
@@ -291,14 +294,10 @@ public class tekkitrestrict extends JavaPlugin {
 		ttt.gemArmorThread.interrupt();
 		ttt.worldScrubThread.interrupt();
 		ttt.saveThread.interrupt();
-		if (ttt.bagCacheThread.isAlive()) ttt.bagCacheThread.interrupt();
 		//ttt.limitFlyThread.interrupt();
 		
 		try { Thread.sleep(1500); } catch (InterruptedException e) {} //Sleep for 1.5 seconds to allow the savethread to save.
-		//try {
-		//	TRThread.originalEUEnd(); (Currently does nothing)
-		//} catch (Exception ex) {
-		//}
+
 		TRLogger.saveLogs();
 		TRLogFilter.disable();
 		Log.deinit();
@@ -415,31 +414,65 @@ public class tekkitrestrict extends JavaPlugin {
 		Hacks.speeds.command = config.getString(ConfigFile.HackDupe, "Anti-Hacks.MoveSpeed.ExecuteCommand.Command", "");
 		Hacks.speeds.triggerAfter = config.getInt(ConfigFile.HackDupe, "Anti-Hacks.MoveSpeed.ExecuteCommand.TriggerAfter", 1);
 		
-		Hacks.broadcast = config.getStringList(ConfigFile.HackDupe, "HackBroadcasts");
-		Hacks.broadcastFormat = config.getString(ConfigFile.HackDupe, "HackBroadcastString", "{PLAYER} tried to {TYPE}-hack!"); //TODO add colors
-		Hacks.kick = config.getStringList(ConfigFile.HackDupe, "HackKick");
+		Hacks.broadcastFormat = config.getString(ConfigFile.HackDupe, "Anti-Hacks.BroadcastString", "{PLAYER} tried to {TYPE}-hack!"); //TODO add colors
 		
-		Hacks.fly = config.getBoolean(ConfigFile.HackDupe, "Anti-Hacks.Fly.Enabled", true);
-		Hacks.flyTolerance = config.getInt(ConfigFile.HackDupe, "Anti-Hacks.Fly.Tolerance", 40);
-		Hacks.flyMinHeight = config.getDouble(ConfigFile.HackDupe, "Anti-Hacks.Fly.MinHeight", 3);
+		Dupes.alcBags = new TRDupeSettings();
+		Dupes.alcBags.prevent = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.AlchemyBagDupe.Prevent", true);
+		Dupes.alcBags.broadcast = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.AlchemyBagDupe.Broadcast", true);
+		Dupes.alcBags.kick = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.AlchemyBagDupe.Kick", false);
+		Dupes.alcBags.useCommand = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.AlchemyBagDupe.ExecuteCommand.Enabled", false);
+		Dupes.alcBags.command = config.getString(ConfigFile.HackDupe, "Anti-Dupes.AlchemyBagDupe.ExecuteCommand.Command", "");
+		Dupes.alcBags.triggerAfter = config.getInt(ConfigFile.HackDupe, "Anti-Dupes.AlchemyBagDupe.ExecuteCommand.TriggerAfter", 1);
 		
-		Hacks.forcefield = config.getBoolean(ConfigFile.HackDupe, "Anti-Hacks.Forcefield.Enabled", true);
-		Hacks.ffTolerance = config.getInt(ConfigFile.HackDupe, "Anti-Hacks.Forcefield.Tolerance", 15);
-		Hacks.ffVangle = config.getDouble(ConfigFile.HackDupe, "Anti-Hacks.Forcefield.Angle", 40);
+		Dupes.rmFurnaces = new TRDupeSettings();
+		Dupes.rmFurnaces.prevent = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.RMFurnaceDupe.Prevent", true);
+		Dupes.rmFurnaces.broadcast = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.RMFurnaceDupe.Broadcast", true);
+		Dupes.rmFurnaces.kick = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.RMFurnaceDupe.Kick", false);
+		Dupes.rmFurnaces.useCommand = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.RMFurnaceDupe.ExecuteCommand.Enabled", false);
+		Dupes.rmFurnaces.command = config.getString(ConfigFile.HackDupe, "Anti-Dupes.RMFurnaceDupe.ExecuteCommand.Command", "");
+		Dupes.rmFurnaces.triggerAfter = config.getInt(ConfigFile.HackDupe, "Anti-Dupes.RMFurnaceDupe.ExecuteCommand.TriggerAfter", 1);
 		
-		Hacks.speed = config.getBoolean(ConfigFile.HackDupe, "Anti-Hacks.MoveSpeed.Enabled", false);
-		Hacks.speedTolerance = config.getInt(ConfigFile.HackDupe, "Anti-Hacks.MoveSpeed.Tolerance", 30);
-		Hacks.speedMaxSpeed = config.getDouble(ConfigFile.HackDupe, "Anti-Hacks.MoveSpeed.MaxMoveSpeed", 2.5);
+		Dupes.transmutes = new TRDupeSettings();
+		Dupes.transmutes.prevent = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.TransmuteDupe.Prevent", true);
+		Dupes.transmutes.broadcast = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.TransmuteDupe.Broadcast", true);
+		Dupes.transmutes.kick = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.TransmuteDupe.Kick", false);
+		Dupes.transmutes.useCommand = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.TransmuteDupe.ExecuteCommand.Enabled", false);
+		Dupes.transmutes.command = config.getString(ConfigFile.HackDupe, "Anti-Dupes.TransmuteDupe.ExecuteCommand.Command", "");
+		Dupes.transmutes.triggerAfter = config.getInt(ConfigFile.HackDupe, "Anti-Dupes.TransmuteDupe.ExecuteCommand.TriggerAfter", 1);
 		
-		Dupes.broadcast = config.getStringList(ConfigFile.HackDupe, "Anti-Dupes.Broadcast");
-		Dupes.broadcastFormat = config.getString(ConfigFile.HackDupe, "Anti-Dupes.BroadcastString", "{PLAYER} tried to dupe using {TYPE}!"); //TODO add colors
-		Dupes.kick = config.getStringList(ConfigFile.HackDupe, "Anti-Dupes.Kick");
-		Dupes.alcBag = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.PreventAlchemyBagDupe", true);
-		Dupes.rmFurnace = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.PreventRMFurnaceDupe", true);
-		Dupes.tankcart = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.PreventTankCartDupe", true);
-		Dupes.tankcartGlitch = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.PreventTankCartGlitch", true);
-		Dupes.transmute = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.PreventTransmuteDupe", true);
-		Dupes.pedestal = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.PedestalEmcGen", true);
+		Dupes.tankcarts = new TRDupeSettings();
+		Dupes.tankcarts.prevent = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.TankCartDupe.Prevent", true);
+		Dupes.tankcarts.broadcast = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.TankCartDupe.Broadcast", true);
+		Dupes.tankcarts.kick = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.TankCartDupe.Kick", false);
+		Dupes.tankcarts.useCommand = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.TankCartDupe.ExecuteCommand.Enabled", false);
+		Dupes.tankcarts.command = config.getString(ConfigFile.HackDupe, "Anti-Dupes.TankCartDupe.ExecuteCommand.Command", "");
+		Dupes.tankcarts.triggerAfter = config.getInt(ConfigFile.HackDupe, "Anti-Dupes.TankCartDupe.ExecuteCommand.TriggerAfter", 1);
+		
+		Dupes.tankcartGlitchs = new TRDupeSettings();
+		Dupes.tankcartGlitchs.prevent = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.TankCartGlitch.Prevent", true);
+		Dupes.tankcartGlitchs.broadcast = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.TankCartGlitch.Broadcast", true);
+		Dupes.tankcartGlitchs.kick = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.TankCartGlitch.Kick", false);
+		Dupes.tankcartGlitchs.useCommand = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.TankCartGlitch.ExecuteCommand.Enabled", false);
+		Dupes.tankcartGlitchs.command = config.getString(ConfigFile.HackDupe, "Anti-Dupes.TankCartGlitch.ExecuteCommand.Command", "");
+		Dupes.tankcartGlitchs.triggerAfter = config.getInt(ConfigFile.HackDupe, "Anti-Dupes.TankCartGlitch.ExecuteCommand.TriggerAfter", 1);
+		
+		Dupes.teleports = new TRDupeSettings();
+		Dupes.teleports.prevent = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.TeleportDupe.Prevent", true);
+		Dupes.teleports.broadcast = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.TeleportDupe.Broadcast", true);
+		Dupes.teleports.kick = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.TeleportDupe.Kick", false);
+		Dupes.teleports.useCommand = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.TeleportDupe.ExecuteCommand.Enabled", false);
+		Dupes.teleports.command = config.getString(ConfigFile.HackDupe, "Anti-Dupes.TeleportDupe.ExecuteCommand.Command", "");
+		Dupes.teleports.triggerAfter = config.getInt(ConfigFile.HackDupe, "Anti-Dupes.TeleportDupe.ExecuteCommand.TriggerAfter", 1);
+		
+		Dupes.pedestals = new TRDupeSettings();
+		Dupes.pedestals.prevent = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.PedestalEmcGen.Prevent", true);
+		Dupes.pedestals.broadcast = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.PedestalEmcGen.Broadcast", true);
+		Dupes.pedestals.kick = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.PedestalEmcGen.Kick", false);
+		Dupes.pedestals.useCommand = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.PedestalEmcGen.ExecuteCommand.Enabled", false);
+		Dupes.pedestals.command = config.getString(ConfigFile.HackDupe, "Anti-Dupes.PedestalEmcGen.ExecuteCommand.Command", "");
+		Dupes.pedestals.triggerAfter = config.getInt(ConfigFile.HackDupe, "Anti-Dupes.PedestalEmcGen.ExecuteCommand.TriggerAfter", 1);
+		
+		Dupes.broadcastFormat = config.getString(ConfigFile.HackDupe, "Anti-Dupes.BroadcastString", "{PLAYER} tried to dupe {ITEM} using {TYPE}!"); //TODO add colors
 		
 		Global.debug = config.getBoolean(ConfigFile.General, "ShowDebugMessages", false) ||
 					   config.getBoolean(ConfigFile.Logging, "LogDebug", false);

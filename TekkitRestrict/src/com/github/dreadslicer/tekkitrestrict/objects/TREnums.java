@@ -5,6 +5,10 @@ public class TREnums {
 		fly, forcefield, speed
 	}
 	
+	public enum DupeType {
+		rmFurnace, alcBag, tankCart, tankCartGlitch, teleport, transmution, pedestal
+	}
+	
 	public enum TRClickType{
 		Left, Right, Both, Trample, All;
 		public boolean right(){return (this.equals(TRClickType.Right));}

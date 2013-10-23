@@ -88,13 +88,12 @@ public class TPerformanceConfig extends TRConfig {
 		tbr.add("# The radius of blocks that should stay loaded around a player.");
 		tbr.add("# The ChunkUnloader will not unload chunks that are within this radius to a");
 		tbr.add("# player.");
-		tbr.add("# The default for TekkitRestrict is 128 blocks (8 chunks).");
 		tbr.add("# Minecraft's default is 256 blocks (16 chunks).");
 		tbr.add("# ");
 		tbr.add("# Recommended: 128-256");
 		tbr.add("# Default: 256");
 		tbr.add("MaxRadii: 256");
-		if (extra) tbr.add("#:-;-:# MaxRadii");
+		//if (extra) tbr.add("#:-;-:# MaxRadii"); IMPORTANT: This is commented to switch to new default settings
 		tbr.add("");
 		tbr.add("##################################################################################");
 		tbr.add("############################ Threading Configuration #############################");
@@ -134,12 +133,12 @@ public class TPerformanceConfig extends TRConfig {
 		if (extra) tbr.add("#:-;-:# InventoryThread");
 		tbr.add("");
 		tbr.add("# The amount of time the WorldCleanerThread sleeps for.");
-		tbr.add("# This thread takes care of the ChunkUnloader, RPTimer and the WorldScrubber");
+		tbr.add("# This thread takes care of the ChunkUnloader and the WorldScrubber");
 		tbr.add("#");
-		tbr.add("# Recommended: [10000-30000]");
-		tbr.add("# Default: 15000");
-		tbr.add("WorldCleanerThread: 15000");
-		if (extra) tbr.add("#:-;-:# WorldCleanerThread");
+		tbr.add("# Recommended: [30000-90000]");
+		tbr.add("# Default: 60000");
+		tbr.add("WorldCleanerThread: 60000");
+		//if (extra) tbr.add("#:-;-:# WorldCleanerThread"); IMPORTANT: This is commented to switch to new default settings
 		tbr.add("");
 		tbr.add("# The amount of time the AutoSave Thread sleeps for.");
 		tbr.add("# This thread makes sure that all information is correctly saved to the database.");
@@ -148,9 +147,9 @@ public class TPerformanceConfig extends TRConfig {
 		tbr.add("# lose data changed within 11 seconds before the crash)");
 		tbr.add("#");
 		tbr.add("# Recommended: [10000-30000]");
-		tbr.add("# Default: 11000");
-		tbr.add("AutoSaveThreadSpeed: 11000");
-		if (extra) tbr.add("#:-;-:# AutoSaveThreadSpeed");
+		tbr.add("# Default: 10000");
+		tbr.add("AutoSaveThreadSpeed: 10000");
+		//if (extra) tbr.add("#:-;-:# AutoSaveThreadSpeed"); IMPORTANT: This is commented to switch to new default settings
 		tbr.add("");
 		tbr.add("# Runs a thread for each player upon the Inventory Thread tick.");
 		tbr.add("# (May take up some processor if you have a ton of players)");
@@ -165,7 +164,7 @@ public class TPerformanceConfig extends TRConfig {
 		tbr.add("");
 		tbr.add("");
 		tbr.add("##	Inventory thread enables:    [DisableItems, CreativeDisable, MaxEU, EEDecharger, EEMaxCharger (~198-5000x)]");
-		tbr.add("##	WorldCleaner thread enables: [ChunkUnloader, RPTimer enforcer, DisabledItemBlockRemover (~40-Xx)]");
+		tbr.add("##	WorldCleaner thread enables: [ChunkUnloader, DisabledItemBlockRemover (~40-Xx)]");
 		tbr.add("##	AutoSave thread enables:     [SaveToSQL, BlockLimiter RemoveBlk (~8+x)]");
 		tbr.add("");
 		tbr.add("##################################################################################");

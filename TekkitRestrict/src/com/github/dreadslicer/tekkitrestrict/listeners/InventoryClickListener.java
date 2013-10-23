@@ -1,14 +1,18 @@
 package com.github.dreadslicer.tekkitrestrict.listeners;
 
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import com.github.dreadslicer.tekkitrestrict.Log;
+
+import com.github.dreadslicer.tekkitrestrict.TRNoDupe;
 import com.github.dreadslicer.tekkitrestrict.TRNoItem;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Dupes;
+import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Listeners;
+import com.github.dreadslicer.tekkitrestrict.objects.TREnums.DupeType;
 
 public class InventoryClickListener implements Listener {
 	static boolean doDupeCheck = false;
@@ -20,86 +24,100 @@ public class InventoryClickListener implements Listener {
 		int data1 = 0;
 		int id2 = 0;
 		
-		if (event.getCurrentItem() != null) {
+		if (event.getCurrentItem() != null){
 			id1 = event.getCurrentItem().getTypeId();
 			data1 = event.getCurrentItem().getDurability();
-			if (!player.hasPermission("tekkitrestrict.bypass.noitem")) {
-				boolean banned = false;
-				
-				if (TRNoItem.isItemBanned(player, id1, data1, false)) banned = true;
-				
-				if (banned) {
-					player.sendMessage(ChatColor.RED + "This item is banned!");
-					event.setCancelled(true);
-					return;
+
+			boolean banned = false;
+			
+			if (player.getGameMode() == GameMode.CREATIVE){
+				if (event.getView().getTopInventory() != null){
+					if (Listeners.UseLimitedCreative && Listeners.BlockCreativeContainer){
+						if (!"container.inventory".equals(event.getView().getTopInventory().getName())){
+							player.sendMessage(ChatColor.RED + "[TRLimitedCreative] You may not interact with other inventories.");
+							event.setCancelled(true);
+							return;
+						}
+					}
 				}
+				
+				if (TRNoItem.isItemBannedInCreative(player, id1, data1, true)) banned = true;
+				else if (TRNoItem.isItemBanned(player, id1, data1, true)) banned = true;
+			} else if (TRNoItem.isItemBanned(player, id1, data1, true)) banned = true;
+			
+			if (banned){
+				player.sendMessage(ChatColor.RED + "[TRItemDisabler] This item is banned!");
+				event.setCancelled(true);
+				return;
 			}
 		}
 		
-		if (event.getCursor() != null) {
+		if (event.getCursor() != null){
 			id2 = event.getCursor().getTypeId();
 		}
 		
-		
 		if (!doDupeCheck) return;
 		
+		String title;
+		try {
+			title = event.getView().getTopInventory().getTitle().toLowerCase();
+		} catch (NullPointerException ex) {
+			return;
+		}
+		
 		int slot = event.getSlot();
-
-		String title = event.getView().getTopInventory().getTitle().toLowerCase();
+		
 		if (title.equals("rm furnace")){
-			if (Dupes.rmFurnace && slot == 35 && event.isShiftClick()){
+			if (Dupes.rmFurnaces.prevent && slot == 35 && event.isShiftClick()){
 				if (!player.hasPermission("tekkitrestrict.bypass.dupe.rmfurnace")){
 					event.setCancelled(true);
 					player.sendMessage(ChatColor.DARK_RED + "You are not allowed to Shift+Click into a Red Matter Furnace from this slot!");
-					Log.Dupe("Red Matter Furnace", "RMFurnace", player.getName());
+					TRNoDupe.handleDupe(player, DupeType.rmFurnace, id1, data1);
 				}
 			}
 		} else if (title.equals("tank cart")){
 			if (slot == 35) {
-				if (Dupes.tankcart && event.isShiftClick() && !player.hasPermission("tekkitrestrict.bypass.dupe.tankcart")){
+				if (Dupes.tankcarts.prevent && event.isShiftClick() && !player.hasPermission("tekkitrestrict.bypass.dupe.tankcart")){
 						event.setCancelled(true);
 						player.sendMessage(ChatColor.DARK_RED + "You are not allowed to Shift+Click into a Tank Cart from this slot!");
-						Log.Dupe("Tank Cart", "TankCart", player.getName());
+						TRNoDupe.handleDupe(player, DupeType.tankCart, id1, data1);
 				}
 			} else if (slot <= 8){
-				if (event.isShiftClick() && Dupes.tankcartGlitch){
+				if (event.isShiftClick() && Dupes.tankcartGlitchs.prevent){
 					event.setCancelled(true);
 					player.sendMessage(ChatColor.DARK_RED + "You are not allowed to Shift+Click into a Tank Cart!");
-					Log.Glitch("Tank Cart", player.getName());
+					TRNoDupe.handleDupe(player, DupeType.tankCartGlitch, id1, data1);
 				}
 			}
 		} else if (title.equals("trans tablet")){
-			if (Dupes.transmute && event.isShiftClick()) {
-				boolean isslot = slot == 0 || slot == 1 || slot == 2
-						|| slot == 3 || slot == 4 || slot == 5 || slot == 6
-						|| slot == 7;
+			if (Dupes.transmutes.prevent && event.isShiftClick()) {
+				boolean isslot = (slot>=0 && slot<8);
 				if (isslot && !player.hasPermission("tekkitrestrict.bypass.dupe.transtablet")){
 					event.setCancelled(true);
 					player.sendMessage(ChatColor.DARK_RED + "You are not allowed to Shift+Click any item out of the Tranmutation Table(t)!");
-					Log.Dupe("Transmution Tablet", "TransmutionTablet", player.getName());
+					TRNoDupe.handleDupe(player, DupeType.transmution, id1, data1);
 				}
 			}
 		} else if (title.equals("bag")){
-			if (Dupes.alcBag && (id1 == 27532 || id1 == 27593 || id2 == 27532 || id2 == 27593))
-			{
+			if (Dupes.alcBags.prevent && (id1 == 27532 || id1 == 27593 || id2 == 27532 || id2 == 27593)){
 				if (!player.hasPermission("tekkitrestrict.bypass.dupe.alcbag")){
 					event.setCancelled(true);
-					if (event.getCurrentItem().getTypeId() == 27532){
+					if (id1 == 27532){
 						player.sendMessage(ChatColor.DARK_RED + "You are not allowed to put Black Hole Bands in an alchemy bag!");
-						Log.Dupe("Alchemy Bag + Black Hole Band", "AlchemicalBag", player.getName());
-					}
-					else if (event.getCurrentItem().getTypeId() == 27593){
+					} else if (id1 == 27593){
 						player.sendMessage(ChatColor.DARK_RED + "You are not allowed to put Void Rings in an alchemy bag!");
-						Log.Dupe("Alchemy Bag + Void Ring", "AlchemicalBag", player.getName());
+					} else {
+						player.sendMessage(ChatColor.DARK_RED + "You are not allowed to put Black Hole Bands or Void Rings in an alchemy bag!");
 					}
+					TRNoDupe.handleDupe(player, DupeType.alcBag, id1, data1);
 				}
 			}
 		} else if (title.equals("pedestal")){
-			if (Dupes.pedestal && (id1 == 27537 || id2 == 27537)){
+			if (Dupes.pedestals.prevent && (id1 == 27537 || id2 == 27537)){
 				if (!player.hasPermission("tekkitrestrict.bypass.dupe.pedestal")){
 					event.setCancelled(true);
 					player.sendMessage(ChatColor.DARK_RED + "You are not allowed to put Harvest rings on a pedestal!");
-					Log.Dupe("Pedestal + Harvest Godess Band", "Pedestal", player.getName());
+					TRNoDupe.handleDupe(player, DupeType.pedestal, id1, data1);
 				}
 			}
 		}

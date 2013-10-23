@@ -4,6 +4,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
 
+import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Dupes;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Hacks;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Listeners;
 import com.github.dreadslicer.tekkitrestrict.eepatch.EEAssigner;
@@ -22,15 +23,15 @@ public class Assigner {
 		PM.registerEvents(new QuitListener(), plugin);
 		
 		PM.registerEvents(new InventoryClickListener(), plugin);
-		if (tekkitrestrict.config.getBoolean("PreventAlcDupe", true) ||
-			tekkitrestrict.config.getBoolean("PreventTransmuteDupe", true) ||
-			tekkitrestrict.config.getBoolean("PreventTankCartDupe", true) ||
-			tekkitrestrict.config.getBoolean("PreventRMFurnaceDupe", true) ||
-			tekkitrestrict.config.getBoolean("PreventTankCartGlitch", true) ||
-			tekkitrestrict.config.getBoolean("PreventPedestalEmcGen", true))
+		if (Dupes.alcBags.prevent ||
+			Dupes.pedestals.prevent ||
+			Dupes.rmFurnaces.prevent ||
+			Dupes.tankcarts.prevent ||
+			Dupes.tankcartGlitchs.prevent ||
+			Dupes.transmutes.prevent)
 			InventoryClickListener.doDupeCheck = true;
 
-		if (tekkitrestrict.config.getBoolean("PreventTeleportDupe", true))
+		if (Dupes.teleports.prevent)
 			PM.registerEvents(new TeleportListener(), plugin);
 		
 		if (Listeners.UseBlockLimit){
@@ -38,13 +39,13 @@ public class Assigner {
 			PM.registerEvents(new LoginListener(), plugin);
 		}
 		
-		if (Hacks.forcefield)
+		if (Hacks.forcefields.enable)
 			PM.registerEvents(new NoHackForcefield(), plugin);
 		
-		if (Hacks.speed)
+		if (Hacks.speeds.enable)
 			PM.registerEvents(new NoHackSpeed(), plugin);
 		
-		if (Hacks.fly)
+		if (Hacks.flys.enable)
 			PM.registerEvents(new NoHackFly(), plugin);
 	}
 	

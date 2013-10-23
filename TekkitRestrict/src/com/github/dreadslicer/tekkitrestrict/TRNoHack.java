@@ -1,6 +1,6 @@
 package com.github.dreadslicer.tekkitrestrict;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
@@ -14,9 +14,9 @@ import com.github.dreadslicer.tekkitrestrict.objects.TREnums.HackType;
 
 public class TRNoHack {
 	//public static int hacks = 0;
-	public static HashMap<String, Integer> commandUsesFly = new HashMap<String, Integer>();
-	public static HashMap<String, Integer> commandUsesForcefield = new HashMap<String, Integer>();
-	public static HashMap<String, Integer> commandUsesSpeed = new HashMap<String, Integer>();
+	public static ConcurrentHashMap<String, Integer> cmdFly = new ConcurrentHashMap<String, Integer>();
+	public static ConcurrentHashMap<String, Integer> cmdForcefield = new ConcurrentHashMap<String, Integer>();
+	public static ConcurrentHashMap<String, Integer> cmdSpeed = new ConcurrentHashMap<String, Integer>();
 	public static void handleHack(Player player, HackType type) {
 		//int x = player.getLocation().getBlockX();
 		//int y = player.getLocation().getBlockY();
@@ -41,10 +41,11 @@ public class TRNoHack {
 		//		+"Vehicle: ["
 		//		+(veh != null ? veh.getClass().getName() : "none") + "] "
 		//		+"Entity#: [player: " + npl + ", mob: " + nmob + "]";
-		Log.Hack(type, player.getName());
+		String message = "";
+		
 		if (type == HackType.fly){
 			if (Hacks.flys.useCommand){
-				Integer cur = commandUsesFly.get(player.getName());
+				Integer cur = cmdFly.get(player.getName());
 				if (cur == null) cur = 0;
 				cur++;
 				
@@ -52,14 +53,18 @@ public class TRNoHack {
 					try {
 						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), Hacks.flys.command.replace("{PLAYER}", player.getName()).replace("{TYPE}", "fly"));
 					} catch (Exception ex) {}
-					commandUsesFly.remove(player.getName());
+					cmdFly.remove(player.getName());
 				} else {
-					commandUsesFly.put(player.getName(), cur);
+					cmdFly.put(player.getName(), cur);
 				}
 			}
+			
+			message = convert(Hacks.broadcastFormat, "Fly", player);
+			if (Hacks.flys.kick) Util.kick(player, "[TRHack] Kicked for Fly-hacking!");
+			if (Hacks.flys.broadcast) Bukkit.broadcast("[TRHack] " + message, "tekkitrestrict.notify.hack");
 		} else if (type == HackType.forcefield){
 			if (Hacks.forcefields.useCommand){
-				Integer cur = commandUsesForcefield.get(player.getName());
+				Integer cur = cmdForcefield.get(player.getName());
 				if (cur == null) cur = 0;
 				cur++;
 				
@@ -67,14 +72,18 @@ public class TRNoHack {
 					try {
 						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), Hacks.forcefields.command.replace("{PLAYER}", player.getName()).replace("{TYPE}", "forcefield"));
 					} catch (Exception ex) {}
-					commandUsesForcefield.remove(player.getName());
+					cmdForcefield.remove(player.getName());
 				} else {
-					commandUsesForcefield.put(player.getName(), cur);
+					cmdForcefield.put(player.getName(), cur);
 				}
 			}
+			
+			message = convert(Hacks.broadcastFormat, "Forcefield", player);
+			if (Hacks.forcefields.kick) Util.kick(player, "[TRHack] Kicked for Forcefield-hacking!");
+			if (Hacks.forcefields.broadcast) Bukkit.broadcast("[TRHack] " + message, "tekkitrestrict.notify.hack");
 		} else if (type == HackType.speed){
 			if (Hacks.speeds.useCommand){
-				Integer cur = commandUsesSpeed.get(player.getName());
+				Integer cur = cmdSpeed.get(player.getName());
 				if (cur == null) cur = 0;
 				cur++;
 				
@@ -82,14 +91,29 @@ public class TRNoHack {
 					try {
 						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), Hacks.speeds.command.replace("{PLAYER}", player.getName()).replace("{TYPE}", "movespeed"));
 					} catch (Exception ex) {}
-					commandUsesSpeed.remove(player.getName());
+					cmdSpeed.remove(player.getName());
 				} else {
-					commandUsesSpeed.put(player.getName(), cur);
+					cmdSpeed.put(player.getName(), cur);
 				}
 			}
+			
+			message = convert(Hacks.broadcastFormat, "Speed", player);
+			if (Hacks.speeds.kick) Util.kick(player, "[TRHack] Kicked for speed-hacking!");
+			if (Hacks.speeds.broadcast) Bukkit.broadcast("[TRHack] " + message, "tekkitrestrict.notify.hack");
 		}
-		//Log.Debug(additional);
-		Util.kickHacker(type, player);
+		
+		Log.Hack(message);
+	}
+	
+	private static String convert(String str, String type, Player player){
+		str = Log.replaceColors(str);
+		str = str.replace("{PLAYER}", player.getName());
+		str = str.replace("{TYPE}", type);
+		str = str.replace("{ID}","");
+		str = str.replace("{DATA}", "");
+		str = str.replace("{ITEM}", "");
+		str = str.replace("  ", "");
+		return str;
 	}
 
 	/** Teleport the player to the highest block at his position. Will not teleport players above their current position. */
@@ -111,6 +135,9 @@ public class TRNoHack {
 		NoHackSpeed.playerLogout(player.getName());
 		NoHackFly.playerLogout(player.getName());
 		NoHackForcefield.playerLogout(player.getName());
+		cmdFly.remove(player.getName());
+		cmdForcefield.remove(player.getName());
+		cmdSpeed.remove(player.getName());
 		//TRLimitFlyThread.setGrounded(player);
 	}
 }

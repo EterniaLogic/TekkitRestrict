@@ -75,12 +75,11 @@ UnloadOrder: 0
 # The radius of blocks that should stay loaded around a player.
 # The ChunkUnloader will not unload chunks that are within this radius to a
 # player.
-# The default for TekkitRestrict is 128 blocks (8 chunks).
 # Minecraft's default is 256 blocks (16 chunks).
 # 
 # Recommended: 128-256
-# Default: 128 
-MaxRadii: 128
+# Default: 256 
+MaxRadii: 256
 
 ##################################################################################
 ############################ Threading Configuration #############################
@@ -117,11 +116,11 @@ SSEntityRemoverThread: 350
 InventoryThread: 400
 
 # The amount of time the WorldCleanerThread sleeps for.
-# This thread takes care of the ChunkUnloader, RPTimer and the WorldScrubber
+# This thread takes care of the ChunkUnloader and the WorldScrubber
 #
-# Recommended: [10000-30000]
-# Default: 15000
-WorldCleanerThread: 15000
+# Recommended: [30000-90000]
+# Default: 60000
+WorldCleanerThread: 60000
 
 # The amount of time the AutoSave Thread sleeps for.
 # This thread makes sure that all information is correctly saved to the database.
@@ -146,7 +145,7 @@ AutoSaveThreadSpeed: 11000
 
 
 ##	Inventory thread enables:    [DisableItems, CreativeDisable, MaxEU, EEDecharger, EEMaxCharger (~198-5000x)]
-##	WorldCleaner thread enables: [ChunkUnloader, RPTimer enforcer, DisabledItemBlockRemover (~40-Xx)]
+##	WorldCleaner thread enables: [ChunkUnloader, DisabledItemBlockRemover (~40-Xx)]
 ##	AutoSave thread enables:     [SaveToSQL, BlockLimiter RemoveBlk (~8+x)]
 
 ##################################################################################
