@@ -128,6 +128,7 @@ public class ModModificationsConfig extends TRConfig {
 	}
 	
 	public static void upgradeFile(){
+		/*
 		ArrayList<String> def = convertDefaults(defaultContents(true));
 		int k = def.size()-1;
 		for (int i = k; i>=0;i++){
@@ -143,8 +144,8 @@ public class ModModificationsConfig extends TRConfig {
 					j--; k--;
 				}
 			}
-		}
+		}*/
 		//Check for duplicates here.
-		upgradeFile("ModModifications", def);
+		upgradeFile("ModModifications", convertDefaults(defaultContents(true)));
 	}
 }
