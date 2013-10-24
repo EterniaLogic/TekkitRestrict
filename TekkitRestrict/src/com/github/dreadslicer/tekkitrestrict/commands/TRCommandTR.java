@@ -250,7 +250,7 @@ public class TRCommandTR implements CommandExecutor {
 				return;
 			}
 			for (TRItem isr : iss) {
-				int data = isr.data;
+				int data = isr.data == -1 || isr.data == 0 ? 0 : isr.data;
 				if (emc > 0) ee.EEMaps.addEMC(isr.id, data, emc);
 				else {
 					//Remove EMC value.
@@ -261,7 +261,7 @@ public class TRCommandTR implements CommandExecutor {
 						else ee.EEMaps.alchemicalValues.put(isr.id, hm);
 					}
 				}
-				send.msg(ChatColor.GREEN + "Temporary set " + isr.id + ":" + isr.data + " to " + emc + " EMC.");
+				send.msg(ChatColor.GREEN + "Temporary set " + isr.id + ":" + data + " to " + emc + " EMC.");
 			}
 		} catch (Exception ex){
 			Log.debugEx(ex);
@@ -295,7 +295,7 @@ public class TRCommandTR implements CommandExecutor {
 				HashMap<Integer, Integer> hm = (HashMap<Integer, Integer>) ee.EEMaps.alchemicalValues.get(isr.id);
 				if (hm == null) continue;
 				
-				if (isr.data == 0) { //Get all data values
+				if (isr.data == -1) { //Get all data values
 					Iterator<Integer> ks = hm.keySet().iterator();//Every data value
 					while (ks.hasNext()) {
 						Integer dat = ks.next();
@@ -305,10 +305,11 @@ public class TRCommandTR implements CommandExecutor {
 						send.msg("[" + isr.id + ":" + dat + "] EMC: " + emc);
 					}
 				} else {
-					Integer emc = hm.get(isr.data);
+					int datax = isr.data == -10 ? 0 : isr.data;
+					Integer emc = hm.get(datax);
 					if (emc == null) continue;
 					found = true;
-					int datax = isr.data == -10 ? 0 : isr.data;
+					
 					send.msg("[" + isr.id + ":" + datax + "] EMC: " + emc);
 				}
 			}

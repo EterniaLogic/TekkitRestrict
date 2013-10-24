@@ -112,7 +112,7 @@ public class TRNoHack {
 		str = str.replace("{ID}","");
 		str = str.replace("{DATA}", "");
 		str = str.replace("{ITEM}", "");
-		str = str.replace("  ", "");
+		str = str.replace("  ", " ");
 		return str;
 	}
 

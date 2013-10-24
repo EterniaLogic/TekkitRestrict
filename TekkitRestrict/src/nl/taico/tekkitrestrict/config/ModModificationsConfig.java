@@ -1,6 +1,10 @@
 package nl.taico.tekkitrestrict.config;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+
+import com.github.dreadslicer.tekkitrestrict.Log;
 
 public class ModModificationsConfig extends TRConfig {
 	public static ArrayList<String> defaultContents(boolean extra){
@@ -52,16 +56,12 @@ public class ModModificationsConfig extends TRConfig {
 		tbr.add("#- \"27563 900000\"");
 		tbr.add("#- \"126:9 1300000\"");
 		tbr.add("#");
-		tbr.add("# DEFAULT: EMC farm removal [Milk, Blaze Rod, Bonemeal, Indigo Flower, Flower, Rose, Seed]");
+		tbr.add("# DEFAULT: EMC farm removal [Milk, Blaze Rod, Bonemeal]");
 		tbr.add("SetEMC: ");
-		if (extra) tbr.add("#:-;-:# SetEMC 7");
-		tbr.add("- \"335 100\"");
-		tbr.add("- \"369 780\"");
-		tbr.add("- \"351:15 30\"");
-		tbr.add("- \"139 4\"");
-		tbr.add("- \"37 4\"");
-		tbr.add("- \"38 4\"");
-		tbr.add("- \"295 4\"");
+		if (extra) tbr.add("#:-;-:# SetEMC 3");
+		tbr.add("- \"335 768\"");
+		tbr.add("- \"377 308\"");
+		tbr.add("- \"351:15 29\"");
 		tbr.add("");
 		tbr.add("##########################################################################################");
 		tbr.add("####################################### Item Max EU ######################################");
@@ -128,24 +128,46 @@ public class ModModificationsConfig extends TRConfig {
 	}
 	
 	public static void upgradeFile(){
-		/*
 		ArrayList<String> def = convertDefaults(defaultContents(true));
-		int k = def.size()-1;
-		for (int i = k; i>=0;i++){
-			String str = def.get(i);
-			if (str.equals("DechargeInSS: ")) break;
-			for (int j = k; j>=0;j++){
-				String str2=def.get(j);
-				
-				if (i == j) continue;
-				if (str2.equals("DechargeInSS: ")) break;
-				if (str2.equals(str)){
-					def.remove(j);
-					j--; k--;
+		boolean fixed = false;
+		int j = def.size();
+		for (int i = 0; i < j; i++){
+			String s = def.get(i);
+			if (s.startsWith("-")){
+				switch (s){
+					case "- \"335 100\"":
+						def.set(i, "- \"335 768\"");
+						fixed = true;
+						break;
+					case "- \"369 780\"":
+						def.set(i, "- \"377 308\"");
+						fixed = true;
+						break;
+					case "- \"351:15 30\"":
+						def.set(i, "- \"351:15 29\"");
+						fixed = true;
+						break;
+					case "- \"139 4\"":
+					case "- \"37 4\"":
+					case "- \"38 4\"":
+					case "- \"295 4\"":
+						def.remove(i);
+						i--;j--;
+						break;
 				}
 			}
-		}*/
-		//Check for duplicates here.
-		upgradeFile("ModModifications", convertDefaults(defaultContents(true)));
+		}
+		if (fixed) Log.Warning.load("Fixed old incorrect default values for EMC farm fixes. All EMC farm fixes now should work properly.");
+		
+		//Duplicate remover
+		Iterator<String> it = def.iterator();
+		HashSet<String> tbr = new HashSet<String>();
+		while (it.hasNext()){
+			String s = it.next();
+			if (s.startsWith("-")){
+				if (!tbr.add(s)) it.remove();
+			}
+		}
+		upgradeFile("ModModifications", def);
 	}
 }

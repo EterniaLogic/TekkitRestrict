@@ -176,7 +176,7 @@ public class TRNoDupe {
 			str = str.replace("{DATA}", ""+data);
 			str = str.replace("{ITEM}", ""+id+":"+data);
 		}
-		str = str.replace("  ", "");
+		str = str.replace("  ", " ");
 		return str;
 	}
 	
@@ -187,7 +187,7 @@ public class TRNoDupe {
 		str = str.replace("{ID}","");
 		str = str.replace("{DATA}", "");
 		str = str.replace("{ITEM}", "");
-		str = str.replace("  ", "");
+		str = str.replace("  ", " ");
 		return str;
 	}
 	

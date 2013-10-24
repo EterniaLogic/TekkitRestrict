@@ -15,17 +15,12 @@ public class TRConfigCache {
 	
 	public static class Hacks {
 		public static TRHackSettings flys, forcefields, speeds;
-
 		public static String broadcastFormat;
-		
-
 	}
 	
 	public static class Dupes {
 		public static TRDupeSettings alcBags, rmFurnaces, tankcarts, tankcartGlitchs, transmutes, pedestals, teleports;
-
 		public static String broadcastFormat;
-
 	}
 	
 	public static class SafeZones {

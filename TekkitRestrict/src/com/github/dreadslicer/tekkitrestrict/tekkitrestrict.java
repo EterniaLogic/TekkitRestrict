@@ -1,5 +1,7 @@
 package com.github.dreadslicer.tekkitrestrict;
 
+import ic2.common.EntityMiningLaser;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -16,6 +18,7 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
+import net.minecraft.server.Block;
 import net.minecraft.server.RedPowerLogic;
 import net.minecraft.server.RedPowerMachine;
 
@@ -165,10 +168,32 @@ public class tekkitrestrict extends JavaPlugin {
 		
 		//BlockBreaker anti-dupe
 		try {
+			ArrayList<Block> miningLaser = new ArrayList<Block>();
+			
+			for (Block block : EntityMiningLaser.unmineableBlocks){
+				miningLaser.add(block);
+			}
+			miningLaser.add(Block.byId[194]);
+			EntityMiningLaser.unmineableBlocks = miningLaser.toArray(new Block[miningLaser.size()]);
+		} catch (Exception ex){
+			loadWarning("Unable to patch MiningLaser + Auto Crafting Table MK II dupe!");
+		}
+		
+		try {
 			RedPowerMachine.breakerBlacklist.add(Integer.valueOf(-1 << 15 | 194));
-			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(0 << 15 | 6362));
-			log.info("Patched BlockBreaker + Auto Crafting Table MK II dupe.");
-			log.info("Patched Deployer + REP Crash Bug.");
+			
+			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(0 << 15 | 6362));//REP
+			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(0 << 15 | 6359));//Wireless sniffer
+			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(0 << 15 | 6363));//Private sniffer
+			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(0 << 15 | 27562));//Alcbag
+			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(0 << 15 | 27585));//Divining ROd
+			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(0 << 15 | 30122));//Cropnalyser
+			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(0 << 15 | 30104));//Debug item
+			
+			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(0 << 15 | 27592));//transtablet
+			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(0 << 15 | 7493));//Ender pouch
+			log.fine("Patched most Auto Crafting Table MK II dupes.");
+			log.fine("Patched Deployer + REP Crash Bug.");
 		} catch (Exception ex){
 			loadWarning("Unable to patch BlockBreaker + Auto Crafting Table MK II dupe!");
 			loadWarning("Unable to patch Deployer + REP Crash Bug!");
