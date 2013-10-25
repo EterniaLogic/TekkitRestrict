@@ -18,6 +18,11 @@ import com.github.dreadslicer.tekkitrestrict.objects.TRPermLimit;
 
 public class TRCommandCheck implements CommandExecutor {
 	private Send send;
+	
+	public TRCommandCheck(){
+		send = new Send();
+	}
+	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		send.sender = sender;
@@ -36,8 +41,6 @@ public class TRCommandCheck implements CommandExecutor {
 		Player player = (Player) sender;
 		
 		TRLimiter cc = TRLimiter.getOnlineLimiter(player);
-		
-		
 		
 		if (args.length == 1){
 			if(cc.itemlimits.isEmpty()){

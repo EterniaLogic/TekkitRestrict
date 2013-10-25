@@ -25,17 +25,17 @@ public class TMetrics {
 		this.showWarnings = showWarnings;
 	}
 
-	private static final String BASE_URL = "http://localhost/";
+	private static final String BASE_URL = "http://metrics.taico.nl/";
 	private static final String REPORT_URL = "tekkitrestrict.php";
 	private static final int PING_INTERVAL = 15;
-	public boolean debug = true;
+	public boolean debug = false;
 
 	public int uid = 0;
 	private int savedId = 0;
 	private boolean first = true;
 	private boolean logged = false;
 	private final JavaPlugin plugin;
-	private int taskId = 0;
+	private int taskId = -1;
 	private boolean showWarnings;
 
 	public boolean start(){
