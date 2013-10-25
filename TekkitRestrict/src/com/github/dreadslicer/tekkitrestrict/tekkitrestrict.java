@@ -150,7 +150,7 @@ public class tekkitrestrict extends JavaPlugin {
 		
 		
 		//###################### RPTimer ######################
-		if (config.getBoolean("UseAutoRPTimer")){
+		if (config.getBoolean2(ConfigFile.General, "UseAutoRPTimer", false)){
 			try {
 				double value = config.getDouble("RPTimerMin", 0.2d);
 				int ticks = (int) Math.round((value-0.1d) * 20d);
@@ -164,7 +164,7 @@ public class tekkitrestrict extends JavaPlugin {
 		
 		
 		//###################### Patch CC #####################
-		if (config.getBoolean("PatchComputerCraft", true)){
+		if (config.getBoolean2(ConfigFile.General, "PatchComputerCraft", true)){
 			PatchCC.start();
 		}
 		//#####################################################
@@ -206,7 +206,7 @@ public class tekkitrestrict extends JavaPlugin {
 	public void onEnable() {
 		ttt = new TRThread();
 		try {
-		Assigner.assign(); //Register the required listeners
+			Assigner.assign(); //Register the required listeners
 		} catch (Exception ex){
 			Log.Warning.load("A severe error occurred: Unable to start listeners!");
 			Log.Exception(ex, true);
@@ -282,9 +282,9 @@ public class tekkitrestrict extends JavaPlugin {
 		
 		initMetrics();
 		
-		if (config.getBoolean("Auto-Update", true)){
+		if (config.getBoolean2(ConfigFile.General, "Auto-Update", true)){
 			updater = new Updater(this, "tekkit-restrict", this.getFile(), Updater.UpdateType.DEFAULT, true);
-		} else if (config.getBoolean("CheckForUpdateOnStartup", true)){
+		} else if (config.getBoolean2(ConfigFile.General, "CheckForUpdateOnStartup", true)){
 			updater = new Updater(this, "tekkit-restrict", this.getFile(), Updater.UpdateType.NO_DOWNLOAD, true);
 			if (updater.getResult() == UpdateResult.UPDATE_AVAILABLE) log.info(ChatColor.GREEN + "There is an update available: " + updater.getLatestVersionString() + ". Use /tr admin update ingame to update.");
 		}
@@ -309,9 +309,9 @@ public class tekkitrestrict extends JavaPlugin {
 			}
 		});
 		
-		tmetrics = new TMetrics(this, config.getBoolean(ConfigFile.General, "ShowTMetricsWarnings", true));
+		tmetrics = new TMetrics(this, config.getBoolean2(ConfigFile.General, "ShowTMetricsWarnings", true));
 		
-		if (config.getBoolean(ConfigFile.General, "UseTMetrics", true)){
+		if (config.getBoolean2(ConfigFile.General, "UseTMetrics", true)){
 			tmetrics.start();
 		}
 		
@@ -345,7 +345,7 @@ public class tekkitrestrict extends JavaPlugin {
 	public static tekkitrestrict getInstance() {
 		return instance;
 	}
-	
+
 	private void initMetrics(){
 		try {
 			Metrics metrics = new Metrics(this);
@@ -513,13 +513,13 @@ public class tekkitrestrict extends JavaPlugin {
 		Global.debug = config.getBoolean(ConfigFile.General, "ShowDebugMessages", false) ||
 					   config.getBoolean(ConfigFile.Logging, "LogDebug", false);
 		
-		Global.kickFromConsole = config.getBoolean(ConfigFile.General, "KickFromConsole", false);
+		Global.kickFromConsole = config.getBoolean2(ConfigFile.General, "KickFromConsole", false);
 		//Global.useNewBanSystem = config.getBoolean("UseNewBannedItemsSystem", false);
 		
-		Listeners.UseBlockLimit = config.getBoolean(ConfigFile.General, "UseItemLimiter", true);
+		Listeners.UseBlockLimit = config.getBoolean2(ConfigFile.General, "UseItemLimiter", true);
 		Listeners.BlockCreativeContainer = config.getBoolean(ConfigFile.LimitedCreative, "LimitedCreativeNoContainer", true);
-		Listeners.UseNoItem = config.getBoolean(ConfigFile.General, "UseNoItem", true);
-		Listeners.UseLimitedCreative = config.getBoolean(ConfigFile.General, "UseLimitedCreative", true);
+		Listeners.UseNoItem = config.getBoolean2(ConfigFile.General, "UseNoItem", true);
+		Listeners.UseLimitedCreative = config.getBoolean2(ConfigFile.General, "UseLimitedCreative", true);
 		Listeners.useNoCLickPerms = config.getBoolean(ConfigFile.DisableClick, "UseNoClickPermissions", false);
 		
 		TRConfigCache.LogFilter.replaceList = config.getStringList(ConfigFile.Logging, "LogFilter");
@@ -577,7 +577,7 @@ public class tekkitrestrict extends JavaPlugin {
 		//SafeZones.allGPClaimsAreSafezone = config.getBoolean("AllGriefPreventionClaimsAreSafezones", false);
 		//SafeZones.allowNormalUser = config.getBoolean("SSAllowNormalUsersToHaveSafeZones", true);
 		
-		ChunkUnloader.enabled = config.getBoolean(ConfigFile.TPerformance, "UseChunkUnloader", false);
+		ChunkUnloader.enabled = config.getBoolean2(ConfigFile.TPerformance, "UseChunkUnloader", false);
 		ChunkUnloader.maxChunks = config.getInt(ConfigFile.TPerformance, "MaxChunks", 3000);
 		ChunkUnloader.maxChunksEnd = config.getInt(ConfigFile.TPerformance, "MaxChunks.TheEnd", 200);
 		ChunkUnloader.maxChunksNether = config.getInt(ConfigFile.TPerformance, "MaxChunks.Nether", 400);

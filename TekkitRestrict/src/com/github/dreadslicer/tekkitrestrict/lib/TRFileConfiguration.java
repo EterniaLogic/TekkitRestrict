@@ -24,6 +24,11 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.representer.Representer;
 
+import nl.taico.tekkitrestrict.config.AdvancedConfig;
+import nl.taico.tekkitrestrict.config.GeneralConfig;
+import nl.taico.tekkitrestrict.config.TPerformanceConfig;
+
+import com.github.dreadslicer.tekkitrestrict.Log;
 import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
 
@@ -146,6 +151,11 @@ public class TRFileConfiguration extends FileConfiguration {
 	public boolean getBoolean(ConfigFile file, String path, boolean def) {
 		Object val = get(file, path, Boolean.valueOf(def));
 		return (val instanceof Boolean) ? ((Boolean) val).booleanValue() : def;
+	}
+	
+	public boolean getBoolean2(ConfigFile file, String path, boolean def){
+		Object val = get(file, path, Boolean.valueOf(def));
+		return (val instanceof Boolean) ? ((Boolean) val).booleanValue() : missingSettings(def, file, path);
 	}
 
 	@Override
@@ -693,6 +703,17 @@ public class TRFileConfiguration extends FileConfiguration {
 
 	    val = get(file, path, getDefault(path));
 	    return (val instanceof ConfigurationSection) ? createSection(path) : null;
+	}
+	
+	private boolean missingSettings(boolean val, ConfigFile file, String setting){
+		if (file == ConfigFile.General) GeneralConfig.upgradeFile();
+		else if (file == ConfigFile.Advanced) AdvancedConfig.upgradeFile();
+		else if (file == ConfigFile.TPerformance) TPerformanceConfig.upgradeFile();
+		else {
+			Log.Warning.config("Missing setting " + setting + " in " + file.toString() + ".config.yml!");
+		}
+		tekkitrestrict.getInstance().reload(false, true);
+		return val;
 	}
 	
 	protected static final String COMMENT_PREFIX = "# ";
