@@ -59,6 +59,47 @@ UpdateToBetaVersions: false
 UpdateToDevelopmentVersions: false
 
 ######################################################################
+############################## TMetrics ##############################
+# Lately Metrics by Hidendra hasn't been very reliable. The graphs
+# show things I can hardly believe. I would like to know how many
+# servers actually use TekkitRestrict, what systems they are
+# running on and how much memory is dedicated to those servers.
+#
+# For this reason I decided to make my own metrics system called
+# TMetrics.
+#
+# TMetrics sends the data to http://metrics.taico.nl/, my own website,
+# where the data will be stored. Every server will get a unique ID
+# that makes sure there will be few to no duplicates in the
+# database. This UID is stored in a file in the tekkitrestrict plugin
+# directory, and I ask you to never delete it.
+#
+# TMetrics will send the following information:
+# - The version of TekkitRestrict you are using
+# - The version of Minecraft you are using
+# - If onlinemode is on or off
+# - The amount of players online
+# - The system you are running the server on
+# - If that system is 32 or 64 bit
+# - The amount of cores your system has.
+# - The amount of memory allocated to your Minecraft server
+# - The version of Java you are using
+#
+# When the server starts, TMetrics will send system data to let
+# the server know if something has changed (Memory allocated,
+# Operating system, Java version, etc.). After that, TMetrics will
+# ping my server every 15 minutes. On these pings it will only send
+# the amount of players online.
+#
+# If you don't want to send these metrics, you can set UseTMetrics
+# to false.
+UseTMetrics: true
+
+# Should TMetrics give warnings in the console when submitting the
+# statistics failed?
+ShowTMetricsWarnings: true
+
+######################################################################
 ######################################################################
 # Do NOT change this. It will reset the config files if you do.
 ConfigVersion: 1.5

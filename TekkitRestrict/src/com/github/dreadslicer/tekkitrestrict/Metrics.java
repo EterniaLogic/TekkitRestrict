@@ -197,7 +197,7 @@ public class Metrics {
             }
 
             // Begin hitting the server with glorious data
-            plugin.getServer().getScheduler().scheduleAsyncRepeatingTask(plugin, new Runnable() {
+            taskId = plugin.getServer().getScheduler().scheduleAsyncRepeatingTask(plugin, new Runnable() {
 
                 private boolean firstPost = true;
 

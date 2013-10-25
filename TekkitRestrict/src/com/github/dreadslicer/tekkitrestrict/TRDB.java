@@ -219,7 +219,7 @@ public class TRDB {
 		
 		try {
 			tekkitrestrict.db.query("CREATE TABLE IF NOT EXISTS tr_limiter ( "
-					+ "player VARCHAR(16) UNIQUE,"
+					+ "player VARCHAR(32) UNIQUE,"
 					+ "blockdata TEXT) CHARACTER SET latin1 COLLATE latin1_swedish_ci;");
 		} catch (Exception ex) {
 			tekkitrestrict.loadWarning("[MySQL] Unable to create limiter table!");

@@ -84,6 +84,9 @@ public class tekkitrestrict extends JavaPlugin {
 	private static TRLogFilter filter = null;
 	public static LinkedList<YamlConfiguration> configList = new LinkedList<YamlConfiguration>();
 	
+	public static boolean useTMetrics = true;
+	private static TMetrics tmetrics;
+	
 	/**
 	 * Log a warning while the plugin is still loading.
 	 * If you type /tr warnings, you will see the warnings again.
@@ -306,13 +309,21 @@ public class tekkitrestrict extends JavaPlugin {
 			}
 		});
 		
+		tmetrics = new TMetrics(this, config.getBoolean(ConfigFile.General, "ShowTMetricsWarnings", true));
+		
+		if (config.getBoolean(ConfigFile.General, "UseTMetrics", true)){
+			tmetrics.start();
+		}
+		
 		log.info("TekkitRestrict v" + version + " Enabled!");
+		
 		
 		// TRThrottler.init();
 	}
 	@Override
 	public void onDisable() {
 		disable = true;
+		tmetrics.stop();
 		
 		ttt.disableItemThread.interrupt();
 		ttt.entityRemoveThread.interrupt();
@@ -607,6 +618,11 @@ public class tekkitrestrict extends JavaPlugin {
 			EEPSettings.loadMaxCharge();
 			if (listeners)
 				Assigner.assignEEPatch();
+		}
+		
+		//Stop TMetrics if the user disabled it in the config and reloaded.
+		if (!config.getBoolean(ConfigFile.General, "UseTMetrics", true)){
+			tmetrics.stop();
 		}
 		
 		if (listeners)
