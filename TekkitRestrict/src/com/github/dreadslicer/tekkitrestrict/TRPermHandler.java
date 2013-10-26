@@ -66,17 +66,11 @@ public class TRPermHandler {
 
 	private static boolean logged = false;
 	public static TRPermLimit getPermLimitFromPerm(Player player, String permBase, int id, int data) {
-		//String gs[] = permBase.replace('.', ';').split(";");
-		//if (gs.length < 2) return null;
-		
 		TRPermLimit t = new TRPermLimit();
 		Set<String> negPerms = getNegPermissions(player, permBase);
 		
 		for (String negPerm : negPerms) {
 			String gp[] = negPerm.split("\\.");//tekkitrestrict;limiter;id;data
-			//if (gp.length < 2) continue;//TODO not needed?
-
-			//if (!gp[1].equals(gs[1])) continue;//TODO not needed?
 			try {
 				if (gp.length == 5){
 					if (TRItemProcessor.isInRange(gp[2]+":"+gp[3], id, data, negPerm)){
@@ -127,10 +121,6 @@ public class TRPermHandler {
 		
 		for (String perm : perms) {
 			String gp[] = perm.split("\\.");//tekkitrestrict;limiter;id
-			//if (gp.length < 2) continue;//TODO not needed?
-			
-			//if (!gp[1].equals(gs[1])) continue;//TODO not needed?
-			
 			try {
 				if (gp.length == 5){
 					if (TRItemProcessor.isInRange(gp[2]+":"+gp[3], id, data, perm)){
@@ -179,10 +169,6 @@ public class TRPermHandler {
 		Set<String> negPerms = getNegPermissions(player, "tekkitrestrict.limiter");
 		for (String negPerm : negPerms) {
 			String gp[] = negPerm.split("\\.");//tekkitrestrict;limiter;id;data
-
-			//if (gp.length < 2) continue;//TODO not needed?
-			
-			//if (!gp[1].equals("limiter")) continue;//TODO not needed?
 			try {
 				if (gp.length == 5){
 					List<TRItem> items = TRItemProcessor.processItemString(gp[2]+":"+gp[3]);
@@ -218,9 +204,6 @@ public class TRPermHandler {
 		if (perms == null) perms = new HashSet<String>();
 		for (String perm : perms) {
 			String gp[] = perm.split("\\.");//tekkitrestrict;limiter;id
-
-			//if (gp.length < 2) continue;//TODO not needed?
-			//if (!gp[1].equals("limiter")) continue;//TODO not needed?
 			try {
 				if (gp.length == 5){
 					int max;

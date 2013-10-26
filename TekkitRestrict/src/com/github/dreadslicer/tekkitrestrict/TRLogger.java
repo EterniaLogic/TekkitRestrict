@@ -6,19 +6,10 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Global;
+import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Logger;
 
 public class TRLogger {
-	private static boolean LogAmulets, LogRings, LogDMTools, LogRMTools, LogEEMisc, LogEEDestructive;
 	private static HashMap<String, ArrayList<String>> logMessages = new HashMap<String, ArrayList<String>>();
-
-	public static void reload() {
-		LogAmulets = tekkitrestrict.config.getBoolean("LogAmulets");
-		LogRings = tekkitrestrict.config.getBoolean("LogRings");
-		LogDMTools = tekkitrestrict.config.getBoolean("LogDMTools");
-		LogRMTools = tekkitrestrict.config.getBoolean("LogRMTools");
-		LogEEMisc = tekkitrestrict.config.getBoolean("LogEEMisc");
-		LogEEDestructive = tekkitrestrict.config.getBoolean("LogEEDestructive");
-	}
 
 	public static void Log(String type, String info) {
 		if (!isLoggable(type)) return;
@@ -63,12 +54,12 @@ public class TRLogger {
 
 	private static boolean isLoggable(String type) {
 		type = type.toLowerCase();
-		if (type.equals("eering")) return LogRings;
-		if (type.equals("eedmtool")) return LogDMTools;
-		if (type.equals("eermtool")) return LogRMTools;
-		if (type.equals("eeamulet")) return LogAmulets;
-		if (type.equals("eemisc")) return LogEEMisc;
-		if (type.equals("eedestructive")) return LogEEDestructive;
+		if (type.equals("eering")) return Logger.LogRings;
+		if (type.equals("eedmtool")) return Logger.LogDMTools;
+		if (type.equals("eermtool")) return Logger.LogRMTools;
+		if (type.equals("eeamulet")) return Logger.LogAmulets;
+		if (type.equals("eemisc")) return Logger.LogEEMisc;
+		if (type.equals("eedestructive")) return Logger.LogEEDestructive;
 		if (type.equals("debug")) return Global.debug;
 		if (type.equals("error")) return true;
 

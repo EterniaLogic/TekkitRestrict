@@ -77,19 +77,21 @@ public class TRThread {
 	public static void reload() {
 		// reloads the variables in each thread...
 		instance.disableItemThread.reload();
+		//instance.limitFlyThread.reload();
 	}
 }
 
 class TRLimitFlyThread extends Thread {
 	private int reset = 0;
-	private static List<Player> isFlying = Collections.synchronizedList(new LinkedList<Player>());
-	private static ConcurrentHashMap<Player, Integer> playerTimes = new ConcurrentHashMap<Player, Integer>();
-	private static int groundTime = 99999999;
+	private List<Player> isFlying = Collections.synchronizedList(new LinkedList<Player>());
+	private ConcurrentHashMap<Player, Integer> playerTimes = new ConcurrentHashMap<Player, Integer>();
+	private int groundTime = 99999999;
 	
 	@SuppressWarnings("unused")
 	@Override
 	public void run(){
 		if (true) return;
+		load();
 		while (true){
 			try {
 				Thread.sleep(1000 * 60);
@@ -115,16 +117,16 @@ class TRLimitFlyThread extends Thread {
 		}
 	}
 	
-	public static void setFly(Player player) {
+	public void setFly(Player player) {
 		if (!isFlying.contains(player)) isFlying.add(player);
 	}
 	
-	public static void setGrounded(Player player) {
+	public void setGrounded(Player player) {
 		isFlying.remove(player);
 	}
 	
 	@SuppressWarnings("unused")
-	private static void willGround(Player player) {
+	private void willGround(Player player) {
 		if (player.hasPermission("tekkitrestrict.bypass.flylimit")) return;
 		Integer time = playerTimes.get(player);
 		if (time == null) return;
@@ -136,7 +138,8 @@ class TRLimitFlyThread extends Thread {
 		}
 	}
 	
-	public static void reload() {
+	private void load(){ reload(); }
+	public void reload() {
 		groundTime = tekkitrestrict.config.getInt("FlyLimitDailyMinutes");
 	}
 }
@@ -303,6 +306,7 @@ class DisableItemThread extends Thread {
 
 	@Override
 	public void run() {
+		load();
 		while (true) {
 			try {
 				// Disabled Items remover
@@ -606,6 +610,7 @@ class DisableItemThread extends Thread {
 		return false;
 	}
 	
+	private void load(){ reload(); }
 	public void reload() {
 		if (SSDecharged == null) SSDecharged = Collections.synchronizedList(new LinkedList<TRItem>());
 		else SSDecharged.clear();

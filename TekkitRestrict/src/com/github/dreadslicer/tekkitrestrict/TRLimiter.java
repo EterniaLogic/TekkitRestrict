@@ -530,23 +530,9 @@ public class TRLimiter {
 				logged = true;
 			}
 		}
-		/*
-		int estID = 0;
-		// get a numeral from the player's name.
-		for (int i = 0; i < player.length(); i++) {
-			char c = player.charAt(i); //TODO FIXME IMPORTANT This can be the same for multiple names. (abba = 1+2+2+1=6, baab = 2+1+1+2 = 6)
-			estID += Character.getNumericValue(c);
-		}
-		*/
+
 		if (blockdata == null) return;
 		try {
-				//tekkitrestrict.db.query("INSERT OR REPLACE INTO `tr_limiter` (`id`,`player`,`blockdata`) VALUES ("
-				//						+ estID
-				//						+ ",'"
-				//						+ player
-				//						+ "','"
-				//						+ blockdata
-				//						+ "')");
 				tekkitrestrict.db.query("INSERT OR REPLACE INTO `tr_limiter` (`player`,`blockdata`) VALUES ('"
 						+ player
 						+ "','"
@@ -585,8 +571,7 @@ public class TRLimiter {
 		ResultSet dbin = null;
 		try {
 			dbin = tekkitrestrict.db.query("SELECT * FROM `tr_limiter`;");
-			//if (dbin.next()) {//FIXME IMPORTANT only loads 1 player
-			while (dbin.next()) {//FIXME IMPORTANT changed this here to load all players instead of one
+			while (dbin.next()) {
 				// This player exists in the database!!!
 				// load them up!
 

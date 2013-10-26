@@ -36,13 +36,6 @@ import nl.taico.tekkitrestrict.config.TPerformanceConfig;
 import nl.taico.tekkitrestrict.eepatch.EEPSettings;
 
 import com.github.dreadslicer.tekkitrestrict.Log.Warning;
-import com.github.dreadslicer.tekkitrestrict.TRConfigCache.ChunkUnloader;
-import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Dupes;
-import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Global;
-import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Hacks;
-import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Listeners;
-import com.github.dreadslicer.tekkitrestrict.TRConfigCache.SafeZones;
-import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Threads;
 import com.github.dreadslicer.tekkitrestrict.Updater.UpdateResult;
 import com.github.dreadslicer.tekkitrestrict.commands.TRCommandAlc;
 import com.github.dreadslicer.tekkitrestrict.commands.TRCommandCheck;
@@ -52,15 +45,11 @@ import com.github.dreadslicer.tekkitrestrict.database.Database;
 import com.github.dreadslicer.tekkitrestrict.lib.TRFileConfiguration;
 import com.github.dreadslicer.tekkitrestrict.lib.YamlConfiguration;
 import com.github.dreadslicer.tekkitrestrict.listeners.Assigner;
-import com.github.dreadslicer.tekkitrestrict.objects.TRDupeSettings;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.DBType;
-import com.github.dreadslicer.tekkitrestrict.objects.TREnums.SSMode;
-import com.github.dreadslicer.tekkitrestrict.objects.TRHackSettings;
 import com.github.dreadslicer.tekkitrestrict.objects.TRItem;
 
 public class tekkitrestrict extends JavaPlugin {
-	
 	private static tekkitrestrict instance;
 	public static Logger log;
 	public static TRFileConfiguration config;
@@ -120,7 +109,12 @@ public class tekkitrestrict extends JavaPlugin {
 			reloadConfig();
 		}
 		
-		loadConfigCache();
+		try {//Load all settings
+			load();
+		} catch (Exception ex) {
+			Log.Warning.load("An error occurred: Unable to load settings!");
+			Log.Exception(ex, true);
+		}
 		//#####################################################
 		
 		
@@ -178,8 +172,9 @@ public class tekkitrestrict extends JavaPlugin {
 			}
 			miningLaser.add(Block.byId[194]);
 			EntityMiningLaser.unmineableBlocks = miningLaser.toArray(new Block[miningLaser.size()]);
+			log.fine("Patched Mining Laser + Auto Crafting Table MK II dupe.");
 		} catch (Exception ex){
-			loadWarning("Unable to patch MiningLaser + Auto Crafting Table MK II dupe!");
+			loadWarning("Unable to patch Mining Laser + Auto Crafting Table MK II dupe!");
 		}
 		
 		try {
@@ -195,11 +190,11 @@ public class tekkitrestrict extends JavaPlugin {
 			
 			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(0 << 15 | 27592));//transtablet
 			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(0 << 15 | 7493));//Ender pouch
-			log.fine("Patched most Auto Crafting Table MK II dupes.");
-			log.fine("Patched Deployer + REP Crash Bug.");
+			log.fine("Patched BlockBreaker + Auto Crafting Table MK II dupe.");
+			log.fine("Patched most Deployer Crash Bugs.");
 		} catch (Exception ex){
 			loadWarning("Unable to patch BlockBreaker + Auto Crafting Table MK II dupe!");
-			loadWarning("Unable to patch Deployer + REP Crash Bug!");
+			loadWarning("Unable to patch Deployer Crash Bugs!");
 		}
 	}
 	@Override
@@ -223,10 +218,8 @@ public class tekkitrestrict extends JavaPlugin {
 
 		// determine if EE2 is enabled by using pluginmanager
 		PluginManager pm = this.getServer().getPluginManager();
-		if (pm.isPluginEnabled("mod_EE"))
-			tekkitrestrict.EEEnabled = true;
-		else
-			tekkitrestrict.EEEnabled = false;
+		
+		tekkitrestrict.EEEnabled = pm.isPluginEnabled("mod_EE");
 
 		try {
 			if (pm.isPluginEnabled("PermissionsEx")) {
@@ -236,14 +229,6 @@ public class tekkitrestrict extends JavaPlugin {
 		} catch (Exception ex) {
 			log.info("Linking with Pex Failed!");
 			// Was not able to load permissionsEx
-		}
-		
-		// Initiate noItem, Time-thread and our event listener
-		try {
-			reload(false, true);//Why reload here?
-		} catch (Exception ex) {
-			Log.Warning.load("An error occurred: Unable to load settings!");
-			Log.Exception(ex, true);
 		}
 		
 		try {
@@ -267,7 +252,6 @@ public class tekkitrestrict extends JavaPlugin {
 			EEPSettings.loadAllDisabledActions();
 			try {
 				Assigner.assignEEPatch();
-				//TODO add more here
 			} catch (Exception ex){
 				success = false;
 			}
@@ -279,8 +263,6 @@ public class tekkitrestrict extends JavaPlugin {
 		} else {
 			log.info("EEPatch is not available. Extended functionality disabled.");
 		}
-		
-		initMetrics();
 		
 		if (config.getBoolean2(ConfigFile.General, "Auto-Update", true)){
 			updater = new Updater(this, "tekkit-restrict", this.getFile(), Updater.UpdateType.DEFAULT, true);
@@ -299,6 +281,13 @@ public class tekkitrestrict extends JavaPlugin {
 		}
 		//#####################################################
 		
+		initMetrics();
+		tmetrics = new TMetrics(this, config.getBoolean2(ConfigFile.General, "ShowTMetricsWarnings", true));
+		
+		if (config.getBoolean2(ConfigFile.General, "UseTMetrics", true)){
+			tmetrics.start();
+		}
+		
 		Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
 			@Override
 			public void run() {
@@ -309,16 +298,7 @@ public class tekkitrestrict extends JavaPlugin {
 			}
 		});
 		
-		tmetrics = new TMetrics(this, config.getBoolean2(ConfigFile.General, "ShowTMetricsWarnings", true));
-		
-		if (config.getBoolean2(ConfigFile.General, "UseTMetrics", true)){
-			tmetrics.start();
-		}
-		
 		log.info("TekkitRestrict v" + version + " Enabled!");
-		
-		
-		// TRThrottler.init();
 	}
 	@Override
 	public void onDisable() {
@@ -418,178 +398,9 @@ public class tekkitrestrict extends JavaPlugin {
 		}
 	}
 	
-	@SuppressWarnings("rawtypes")
-	public static void loadConfigCache(){
-		Hacks.flys = new TRHackSettings();
-		Hacks.flys.enable = config.getBoolean(ConfigFile.HackDupe, "Anti-Hacks.Fly.Enabled", true);
-		Hacks.flys.kick = config.getBoolean(ConfigFile.HackDupe, "Anti-Hacks.Fly.Kick", true);
-		Hacks.flys.broadcast = config.getBoolean(ConfigFile.HackDupe, "Anti-Hacks.Fly.Broadcast", true);
-		Hacks.flys.tolerance = config.getInt(ConfigFile.HackDupe, "Anti-Hacks.Fly.Tolerance", 40);
-		Hacks.flys.value = (int) Math.round(config.getDouble(ConfigFile.HackDupe, "Anti-Hacks.Fly.MinHeight", 3));
-		Hacks.flys.useCommand = config.getBoolean(ConfigFile.HackDupe, "Anti-Hacks.Fly.ExecuteCommand.Enabled", false);
-		Hacks.flys.command = config.getString(ConfigFile.HackDupe, "Anti-Hacks.Fly.ExecuteCommand.Command", "");
-		Hacks.flys.triggerAfter = config.getInt(ConfigFile.HackDupe, "Anti-Hacks.Fly.ExecuteCommand.TriggerAfter", 1);
-		
-		Hacks.forcefields = new TRHackSettings();
-		Hacks.forcefields.enable = config.getBoolean(ConfigFile.HackDupe, "Anti-Hacks.Forcefield.Enabled", true);
-		Hacks.forcefields.kick = config.getBoolean(ConfigFile.HackDupe, "Anti-Hacks.Forcefield.Kick", true);
-		Hacks.forcefields.broadcast = config.getBoolean(ConfigFile.HackDupe, "Anti-Hacks.Forcefield.Broadcast", true);
-		Hacks.forcefields.tolerance = config.getInt(ConfigFile.HackDupe, "Anti-Hacks.Forcefield.Tolerance", 20);
-		Hacks.forcefields.value = config.getDouble(ConfigFile.HackDupe, "Anti-Hacks.Forcefield.Angle", 40);
-		Hacks.forcefields.useCommand = config.getBoolean(ConfigFile.HackDupe, "Anti-Hacks.Forcefield.ExecuteCommand.Enabled", false);
-		Hacks.forcefields.command = config.getString(ConfigFile.HackDupe, "Anti-Hacks.Forcefield.ExecuteCommand.Command", "");
-		Hacks.forcefields.triggerAfter = config.getInt(ConfigFile.HackDupe, "Anti-Hacks.Forcefield.ExecuteCommand.TriggerAfter", 1);
-		
-		Hacks.speeds = new TRHackSettings();
-		Hacks.speeds.enable = config.getBoolean(ConfigFile.HackDupe, "Anti-Hacks.MoveSpeed.Enabled", true);
-		Hacks.speeds.kick = config.getBoolean(ConfigFile.HackDupe, "Anti-Hacks.MoveSpeed.Kick", true);
-		Hacks.speeds.broadcast = config.getBoolean(ConfigFile.HackDupe, "Anti-Hacks.MoveSpeed.Broadcast", true);
-		Hacks.speeds.tolerance = config.getInt(ConfigFile.HackDupe, "Anti-Hacks.MoveSpeed.Tolerance", 30);
-		Hacks.speeds.value = config.getDouble(ConfigFile.HackDupe, "Anti-Hacks.MoveSpeed.MaxMoveSpeed", 2.5d);
-		Hacks.speeds.useCommand = config.getBoolean(ConfigFile.HackDupe, "Anti-Hacks.MoveSpeed.ExecuteCommand.Enabled", false);
-		Hacks.speeds.command = config.getString(ConfigFile.HackDupe, "Anti-Hacks.MoveSpeed.ExecuteCommand.Command", "");
-		Hacks.speeds.triggerAfter = config.getInt(ConfigFile.HackDupe, "Anti-Hacks.MoveSpeed.ExecuteCommand.TriggerAfter", 1);
-		
-		Hacks.broadcastFormat = config.getString(ConfigFile.HackDupe, "Anti-Hacks.BroadcastString", "{PLAYER} tried to {TYPE}-hack!"); //TODO add colors
-		
-		Dupes.alcBags = new TRDupeSettings();
-		Dupes.alcBags.prevent = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.AlchemyBagDupe.Prevent", true);
-		Dupes.alcBags.broadcast = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.AlchemyBagDupe.Broadcast", true);
-		Dupes.alcBags.kick = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.AlchemyBagDupe.Kick", false);
-		Dupes.alcBags.useCommand = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.AlchemyBagDupe.ExecuteCommand.Enabled", false);
-		Dupes.alcBags.command = config.getString(ConfigFile.HackDupe, "Anti-Dupes.AlchemyBagDupe.ExecuteCommand.Command", "");
-		Dupes.alcBags.triggerAfter = config.getInt(ConfigFile.HackDupe, "Anti-Dupes.AlchemyBagDupe.ExecuteCommand.TriggerAfter", 1);
-		
-		Dupes.rmFurnaces = new TRDupeSettings();
-		Dupes.rmFurnaces.prevent = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.RMFurnaceDupe.Prevent", true);
-		Dupes.rmFurnaces.broadcast = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.RMFurnaceDupe.Broadcast", true);
-		Dupes.rmFurnaces.kick = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.RMFurnaceDupe.Kick", false);
-		Dupes.rmFurnaces.useCommand = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.RMFurnaceDupe.ExecuteCommand.Enabled", false);
-		Dupes.rmFurnaces.command = config.getString(ConfigFile.HackDupe, "Anti-Dupes.RMFurnaceDupe.ExecuteCommand.Command", "");
-		Dupes.rmFurnaces.triggerAfter = config.getInt(ConfigFile.HackDupe, "Anti-Dupes.RMFurnaceDupe.ExecuteCommand.TriggerAfter", 1);
-		
-		Dupes.transmutes = new TRDupeSettings();
-		Dupes.transmutes.prevent = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.TransmuteDupe.Prevent", true);
-		Dupes.transmutes.broadcast = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.TransmuteDupe.Broadcast", true);
-		Dupes.transmutes.kick = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.TransmuteDupe.Kick", false);
-		Dupes.transmutes.useCommand = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.TransmuteDupe.ExecuteCommand.Enabled", false);
-		Dupes.transmutes.command = config.getString(ConfigFile.HackDupe, "Anti-Dupes.TransmuteDupe.ExecuteCommand.Command", "");
-		Dupes.transmutes.triggerAfter = config.getInt(ConfigFile.HackDupe, "Anti-Dupes.TransmuteDupe.ExecuteCommand.TriggerAfter", 1);
-		
-		Dupes.tankcarts = new TRDupeSettings();
-		Dupes.tankcarts.prevent = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.TankCartDupe.Prevent", true);
-		Dupes.tankcarts.broadcast = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.TankCartDupe.Broadcast", true);
-		Dupes.tankcarts.kick = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.TankCartDupe.Kick", false);
-		Dupes.tankcarts.useCommand = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.TankCartDupe.ExecuteCommand.Enabled", false);
-		Dupes.tankcarts.command = config.getString(ConfigFile.HackDupe, "Anti-Dupes.TankCartDupe.ExecuteCommand.Command", "");
-		Dupes.tankcarts.triggerAfter = config.getInt(ConfigFile.HackDupe, "Anti-Dupes.TankCartDupe.ExecuteCommand.TriggerAfter", 1);
-		
-		Dupes.tankcartGlitchs = new TRDupeSettings();
-		Dupes.tankcartGlitchs.prevent = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.TankCartGlitch.Prevent", true);
-		Dupes.tankcartGlitchs.broadcast = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.TankCartGlitch.Broadcast", true);
-		Dupes.tankcartGlitchs.kick = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.TankCartGlitch.Kick", false);
-		Dupes.tankcartGlitchs.useCommand = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.TankCartGlitch.ExecuteCommand.Enabled", false);
-		Dupes.tankcartGlitchs.command = config.getString(ConfigFile.HackDupe, "Anti-Dupes.TankCartGlitch.ExecuteCommand.Command", "");
-		Dupes.tankcartGlitchs.triggerAfter = config.getInt(ConfigFile.HackDupe, "Anti-Dupes.TankCartGlitch.ExecuteCommand.TriggerAfter", 1);
-		
-		Dupes.teleports = new TRDupeSettings();
-		Dupes.teleports.prevent = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.TeleportDupe.Prevent", true);
-		Dupes.teleports.broadcast = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.TeleportDupe.Broadcast", true);
-		Dupes.teleports.kick = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.TeleportDupe.Kick", false);
-		Dupes.teleports.useCommand = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.TeleportDupe.ExecuteCommand.Enabled", false);
-		Dupes.teleports.command = config.getString(ConfigFile.HackDupe, "Anti-Dupes.TeleportDupe.ExecuteCommand.Command", "");
-		Dupes.teleports.triggerAfter = config.getInt(ConfigFile.HackDupe, "Anti-Dupes.TeleportDupe.ExecuteCommand.TriggerAfter", 1);
-		
-		Dupes.pedestals = new TRDupeSettings();
-		Dupes.pedestals.prevent = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.PedestalEmcGen.Prevent", true);
-		Dupes.pedestals.broadcast = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.PedestalEmcGen.Broadcast", true);
-		Dupes.pedestals.kick = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.PedestalEmcGen.Kick", false);
-		Dupes.pedestals.useCommand = config.getBoolean(ConfigFile.HackDupe, "Anti-Dupes.PedestalEmcGen.ExecuteCommand.Enabled", false);
-		Dupes.pedestals.command = config.getString(ConfigFile.HackDupe, "Anti-Dupes.PedestalEmcGen.ExecuteCommand.Command", "");
-		Dupes.pedestals.triggerAfter = config.getInt(ConfigFile.HackDupe, "Anti-Dupes.PedestalEmcGen.ExecuteCommand.TriggerAfter", 1);
-		
-		Dupes.broadcastFormat = config.getString(ConfigFile.HackDupe, "Anti-Dupes.BroadcastString", "{PLAYER} tried to dupe {ITEM} using {TYPE}!"); //TODO add colors
-		
-		Global.debug = config.getBoolean(ConfigFile.General, "ShowDebugMessages", false) ||
-					   config.getBoolean(ConfigFile.Logging, "LogDebug", false);
-		
-		Global.kickFromConsole = config.getBoolean2(ConfigFile.General, "KickFromConsole", false);
-		//Global.useNewBanSystem = config.getBoolean("UseNewBannedItemsSystem", false);
-		
-		Listeners.UseBlockLimit = config.getBoolean2(ConfigFile.General, "UseItemLimiter", true);
-		Listeners.BlockCreativeContainer = config.getBoolean(ConfigFile.LimitedCreative, "LimitedCreativeNoContainer", true);
-		Listeners.UseNoItem = config.getBoolean2(ConfigFile.General, "UseNoItem", true);
-		Listeners.UseLimitedCreative = config.getBoolean2(ConfigFile.General, "UseLimitedCreative", true);
-		Listeners.useNoCLickPerms = config.getBoolean(ConfigFile.DisableClick, "UseNoClickPermissions", false);
-		
-		TRConfigCache.LogFilter.replaceList = config.getStringList(ConfigFile.Logging, "LogFilter");
-		TRConfigCache.LogFilter.splitLogs = config.getBoolean(ConfigFile.Logging, "SplitLogs", true);
-		TRConfigCache.LogFilter.filterLogs = config.getBoolean(ConfigFile.Logging, "FilterLogs", true);
-		TRConfigCache.LogFilter.logLocation = config.getString(ConfigFile.Logging, "SplitLogsLocation", "log");
-		TRConfigCache.LogFilter.fileFormat = config.getString(ConfigFile.Logging, "FilenameFormat", "{TYPE}-{DAY}-{MONTH}-{YEAR}.log");
-		TRConfigCache.LogFilter.logFormat = config.getString(ConfigFile.Logging, "LogStringFormat", "[{HOUR}:{MINUTE}:{SECOND}] {INFO}");
-		
-		Threads.gemArmorSpeed = config.getInt(ConfigFile.TPerformance, "GemArmorDThread", 120);
-		Threads.inventorySpeed = config.getInt(ConfigFile.TPerformance, "InventoryThread", 400);
-		Threads.saveSpeed = config.getInt(ConfigFile.TPerformance, "AutoSaveThreadSpeed", 11000);
-		Threads.SSEntityRemoverSpeed = config.getInt(ConfigFile.TPerformance, "SSEntityRemoverThread", 350);
-		Threads.worldCleanerSpeed = config.getInt(ConfigFile.TPerformance, "WorldCleanerThread", 15000);
-		
-		Threads.GAMovement = config.getBoolean(ConfigFile.ModModifications, "AllowGemArmorDefensive", true);
-		Threads.GAOffensive = config.getBoolean(ConfigFile.ModModifications, "AllowGemArmorOffensive", false);
-		
-		Threads.SSDisableEntities = config.getBoolean(ConfigFile.SafeZones, "InSafeZones.DisableEntities", false);
-		Threads.SSDechargeEE = config.getBoolean(ConfigFile.SafeZones, "InSafeZones.DechargeEE", true);
-		Threads.SSDisableArcane = config.getBoolean(ConfigFile.SafeZones, "InSafeZones.DisableRingOfArcana", true);
-		List<String> exempt = config.getStringList(ConfigFile.SafeZones, "InSafeZones.ExemptEntityTypes");
-		Threads.SSClassBypasses = new ArrayList<Class>();
-		for (String s : exempt){
-			try {
-				Class cl = Class.forName("org.bukkit.entity."+s);
-				Threads.SSClassBypasses.add(cl);
-			} catch (Exception ex){
-				try {
-					Class cl = Class.forName("org.bukkit.entity."+Character.toUpperCase(s.charAt(0)) + s.substring(1));
-					Threads.SSClassBypasses.add(cl);
-				} catch (Exception ex2){
-					Warning.config("Invalid value in ExemptEntityTypes in SafeZones.config: cannot find class org.bukkit.entity."+ s + "!");
-					continue;
-				}
-			}
-		}
-		
-		Threads.RMDB = config.getBoolean(ConfigFile.DisableItems, "RemoveDisabledItemBlocks", false);
-		//Threads.UseRPTimer = config.getBoolean(ConfigFile.General, "UseAutoRPTimer", false);
-		Threads.ChangeDisabledItemsIntoId = config.getInt(ConfigFile.DisableItems, "ChangeDisabledItemsIntoId", 3);
-		//Threads.RPTickTime = (int) Math.round((config.getDouble(ConfigFile.ModModifications, "RPTimerMin", 0.2)-0.1d) * 20d);
-		
-		SafeZones.UseSafeZones = config.getBoolean(ConfigFile.SafeZones, "UseSafeZones", true);
-		SafeZones.UseFactions = config.getBoolean(ConfigFile.SafeZones, "SSEnabledPlugins.Factions", true);
-		SafeZones.UseGP = config.getBoolean(ConfigFile.SafeZones, "SSEnabledPlugins.GriefPrevention", true);
-		SafeZones.UsePS = config.getBoolean(ConfigFile.SafeZones, "SSEnabledPlugins.PreciousStones", true);
-		SafeZones.UseTowny = config.getBoolean(ConfigFile.SafeZones, "SSEnabledPlugins.Towny", true);
-		SafeZones.UseWG = config.getBoolean(ConfigFile.SafeZones, "SSEnabledPlugins.WorldGuard", true);
-		SafeZones.GPMode = SSMode.parse(config.getString(ConfigFile.SafeZones, "GriefPreventionSafeZoneMethod", "admin"));
-		SafeZones.WGMode = SSMode.parse(config.getString(ConfigFile.SafeZones, "WorldGuardSafeZoneMethod", "specific"));
-		
-		//SafeZones.SSPlugins = config.getStringList("SSEnabledPlugins");
-		//SafeZones.SSDisableFly = config.getBoolean("SSDisableFlying", false);
-		//SafeZones.allGPClaimsAreSafezone = config.getBoolean("AllGriefPreventionClaimsAreSafezones", false);
-		//SafeZones.allowNormalUser = config.getBoolean("SSAllowNormalUsersToHaveSafeZones", true);
-		
-		ChunkUnloader.enabled = config.getBoolean2(ConfigFile.TPerformance, "UseChunkUnloader", false);
-		ChunkUnloader.maxChunks = config.getInt(ConfigFile.TPerformance, "MaxChunks", 3000);
-		ChunkUnloader.maxChunksEnd = config.getInt(ConfigFile.TPerformance, "MaxChunks.TheEnd", 200);
-		ChunkUnloader.maxChunksNether = config.getInt(ConfigFile.TPerformance, "MaxChunks.Nether", 400);
-		ChunkUnloader.maxChunksNormal = config.getInt(ConfigFile.TPerformance, "MaxChunks.Normal", 4000);
-		ChunkUnloader.maxChunksTotal = config.getInt(ConfigFile.TPerformance, "MaxChunks.Total", 4000);
-		ChunkUnloader.unloadOrder = config.getInt(ConfigFile.TPerformance, "UnloadOrder", 0);
-		ChunkUnloader.maxRadii = config.getInt(ConfigFile.TPerformance, "MaxRadii", 256);
-	}
-
 	/** Make the limiter expire limits every 32 ticks. */
-	private static void initHeartBeat() {
-		instance.getServer().getScheduler().scheduleAsyncRepeatingTask(instance, new Runnable() {
+	private void initHeartBeat() {
+		getServer().getScheduler().scheduleAsyncRepeatingTask(this, new Runnable() {
 			@Override
 			public void run() {
 				TRLimiter.expireLimiters();
@@ -597,36 +408,42 @@ public class tekkitrestrict extends JavaPlugin {
 		}, 60L, 32L);
 	}
 	
-	public void reload(boolean listeners, boolean silent) {
-		if (listeners){
-			Assigner.unregisterAll();
-		}
-		this.reloadConfig();
-		config = this.getConfigx();
-		loadConfigCache();
+	public void load(){
+		TRConfigCache.loadConfigCache();
 		TRItemProcessor.reload();
 		TRNoItem.reload(); //Banned items and limited creative.
-		TRThread.reload(); // branches out
-		TRListener.reload();
+		TRNoClick.reload();
 		TRLimiter.reload();
-		TRLogger.reload();
 		TRRecipeBlock.reload();
-		TRLimitFlyThread.reload();
 		TREMCSet.reload();
 		if (linkEEPatch()){
 			EEPSettings.loadAllDisabledActions();
 			EEPSettings.loadMaxCharge();
-			if (listeners)
-				Assigner.assignEEPatch();
-		}
+		}		
+	}
+	
+	/**
+	 * @param listeners Reload Listeners as well?
+	 * @param silent If silent is true, no notice of the reload will appear in the console.
+	 * @param startup If startup is true, it will not 
+	 */
+	public void reload(boolean listeners, boolean silent) {
+		if (listeners) Assigner.unregisterAll();
+		
+		this.reloadConfig();
+		config = this.getConfigx();
+		load();
+		TRThread.reload();
 		
 		//Stop TMetrics if the user disabled it in the config and reloaded.
 		if (!config.getBoolean(ConfigFile.General, "UseTMetrics", true)){
 			tmetrics.stop();
 		}
 		
-		if (listeners)
+		if (listeners){
 			Assigner.assign();
+			if (linkEEPatch()) Assigner.assignEEPatch();
+		}
 		
 		if (!silent) log.info("TekkitRestrict Reloaded!");
 	}

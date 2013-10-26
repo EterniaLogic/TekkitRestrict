@@ -20,12 +20,12 @@ import org.bukkit.plugin.PluginManager;
 import com.github.dreadslicer.tekkitrestrict.Log;
 import com.github.dreadslicer.tekkitrestrict.Send;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.LogFilter;
+import com.github.dreadslicer.tekkitrestrict.TRConfigCache;
 import com.github.dreadslicer.tekkitrestrict.TREMCSet;
 import com.github.dreadslicer.tekkitrestrict.TRItemProcessor;
 import com.github.dreadslicer.tekkitrestrict.TRDB;
 import com.github.dreadslicer.tekkitrestrict.TRException;
 import com.github.dreadslicer.tekkitrestrict.TRLimiter;
-import com.github.dreadslicer.tekkitrestrict.TRLogger;
 import com.github.dreadslicer.tekkitrestrict.TRNoClick;
 import com.github.dreadslicer.tekkitrestrict.TRNoItem;
 import com.github.dreadslicer.tekkitrestrict.TRPerformance;
@@ -417,7 +417,12 @@ public class TRCommandTR implements CommandExecutor {
 				LogFilter.logLocation = tekkitrestrict.config.getString(ConfigFile.Logging, "SplitLogsLocation", "log");
 				LogFilter.fileFormat = tekkitrestrict.config.getString(ConfigFile.Logging, "FilenameFormat", "{TYPE}-{DAY}-{MONTH}-{YEAR}.log");
 				LogFilter.logFormat = tekkitrestrict.config.getString(ConfigFile.Logging, "LogStringFormat", "[{HOUR}:{MINUTE}:{SECOND}] {INFO}");
-				TRLogger.reload();
+				TRConfigCache.Logger.LogAmulets = tekkitrestrict.config.getBoolean(ConfigFile.Logging, "LogAmulets", false);
+				TRConfigCache.Logger.LogRings = tekkitrestrict.config.getBoolean(ConfigFile.Logging, "LogRings", false);
+				TRConfigCache.Logger.LogDMTools = tekkitrestrict.config.getBoolean(ConfigFile.Logging, "LogDMTools", false);
+				TRConfigCache.Logger.LogRMTools = tekkitrestrict.config.getBoolean(ConfigFile.Logging, "LogRMTools", false);
+				TRConfigCache.Logger.LogEEMisc = tekkitrestrict.config.getBoolean(ConfigFile.Logging, "LogEEMisc", false);
+				TRConfigCache.Logger.LogEEDestructive = tekkitrestrict.config.getBoolean(ConfigFile.Logging, "LogEEDestructive", false);
 				send.msg("Log Filter/Splitter Reloaded!");
 			} else if (largs[2].equals("emcset")){
 				TREMCSet.reload();
@@ -674,7 +679,6 @@ public class TRCommandTR implements CommandExecutor {
 			return;
 		}
 		
-		//FIXME uppercase problem
 		try {
 			tekkitrestrict.db.query("DELETE FROM `tr_saferegion` WHERE `name` = '"
 							+ TRDB.antisqlinject((name == null ? largs[3] : name)) + "' COLLATE NOCASE");

@@ -711,6 +711,7 @@ public class TRFileConfiguration extends FileConfiguration {
 		else if (file == ConfigFile.TPerformance) TPerformanceConfig.upgradeFile();
 		else {
 			Log.Warning.config("Missing setting " + setting + " in " + file.toString() + ".config.yml!");
+			return val;
 		}
 		tekkitrestrict.getInstance().reload(false, true);
 		return val;

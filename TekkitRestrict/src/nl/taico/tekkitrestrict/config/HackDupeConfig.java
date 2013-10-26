@@ -73,7 +73,7 @@ public class HackDupeConfig extends TRConfig {
 		tbr.add("#                   Default: All 1");
 		tbr.add("#");
 		tbr.add("# BroadcastString:  The formatting of the BroadcastString.");
-		tbr.add("#                   Default: \"{PLAYER} tried to {TYPE}-hack!\"");
+		tbr.add("#                   Default: \"&9{PLAYER} &ctried to &a{TYPE}&c-hack!\"");
 		tbr.add("#                   NOTE: The following will be replaced:");
 		tbr.add("#                   {PLAYER} - The player's name");
 		tbr.add("#                   {TYPE}   - The type of hack");
@@ -133,7 +133,7 @@ public class HackDupeConfig extends TRConfig {
 		if (extra) tbr.add("#:-;-:# Anti-Hacks.Forcefield.ExecuteCommand.Command");
 		tbr.add("            TriggerAfter: 1");
 		if (extra) tbr.add("#:-;-:# Anti-Hacks.Forcefield.ExecuteCommand.TriggerAfter");
-		tbr.add("    BroadcastString: \"{PLAYER} tried to {TYPE}-hack!\"");
+		tbr.add("    BroadcastString: \"&9{PLAYER} &ctried to &a{TYPE}&c-hack!\"");
 		if (extra) tbr.add("#:-;-:# Anti-Hacks.BroadcastString HackBroadcastString");
 		tbr.add("");
 		tbr.add("##############################################################################################");
@@ -172,7 +172,7 @@ public class HackDupeConfig extends TRConfig {
 		tbr.add("#                   Default: All 1");
 		tbr.add("#");
 		tbr.add("# BroadcastString:  The formatting of the BroadcastString for dupes.");
-		tbr.add("#                   Default: \"{PLAYER} tried to dupe {ITEM} using {TYPE}!\"");
+		tbr.add("#                   Default: \"&9{PLAYER} &ctried to dupe&6 {ITEM} &cusing &a{TYPE}&c!\"");
 		tbr.add("#                   NOTE: The following will be replaced:");
 		tbr.add("#                   {PLAYER} - The player's name");
 		tbr.add("#                   {TYPE}   - The type of dupe");
@@ -268,7 +268,7 @@ public class HackDupeConfig extends TRConfig {
 		tbr.add("    TeleportDupe:");
 		tbr.add("        Prevent: true");
 		if (extra) tbr.add("#:-;-:# Anti-Dupes.PreventTeleportDupe Dupes.PreventTeleportDupe");
-		tbr.add("    BroadcastString: \"{PLAYER} tried to dupe {ITEM} using {TYPE}!\"");
+		tbr.add("    BroadcastString: \"&9{PLAYER} &ctried to dupe&6 {ITEM} &cusing &a{TYPE}&c!\"");
 		if (extra) tbr.add("#:-;-:# Anti-Dupes.BroadcastString Dupes.BroadcastString");
 		tbr.add("");
 		tbr.add("##############################################################################################");

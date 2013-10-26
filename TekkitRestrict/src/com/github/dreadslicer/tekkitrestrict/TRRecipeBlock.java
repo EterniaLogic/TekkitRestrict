@@ -72,7 +72,7 @@ public class TRRecipeBlock {
 
 		while (recipes.hasNext()) {
 			if ((recipe = recipes.next()) != null) {
-				int tid = recipe.getResult().getData().getItemTypeId();//TODO .getTypeId()?
+				int tid = recipe.getResult().getTypeId();//was .getData().getItemTypeId();
 				int tdata = recipe.getResult().getDurability();
 				if (tid == id && (tdata == data || data == 0)) {
 					recipes.remove();

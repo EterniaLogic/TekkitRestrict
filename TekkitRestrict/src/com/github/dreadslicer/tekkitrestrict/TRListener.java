@@ -25,16 +25,12 @@ import org.bukkit.inventory.ItemStack;
 import com.github.dreadslicer.tekkitrestrict.Log.Warning;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Listeners;
 import com.github.dreadslicer.tekkitrestrict.commands.TRCommandAlc;
-import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
 
 import eloraam.core.TileCovered;
 
 public class TRListener implements Listener {
-	private static TRListener instance;
-	boolean LogAmulets, LogRings, LogDMTools, LogRMTools, LogEEMisc;
-	private Map<Integer, String> EENames = Collections.synchronizedMap(new HashMap<Integer, String>());
-
-	public TRListener() {
+	private static Map<Integer, String> EENames = Collections.synchronizedMap(new HashMap<Integer, String>());
+	static {
 		EENames.put(27526, "Philosopher Stone");
 		EENames.put(27527, "Destruction Catalyst");
 		EENames.put(27528, "Iron Band");
@@ -106,21 +102,6 @@ public class TRListener implements Listener {
 		EENames.put(27592, "Transmutation Tablet");
 		EENames.put(27593, "Void Ring");
 		EENames.put(27594, "Alchemy Tome");
-		instance = this;
-	}
-
-	public static void reload() {
-		instance.LogAmulets = tekkitrestrict.config.getBoolean(ConfigFile.Logging, "LogAmulets", true);
-		instance.LogRings = tekkitrestrict.config.getBoolean(ConfigFile.Logging, "LogRings", true);
-		instance.LogDMTools = tekkitrestrict.config.getBoolean(ConfigFile.Logging, "LogDMTools", true);
-		instance.LogRMTools = tekkitrestrict.config.getBoolean(ConfigFile.Logging, "LogRMTools", true);
-		instance.LogEEMisc = tekkitrestrict.config.getBoolean(ConfigFile.Logging, "LogEEMisc", true);
-		
-		TRNoClick.reload();
-	}
-
-	public static TRListener getInstance() {
-		return instance;
 	}
 	
 	private int lastdata = 0;
