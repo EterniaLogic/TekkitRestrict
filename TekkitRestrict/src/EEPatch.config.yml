@@ -289,9 +289,30 @@ Actions:
                 BreakRadius: true
     Amulets:
         Evertide:
-            tull: f
+            # CreateWater: Create a patch of water. The size depends on the chargelevel
+            # of the Evertide Amulet.
+            CreateWater: true
+
+            # CreateWaterBall: Shoot a WaterEssence that creates water where it hits.
+            CreateWaterBall: true
+
+            # PreventDrowing: Passive of the Evertide Amulet that prevents the player
+            # from drowning.
+            PreventDrowning: true
         Volcanite:
-            tull: f
+            # CreateLava: Create a patch of lava. The size depends on the chargelevel
+            # of the Volcanite Amulet.
+            CreateLava: true
+            
+            # CreateLavaBall: Shoot a LavaEssence that creates lava where it his.
+            CreateLavaBall: true
+
+            # Vaporize: Vaporize water around the player.
+            Vaporize: true
+
+            # FireImmune: Passive of the Volcanite Amulet that prevents the player from
+            # taking fire damage.
+            FireImmune: true
     Rings:
         ZeroRing:
             # FreezeRadius: When a Zero Ring is activated or if you rightclick with it, 

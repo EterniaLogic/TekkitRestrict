@@ -13,7 +13,7 @@ import ee.events.ring.EESWRingEvent;
 
 public class EESWRGListener implements Listener {
 
-private ArrayList<String> negate = new ArrayList<String>();
+	private ArrayList<String> negate = new ArrayList<String>();
 	
 	@EventHandler
 	public void SWRGEvent(EESWRingEvent event){

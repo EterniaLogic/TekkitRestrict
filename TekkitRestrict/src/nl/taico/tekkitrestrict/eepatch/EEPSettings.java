@@ -9,6 +9,7 @@ import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
 
 import ee.events.EEEnums.EEAction2;
+import ee.events.EEEnums.EEAmuletAction;
 import ee.events.EEEnums.EERingAction;
 
 public class EEPSettings {
@@ -211,6 +212,7 @@ public class EEPSettings {
 		tekkitrestrict.log.info("[DEBUG] " + "loading EEPatch Settings...");
 		loadDisabledRingActions();
 		loadDisabledDestActions();
+		loadDisabledAmuletActions();
 	}
 	
 	public static ArrayList<Integer> zeroring = new ArrayList<Integer>();
@@ -318,11 +320,32 @@ public class EEPSettings {
 		dest2.clear();
 		dest3.clear();
 		
-		if (!tekkitrestrict.config.getBoolean("Actions.Destruction.DestructionCatalyst.BreakRadius", true))
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.Destruction.DestructionCatalyst.BreakRadius", true))
 			dest1.add(EEAction2.BreakRadius.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Destruction.HyperKineticLens.BreakRadius", true))
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.Destruction.HyperKineticLens.BreakRadius", true))
 			dest2.add(EEAction2.BreakRadius.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Destruction.CatalyticLens.BreakRadius", true))
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.Destruction.CatalyticLens.BreakRadius", true))
 			dest3.add(EEAction2.BreakRadius.ordinal());
+	}
+	
+	public static ArrayList<Integer> evertide = new ArrayList<Integer>();
+	public static ArrayList<Integer> volcanite = new ArrayList<Integer>();
+	
+	public static void loadDisabledAmuletActions(){
+		if (!tekkitrestrict.config.getBoolean("Actions.Amulets.Evertide.CreateWater", true))
+			evertide.add(EEAmuletAction.CreateWater.ordinal());
+		if (!tekkitrestrict.config.getBoolean("Actions.Amulets.Evertide.CreateWaterBall", true))
+			evertide.add(EEAmuletAction.CreateWaterBall.ordinal());
+		if (!tekkitrestrict.config.getBoolean("Actions.Amulets.Evertide.PreventDrowning", true))
+			evertide.add(EEAmuletAction.StopDrowning.ordinal());
+		
+		if (!tekkitrestrict.config.getBoolean("Actions.Amulets.Volcanite.CreateLava", true))
+			volcanite.add(EEAmuletAction.CreateLava.ordinal());
+		if (!tekkitrestrict.config.getBoolean("Actions.Amulets.Volcanite.CreateLavaBall", true))
+			volcanite.add(EEAmuletAction.CreateLavaBall.ordinal());
+		if (!tekkitrestrict.config.getBoolean("Actions.Amulets.Volcanite.Vaporize", true))
+			volcanite.add(EEAmuletAction.Vaporize.ordinal());
+		if (!tekkitrestrict.config.getBoolean("Actions.Amulets.Volcanite.FireImmune", true))
+			volcanite.add(EEAmuletAction.FireImmune.ordinal());
 	}
 }
