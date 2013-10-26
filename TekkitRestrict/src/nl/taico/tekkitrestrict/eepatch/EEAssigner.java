@@ -6,6 +6,8 @@ import org.bukkit.plugin.PluginManager;
 import nl.taico.tekkitrestrict.eepatch.amuletlisteners.EEAmuletListener;
 import nl.taico.tekkitrestrict.eepatch.destlisteners.EEDestructionListener;
 import nl.taico.tekkitrestrict.eepatch.ringlisteners.EERingListener;
+import nl.taico.tekkitrestrict.eepatch.toollisteners.EEDMToolListener;
+import nl.taico.tekkitrestrict.eepatch.toollisteners.EERMToolListener;
 
 import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
 
@@ -21,6 +23,14 @@ public class EEAssigner {
 		
 		if (!EEPSettings.evertide.isEmpty() || !EEPSettings.volcanite.isEmpty())
 			PM.registerEvents(new EEAmuletListener(), tr);
+		
+		if (!EEPSettings.dmaxe.isEmpty() || !EEPSettings.dmpick.isEmpty() || !EEPSettings.dmhoe.isEmpty() || !EEPSettings.dmshovel.isEmpty() ||
+			!EEPSettings.dmhammer.isEmpty() || !EEPSettings.dmshears.isEmpty() || !EEPSettings.dmsword.isEmpty())
+			PM.registerEvents(new EEDMToolListener(), tr);
+		
+		if (!EEPSettings.rmaxe.isEmpty() || !EEPSettings.rmpick.isEmpty() || !EEPSettings.rmhoe.isEmpty() || !EEPSettings.rmshovel.isEmpty() ||
+			!EEPSettings.rmhammer.isEmpty() || !EEPSettings.rmshears.isEmpty() || !EEPSettings.rmsword.isEmpty() || !EEPSettings.katar.isEmpty() || !EEPSettings.morningstar.isEmpty())
+			PM.registerEvents(new EERMToolListener(), tr);
 		
 		if (!tekkitrestrict.config.getBoolean("AllowRMFurnaceOreDuplication", true))
 			PM.registerEvents(new EEDuplicateListener(), tr);

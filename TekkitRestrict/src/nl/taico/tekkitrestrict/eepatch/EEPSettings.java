@@ -213,6 +213,9 @@ public class EEPSettings {
 		loadDisabledRingActions();
 		loadDisabledDestActions();
 		loadDisabledAmuletActions();
+		loadDMToolActions();
+		loadRMToolActions();
+		loadRedToolActions();
 	}
 	
 	public static ArrayList<Integer> zeroring = new ArrayList<Integer>();
@@ -347,5 +350,124 @@ public class EEPSettings {
 			volcanite.add(EEAmuletAction.Vaporize.ordinal());
 		if (!tekkitrestrict.config.getBoolean("Actions.Amulets.Volcanite.FireImmune", true))
 			volcanite.add(EEAmuletAction.FireImmune.ordinal());
+	}
+
+	public static ArrayList<Integer> dmaxe = new ArrayList<Integer>();
+	public static ArrayList<Integer> dmpick = new ArrayList<Integer>();
+	public static ArrayList<Integer> dmshovel = new ArrayList<Integer>();
+	public static ArrayList<Integer> dmhoe = new ArrayList<Integer>();
+	public static ArrayList<Integer> dmshears = new ArrayList<Integer>();
+	public static ArrayList<Integer> dmhammer = new ArrayList<Integer>();
+	public static ArrayList<Integer> dmsword = new ArrayList<Integer>();
+
+	public static void loadDMToolActions(){
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.DarkMatter.Pickaxe.Break-3.Tall", true))
+			dmpick.add(EEAction2.TallBreak.ordinal());
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.DarkMatter.Pickaxe.Break-3.Wide", true))
+			dmpick.add(EEAction2.WideBreak.ordinal());
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.DarkMatter.Pickaxe.Break-3.Long", true))
+			dmpick.add(EEAction2.LongBreak.ordinal());
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.DarkMatter.Pickaxe.BreakOreVein", true))
+			dmpick.add(EEAction2.BreakRadius.ordinal());
+		
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.DarkMatter.Axe.BreakRadius", true))
+			dmaxe.add(EEAction2.BreakRadius.ordinal());
+		
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.DarkMatter.Shovel.Break-3.Tall", true))
+			dmshovel.add(EEAction2.TallBreak.ordinal());
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.DarkMatter.Shovel.Break-3.Wide", true))
+			dmshovel.add(EEAction2.WideBreak.ordinal());
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.DarkMatter.Shovel.Break-3.Long", true))
+			dmshovel.add(EEAction2.LongBreak.ordinal());
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.DarkMatter.Shovel.BreakRadius", true))
+			dmshovel.add(EEAction2.BreakRadius.ordinal());
+		
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.DarkMatter.Hoe.TillRadius", true))
+			dmhoe.add(EEAction2.TillRadius.ordinal());
+		
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.DarkMatter.Shears.BreakRadius", true))
+			dmshears.add(EEAction2.BreakRadius.ordinal());
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.DarkMatter.Shears.Shear", true))
+			dmshears.add(EEAction2.Shear.ordinal());
+		
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.DarkMatter.Hammer.MegaBreak", true))
+			dmhammer.add(EEAction2.MegaBreak.ordinal());
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.DarkMatter.Hammer.BreakRadius", true))
+			dmhammer.add(EEAction2.BreakRadius.ordinal());
+		
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.DarkMatter.Sword.AttackRadius", true))
+			dmsword.add(EEAction2.AttackRadius.ordinal());
+	}
+	
+	public static ArrayList<Integer> rmaxe = new ArrayList<Integer>();
+	public static ArrayList<Integer> rmpick = new ArrayList<Integer>();
+	public static ArrayList<Integer> rmshovel = new ArrayList<Integer>();
+	public static ArrayList<Integer> rmhoe = new ArrayList<Integer>();
+	public static ArrayList<Integer> rmshears = new ArrayList<Integer>();
+	public static ArrayList<Integer> rmhammer = new ArrayList<Integer>();
+	public static ArrayList<Integer> rmsword = new ArrayList<Integer>();
+
+	public static void loadRMToolActions(){
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.RedMatter.Pickaxe.Break-3.Tall", true))
+			rmpick.add(EEAction2.TallBreak.ordinal());
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.RedMatter.Pickaxe.Break-3.Wide", true))
+			rmpick.add(EEAction2.WideBreak.ordinal());
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.RedMatter.Pickaxe.Break-3.Long", true))
+			rmpick.add(EEAction2.LongBreak.ordinal());
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.RedMatter.Pickaxe.BreakOreVein", true))
+			rmpick.add(EEAction2.BreakRadius.ordinal());
+		
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.RedMatter.Axe.BreakRadius", true))
+			rmaxe.add(EEAction2.BreakRadius.ordinal());
+		
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.RedMatter.Shovel.Break-3.Tall", true))
+			rmshovel.add(EEAction2.TallBreak.ordinal());
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.RedMatter.Shovel.Break-3.Wide", true))
+			rmshovel.add(EEAction2.WideBreak.ordinal());
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.RedMatter.Shovel.Break-3.Long", true))
+			rmshovel.add(EEAction2.LongBreak.ordinal());
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.RedMatter.Shovel.BreakRadius", true))
+			rmshovel.add(EEAction2.BreakRadius.ordinal());
+		
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.RedMatter.Hoe.TillRadius", true))
+			rmhoe.add(EEAction2.TillRadius.ordinal());
+		
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.RedMatter.Shears.BreakRadius", true))
+			rmshears.add(EEAction2.BreakRadius.ordinal());
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.RedMatter.Shears.Shear", true))
+			rmshears.add(EEAction2.Shear.ordinal());
+		
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.RedMatter.Hammer.MegaBreak", true))
+			rmhammer.add(EEAction2.MegaBreak.ordinal());
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.RedMatter.Hammer.BreakRadius", true))
+			rmhammer.add(EEAction2.BreakRadius.ordinal());
+		
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.RedMatter.Sword.AttackRadius", true))
+			rmsword.add(EEAction2.AttackRadius.ordinal());
+	}
+	
+	public static ArrayList<Integer> katar = new ArrayList<Integer>();
+	public static ArrayList<Integer> morningstar = new ArrayList<Integer>();
+	
+	public static void loadRedToolActions(){
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.Katar.BreakRadius", true))
+			katar.add(EEAction2.BreakRadius.ordinal());
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.Katar.TillRadius", true))
+			katar.add(EEAction2.TillRadius.ordinal());
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.Katar.AttackRadius", true))
+			katar.add(EEAction2.AttackRadius.ordinal());
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.Katar.Shear", true))
+			katar.add(EEAction2.Shear.ordinal());
+		
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.MorningStar.Break-3.Tall", true))
+			morningstar.add(EEAction2.TallBreak.ordinal());
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.MorningStar.Break-3.Wide", true))
+			morningstar.add(EEAction2.WideBreak.ordinal());
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.MorningStar.Break-3.Long", true))
+			morningstar.add(EEAction2.LongBreak.ordinal());
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.MorningStar.MegaBreak", true))
+			morningstar.add(EEAction2.MegaBreak.ordinal());
+		if (!tekkitrestrict.config.getBoolean("Actions.Tools.MorningStar.BreakRadius", true))
+			morningstar.add(EEAction2.BreakRadius.ordinal());
 	}
 }

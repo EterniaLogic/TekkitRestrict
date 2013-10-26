@@ -88,7 +88,6 @@ Actions:
                 # will break all ores of the same kind surrounding the ore block you
                 # clicked.
                 BreakOreVein: true
-
             Axe:
                 # BreakRadius: If you press R while holding an DM Axe, or if you rightclick
                 # with one, it will break axe-type blocks in a radius that is dependent on
@@ -97,7 +96,6 @@ Actions:
                 # Axe-type blocks = blocks that are supposed to be mined with an axe.
                 # (Logs, wood and most blocks made out of wood)
                 BreakRadius: true
-
             Shovel:
                 # Break-3: See DM Pickaxe
                 Break-3:
@@ -112,7 +110,6 @@ Actions:
                 # Shovel-type blocks = blocks that are supposed to be mined with a shovel.
                 # (Dirt, grass, gravel, sand, etc.)
                 BreakRadius: true
-
             Hoe:
                 # TillRadius: If you press R while holding a DM Hoe, or if you rightclick
                 # with one, it will till all grass and dirt in a radius that is dependent
@@ -120,7 +117,6 @@ Actions:
                 #
                 # Tip of Taeir: Disable this to prevent major "nature grief".
                 TillRadius: true
-
             Shears:
                 # BreakRadius: If you press R while holding DM Shears, or if you
                 # rightclick with some, it will break shear-type blocks in a radius that
@@ -133,7 +129,6 @@ Actions:
                 # Shear: If you rightclick a shearable mob (sheep, mooshroom) with DM
                 # Shears, you will shear it.
                 Shear: true
-
             Hammer:
                 # MegaBreak: If you enable Mega Hammer mode, and you rightclick with a
                 # DM Hammer, it will break a very large cube of blocks around where you
@@ -146,14 +141,12 @@ Actions:
                 #
                 # (Hammer-type blocks = stone, cobblestone, ores, netherrack, ice, etc.)
                 BreakRadius: true
-
             Sword:
                 # AttackRadius: If you press R with a DM Sword, you will attack mobs in a
                 # range around you which is dependent on the charge level of the tool.
                 # You can change the mode of the sword to switch between only damaging
                 # hostile mobs (excluding players) and all mobs (including players).
                 AttackRadius: true
-
         RedMatter:
             Pickaxe:
                 # Break-3: See DM Pickaxe
@@ -166,7 +159,6 @@ Actions:
                 # will break all ores of the same kind surrounding the ore block you
                 # clicked.
                 BreakOreVein: true
-
             Axe:
                 # BreakRadius: If you press R while holding an RM Axe, or if you rightclick
                 # with one, it will break axe-type blocks in a radius that is dependent on
@@ -175,7 +167,6 @@ Actions:
                 # Axe-type blocks = blocks that are supposed to be mined with an axe.
                 # (Logs, wood and most blocks made out of wood)
                 BreakRadius: true
-
             Shovel:
                 # Break-3: See DM Pickaxe
                 Break-3:
@@ -190,7 +181,6 @@ Actions:
                 # Shovel-type blocks = blocks that are supposed to be mined with a shovel.
                 # (Dirt, grass, gravel, sand, etc.)
                 BreakRadius: true
-
             Hoe:
                 # TillRadius: If you press R while holding a RM Hoe, or if you rightclick
                 # with one, it will till all grass and dirt in a radius that is dependent
@@ -198,7 +188,6 @@ Actions:
                 #
                 # Tip of Taeir: Disable this to prevent major "nature grief".
                 TillRadius: true
-
             Shears:
                 # BreakRadius: If you press R while holding RM Shears, or if you
                 # rightclick with some, it will break shear-type blocks in a radius that
@@ -211,7 +200,6 @@ Actions:
                 # Shear: If you rightclick a shearable mob (sheep, mooshroom) with RM
                 # Shears, you will shear it.
                 Shear: true
-
             Hammer:
                 # MegaBreak: If you enable Mega Hammer mode, and you rightclick with a
                 # RM Hammer, it will break a very large cube of blocks around where you
@@ -224,14 +212,12 @@ Actions:
                 #
                 # (Hammer-type blocks = stone, cobblestone, ores, netherrack, ice, etc.)
                 BreakRadius: true
-
             Sword:
                 # AttackRadius: If you press R with a RM Sword, you will attack mobs in a
                 # range around you which is dependent on the charge level of the tool.
                 # You can change the mode of the sword to switch between only damaging
                 # hostile mobs (excluding players) and all mobs (including players).
                 AttackRadius: true
-
         Katar:
             # BreakRadius: If you rightclick with a Katar on wood-type blocks, it will
             # break wood-like blocks in a radius. If you rightclick on shear-type blocks,
@@ -255,7 +241,6 @@ Actions:
             # Shear: If you rightclick a shearable mob (sheep, mooshroom) with a Katar,
             # you will shear it.
             Shear: true
-
         MorningStar:
             # Break-3: See DM Pickaxe
             Break-3:
@@ -273,7 +258,6 @@ Actions:
             # - BreakRadius for RM Shovel
             # - BreakRadius for RM Hammer
             BreakRadius: true
-
         Destruction:
             DestructionCatalyst:
                 # BreakRadius: Break a large amount of blocks at once with the destruction
