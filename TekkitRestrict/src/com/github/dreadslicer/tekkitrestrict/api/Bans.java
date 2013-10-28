@@ -20,7 +20,7 @@ public class Bans {
 	 * @return If the given id:data combination is banned for this player.
 	 */
 	public static boolean isItemBanned(Player player, int id, int data){
-		return TRNoItem.isItemBanned(player, id, data, true);
+		return TRNoItem.isItemBanned(player, id, data, true) != null;
 	}
 	/**
 	 * @return If the given item/block is banned in the config.
@@ -37,7 +37,7 @@ public class Bans {
 	 * in creative mode.
 	 */
 	public static boolean isItemBannedInCreative(Player player, int id, int data){
-		return TRNoItem.isItemBannedInCreative(player, id, data, true);
+		return TRNoItem.isItemBannedInCreative(player, id, data, true) != null;
 	}
 	
 	

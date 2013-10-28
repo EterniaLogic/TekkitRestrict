@@ -12,6 +12,7 @@ import com.github.dreadslicer.tekkitrestrict.TRNoDupe;
 import com.github.dreadslicer.tekkitrestrict.TRNoItem;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Dupes;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Listeners;
+import com.github.dreadslicer.tekkitrestrict.objects.TRItem;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.DupeType;
 
 public class InventoryClickListener implements Listener {
@@ -28,7 +29,7 @@ public class InventoryClickListener implements Listener {
 			id1 = event.getCurrentItem().getTypeId();
 			data1 = event.getCurrentItem().getDurability();
 
-			boolean banned = false;
+			String banned = null;
 			
 			if (player.getGameMode() == GameMode.CREATIVE){
 				if (event.getView().getTopInventory() != null){
@@ -41,12 +42,15 @@ public class InventoryClickListener implements Listener {
 					}
 				}
 				
-				if (TRNoItem.isItemBannedInCreative(player, id1, data1, true)) banned = true;
-				else if (TRNoItem.isItemBanned(player, id1, data1, true)) banned = true;
-			} else if (TRNoItem.isItemBanned(player, id1, data1, true)) banned = true;
+				banned = TRNoItem.isItemBannedInCreative(player, id1, data1, true);
+				if (banned == null) banned = TRNoItem.isItemBanned(player, id1, data1, true);
+			} else {
+				banned = TRNoItem.isItemBanned(player, id1, data1, true);
+			}
 			
-			if (banned){
-				player.sendMessage(ChatColor.RED + "[TRItemDisabler] This item is banned!");
+			if (banned != null){
+				if (banned.equals("")) banned = ChatColor.RED + "[TRItemDisabler] This item is banned!";
+				TRItem.sendBannedMessage(player, banned);
 				event.setCancelled(true);
 				return;
 			}

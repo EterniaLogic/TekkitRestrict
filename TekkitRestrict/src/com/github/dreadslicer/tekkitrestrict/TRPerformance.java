@@ -82,7 +82,7 @@ public class TRPerformance {
 					// dump the rest into a file...
 					out.write("Thread [" + threadInfo.getThreadId() + "] \""
 							+ threadInfo.getThreadName() + "\"\n");
-					out.write("  Blocket Count: "
+					out.write("  Blocked Count: "
 							+ threadInfo.getBlockedCount() + " time:"
 							+ threadInfo.getBlockedTime() + "\n");
 					out.write("  CPU time: "

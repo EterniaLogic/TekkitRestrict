@@ -154,7 +154,7 @@ public class TRFileConfiguration extends FileConfiguration {
 	}
 	
 	public boolean getBoolean2(ConfigFile file, String path, boolean def){
-		Object val = get(file, path, Boolean.valueOf(def));
+		Object val = get(file, path, null);
 		return (val instanceof Boolean) ? ((Boolean) val).booleanValue() : missingSettings(def, file, path);
 	}
 

@@ -1,62 +1,74 @@
-######################################################################
-## Configuration file for TekkitRestrict                            ##
-## Authors: Taeir, DreadEnd (aka DreadSlicer)                       ##
-## BukkitDev: http://dev.bukkit.org/server-mods/tekkit-restrict/    ##
-## Please ask questions/report issues on the BukkitDev page.        ##
-######################################################################
+##########################################################################################
+## Configuration file for TekkitRestrict                                                ##
+## Authors: Taeir, DreadEnd (aka DreadSlicer)                                           ##
+## BukkitDev: http://dev.bukkit.org/server-mods/tekkit-restrict/                        ##
+## Please ask questions/report issues on the BukkitDev page.                            ##
+##########################################################################################
 
-######################################################################
-##################### DisableItems Configuration #####################
-######################################################################
+##########################################################################################
+############################### DisableItems Configuration ###############################
+##########################################################################################
 
 # Should disabledItemBlocks be removed from the map?
-# WARNING: It can cause lag as the complete map has to be searched for
-#          disabled blocks.
+# WARNING: It can cause lag as the complete map has to be searched for disabled blocks.
 # Default: false
 RemoveDisabledItemBlocks: false
 
-# When a disabled item is found in someone's inventory, it is changed
-# into this item ID.
+# When a disabled item is found in someone's inventory, it is changed into this item ID.
 #
 # Default: 3 (dirt)
 ChangeDisabledItemsIntoId: 3
 
-# All Items listed below will be "disabled". This means that if a
-# player does not have the bypass permission
-# (tekkitrestrict.bypass.noitem), any item listed here will be
-# uncraftable for him. If he has an item listed here in his inventory,
-# it will be changed to the item specified by
-# ChangeDisabledItemsIntoId (default dirt).
+# All Items listed below will be "disabled". This means that if a player does not have
+# the bypass permission (tekkitrestrict.bypass.noitem), any item listed here will be
+# uncraftable for him. If he has an item listed here in his inventory, it will be changed
+# to the item specified by ChangeDisabledItemsIntoId (default dirt), and he will be
+# informed with the message you set, or a default message.
 #
-# You can also use individual permissions to add bans to some players
-# only. The individual permission is: tekkitrestrict.noitem.ID.DATA
+# You can also use individual permissions to add bans to some players only.
+# The individual permission is: tekkitrestrict.noitem.ID.DATA
 #
-# Examples:
-#- EE
-#- RedPowerCore
-#- RedPowerControl
-#- RedPowerLogic
-#- RedPowerMachine
-#- RedPowerLighting
-#- WirelessRedstone
-#- BuildCraft
-#- AdditionalPipes
-#- AdvancedMachines
-#- IndustrialCraft
-#- NuclearControl
-#- CompactSolars
-#- ChargingBench
-#- PowerConverters
-#- Mffs
-#- RailCraft
-#- TubeStuffs (Buffer, AutoCraftTableII, BlackHoleChest, Incinerator. Duplicator, Retrievulator)
-#- IronChests
-#- BalkonWeaponMod
-#- EnderChest (EnderChest, EnderPouch)
-#- ChunkLoaders
-#- 200-3000
-#- 246
-#- "150:3"
+# There are multiple ways to add items to this list:
+# 1. You can use single id's:
+# - "12"
+# - "13:5"
+# 2. You can use ranges(*1):
+# - "20-30"
+# - "30-45:5"(*2)
+# 3. You can use EE and IC2 item names(*3) (without spaces):
+# - "RedMatterPickaxe"
+# - "Jetpack"
+# 4. You can use preset groups (NOT caseSENSItive):
+# - "ee"
+# - "buildcraft"
+# 5. You can also use groups you made yourself in the GroupPermissions config.
+#
+# You can also set the message that is shown to a player when he tries to craft or click
+# on a banned item like so:
+# - "50 {We don't like torches on this server...}"
+# - "EE {Equivalent Exchange is too overpowered, so it is banned!}"
+# - "20-30 {Items 20 to 30 are banned!}"
+#
+# You can add colours(*4) and styling(*5) to these messages:
+# - "EE {&0&n(Black Underlined)NO EE!}"
+#
+# You can add line breaks with \n:
+# - "50 {We don't like torches on this server...\nSo you are not allowed to have them!}"
+#
+# These are all preset Groups (NOT caseSENSItive):
+# EE, RedPowerCore, RedPowerControl, RedPowerLogic, RedPowerMachine,
+# RedPowerLighting, WirelessRedstone, BuildCraft, AdditionalPipes,
+# IronChests, IndustrialCraft, IC2, NuclearControl, CompactSolars,
+# ChargingBench, PowerConverters, MFFS, RailCraft, TubeStuff,
+# AdvancedMachines, WeaponMod, EnderChest and ChunkLoaders
+#
+# *1: Ranges are inclusive, 20-22 means items 20, 21 and 22.
+# *2: 15-17:10 means items 15:10, 16:10 and 17:10.
+# *3: Not all items names are included. You will be informed in the console when you add
+#     an item that is not known.
+#     You can also use /tr warnings config to view these warnings.
+# *4: You can add colours with &0 to &9 and &a to &f.
+# *5: You can add styling with &k to &o. &r will reset all styling and colours.
 DisableItems: []
 
-######################################################################
+##########################################################################################

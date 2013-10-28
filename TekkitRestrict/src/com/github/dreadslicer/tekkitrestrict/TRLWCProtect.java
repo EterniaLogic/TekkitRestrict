@@ -55,15 +55,15 @@ public class TRLWCProtect {
 		int id = block.getTypeId();
 		byte data = block.getData();
 
-		boolean blocked = false;
+		String blocked = null;
 		for (TRItem tci : lwcBlocked){
 			if (tci.compare(id, data)){
-				blocked = true;
+				blocked = tci.msg == null ? "" : tci.msg;
 				break;
 			}
 		}
 		
-		if (!blocked) return true;
+		if (blocked == null) return true;
 		
 		LWC LWC = TRConfigCache.LWC.lwcPlugin.getLWC();
 		String playername = player.getName().toLowerCase();
@@ -78,7 +78,8 @@ public class TRLWCProtect {
 					if (pe.getName().toLowerCase().equals(playername)) continue outerloop;
 				}
 	
-				player.sendMessage(ChatColor.RED + "You are not allowed to place this here!");
+				if (blocked.equals("")) blocked = ChatColor.RED + "You are not allowed to place this here!";
+				TRItem.sendBannedMessage(player, blocked);
 				event.setCancelled(true);
 				return false;
 			}

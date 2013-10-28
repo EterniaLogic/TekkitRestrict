@@ -199,6 +199,8 @@ public class tekkitrestrict extends JavaPlugin {
 	}
 	@Override
 	public void onEnable() {
+		config.getConfigurationSection("").getValues(true).keySet();
+		
 		ttt = new TRThread();
 		try {
 			Assigner.assign(); //Register the required listeners

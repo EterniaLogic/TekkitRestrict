@@ -38,6 +38,7 @@ import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.SafeZone;
 import com.github.dreadslicer.tekkitrestrict.objects.TRItem;
 import com.github.dreadslicer.tekkitrestrict.objects.TRLimit;
+import com.github.dreadslicer.tekkitrestrict.objects.TRPos;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
@@ -594,7 +595,7 @@ public class TRCommandTR implements CommandExecutor {
 			else if (z.mode == 2) pl = "[PS] ";
 			else if (z.mode == 3) pl = "[F] ";
 			
-			send.msg("" + ChatColor.YELLOW + (i+1) + ": " + pl + z.name + " - Loc: [" + z.world + "] [" + z.x1 + " " + z.y1 + " " + z.z1 + "] - [" + z.x2 + " " + z.y2 + " " + z.z2 + "]");
+			send.msg("" + ChatColor.YELLOW + (i+1) + ": " + pl + z.name + " - Loc: [" + z.world + "] [" + z.location.x1 + " " + z.location.y1 + " " + z.location.z1 + "] - [" + z.location.x2 + " " + z.location.y2 + " " + z.location.z2 + "]");
 		}
 	}
 	private void ssCheck(String[] largs){
@@ -720,12 +721,8 @@ public class TRCommandTR implements CommandExecutor {
 				zone.mode = 1;
 				zone.name = name;
 				zone.world = player.getWorld().getName();
-				zone.x1 = pr.getMinimumPoint().getBlockX();
-				zone.x2 = pr.getMaximumPoint().getBlockX();
-				zone.y1 = pr.getMinimumPoint().getBlockY();
-				zone.y2 = pr.getMaximumPoint().getBlockY();
-				zone.z1 = pr.getMinimumPoint().getBlockZ();
-				zone.z2 = pr.getMaximumPoint().getBlockZ();
+				zone.location = TRPos.parse(pr.getMinimumPoint(), pr.getMaximumPoint());
+				zone.pluginRegion = pr;
 				zone.locSet = true;
 				TRSafeZone.zones.add(zone);
 				TRSafeZone.save();

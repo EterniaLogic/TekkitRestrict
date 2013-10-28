@@ -255,10 +255,37 @@ class TEntityRemover extends Thread {
 		if (!Threads.SSDisableEntities) return;
 
 		List<World> worlds = tekkitrestrict.getInstance().getServer().getWorlds();
-		ArrayList<Entity> tbr = new ArrayList<Entity>();
+		
 		
 		for (World world : worlds) {
 			try {
+				Chunk[] chunks = world.getLoadedChunks();
+				for (Chunk c : chunks){
+					ArrayList<Entity> tbr = new ArrayList<Entity>();
+					Entity[] entities = c.getEntities();
+					for (Entity e : entities){
+						if (e instanceof org.bukkit.entity.Item || e instanceof Player || e instanceof ExperienceOrb || e instanceof FallingSand || e instanceof Painting) continue;
+						if (e instanceof Vehicle && !(e instanceof Pig)) continue;
+						boolean blocked = false;
+						for (Class cl : TRConfigCache.Threads.SSClassBypasses){
+							if (cl.isInstance(e)){
+								blocked = true;
+								break;
+							}
+						}
+						if (blocked) continue;
+						tbr.add(e);
+					}
+					
+					for (Entity e : tbr){
+						if (e == null) continue;
+						if (!TRSafeZone.getSafeZoneByLocation(e.getLocation(), true).equals("")) {
+							e.remove();
+						}
+						
+					}
+				}
+				/*
 				List<Entity> entities = world.getEntities();
 				for (int i = 0;i<entities.size();i++){
 					Entity e = entities.get(i);
@@ -278,6 +305,7 @@ class TEntityRemover extends Thread {
 						tbr.add(e);
 					}
 				}
+				*/
 			} catch (Exception ex){
 				if (!err1){
 					Warning.other("An error occurred in the entities Disabler thread: " + ex.getMessage() + " (this error will only be logged once)");
@@ -286,11 +314,6 @@ class TEntityRemover extends Thread {
 				}
 				//Entities list probably modified while iterating over it.
 			}
-		}
-		
-		for (Entity e : tbr){
-			if (e == null) continue;
-			e.remove();
 		}
 	}
 }
@@ -350,18 +373,20 @@ class DisableItemThread extends Thread {
 				try {
 					if (st1[i] == null) continue;
 
-					boolean banned = false;
+					String banned = null;
 					int id = st1[i].getTypeId();
 					int data = st1[i].getDurability();
 					
 					if (isCreative){
-						if (!bypassn && TRNoItem.isItemBanned(player, id, data, false)) banned = true;
-						else if (!bypassc && TRNoItem.isItemBannedInCreative(player, id, data, false)) banned = true;
+						if (!bypassn) banned = TRNoItem.isItemBanned(player, id, data, false);
+						if (banned == null && !bypassc) banned = TRNoItem.isItemBannedInCreative(player, id, data, false);
 					} else {
-						if (!bypassn && TRNoItem.isItemBanned(player, id, data, false)) banned = true;
+						if (!bypassn) banned = TRNoItem.isItemBanned(player, id, data, false);
 					}
 					
-					if (banned) {
+					if (banned != null) {
+						if (banned.equals("")) banned = ChatColor.RED + "Removed a banned item in your inventory: "+id+":"+data+".";
+						TRItem.sendBannedMessage(player, banned);
 						changedInv = true;
 						st1[i] = new ItemStack(Threads.ChangeDisabledItemsIntoId, 1);
 						continue; //Item is now dirt so continue with next one.
@@ -389,15 +414,17 @@ class DisableItemThread extends Thread {
 					int id = str.getTypeId();
 					int data = str.getDurability();
 
-					boolean banned = false;
+					String banned = null;
 					if (isCreative){
-						if (!bypassn && TRNoItem.isItemBanned(player, id, data, false)) banned = true;
-						else if (!bypassc && TRNoItem.isItemBannedInCreative(player, id, data, false)) banned = true;
+						if (!bypassn) banned = TRNoItem.isItemBanned(player, id, data, false);
+						if (banned == null && !bypassc) banned = TRNoItem.isItemBannedInCreative(player, id, data, false);
 					} else {
-						if (!bypassn && TRNoItem.isItemBanned(player, id, data, false)) banned = true;
+						if (!bypassn) banned = TRNoItem.isItemBanned(player, id, data, false);
 					}
 					
-					if (banned) {
+					if (banned != null) {
+						if (banned.equals("")) banned = ChatColor.RED + "Removed banned armor from your inventory: "+id+":"+data+".";
+						TRItem.sendBannedMessage(player, banned);
 						changedArmor = true;
 						st2[i] = new ItemStack(Threads.ChangeDisabledItemsIntoId, 1); //proceed to remove it.
 						continue;

@@ -1,10 +1,22 @@
 package com.github.dreadslicer.tekkitrestrict.objects;
 
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+
 import nl.taico.tekkitrestrict.annotations.Safe;
 
 public class TRItem {
 	public int id;
 	public int data;
+	public String msg = "";
+	
+	public static TRItem parseItem(int id, int data, String msg) {
+		TRItem item = new TRItem();
+		item.id = id;
+		item.data = data;
+		item.msg = msg;
+		return item;
+	}
 	
 	public static TRItem parseItem(int id, int data) {
 		TRItem item = new TRItem();
@@ -33,6 +45,7 @@ public class TRItem {
 		TRItem ti = new TRItem();
 		ti.id = this.id;
 		ti.data = this.data;
+		ti.msg = this.msg;
 		return ti;
 	}
 	
@@ -49,12 +62,25 @@ public class TRItem {
 	public boolean compare(int id, int data) {
 		return this.id == id && (this.data == data || this.data == -1 || (data == 0 && this.data == -10));
 	}
-	
+	//IMPORTANT does not check messages!
 	public static boolean compare(int id, int data, TRItem mainItem){
 		return id == mainItem.id && (data == mainItem.data || mainItem.data == -1 || (data == 0 && mainItem.data == -10));
 	}
-	
+	//IMPORTANT does not check messages!
 	public static boolean compare(int id, int data, int mainId, int mainData){
 		return id == mainId && (data == mainData || mainData == -1 || (data == 0 && mainData == -10));
+	}
+	
+	public static String defaultMessage(){
+		return ChatColor.RED + "You are not allowed to modify/obtain this item!";
+	}
+	
+	public static void sendBannedMessage(Player player, String message){
+		if (message.contains("\n")){
+			String temp[] = message.split("\n");
+			for (String msg : temp) player.sendMessage(msg);
+		} else {
+			player.sendMessage(message);
+		}
 	}
 }

@@ -82,7 +82,12 @@ public class TRNoClick {
 		disableClickItemActions.clear();
 		List<String> disableClicks = tekkitrestrict.config.getStringList(ConfigFile.DisableClick , "DisableClick");
 		for (String disableClick : disableClicks){
-			
+			String msg = null;
+			if (disableClick.contains("{")){
+				String temp[] = disableClick.split("\\{");
+				disableClick = temp[0].trim();
+				msg = Log.replaceColors(temp[1].replace("}", ""));
+			}
 			String temp[] = disableClick.split(" ");
 			if (temp[0].equalsIgnoreCase("block")){
 				if (temp.length == 1){
@@ -102,7 +107,10 @@ public class TRNoClick {
 					TRNoClick noclick = new TRNoClick();
 					noclick.id = item.id;
 					noclick.data = item.data;
-					noclick.msg = "You may not interact with this block.";
+					if (msg != null)
+						noclick.msg = msg;
+					else
+						noclick.msg = ChatColor.RED + "You may not interact with this block.";
 					noclick.useB = true;
 					disableClickItemActions.add(noclick);
 				}
@@ -148,24 +156,28 @@ public class TRNoClick {
 						noclick.block = true;
 					}
 					
-					String a = "";
-					if (noclick.air){
-						if (noclick.block) a = "";
-						else a = " in the air";
+					if (msg != null){
+						noclick.msg = msg;
 					} else {
-						a = " on blocks";
+						String a = "";
+						if (noclick.air){
+							if (noclick.block) a = "";
+							else a = " in the air";
+						} else {
+							a = " on blocks";
+						}
+						
+						String s = noclick.safezone ? " inside a safezone." : ".";
+						
+						if (noclick.type.all() || noclick.type.both())
+							noclick.msg = ChatColor.RED + "Sorry, but clicking with this item"+a+" is disabled" + s;
+						else if (noclick.type.left())
+							noclick.msg = ChatColor.RED + "Sorry, but left-clicking with this item"+a+" is disabled" + s;
+						else if (noclick.type.right())
+							noclick.msg = ChatColor.RED + "Sorry, but right-clicking with this item"+a+" is disabled" + s;
+						else if (noclick.type.trample())
+							noclick.msg = ChatColor.RED + "Sorry, but trampling with this item in your hand is disabled" + s;
 					}
-					
-					String s = noclick.safezone ? " inside a safezone." : ".";
-					
-					if (noclick.type.all() || noclick.type.both())
-						noclick.msg = "Sorry, but clicking with this item"+a+" is disabled" + s;
-					else if (noclick.type.left())
-						noclick.msg = "Sorry, but left-clicking with this item"+a+" is disabled" + s;
-					else if (noclick.type.right())
-						noclick.msg = "Sorry, but right-clicking with this item"+a+" is disabled" + s;
-					else if (noclick.type.trample())
-						noclick.msg = "Sorry, but trampling with this item in your hand is disabled" + s;
 					
 					disableClickItemActions.add(noclick);
 				}
@@ -210,7 +222,7 @@ public class TRNoClick {
 			for (TRNoClick cia : disableClickItemActions) {
 				if (cia.compare(player, event.getClickedBlock(), event.getItem(), event.getAction())) {
 					if (!cia.msg.equals("")) {
-						player.sendMessage(ChatColor.RED + cia.msg);
+						TRItem.sendBannedMessage(player, cia.msg);
 					} else {
 						String t = (cia.type.both() || cia.type.all()) ? "" : " " + cia.type.name();
 						String a = (cia.air && !cia.block) ? " in the air" : ((cia.block && !cia.air) ? " on blocks" : "");

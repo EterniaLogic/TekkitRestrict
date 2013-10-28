@@ -91,7 +91,7 @@ public class TRNoItem {
 	 * 
 	 * @see #isItemBanned(Player, int, int, boolean) Same as isItemBanned(player, id, 0, doBypassCheck)
 	 */
-	public static boolean isItemBanned(Player player, int id, boolean doBypassCheck) {
+	public static String isItemBanned(Player player, int id, boolean doBypassCheck) {
 		return isItemBanned(player, id, 0, doBypassCheck);
 	}
 	/**
@@ -100,8 +100,8 @@ public class TRNoItem {
 	 * 
 	 * @return If the given id:data combination is banned for this player.
 	 */
-	public static boolean isItemBanned(Player player, int id, int data, boolean doBypassCheck) {
-		return Listeners.UseNoItem ? isTypeNoItemBanned(player, id, data, doBypassCheck) : false;
+	public static String isItemBanned(Player player, int id, int data, boolean doBypassCheck) {
+		return Listeners.UseNoItem ? isTypeNoItemBanned(player, id, data, doBypassCheck) : null;
 	}
 	/**
 	 * Goes through all banned items and checks if the id and data match.
@@ -125,29 +125,29 @@ public class TRNoItem {
 	 * @return If the given id:data combination is banned for this player when he/she is
 	 * in creative mode.
 	 */
-	public static boolean isItemBannedInCreative(Player player, int id, int data, boolean doBypassCheck) {
-		return Listeners.UseLimitedCreative ? isTypeCreativeBanned(player, id, data, doBypassCheck) : false;
+	public static String isItemBannedInCreative(Player player, int id, int data, boolean doBypassCheck) {
+		return Listeners.UseLimitedCreative ? isTypeCreativeBanned(player, id, data, doBypassCheck) : null;
 	}
 
-	private static boolean isTypeCreativeBanned(Player player, int id, int data, boolean doBypassCheck) {
-		if (id < 8) return false;
-		if (doBypassCheck && player.hasPermission("tekkitrestrict.bypass.creative")) return false;
+	private static String isTypeCreativeBanned(Player player, int id, int data, boolean doBypassCheck) {
+		if (id < 8) return null;
+		if (doBypassCheck && player.hasPermission("tekkitrestrict.bypass.creative")) return null;
 		
 		if (DisabledCreativeItems != null) {
 			for (TRItem cc : DisabledCreativeItems){
-				if (cc.compare(id, data)) return true;
+				if (cc.compare(id, data)) return cc.msg == null ? "" : cc.msg;
 			}
 		}
 		
-		if (player.hasPermission("tekkitrestrict.creative.blockall")) return true;
+		if (player.hasPermission("tekkitrestrict.creative.blockall")) return "";
 
 		//TRCacheItem ci1 = TRCacheItem.getPermCacheItem(player, "c", "creative", id, data, false);
 		//if (ci1 != null) return true;
 		
 		String idStr = "tekkitrestrict.creative."+id;
 		
-		if (player.hasPermission(idStr+"."+data)) return true;
-		else if (player.hasPermission(idStr)) return true;
+		if (player.hasPermission(idStr+"."+data)) return "";
+		else if (player.hasPermission(idStr)) return "";
 		else {
 			Iterator<String> keys = TRItemProcessor.groups.keySet().iterator();
 			while (keys.hasNext()) {
@@ -156,34 +156,34 @@ public class TRNoItem {
 					List<TRItem> mi = TRItemProcessor.groups.get(key);
 					for(TRItem c:mi){
 						if (c == null) continue;
-						if (c.compare(id, data)) return true;
+						if (c.compare(id, data)) return "";
 					}
 				}
 			}
 		}
 		
-		return false;
+		return null;
 	}
 	
-	private static boolean isTypeNoItemBanned(Player player, int id, int data, boolean doBypassCheck) {
-		if (id < 8) return false;
-		if (doBypassCheck && player.hasPermission("tekkitrestrict.bypass.noitem")) return false;
+	private static String isTypeNoItemBanned(Player player, int id, int data, boolean doBypassCheck) {
+		if (id < 8) return null;
+		if (doBypassCheck && player.hasPermission("tekkitrestrict.bypass.noitem")) return null;
 
 		if (DisabledItems != null) {
 			for (TRItem cc : DisabledItems){
-				if (cc.compare(id, data)) return true;
+				if (cc.compare(id, data)) return cc.msg == null ? "" : cc.msg;
 			}
 		}
 		
-		if (player.hasPermission("tekkitrestrict.noitem.blockall")) return true;
+		if (player.hasPermission("tekkitrestrict.noitem.blockall")) return "";
 		
 		//TRCacheItem ci1 = TRCacheItem.getPermCacheItem(player, "n", "noitem", id, data, false);//Perms and cache??
 		//if (ci1 != null) return true;
 		
 		String idStr = "tekkitrestrict.noitem."+id;
 		
-		if (player.hasPermission(idStr+"."+data)) return true;
-		else if (player.hasPermission(idStr)) return true;
+		if (player.hasPermission(idStr+"."+data)) return "";
+		else if (player.hasPermission(idStr)) return "";
 		else {
 			Iterator<String> keys = TRItemProcessor.groups.keySet().iterator();
 			while (keys.hasNext()) {
@@ -192,15 +192,13 @@ public class TRNoItem {
 					List<TRItem> mi = TRItemProcessor.groups.get(key);
 					for(TRItem c:mi){
 						if (c == null) continue;
-						if (c.compare(id, data)) return true;
+						if (c.compare(id, data)) return "";
 					}
 				}
 			}
 		}
 		
-		
-		
-		return false;
+		return null;
 	}
 
 	/*

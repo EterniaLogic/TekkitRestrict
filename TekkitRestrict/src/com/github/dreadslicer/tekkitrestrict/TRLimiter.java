@@ -55,6 +55,12 @@ public class TRLimiter {
 		List<String> limitedBlocks = tekkitrestrict.config.getStringList(ConfigFile.Advanced, "LimitBlocks");
 		configLimits.clear();
 		for (String limBlock : limitedBlocks) {
+			String msg = null;
+			if (limBlock.contains("{")){
+				String temp[] = limBlock.split("\\{");
+				limBlock = temp[0].trim();
+				msg = Log.replaceColors(temp[1].replace("}", ""));
+			}
 			try {
 				String[] temp = limBlock.split(" ");
 				if (temp.length!=2){
@@ -83,6 +89,7 @@ public class TRLimiter {
 					TRConfigLimit cLimit = new TRConfigLimit();
 					cLimit.id = ci.id;
 					cLimit.data = ci.data;
+					cLimit.msg = (msg == null ? "" : msg);
 					cLimit.configcount = limit;
 					configLimits.add(cLimit);
 				}
@@ -111,6 +118,7 @@ public class TRLimiter {
 				if (lim.compare(thisid, thisdata)){
 					if (lim.max == -2) return -1;
 					if (lim.max != -1) return lim.max;
+					
 					found = true;
 				}
 			}
@@ -126,6 +134,7 @@ public class TRLimiter {
 				for (int i = 0; i < configLimits.size(); i++) {
 					TRConfigLimit cc = configLimits.get(i);
 					if (cc.compare(thisid, thisdata)) {
+						lastString = cc.msg;
 						return cc.configcount;
 					}
 				}
@@ -136,15 +145,17 @@ public class TRLimiter {
 		}
 		return max;
 	}
+	
+	private String lastString = "";
 
 	/**
 	 * If the player has not yet maxed out his limits, it will add the placed block to his limits.
 	 * @return Whether a player has already maxed out their limits.
 	 * @see TRListener#onBlockPlace(BlockPlaceEvent) Used by TRListener.onBlockPlace(BlockPlaceEvent)
 	 */
-	public boolean checkLimit(BlockPlaceEvent event, boolean doBypassCheck) {
-		boolean r = true;
-		if (doBypassCheck && event.getPlayer().hasPermission("tekkitrestrict.bypass.limiter")) return true;
+	public String checkLimit(BlockPlaceEvent event, boolean doBypassCheck) {
+		String r = null;
+		if (doBypassCheck && event.getPlayer().hasPermission("tekkitrestrict.bypass.limiter")) return null;//true
 		Block block = event.getBlock();
 		int thisid = block.getTypeId();
 		int thisdata = block.getData();
@@ -162,7 +173,9 @@ public class TRLimiter {
 				int currentnum = limit.placedBlock.size();
 				if (currentnum >= TLimit) {
 					// this would be at max.
-					return false;
+					String tbr = lastString;
+					lastString = null;
+					return tbr == null?"":tbr;//false
 				} else {
 					// loop through the placedblocks to make sure that we
 					// aren't placing the same one down twice.
@@ -181,10 +194,10 @@ public class TRLimiter {
 						int z = bloc.getBlockZ();
 						allBlockOwners.put(bloc.getWorld().getName() + ":" + x + ":" + y + ":" + z, event.getPlayer().getName());
 						isModified = true;
-						return true;
+						return null;//true
 					} else {
 						//This block is already in the placed list, so allow placement but do not increment counts.
-						return true;
+						return null;//true
 					}
 				}
 			}
@@ -203,10 +216,10 @@ public class TRLimiter {
 			allBlockOwners.put(bloc.getWorld().getName() + ":" + x + ":" + y + ":" + z, event.getPlayer().getName());
 			isModified = true;
 			// Making new
-			return true;
+			return null;//true
 		}
 
-		return r;
+		return r;//true
 	}
 
 	public void checkBreakLimit(BlockBreakEvent event) {

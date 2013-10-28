@@ -3,6 +3,7 @@ package com.github.dreadslicer.tekkitrestrict;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
+//import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,6 +27,7 @@ import com.github.dreadslicer.tekkitrestrict.TRConfigCache.SafeZones;
 import com.github.dreadslicer.tekkitrestrict.api.SafeZones.SafeZoneCreate;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.SSMode;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.SafeZone;
+import com.github.dreadslicer.tekkitrestrict.objects.TRPos;
 import com.massivecraft.factions.Board;
 import com.massivecraft.factions.Conf;
 import com.massivecraft.factions.FLocation;
@@ -44,13 +46,16 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 public class TRSafeZone {
-	public int x1, y1, z1;
-	public int x2, y2, z2;
+	//public int x1, y1, z1;
+	//public int x2, y2, z2;
+	public TRPos location;
 	public boolean locSet = false;
 	public String name;
 	public String world;
 	protected String data = null;
 	private boolean loadedFromSql = false;
+	
+	public Object pluginRegion = null;
 	/**
 	 * 0 = NONE<br>
 	 * 1 = WorldGuard<br>
@@ -62,15 +67,21 @@ public class TRSafeZone {
 
 	public static List<TRSafeZone> zones = Collections.synchronizedList(new LinkedList<TRSafeZone>());
 	private static Plugin worldGuard = null, griefPrevention = null, preciousStones = null;
+	//private static HashMap<TRPos, TRSafeZone> regions = new HashMap<TRPos, TRSafeZone>();
 	
 	private String getData(){
 		if (data != null) return data;
 		if (!locSet) return "";
-		this.data = x1+","+y1+","+z1+","+x2+","+y2+","+z2;
+		
+		this.data = this.location.toString();
 		return data;
 	}
 	
 	public static void init() {
+		if (SafeZones.UseWG) worldGuard = PM().getPlugin("WorldGuard");
+		if (SafeZones.UseGP) griefPrevention = PM().getPlugin("GriefPrevention");
+		if (SafeZones.UsePS) preciousStones = PM().getPlugin("PreciousStones");
+		
 		ResultSet rs = null;
 		try {
 			rs = tekkitrestrict.db.query("SELECT * FROM `tr_saferegion`;");
@@ -78,40 +89,49 @@ public class TRSafeZone {
 				TRSafeZone sz = new TRSafeZone();
 				sz.name = rs.getString("name");
 				sz.world = rs.getString("world");
+				World world = Bukkit.getWorld(sz.world);
+				if (world == null) continue;
+				
 				sz.mode = rs.getInt("mode");
 				sz.data = rs.getString("data");
 				if ("".equals(sz.data)) sz.data = null;
+				
 				sz.loadedFromSql = true;
+				
 				if (sz.mode == 4 && sz.data != null){
+					if (griefPrevention == null) continue;
 					String temp[] = sz.data.split(",");
-					sz.x1 = Integer.parseInt(temp[0]);
-					sz.y1 = Integer.parseInt(temp[1]);
-					sz.z1 = Integer.parseInt(temp[2]);
-					sz.x2 = Integer.parseInt(temp[3]);
-					sz.y2 = Integer.parseInt(temp[4]);
-					sz.z2 = Integer.parseInt(temp[5]);
+					sz.location = new TRPos(temp);
 					sz.locSet = true;
+					sz.pluginRegion = getGPClaim(sz.location.toLoc(world));
 				} else if (sz.mode == 1) {
+					if (worldGuard == null) continue;
 					ProtectedRegion region = getWGRegion(sz.name);
 					if (region != null){
 						BlockVector loc1 = region.getMinimumPoint();
 						BlockVector loc2 = region.getMaximumPoint();
-						
+						sz.location = TRPos.parse(loc1, loc2);
+						sz.pluginRegion = region;
+						/*
 						sz.x1 = loc1.getBlockX();
 						sz.y1 = loc1.getBlockY();
 						sz.z1 = loc1.getBlockZ();
 						sz.x2 = loc2.getBlockX();
 						sz.y2 = loc2.getBlockY();
 						sz.z2 = loc2.getBlockZ();
+						*/
 						sz.locSet = true;
 					} else if (sz.data != null){
 						String temp[] = sz.data.split(",");
+						sz.location = new TRPos(temp);
+						/*
 						sz.x1 = Integer.parseInt(temp[0]);
 						sz.y1 = Integer.parseInt(temp[1]);
 						sz.z1 = Integer.parseInt(temp[2]);
 						sz.x2 = Integer.parseInt(temp[3]);
 						sz.y2 = Integer.parseInt(temp[4]);
 						sz.z2 = Integer.parseInt(temp[5]);
+						*/
 						sz.locSet = true;
 					}
 				}
@@ -123,10 +143,6 @@ public class TRSafeZone {
 				if (rs != null) rs.close();
 			} catch (SQLException ex) {}
 		}
-		
-		if (SafeZones.UseWG) worldGuard = PM().getPlugin("WorldGuard");
-		if (SafeZones.UseGP) griefPrevention = PM().getPlugin("GriefPrevention");
-		if (SafeZones.UsePS) preciousStones = PM().getPlugin("PreciousStones");
 	}
 	
 	private static ProtectedRegion getWGRegion(String name){
@@ -159,6 +175,7 @@ public class TRSafeZone {
 	 * Gets a GriefPrevention SafeZone at the given location.<br>
 	 * Note: Does not actually get SafeZones from the database.
 	 */
+	@SuppressWarnings("unused")
 	private static String getGPSafeZone(Location loc){
 		if (griefPrevention == null) return "";
 		
@@ -197,6 +214,41 @@ public class TRSafeZone {
 		return ownername;
 	}
 	
+	private static Claim getGPClaim(Location loc){
+		if (griefPrevention == null) return null;
+		
+		GriefPrevention gpPlugin = (GriefPrevention) griefPrevention;
+		Claim claim = gpPlugin.dataStore.getClaimAt(loc, false, null);
+		if (claim == null) return null; //No claim here.
+		
+		//Admin
+		if (SafeZones.GPMode == SSMode.Admin){
+			if (!claim.isAdminClaim()) return null; //Not an admin claim, so it cannot be a SafeZone in ADMIN mode.
+			return claim;
+		}
+		
+		//All
+		if (SafeZones.GPMode == SSMode.All){
+			return claim;
+		}
+		
+		//SpecificAdmin
+		if (SafeZones.GPMode == SSMode.SpecificAdmin){
+			if (!claim.isAdminClaim()) return null; //Not an admin claim, so it cannot be a SafeZone in ADMIN mode.
+			if (!claim.managers.contains("[tekkitrestrict]")) return null; //Not SafeZone
+			return claim;
+		}
+		
+		//Specific
+		if (SafeZones.GPMode == SSMode.Specific){
+			if (!claim.managers.contains("[tekkitrestrict]")) return null; //Not SafeZone
+			return claim;
+		}
+		
+		//There shouldn't be any more possible cases.
+		return claim;
+	}
+	
 	public long getID(){
 		long estID = 0;
 		// get a numeral from the safezone's name & world
@@ -208,8 +260,8 @@ public class TRSafeZone {
 			char c = world.charAt(j);
 			estID += Character.getNumericValue(c);
 		}
-		estID=estID+x1+x2+y1+y2+z1+z2;
-		estID=estID+x1*x2+y1*y2+z1*z2;
+		estID=estID+location.x1+location.x2+location.y1+location.y2+location.z1+location.z2;
+		estID=estID+location.x1*location.x2+location.y1*location.y2+location.z1*location.z2;
 		//tekkitrestrict.log.info("estID: "+estID);
 		return estID;
 	}
@@ -236,6 +288,13 @@ public class TRSafeZone {
 		return Bukkit.getPluginManager();
 	}
 	
+	private static void delete(TRSafeZone zone){
+		try {
+			tekkitrestrict.db.query("DELETE FROM `tr_saferegion` WHERE name='" + zone.name +"');");
+		} catch (Exception ex) {
+		}
+	}
+	
 	/**
 	 * Removes a safezone from the database.<br>
 	 * For GP this also removes [tekkitrestrict] from the managers.<br>
@@ -245,6 +304,7 @@ public class TRSafeZone {
 	public static boolean removeSafeZone(TRSafeZone zone){
 		if (zone.mode == 1){
 			zones.remove(zone); //Remove from database
+			delete(zone);
 			return true;
 		}
 		
@@ -252,32 +312,29 @@ public class TRSafeZone {
 			//IMPORTANT Potential problem when a claim gets resized.
 			if (griefPrevention == null) return false;
 			if (zone.getData().equals("")) return false;
-			int x, y, z;
+			World world = Bukkit.getWorld(zone.world);
+			if (world == null) return false;
+			Location loc;
+
 			if (zone.locSet){
-				x = zone.x1;
-				y = zone.y1;
-				z = zone.z1;
+				loc = zone.location.toLoc(world);
 			} else {
 				String locStr[] = zone.getData().split(",");
 				
 				try {
-					x = Integer.parseInt(locStr[0]);
-					y = Integer.parseInt(locStr[1]);
-					z = Integer.parseInt(locStr[2]);
+					loc = (new TRPos(locStr)).toLoc(world);
 				} catch (Exception ex){
 					return false;
 				}
 			}
-			World world = Bukkit.getWorld(zone.world);
-			if (world == null) return false;
 			
-			Location loc = new Location(world, x, y, z);
 			GriefPrevention gpPlugin = (GriefPrevention) griefPrevention;
 			Claim claim = gpPlugin.dataStore.getClaimAt(loc, true, null);
 			
 			if (claim == null) return true; //Already removed
 			claim.managers.remove("[tekkitrestrict]"); //Remove from managers
 			zones.remove(zone); //Remove from database
+			delete(zone);
 			return true;
 		}
 		
@@ -314,12 +371,8 @@ public class TRSafeZone {
 			
 			TRSafeZone zone = new TRSafeZone();
 			zone.mode = 4;
-			zone.x1 = loc1.getBlockX();
-			zone.x2 = loc2.getBlockX();
-			zone.y1 = loc1.getBlockY();
-			zone.y2 = loc2.getBlockY();
-			zone.z1 = loc1.getBlockZ();
-			zone.z2 = loc2.getBlockX();
+			zone.location = new TRPos(loc1, loc2);
+			zone.pluginRegion = claim;
 			zone.locSet = true;
 			
 			zone.name = name;
@@ -342,12 +395,8 @@ public class TRSafeZone {
 				
 				TRSafeZone zone = new TRSafeZone();
 				zone.mode = 1;
-				zone.x1 = loc1.getBlockX();
-				zone.x2 = loc2.getBlockX();
-				zone.y1 = loc1.getBlockY();
-				zone.y2 = loc2.getBlockY();
-				zone.z1 = loc1.getBlockZ();
-				zone.z2 = loc2.getBlockX();
+				zone.location = TRPos.parse(loc1, loc2);
+				zone.pluginRegion = pr;
 				zone.locSet = true;
 
 				zone.name = name;
@@ -395,8 +444,6 @@ public class TRSafeZone {
 		boolean WGEnabled = (worldGuard != null), GPEnabled = (griefPrevention != null);
 		String r = "";
 
-		double xl = loc.getX();
-		double zl = loc.getZ();
 		Iterator<TRSafeZone> zonesIterator = zones.iterator();
 		while (zonesIterator.hasNext()) {
 			TRSafeZone a = zonesIterator.next();
@@ -407,45 +454,55 @@ public class TRSafeZone {
 			
 			if (a.mode == 1){ //WorldGuard
 				if (!WGEnabled) continue;
-				if (getWGRegion(a.name, loc) != null) return "WorldGuard Safezone Region: " + a.name;
+				if (a.locSet){
+					if (a.location.contains(loc)){
+						if (a.pluginRegion != null) return "WorldGuard Safezone Region: " + a.name;
+						else return "TekkitRestrict SafeZone Region: " + a.name;
+					}
+				} else {
+					if (getWGRegion(a.name, loc) != null) return "WorldGuard Safezone Region: " + a.name;
+				}
 				continue;
 			}
 			
 			//TODO PS support
 			
 			if (a.mode == 4){ //GriefPrevention
-				if (!doGP) continue;
-				if (!GPEnabled) continue;
-				
-				int x1, x2, z1, z2;
+				if (!doGP || !GPEnabled) continue;
 				
 				if (a.locSet){
-					x1 = a.x1;
-					x2 = a.x2;
-					z1 = a.z1;
-					z2 = a.z2;
+					if (!a.location.containsIgnoreY(loc)) continue;
+					if (a.pluginRegion != null){
+						Claim c = (Claim) a.pluginRegion;
+						r = c.ownerName;
+						if (r == null || r.equals("")) r = "Admin";
+						return "GriefPrevention Safezone Claim owned by: " + r;
+					} else {
+						return "GriefPrevention Safezone Claim: " + a.name;
+					}
 				} else {
 					String temp[] = a.getData().split(",");
 					if (temp.length != 6) continue;
 					try {
-						x1 = Integer.parseInt(temp[0]);
-						x2 = Integer.parseInt(temp[3]);
-						z1 = Integer.parseInt(temp[2]);
-						z2 = Integer.parseInt(temp[5]);
-					} catch (NumberFormatException ex){
+						a.location = new TRPos(temp);
+						a.locSet = true;
+						if (!(a.location.containsIgnoreY(loc))) continue;
+						
+						if (a.pluginRegion != null){
+							Claim c = (Claim) a.pluginRegion;
+							r = c.ownerName;
+							if (r == null || r.equals("")) r = "Admin";
+							return "GriefPrevention Safezone Claim owned by: " + r;
+						} else {
+							return "GriefPrevention Safezone Claim: " + a.name;
+						}
+					} catch (Exception ex){
 						continue;
 					}
 				}
-				
-				if (!(xl >= x1 && xl <= x2) && !(xl >= x2 && xl <= x1)) continue;
-				if (!(zl >= z1 && zl <= z2) && !(zl >= z2 && zl <= z1)) continue;
-
-				r = getGPSafeZone(loc);
-				if (!r.equals("")) return "GriefPrevention Safezone Claim owned by: " + r;
-				continue;
 			}
 		}
-		return r;
+		return "";
 		
 	}
 	
@@ -463,6 +520,8 @@ public class TRSafeZone {
 		return false;
 	}
 	
+
+	/** Only used by /tr admin safezone check */
 	public static Object[] getSafeZoneStatusFor(Player player){
 		Object[] obj = new Object[3];
 		obj[0] = "GriefPrevention";
@@ -557,6 +616,7 @@ public class TRSafeZone {
 	
 	public static class GP {
 		public static String lastGP = "";
+		
 		public static SafeZone getSafeZoneStatusFor(Player player){
 			if (!SafeZones.UseSafeZones || griefPrevention == null) return SafeZone.pluginDisabled;
 			
@@ -604,8 +664,6 @@ public class TRSafeZone {
 				}
 				
 				//Check for database to see if it is really a legit claim.
-				double xp = loc.getX();
-				double zp = loc.getZ();
 				
 				Iterator<TRSafeZone> zonesIterator = zones.iterator();
 				while (zonesIterator.hasNext()) {
@@ -614,28 +672,22 @@ public class TRSafeZone {
 						World world = Bukkit.getWorld(a.world);
 						if (world == null) world = player.getWorld();
 						
-						int x1, x2, z1, z2;
-						
 						if (a.locSet){
-							x1 = a.x1;
-							x2 = a.x2;
-							z1 = a.z1;
-							z2 = a.z2;
+							if (!a.location.containsIgnoreY(loc)) continue;
+							return SafeZone.isDisallowed;
 						} else {
 							String temp[] = a.getData().split(",");
 							if (temp.length != 6) continue;
+							
 							try {
-								x1 = Integer.parseInt(temp[0]);
-								x2 = Integer.parseInt(temp[3]);
-								z1 = Integer.parseInt(temp[2]);
-								z2 = Integer.parseInt(temp[5]);
-							} catch (NumberFormatException ex){
+								a.location = new TRPos(temp);
+								a.locSet = true;
+								if (!a.location.containsIgnoreY(loc)) continue;
+								return SafeZone.isDisallowed;
+							} catch (Exception ex){
 								continue;
 							}
 						}
-						if (!(xp >= x1 && xp <= x2) && !(xp >= x2 && xp <= x1)) continue;
-						if (!(zp >= z1 && zp <= z2) && !(zp >= z2 && zp <= z1)) continue;
-						return SafeZone.isDisallowed;
 					}
 				}
 				
@@ -650,8 +702,6 @@ public class TRSafeZone {
 				}
 				
 				//Check for database to see if it is really a legit claim.
-				double xp = loc.getX();
-				double zp = loc.getZ();
 				
 				Iterator<TRSafeZone> zonesIterator = zones.iterator();
 				while (zonesIterator.hasNext()) {
@@ -661,29 +711,21 @@ public class TRSafeZone {
 						World world = Bukkit.getWorld(a.world);
 						if (world == null) world = player.getWorld();
 						
-						int x1, x2, z1, z2;
-						
 						if (a.locSet){
-							x1 = a.x1;
-							x2 = a.x2;
-							z1 = a.z1;
-							z2 = a.z2;
+							if (!a.location.containsIgnoreY(loc)) continue;
+							return SafeZone.isDisallowed;
 						} else {
 							String temp[] = a.getData().split(",");
 							if (temp.length != 6) continue;
 							try {
-								x1 = Integer.parseInt(temp[0]);
-								x2 = Integer.parseInt(temp[3]);
-								z1 = Integer.parseInt(temp[2]);
-								z2 = Integer.parseInt(temp[5]);
-							} catch (NumberFormatException ex){
+								a.location = new TRPos(temp);
+								a.locSet = true;
+								if (!a.location.containsIgnoreY(loc)) continue;
+								return SafeZone.isDisallowed;
+							} catch (Exception ex){
 								continue;
 							}
 						}
-						
-						if (!(xp >= x1 && xp <= x2) && !(xp >= x2 && xp <= x1)) continue;
-						if (!(zp >= z1 && zp <= z2) && !(zp >= z2 && zp <= z1)) continue;
-						return SafeZone.isDisallowed;
 					}
 				}
 				
@@ -728,9 +770,6 @@ public class TRSafeZone {
 					if (managers.next().equalsIgnoreCase(name)) return false; //If manager of claim, return false. (allowed)
 				}
 				
-				double xp = loc.getX();
-				double zp = loc.getZ();
-				
 				Iterator<TRSafeZone> zonesIterator = zones.iterator();
 				while (zonesIterator.hasNext()) {
 					TRSafeZone a = zonesIterator.next();
@@ -738,29 +777,22 @@ public class TRSafeZone {
 						World world = Bukkit.getWorld(a.world);
 						if (world == null) world = player.getWorld();
 						
-						int x1, x2, z1, z2;
-						
 						if (a.locSet){
-							x1 = a.x1;
-							x2 = a.x2;
-							z1 = a.z1;
-							z2 = a.z2;
+							if (!a.location.containsIgnoreY(loc)) continue;
+							return true;
 						} else {
 							String temp[] = a.getData().split(",");
 							if (temp.length != 6) continue;
 							try {
-								x1 = Integer.parseInt(temp[0]);
-								x2 = Integer.parseInt(temp[3]);
-								z1 = Integer.parseInt(temp[2]);
-								z2 = Integer.parseInt(temp[5]);
-							} catch (NumberFormatException ex){
+								a.location = new TRPos(temp);
+								a.locSet = true;
+								if (!a.location.containsIgnoreY(loc)) continue;
+								return true;
+							} catch (Exception ex){
 								continue;
 							}
 						}
-						
-						if (!(xp >= x1 && xp <= x2) && !(xp >= x2 && xp <= x1)) continue;
-						if (!(zp >= z1 && zp <= z2) && !(zp >= z2 && zp <= z1)) continue;
-						return true; //Not allowed because it has been set as a specific claim in the database.
+						//Not allowed because it has been set as a specific claim in the database.
 					}
 				}
 				
@@ -774,10 +806,6 @@ public class TRSafeZone {
 					if (managers.next().equalsIgnoreCase(name)) return false; //If manager of claim, return false. (allowed)
 				}
 				
-				double xp = loc.getX();
-				//double yp = locp.getY();
-				double zp = loc.getZ();
-				
 				Iterator<TRSafeZone> zonesIterator = zones.iterator();
 				while (zonesIterator.hasNext()) {
 					TRSafeZone a = zonesIterator.next();
@@ -785,29 +813,22 @@ public class TRSafeZone {
 						World world = Bukkit.getWorld(a.world);
 						if (world == null) world = player.getWorld();
 						
-						int x1, x2, z1, z2;
-						
 						if (a.locSet){
-							x1 = a.x1;
-							x2 = a.x2;
-							z1 = a.z1;
-							z2 = a.z2;
+							if (!a.location.containsIgnoreY(loc)) continue;
+							return true;
 						} else {
 							String temp[] = a.getData().split(",");
 							if (temp.length != 6) continue;
 							try {
-								x1 = Integer.parseInt(temp[0]);
-								x2 = Integer.parseInt(temp[3]);
-								z1 = Integer.parseInt(temp[2]);
-								z2 = Integer.parseInt(temp[5]);
-							} catch (NumberFormatException ex){
+								a.location = new TRPos(temp);
+								a.locSet = true;
+								if (!a.location.containsIgnoreY(loc)) continue;
+								return true;
+							} catch (Exception ex){
 								continue;
 							}
 						}
-						
-						if (!(xp >= x1 && xp <= x2) && !(xp >= x2 && xp <= x1)) continue;
-						if (!(zp >= z1 && zp <= z2) && !(zp >= z2 && zp <= z1)) continue;
-						return true; //Not allowed because it has been set as a specific claim in the database.
+						//Not allowed because it has been set as a specific claim in the database.
 					}
 				}
 				

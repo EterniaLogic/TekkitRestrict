@@ -25,6 +25,7 @@ import org.bukkit.inventory.ItemStack;
 import com.github.dreadslicer.tekkitrestrict.Log.Warning;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Listeners;
 import com.github.dreadslicer.tekkitrestrict.commands.TRCommandAlc;
+import com.github.dreadslicer.tekkitrestrict.objects.TRItem;
 
 import eloraam.core.TileCovered;
 
@@ -137,9 +138,10 @@ public class TRListener implements Listener {
 			if (!pname.equalsIgnoreCase("[BuildCraft]") && !pname.equalsIgnoreCase("[RedPower]")){
 				if (Listeners.UseBlockLimit && !player.hasPermission("tekkitrestrict.bypass.limiter")) {
 					TRLimiter il = TRLimiter.getOnlineLimiter(player);
-					if (!il.checkLimit(event, false)) {
-						
-						player.sendMessage(ChatColor.RED + "[TRItemLimiter] You cannot place down any more of that block!");
+					String limited = il.checkLimit(event, false);
+					if (limited != null) {
+						if (limited.equals("")) limited = ChatColor.RED + "[TRItemLimiter] You cannot place down any more of that block!";
+						TRItem.sendBannedMessage(player, limited);
 						event.setCancelled(true);
 						if (te1 instanceof TileCovered) {
 							TileCovered tc = (TileCovered) te1;
@@ -161,13 +163,13 @@ public class TRListener implements Listener {
 					}
 				}
 			}
-			boolean banned = false;
 			
-			if (TRNoItem.isItemBanned(player, id, data, true)) banned = true;
+			String msg = TRNoItem.isItemBanned(player, id, data, true);
 			
-			if (banned) {
+			if (msg != null) {
 				// tekkitrestrict.log.info(cc.id+":"+cc.getData());
-				player.sendMessage(ChatColor.RED + "[TRItemDisabler] You cannot place down this type of block!");
+				if (msg.equals("")) msg = ChatColor.RED + "[TRItemDisabler] You are not allowed to place down this type of block!";
+				TRItem.sendBannedMessage(player, msg);
 				event.setCancelled(true);
 				if (te1 instanceof TileCovered) {
 					TileCovered tc = (TileCovered) te1;
@@ -232,9 +234,9 @@ public class TRListener implements Listener {
 		if (player.getGameMode() == GameMode.CREATIVE) {
 			ItemStack str = player.getItemInHand();
 			if (str != null) {
-				boolean banned = false;
+				String msg = null;
 				try {
-					if (TRNoItem.isItemBannedInCreative(player, str.getTypeId(), str.getDurability(), true)) banned = true;
+					msg = TRNoItem.isItemBannedInCreative(player, str.getTypeId(), str.getDurability(), true);
 				} catch (Exception ex) {
 					if (!errorInteract){
 						Warning.other("An error occurred in the InteractListener for LimitedCreative!");
@@ -243,8 +245,9 @@ public class TRListener implements Listener {
 					}
 				}
 				
-				if (banned) {
-					player.sendMessage(ChatColor.RED + "[TRLimitedCreative] You may not interact with this item.");
+				if (msg != null) {
+					if (msg.equals("")) msg = ChatColor.RED + "[TRLimitedCreative] You may not interact with this item.";
+					TRItem.sendBannedMessage(player, msg);
 					event.setCancelled(true);
 					player.setItemInHand(null);
 					return;
