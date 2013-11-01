@@ -20,14 +20,28 @@
 # Default: true
 PatchComputerCraft: true
 
+# Change the lowest possible time for RedPower Timers to the value set
+# in ModModifications.config.yml
+# Default: true
 UseAutoRPTimer: true
+
+# TekkitRestrict has a Limiter. With it, you can set how many of a
+# certain block a player may have placed at a time.
+# For example, you could limit the amount of collectors Mk. 3 someone
+# can have by limiting 126:2 to 1 in the Advanced.config.yml.
+#
+# This option toggles the use of this limiter on or off.
+# Default: true
 UseItemLimiter: true
+
+# Should LimitedCreative be enabled?
+# Default: true
 UseLimitedCreative: true
 # If UseOpenAlc is false, the command /openalc will be disabled.
 # Default: true
 UseOpenAlc: true
 
-# Should NoItem (Bans items) be enabled?
+# Should TekkitRestricts banned items feature be enabled?
 # Default: true
 UseNoItem: true
 

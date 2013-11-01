@@ -15,7 +15,9 @@
 #- "153 1"
 #- "100-200 1"
 #- "52:55 1"
-#- "227 3"
+#- "227-228:10 3"
+#- "ee 5"
+#- "50 10 {&cOnly &a10 &ctorches per player, sorry :P}"
 LimitBlocks: []
 
 ##############################################################################
@@ -27,9 +29,9 @@ LimitBlocks: []
 #
 # Examples:
 #RecipeBlock:
-#- 27232
+#- "27232"
 #- "126:3"
-#- ee
+#- "ee"
 RecipeBlock: []
 
 
@@ -44,7 +46,7 @@ RecipeBlock: []
 #
 # Examples:
 #RecipeFurnaceBlock:
-#- 27232
+#- "27232"
 #- "126:3"
 RecipeFurnaceBlock: []
 
@@ -57,15 +59,15 @@ RecipeFurnaceBlock: []
 
 # Default:
 #LWCPreventNearLocked:
-#- 4306
-#- 4301
-#- 150
+#- "4306 {&cYou are not allowed to place pipes next to someone elses Locked blocks}"
+#- "4301 {&cYou are not allowed to place pipes next to someone elses Locked blocks}"
+#- "150 {&cNo blockbreakers/transposers next to someone elses Locked block!}"
 #- 136
 #- 166
 LWCPreventNearLocked:
-- 4306
-- 4301
-- 150
+- "4306 {&cYou are not allowed to place pipes next to someone elses Locked blocks}"
+- "4301 {&cYou are not allowed to place pipes next to someone elses Locked blocks}"
+- "150 {&cNo blockbreakers/transposers next to someone elses Locked block!}"
 - 136
 - 166
 

@@ -94,7 +94,7 @@ public class TRCommandTR implements CommandExecutor {
 	}
 
 	private void help(){
-		send.msg(ChatColor.YELLOW + "[TekkitRestrict v" + tekkitrestrict.version + " Commands]");
+		send.msg(ChatColor.YELLOW + "[TekkitRestrict v" + tekkitrestrict.version.fullVer + " Commands]");
 		send.msg("Aliases: /tr, /tekkitrestrict");
 		if (send.sender.hasPermission("tekkitrestrict.emc")) send.msg("/tr EMC", "List EMC commands.");
 		if (send.sender.hasPermission("tekkitrestrict.admin")) send.msg("/tr admin", "list admin commands");
@@ -150,6 +150,45 @@ public class TRCommandTR implements CommandExecutor {
 			}
 			return;
 		}
+		
+		if (largs[1].equals("all")){
+			ArrayList<String> msgs = Warning.loadWarnings;
+			if (msgs.isEmpty()){
+				send.msg("Load Warnings: None");
+			} else {
+				send.msg("Load Warnings:");
+				for (String str : msgs){
+					send.msg(str);
+				}
+			}
+			
+			msgs = Warning.configWarnings;
+			if (msgs.isEmpty()){
+				send.msg("Config Warnings: None");
+			} else {
+				send.msg("Config Warnings:");
+				for (String str : msgs){
+					send.msg(str);
+				}
+			}
+			
+			msgs = Warning.otherWarnings;
+			if (msgs.isEmpty()){
+				send.msg("Other Warnings: None");
+			} else {
+				send.msg("Other Warnings:");
+				for (String str : msgs){
+					send.msg(str);
+				}
+			}
+			return;
+		}
+		
+		send.msg("/tr warnings load", "display warnings during loading");
+		send.msg("/tr warnings config", "display config warnings");
+		send.msg("/tr warnings other", "display other warnings");
+		send.msg("/tr warnings all", "display all warnings");
+		return;
 	}
 	private void about(){
 		send.msg("[TekkitRestrict About]");
@@ -216,7 +255,7 @@ public class TRCommandTR implements CommandExecutor {
 		
 	}
 	private void emcHelp(){
-		send.msg(ChatColor.YELLOW + "[TekkitRestrict v" + tekkitrestrict.version + " EMC Commands]");
+		send.msg(ChatColor.YELLOW + "[TekkitRestrict v" + tekkitrestrict.version.fullVer + " EMC Commands]");
 		send.msg("/tr emc tempset <id[:data]> <EMC>", "Set an emc value till the next restart.");
 		send.msg("/tr emc lookup <id[:data]>", "Check the emc value of an item.");
 	}
@@ -446,7 +485,7 @@ public class TRCommandTR implements CommandExecutor {
 	private void adminUpdate(String largs[]){
 		if (send.noPerm("admin.update")) return;
 		
-		if (tekkitrestrict.updater == null){
+		if (tekkitrestrict.updater2 == null){
 			send.msg(ChatColor.RED + "The update check is disabled in the config.");
 			return;
 		}
@@ -464,6 +503,28 @@ public class TRCommandTR implements CommandExecutor {
 			return;
 		}
 		
+		UpdateResult result = tekkitrestrict.updater2.getResult();
+		if (result == UpdateResult.DISABLED){
+			send.msg(ChatColor.RED + "The update check is disabled in the global Updater config.");
+			return;
+		} else if (result == UpdateResult.SUCCESS){
+			send.msg(ChatColor.GREEN + "The update " + ChatColor.YELLOW + tekkitrestrict.updater2.getLatestName() + ChatColor.GREEN + " is available, and has already been downloaded.");
+			send.msg(ChatColor.GREEN + "This update will be installed on the next server start.");
+		} else if (result == UpdateResult.UPDATE_AVAILABLE){
+			if (check){
+				send.msg(ChatColor.GREEN + "The update " + ChatColor.YELLOW + tekkitrestrict.updater2.getLatestName() + ChatColor.GREEN + " is available.");
+				send.msg(ChatColor.YELLOW + "Use /tr admin update download to start downloading.");
+			} else {
+				send.msg(ChatColor.GREEN + "TekkitRestrict will now start downloading " + ChatColor.YELLOW + tekkitrestrict.updater2.getLatestName() + ChatColor.GREEN + ".");
+				tekkitrestrict.getInstance().Update();
+			}
+		} else if (result == UpdateResult.NO_UPDATE){
+			send.msg(ChatColor.YELLOW + "There is no update available for TekkitRestrict.");
+		} else {
+			send.msg(ChatColor.RED + "An error occurred when trying to check for a new version.");
+		}
+		
+		/*
 		UpdateResult result = tekkitrestrict.updater.getResult();
 		if (result == UpdateResult.SUCCESS){
 			send.msg(ChatColor.GREEN + "The update TekkitRestrict " + ChatColor.YELLOW + tekkitrestrict.updater.shortVersion + ChatColor.GREEN + " is available, and has already been downloaded.");
@@ -481,6 +542,7 @@ public class TRCommandTR implements CommandExecutor {
 		} else {
 			send.msg(ChatColor.RED + "An error occurred when trying to check for a new version.");
 		}
+		*/
 	}
 	private void adminThreadLag(){
 		if (send.noPerm("admin.threadlag")) return;
@@ -496,7 +558,7 @@ public class TRCommandTR implements CommandExecutor {
 	}
 	private void adminHelp(int page) {
 		if (page == 1) {
-			send.msg(ChatColor.YELLOW + "[TekkitRestrict " + tekkitrestrict.version + " Admin Commands] Page 1 / 3");
+			send.msg(ChatColor.YELLOW + "[TekkitRestrict " + tekkitrestrict.version.fullVer + " Admin Commands] Page 1 / 3");
 			send.msg("/tr admin help <page>", "Show this help.");
 			send.msg("/tr admin reload", "Reload TekkitRestrict");
 			send.msg("/tr admin reload help", "View Reload subcommands");
@@ -504,7 +566,7 @@ public class TRCommandTR implements CommandExecutor {
 			send.msg("/tr admin update download", "Download an update if it is available.");
 			send.msg("/tr admin threadlag", "Display threadlag information.");
 		} else if (page == 2) {
-			send.msg(ChatColor.YELLOW + "[TekkitRestrict " + tekkitrestrict.version + " Admin Commands] Page 2 / 3");
+			send.msg(ChatColor.YELLOW + "[TekkitRestrict " + tekkitrestrict.version.fullVer + " Admin Commands] Page 2 / 3");
 			send.msg("/tr admin safezone list [page]", "List safezones.");
 			send.msg("/tr admin safezone check [player]", "Check if a player is in a safezone.");
 			send.msg("/tr admin safezone addwg <region>", "Add a safezone using WorldGuard.");
@@ -512,7 +574,7 @@ public class TRCommandTR implements CommandExecutor {
 			send.msg("/tr admin safezone rem <name>", "Remove a safezone.");
 			send.msg(ChatColor.STRIKETHROUGH + "/tr admin reinit", ChatColor.STRIKETHROUGH + "Reload the server.");
 		} else if (page >= 3){
-			send.msg(ChatColor.YELLOW + "[TekkitRestrict " + tekkitrestrict.version + " Admin Commands] Page 3 / 3");
+			send.msg(ChatColor.YELLOW + "[TekkitRestrict " + tekkitrestrict.version.fullVer + " Admin Commands] Page 3 / 3");
 			send.msg("/tr admin limit clear <player>", "Clear a players limits.");
 			send.msg("/tr admin limit clear <player> <id[:data]>", "Clear a players limits for a specific item.");
 			send.msg("/tr admin limit list <player> [id]", "List a players limits.");
@@ -558,7 +620,7 @@ public class TRCommandTR implements CommandExecutor {
 		ssHelp();
 	}
 	private void ssHelp(){
-		send.msg(ChatColor.YELLOW + "[TekkitRestrict v" + tekkitrestrict.version + " Safezone Commands]");
+		send.msg(ChatColor.YELLOW + "[TekkitRestrict v" + tekkitrestrict.version.fullVer + " Safezone Commands]");
 		send.msg("/tr admin safezone check [player]", "Check if a player is in a safezone.");
 		send.msg("/tr admin safezone list [page]", "List safezones");
 		send.msg("/tr admin safezone addwg <name>", "Add a WorldGuard safezone");
@@ -809,7 +871,7 @@ public class TRCommandTR implements CommandExecutor {
 		limitHelp();
 	}
 	private void limitHelp(){
-		send.msg(ChatColor.YELLOW + "[TekkitRestrict v" + tekkitrestrict.version + " Limit Commands]");
+		send.msg(ChatColor.YELLOW + "[TekkitRestrict v" + tekkitrestrict.version.fullVer + " Limit Commands]");
 		send.msg("/tr admin limit list <player>", "View a players limits");
 		send.msg("/tr admin limit list <player> <id>", "View a specific limit.");
 		send.msg("/tr admin limit clear <player>", "Clear a players limits.");

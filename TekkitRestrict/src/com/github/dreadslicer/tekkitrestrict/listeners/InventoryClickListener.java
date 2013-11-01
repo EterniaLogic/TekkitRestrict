@@ -31,7 +31,7 @@ public class InventoryClickListener implements Listener {
 
 			String banned = null;
 			
-			if (player.getGameMode() == GameMode.CREATIVE){
+			if (player.getGameMode() == GameMode.CREATIVE && !player.hasPermission("tekkitrestrict.bypass.creative")){
 				if (event.getView().getTopInventory() != null){
 					if (Listeners.UseLimitedCreative && Listeners.BlockCreativeContainer){
 						if (!"container.inventory".equals(event.getView().getTopInventory().getName())){
@@ -42,7 +42,7 @@ public class InventoryClickListener implements Listener {
 					}
 				}
 				
-				banned = TRNoItem.isItemBannedInCreative(player, id1, data1, true);
+				banned = TRNoItem.isItemBannedInCreative(player, id1, data1, false);
 				if (banned == null) banned = TRNoItem.isItemBanned(player, id1, data1, true);
 			} else {
 				banned = TRNoItem.isItemBanned(player, id1, data1, true);

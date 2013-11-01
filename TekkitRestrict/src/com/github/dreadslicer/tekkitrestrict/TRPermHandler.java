@@ -384,6 +384,7 @@ public class TRPermHandler {
 
 	private static Set<String> getAllPEXPlayerPerms(Player player, String permBase) {
 		HashSet<String> tbr = new HashSet<String>();
+		if (permEx == null) permEx = ru.tehkode.permissions.bukkit.PermissionsEx.getPermissionManager();
 		PermissionUser user = permEx.getUser(player);
 		
 		String world = player.getWorld().getName();

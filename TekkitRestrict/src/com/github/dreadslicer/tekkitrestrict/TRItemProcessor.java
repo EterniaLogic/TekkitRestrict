@@ -55,7 +55,7 @@ public class TRItemProcessor {
 				String[] gg = s.split("=");
 				String mod = gg[0];
 				if (mod.contains("|")){
-					String[] gg2 = mod.split("|");
+					String[] gg2 = mod.split("\\|");
 					for (String mod2 : gg2){
 						try {
 							groups.put(mod2, processMultiString(gg[1]));

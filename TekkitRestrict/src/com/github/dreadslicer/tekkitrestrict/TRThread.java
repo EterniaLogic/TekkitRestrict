@@ -158,7 +158,7 @@ class TGemArmorDisabler extends Thread {
 			} catch (Exception ex) {
 				errors++;
 				Warning.other("Error: [GemArmor thread] " + ex.getMessage());
-				if (errors < 5){
+				if (errors < 2){
 					Log.Exception(ex, true);
 				}
 				
@@ -185,7 +185,7 @@ class TGemArmorDisabler extends Thread {
 					Iterator<EntityHuman> it = EEBase.playerArmorMovementToggle.keySet().iterator();
 					ArrayList<EntityHuman> toremove = new ArrayList<EntityHuman>();
 					while (it.hasNext()){
-						EntityHuman human = (EntityHuman) it;
+						EntityHuman human = it.next();
 						Player player = (Player) human.getBukkitEntity();
 						if (player.hasPermission("tekkitrestrict.bypass.gemarmor.defensive")) continue;
 						player.sendMessage(ChatColor.RED + "You are not allowed to use GemArmor Movement Powers!");
@@ -204,7 +204,7 @@ class TGemArmorDisabler extends Thread {
 					Iterator<EntityHuman> it = EEBase.playerArmorOffensiveToggle.keySet().iterator();
 					ArrayList<EntityHuman> toremove = new ArrayList<EntityHuman>();
 					while (it.hasNext()){
-						EntityHuman human = (EntityHuman) it;
+						EntityHuman human = it.next();
 						Player player = (Player) human.getBukkitEntity();
 						if (player.hasPermission("tekkitrestrict.bypass.gemarmor.offensive")) continue;
 						player.sendMessage(ChatColor.RED + "You are not allowed to use GemArmor Offensive Powers!");

@@ -16,7 +16,6 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
-import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class TMetrics {
@@ -27,7 +26,7 @@ public class TMetrics {
 
 	private static final String BASE_URL = "http://metrics.taico.nl/";
 	private static final String REPORT_URL = "tekkitrestrict.php";
-	private static final int PING_INTERVAL = 15;
+	private static final int PING_INTERVAL = 20;
 	public boolean debug = false;
 
 	public int uid = 0;
@@ -79,9 +78,8 @@ public class TMetrics {
 		int playersOnline = Bukkit.getServer().getOnlinePlayers().length;
 		String params = "";
 		if (uid == 0 || first){
-			PluginDescriptionFile description = plugin.getDescription();
 			int onlineMode = Bukkit.getServer().getOnlineMode() ? 1 : 0;
-			String pluginVersion = description.getVersion();
+			String pluginVersion = tekkitrestrict.version.fullVer;
 			String serverVersion = Bukkit.getVersion();
 	
 			String osname = System.getProperty("os.name");

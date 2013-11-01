@@ -36,7 +36,6 @@ import nl.taico.tekkitrestrict.config.TPerformanceConfig;
 import nl.taico.tekkitrestrict.eepatch.EEPSettings;
 
 import com.github.dreadslicer.tekkitrestrict.Log.Warning;
-import com.github.dreadslicer.tekkitrestrict.Updater.UpdateResult;
 import com.github.dreadslicer.tekkitrestrict.commands.TRCommandAlc;
 import com.github.dreadslicer.tekkitrestrict.commands.TRCommandCheck;
 import com.github.dreadslicer.tekkitrestrict.commands.TRCommandTPIC;
@@ -45,9 +44,11 @@ import com.github.dreadslicer.tekkitrestrict.database.Database;
 import com.github.dreadslicer.tekkitrestrict.lib.TRFileConfiguration;
 import com.github.dreadslicer.tekkitrestrict.lib.YamlConfiguration;
 import com.github.dreadslicer.tekkitrestrict.listeners.Assigner;
+import com.github.dreadslicer.tekkitrestrict.listeners.CraftingListener;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
 import com.github.dreadslicer.tekkitrestrict.objects.TREnums.DBType;
 import com.github.dreadslicer.tekkitrestrict.objects.TRItem;
+import com.github.dreadslicer.tekkitrestrict.objects.TRVersion;
 
 public class tekkitrestrict extends JavaPlugin {
 	private static tekkitrestrict instance;
@@ -59,13 +60,14 @@ public class tekkitrestrict extends JavaPlugin {
 	/** Indicates if tekkitrestrict is disabling. Threads use this to check if they should stop. */
 	public static boolean disable = false;
 	
-	public static String version;
+	public static TRVersion version;
 	public static double dbversion = 1.2;
 	public static int dbworking = 0;
 	
 	public static DBType dbtype = DBType.Unknown;
 	public static Database db;
-	public static Updater updater = null;
+	//public static Updater_Old updater = null;
+	public static Updater updater2 = null;
 	
 	public static ExecutorService basfo = Executors.newCachedThreadPool();
 	
@@ -89,7 +91,8 @@ public class tekkitrestrict extends JavaPlugin {
 	public void onLoad() {
 		instance = this; //Set the instance
 		log = getLogger(); //Set the logger
-		version = getDescription().getVersion();
+		//version = getDescription().getVersion();
+		version = new TRVersion(getDescription().getVersion());
 		Log.init();
 		
 		//#################### load Config ####################
@@ -267,10 +270,13 @@ public class tekkitrestrict extends JavaPlugin {
 		}
 		
 		if (config.getBoolean2(ConfigFile.General, "Auto-Update", true)){
-			updater = new Updater(this, "tekkit-restrict", this.getFile(), Updater.UpdateType.DEFAULT, true);
+			//updater = new Updater_Old(this, "tekkit-restrict", this.getFile(), Updater_Old.UpdateType.DEFAULT, true);
+			updater2 = new Updater(this, 44061, this.getFile(), Updater.UpdateType.DEFAULT, true);
 		} else if (config.getBoolean2(ConfigFile.General, "CheckForUpdateOnStartup", true)){
-			updater = new Updater(this, "tekkit-restrict", this.getFile(), Updater.UpdateType.NO_DOWNLOAD, true);
-			if (updater.getResult() == UpdateResult.UPDATE_AVAILABLE) log.info(ChatColor.GREEN + "There is an update available: " + updater.getLatestVersionString() + ". Use /tr admin update ingame to update.");
+			//updater = new Updater_Old(this, "tekkit-restrict", this.getFile(), Updater_Old.UpdateType.NO_DOWNLOAD, true);
+			updater2 = new Updater(this, 44061, this.getFile(), Updater.UpdateType.NO_DOWNLOAD, true);
+			//if (updater.getResult() == UpdateResult.UPDATE_AVAILABLE) log.info(ChatColor.GREEN + "There is an update available: " + updater.getLatestVersionString() + ". Use /tr admin update ingame to update.");
+			if (updater2.getResult() == Updater.UpdateResult.UPDATE_AVAILABLE) log.info(ChatColor.GREEN + "There is an update available: " + updater2.getLatestName() + ". Use /tr admin update ingame to update.");
 		}
 		
 		//##################### Log Filter ####################
@@ -300,7 +306,8 @@ public class tekkitrestrict extends JavaPlugin {
 			}
 		});
 		
-		log.info("TekkitRestrict v" + version + " Enabled!");
+		CraftingListener.setupCraftHook();
+		log.info("TekkitRestrict v" + version.fullVer + " Enabled!");
 	}
 	@Override
 	public void onDisable() {
@@ -321,7 +328,7 @@ public class tekkitrestrict extends JavaPlugin {
 		Log.deinit();
 		FileLog.closeAll();
 		
-		log.info("TekkitRestrict v " + version + " disabled!");
+		log.info("TekkitRestrict v " + version.fullVer + " disabled!");
 	}
 	
 	public static tekkitrestrict getInstance() {
@@ -612,7 +619,8 @@ public class tekkitrestrict extends JavaPlugin {
 	}
 	
 	public void Update(){
-		updater = new Updater(this, "tekkit-restrict", this.getFile(), Updater.UpdateType.DEFAULT, true);
+		//updater = new Updater_Old(this, "tekkit-restrict", this.getFile(), Updater_Old.UpdateType.DEFAULT, true);
+		updater2 = new Updater(this, 44061, this.getFile(), Updater.UpdateType.DEFAULT, true);
 	}
 	
 	public boolean backupConfig(String sourceString, String destString){
@@ -659,7 +667,7 @@ public class tekkitrestrict extends JavaPlugin {
 		String ver = instance.getDescription().getVersion().toLowerCase();
 		if (ver.contains("beta")){
 			String temp[] = ver.split(" ");
-			if (temp.length >= 3 && temp[2].matches("\\d+")){
+			if (temp.length >= 3 && temp[2].matches("\\d+")){//1.18 beta 2
 				return "b" + temp[2];
 			} else {
 				return "b1";
@@ -674,6 +682,10 @@ public class tekkitrestrict extends JavaPlugin {
 		} else {
 			return "";
 		}
+	}
+	
+	public static ArrayList<Integer> getAdvVersion(){
+		return null;
 	}
 	
 	public static boolean isBeta(){

@@ -433,6 +433,8 @@ public class TRSafeZone {
 		return false; //Otherwise it's not allowed.
 	}
 	
+	private static TRSafeZone lastZone;
+	
 	/**
 	 * <b>Uses the database for information.</b>
 	 * @return A string with information about the type of safezone and its name/owner.<br>
@@ -440,6 +442,25 @@ public class TRSafeZone {
 	 */
 	public static String getSafeZoneByLocation(Location loc, boolean doGP) {
 		if (!SafeZones.UseSafeZones) return "";
+		if (lastZone != null){
+			if (lastZone.mode == 1){
+				if (lastZone.location.contains(loc)){
+					if (lastZone.pluginRegion != null) return "WorldGuard Safezone Region: " + lastZone.name;
+					else return "TekkitRestrict SafeZone Region: " + lastZone.name;
+				}
+			} else if (lastZone.mode == 4){
+				if (lastZone.location.containsIgnoreY(loc)){
+					if (lastZone.pluginRegion != null){
+						Claim c = (Claim) lastZone.pluginRegion;
+						String r = c.ownerName;
+						if (r == null || r.equals("")) r = "Admin";
+						return "GriefPrevention Safezone Claim owned by: " + r;
+					} else {
+						return "GriefPrevention Safezone Claim: " + lastZone.name;
+					}
+				}
+			}
+		}
 		
 		boolean WGEnabled = (worldGuard != null), GPEnabled = (griefPrevention != null);
 		String r = "";
@@ -456,11 +477,15 @@ public class TRSafeZone {
 				if (!WGEnabled) continue;
 				if (a.locSet){
 					if (a.location.contains(loc)){
+						lastZone = a;
 						if (a.pluginRegion != null) return "WorldGuard Safezone Region: " + a.name;
 						else return "TekkitRestrict SafeZone Region: " + a.name;
 					}
 				} else {
-					if (getWGRegion(a.name, loc) != null) return "WorldGuard Safezone Region: " + a.name;
+					if (getWGRegion(a.name, loc) != null){
+						lastZone = a;
+						return "WorldGuard Safezone Region: " + a.name;
+					}
 				}
 				continue;
 			}
@@ -472,6 +497,7 @@ public class TRSafeZone {
 				
 				if (a.locSet){
 					if (!a.location.containsIgnoreY(loc)) continue;
+					lastZone = a;
 					if (a.pluginRegion != null){
 						Claim c = (Claim) a.pluginRegion;
 						r = c.ownerName;
@@ -487,7 +513,7 @@ public class TRSafeZone {
 						a.location = new TRPos(temp);
 						a.locSet = true;
 						if (!(a.location.containsIgnoreY(loc))) continue;
-						
+						lastZone = a;
 						if (a.pluginRegion != null){
 							Claim c = (Claim) a.pluginRegion;
 							r = c.ownerName;

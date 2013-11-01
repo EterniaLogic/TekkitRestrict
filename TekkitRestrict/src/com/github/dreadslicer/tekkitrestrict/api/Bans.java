@@ -26,7 +26,7 @@ public class Bans {
 	 * @return If the given item/block is banned in the config.
 	 */
 	public static boolean isItemGloballyBanned(int id, int data){
-		return TRNoItem.isItemGloballyBanned(id, data);
+		return TRNoItem.isItemGloballyBanned(id, data) != null;
 	}
 	
 	/**

@@ -103,19 +103,20 @@ public class TRNoItem {
 	public static String isItemBanned(Player player, int id, int data, boolean doBypassCheck) {
 		return Listeners.UseNoItem ? isTypeNoItemBanned(player, id, data, doBypassCheck) : null;
 	}
+	
 	/**
 	 * Goes through all banned items and checks if the id and data match.
 	 * 
 	 * @return If the given item/block is banned in the config.
 	 */
-	public static boolean isItemGloballyBanned(int id, int data) {
-		if (!Listeners.UseNoItem) return false;
+	public static String isItemGloballyBanned(int id, int data) {
+		if (!Listeners.UseNoItem) return null;
 		
 		for (TRItem bannedItem : DisabledItems) {
-			if (bannedItem.compare(id, data)) return true;
+			if (bannedItem.compare(id, data)) return bannedItem.msg == null ? "" : bannedItem.msg;
 		}
 		
-		return false;
+		return null;
 	}
 
 	/**
