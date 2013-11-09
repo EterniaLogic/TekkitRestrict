@@ -16,7 +16,7 @@ import com.github.dreadslicer.tekkitrestrict.Log.Warning;
 public class PatchCC {
 	static final String s = File.separator;
 	static void start(){
-		File patched = new File("mods"+s+"ComputerCraft"+s+"lua"+s+"rom"+s+"patched1"+s);
+		File patched = new File("mods"+s+"ComputerCraft"+s+"lua"+s+"rom"+s+"patched2"+s);
 		if (patched.exists()) return;
 		
 		BufferedReader input = null;
@@ -33,9 +33,10 @@ public class PatchCC {
 			return;
 		}
 		
-		String line;
+		
 		ArrayList<String> lines = new ArrayList<String>();
 		try {
+			String line;
 			while ((line = input.readLine()) != null){
 				lines.add(line);
 			}
@@ -47,16 +48,17 @@ public class PatchCC {
 			} catch (IOException e1) {}
 			return;
 		}
-		boolean rebootPatch = true, rsCrashPatch = true;
+		boolean rebootPatch = true, rsCrashPatch = true, nulPatch = false;
 		for (String curline : lines){
 			if (curline == null) continue;
 			if (curline.contains("os.reboot = nil") || curline.contains("os.reboot=nil")) rebootPatch = false;
 			else if (curline.contains("bypassAntiRedstoneCrashBug = rs.setOutput") || curline.contains("rs.setOutput = function(side, bool)")) rsCrashPatch = false;
+			else if (curline.contains("\000")) nulPatch = true;
 			
-			if (!rebootPatch && !rsCrashPatch) break;
+			if (!rebootPatch && !rsCrashPatch && nulPatch) break;
 		}
 		
-		if (!rebootPatch && !rsCrashPatch){
+		if (!rebootPatch && !rsCrashPatch && !nulPatch){
 			try {
 				patched.createNewFile();
 			} catch (IOException e) {
@@ -66,7 +68,6 @@ public class PatchCC {
 			return;
 		}
 
-		
 		if (rebootPatch){
 			tekkitrestrict.log.info("[CCPatch] Adding reboot patch...");
 			lines.add(0, "os.reboot = nil");
@@ -74,7 +75,6 @@ public class PatchCC {
 		} else {
 			tekkitrestrict.log.info("[CCPatch] Reboot patch already found, skipping reboot patch...");
 		}
-		
 		
 		if (rsCrashPatch) {
 			RandomString ran = new RandomString(10);
@@ -88,6 +88,15 @@ public class PatchCC {
 			tekkitrestrict.log.info("[CCPatch] Redstone crash patch added.");
 		} else {
 			tekkitrestrict.log.info("[CCPatch] Redstone crash patch already found, skipping redstone crash patch...");
+		}
+		
+		if (nulPatch){
+			tekkitrestrict.log.info("[CCPatch] Your Computers startupfile is corrupt! Repairing...");
+			char c = RandomString.randomChar();
+			for (String line : lines){
+				line.replace('\000', c);
+			}
+			tekkitrestrict.log.info("[CCPatch] Repair complete!");
 		}
 		
 		BufferedWriter output = null;
