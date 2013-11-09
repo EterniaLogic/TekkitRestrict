@@ -10,10 +10,9 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.util.Vector;
 
+import nl.taico.tekkitrestrict.TRConfigCache.Hacks;
+import nl.taico.tekkitrestrict.functions.TRNoHack;
 import nl.taico.tekkitrestrict.objects.TREnums.HackType;
-
-import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Hacks;
-import com.github.dreadslicer.tekkitrestrict.TRNoHack;
 
 public class NoHackForcefield implements Listener {
 	private static ConcurrentHashMap<String, Integer> tickTolerance = new ConcurrentHashMap<String, Integer>();

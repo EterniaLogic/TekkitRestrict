@@ -4,10 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import nl.taico.tekkitrestrict.Log;
+import nl.taico.tekkitrestrict.tekkitrestrict;
 import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
-
-import com.github.dreadslicer.tekkitrestrict.Log;
-import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
 
 import ee.events.EEEnums.EEAction2;
 import ee.events.EEEnums.EEAmuletAction;

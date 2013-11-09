@@ -5,9 +5,8 @@ import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import nl.taico.tekkitrestrict.functions.TRSafeZone;
 import nl.taico.tekkitrestrict.objects.TREnums.SSPlugin;
-
-import com.github.dreadslicer.tekkitrestrict.TRSafeZone;
 
 public class SafeZones {
 	public static enum SafeZoneCreate {

@@ -5,10 +5,9 @@ import java.util.HashMap;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
+import nl.taico.tekkitrestrict.TRConfigCache;
+import nl.taico.tekkitrestrict.functions.TRNoItem;
 import nl.taico.tekkitrestrict.objects.TRItem;
-
-import com.github.dreadslicer.tekkitrestrict.TRConfigCache;
-import com.github.dreadslicer.tekkitrestrict.TRNoItem;
 
 import net.minecraft.server.EntityHuman;
 import net.minecraft.server.IInventory;

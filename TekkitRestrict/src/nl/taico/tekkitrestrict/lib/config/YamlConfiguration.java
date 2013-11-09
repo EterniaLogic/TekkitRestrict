@@ -17,7 +17,7 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.representer.Representer;
 
-import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
+import nl.taico.tekkitrestrict.tekkitrestrict;
 
 /**
  * An implementation of {@link Configuration} which saves all files in Yaml.

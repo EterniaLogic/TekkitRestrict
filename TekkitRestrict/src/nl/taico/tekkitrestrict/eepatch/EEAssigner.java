@@ -3,13 +3,12 @@ package nl.taico.tekkitrestrict.eepatch;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
 
+import nl.taico.tekkitrestrict.tekkitrestrict;
 import nl.taico.tekkitrestrict.eepatch.amuletlisteners.EEAmuletListener;
 import nl.taico.tekkitrestrict.eepatch.destlisteners.EEDestructionListener;
 import nl.taico.tekkitrestrict.eepatch.ringlisteners.EERingListener;
 import nl.taico.tekkitrestrict.eepatch.toollisteners.EEDMToolListener;
 import nl.taico.tekkitrestrict.eepatch.toollisteners.EERMToolListener;
-
-import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
 
 public class EEAssigner {
 	public static void assign(){

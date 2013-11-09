@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import com.github.dreadslicer.tekkitrestrict.Log;
+import nl.taico.tekkitrestrict.Log;
 
 public class ModModificationsConfig extends TRConfig {
 	public static ArrayList<String> defaultContents(boolean extra){

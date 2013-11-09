@@ -2,7 +2,7 @@ package nl.taico.tekkitrestrict.config;
 
 import java.util.ArrayList;
 
-import com.github.dreadslicer.tekkitrestrict.Log.Warning;
+import nl.taico.tekkitrestrict.Log.Warning;
 
 public class GroupPermissionsConfig extends TRConfig {
 	public static ArrayList<String> defaultContents(boolean extra){

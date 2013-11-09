@@ -20,11 +20,10 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import nl.taico.tekkitrestrict.tekkitrestrict;
+import nl.taico.tekkitrestrict.TRConfigCache.Hacks;
+import nl.taico.tekkitrestrict.functions.TRNoHack;
 import nl.taico.tekkitrestrict.objects.TREnums.HackType;
-
-import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Hacks;
-import com.github.dreadslicer.tekkitrestrict.TRNoHack;
-import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
 
 public class NoHackFly implements Listener {
 	private static ConcurrentHashMap<String, Integer> tickTolerance = new ConcurrentHashMap<String, Integer>();

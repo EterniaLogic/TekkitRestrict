@@ -4,9 +4,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-import com.github.dreadslicer.tekkitrestrict.Log;
-import com.github.dreadslicer.tekkitrestrict.TRLimiter;
-import com.github.dreadslicer.tekkitrestrict.Log.Warning;
+import nl.taico.tekkitrestrict.Log;
+import nl.taico.tekkitrestrict.Log.Warning;
+import nl.taico.tekkitrestrict.functions.TRLimiter;
 
 public class LoginListener implements Listener {
 	@EventHandler

@@ -3,7 +3,7 @@ package nl.taico.tekkitrestrict.api;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-import com.github.dreadslicer.tekkitrestrict.TRNoItem;
+import nl.taico.tekkitrestrict.functions.TRNoItem;
 
 public class Bans {
 	/**

@@ -7,8 +7,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.dreadslicer.tekkitrestrict.Log;
-import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
+import nl.taico.tekkitrestrict.Log;
+import nl.taico.tekkitrestrict.tekkitrestrict;
 
 public abstract class TRConfig {
 	protected static String s = File.separator;

@@ -15,7 +15,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 
-import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
+import nl.taico.tekkitrestrict.tekkitrestrict;
 
 @SuppressWarnings("resource")
 public class MySQL extends Database {

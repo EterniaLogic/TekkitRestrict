@@ -13,7 +13,7 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import com.github.dreadslicer.tekkitrestrict.Send;
+import nl.taico.tekkitrestrict.Send;
 
 public class TRCommandTPIC implements CommandExecutor {
 	private Send send;

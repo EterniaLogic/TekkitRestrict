@@ -1,8 +1,7 @@
 package nl.taico.tekkitrestrict.objects;
 
+import nl.taico.tekkitrestrict.tekkitrestrict;
 import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
-
-import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
 
 public class TRVersion {
 	public String fullVer;

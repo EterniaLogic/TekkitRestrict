@@ -10,13 +10,12 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 
+import nl.taico.tekkitrestrict.Log;
+import nl.taico.tekkitrestrict.Log.Warning;
+import nl.taico.tekkitrestrict.functions.TRLimiter;
+
 import net.minecraft.server.ItemStack;
 import net.minecraft.server.TileEntity;
-
-import com.github.dreadslicer.tekkitrestrict.Log;
-import com.github.dreadslicer.tekkitrestrict.TRLimiter;
-import com.github.dreadslicer.tekkitrestrict.Log.Warning;
-
 import ee.TileAlchChest;
 
 public class BlockBreakListener implements Listener{

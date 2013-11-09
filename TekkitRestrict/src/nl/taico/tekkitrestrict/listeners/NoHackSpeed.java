@@ -7,10 +7,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
+import nl.taico.tekkitrestrict.TRConfigCache.Hacks;
+import nl.taico.tekkitrestrict.functions.TRNoHack;
 import nl.taico.tekkitrestrict.objects.TREnums.HackType;
-
-import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Hacks;
-import com.github.dreadslicer.tekkitrestrict.TRNoHack;
 
 public class NoHackSpeed implements Listener{
 	private static ConcurrentHashMap<String, Double[]> tickLastLoc = new ConcurrentHashMap<String, Double[]>();

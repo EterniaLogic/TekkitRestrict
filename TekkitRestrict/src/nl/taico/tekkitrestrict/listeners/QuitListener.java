@@ -6,13 +6,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import nl.taico.tekkitrestrict.TRConfigCache.Listeners;
 import nl.taico.tekkitrestrict.commands.TRCommandAlc;
-
-import com.github.dreadslicer.tekkitrestrict.TRLimiter;
-import com.github.dreadslicer.tekkitrestrict.TRNoDupe;
-import com.github.dreadslicer.tekkitrestrict.TRNoDupeProjectTable;
-import com.github.dreadslicer.tekkitrestrict.TRNoHack;
-import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Listeners;
+import nl.taico.tekkitrestrict.functions.TRLimiter;
+import nl.taico.tekkitrestrict.functions.TRNoDupe;
+import nl.taico.tekkitrestrict.functions.TRNoDupeProjectTable;
+import nl.taico.tekkitrestrict.functions.TRNoHack;
 
 public class QuitListener implements Listener{
 	@EventHandler

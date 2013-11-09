@@ -4,13 +4,12 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
 
+import nl.taico.tekkitrestrict.TRListener;
+import nl.taico.tekkitrestrict.tekkitrestrict;
+import nl.taico.tekkitrestrict.TRConfigCache.Dupes;
+import nl.taico.tekkitrestrict.TRConfigCache.Hacks;
+import nl.taico.tekkitrestrict.TRConfigCache.Listeners;
 import nl.taico.tekkitrestrict.eepatch.EEAssigner;
-
-import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Dupes;
-import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Hacks;
-import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Listeners;
-import com.github.dreadslicer.tekkitrestrict.TRListener;
-import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
 
 public class Assigner {
 	/**
