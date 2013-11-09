@@ -3,12 +3,13 @@ package com.github.dreadslicer.tekkitrestrict;
 import java.util.ArrayList;
 import java.util.List;
 
+import nl.taico.tekkitrestict.objects.TRDupeSettings;
+import nl.taico.tekkitrestict.objects.TRHackSettings;
+import nl.taico.tekkitrestict.objects.TREnums.ConfigFile;
+import nl.taico.tekkitrestict.objects.TREnums.SSMode;
+
 import com.github.dreadslicer.tekkitrestrict.Log.Warning;
 import com.github.dreadslicer.tekkitrestrict.lib.TRFileConfiguration;
-import com.github.dreadslicer.tekkitrestrict.objects.TRDupeSettings;
-import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
-import com.github.dreadslicer.tekkitrestrict.objects.TREnums.SSMode;
-import com.github.dreadslicer.tekkitrestrict.objects.TRHackSettings;
 import com.griefcraft.lwc.LWCPlugin;
 
 public class TRConfigCache {

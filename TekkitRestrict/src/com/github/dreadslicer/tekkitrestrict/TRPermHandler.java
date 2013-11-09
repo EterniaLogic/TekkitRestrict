@@ -15,9 +15,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
+import nl.taico.tekkitrestict.objects.TRItem;
+import nl.taico.tekkitrestict.objects.TRPermLimit;
+
 import com.github.dreadslicer.tekkitrestrict.Log.Warning;
-import com.github.dreadslicer.tekkitrestrict.objects.TRItem;
-import com.github.dreadslicer.tekkitrestrict.objects.TRPermLimit;
 
 import ru.tehkode.permissions.PermissionGroup;
 import ru.tehkode.permissions.PermissionManager;

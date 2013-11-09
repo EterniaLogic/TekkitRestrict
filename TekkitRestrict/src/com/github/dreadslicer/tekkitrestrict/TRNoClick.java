@@ -11,11 +11,12 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
+import nl.taico.tekkitrestict.objects.TRItem;
+import nl.taico.tekkitrestict.objects.TREnums.ConfigFile;
+import nl.taico.tekkitrestict.objects.TREnums.TRClickType;
+
 import com.github.dreadslicer.tekkitrestrict.Log.Warning;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Listeners;
-import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
-import com.github.dreadslicer.tekkitrestrict.objects.TREnums.TRClickType;
-import com.github.dreadslicer.tekkitrestrict.objects.TRItem;
 
 
 public class TRNoClick {

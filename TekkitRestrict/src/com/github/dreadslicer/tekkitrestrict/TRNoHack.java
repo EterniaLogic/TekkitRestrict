@@ -6,11 +6,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
+import nl.taico.tekkitrestict.objects.TREnums.HackType;
+import nl.taico.tekkitrestrict.listeners.NoHackFly;
+import nl.taico.tekkitrestrict.listeners.NoHackForcefield;
+import nl.taico.tekkitrestrict.listeners.NoHackSpeed;
+
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Hacks;
-import com.github.dreadslicer.tekkitrestrict.listeners.NoHackFly;
-import com.github.dreadslicer.tekkitrestrict.listeners.NoHackForcefield;
-import com.github.dreadslicer.tekkitrestrict.listeners.NoHackSpeed;
-import com.github.dreadslicer.tekkitrestrict.objects.TREnums.HackType;
 
 public class TRNoHack {
 	//public static int hacks = 0;

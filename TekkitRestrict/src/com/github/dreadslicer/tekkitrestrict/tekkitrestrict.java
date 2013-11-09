@@ -27,28 +27,28 @@ import org.bukkit.ChatColor;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import nl.taico.tekkitrestict.objects.TRItem;
+import nl.taico.tekkitrestict.objects.TRVersion;
+import nl.taico.tekkitrestict.objects.TREnums.ConfigFile;
+import nl.taico.tekkitrestict.objects.TREnums.DBType;
+import nl.taico.tekkitrestrict.commands.TRCommandAlc;
+import nl.taico.tekkitrestrict.commands.TRCommandCheck;
+import nl.taico.tekkitrestrict.commands.TRCommandTPIC;
+import nl.taico.tekkitrestrict.commands.TRCommandTR;
 import nl.taico.tekkitrestrict.config.AdvancedConfig;
 import nl.taico.tekkitrestrict.config.GeneralConfig;
 import nl.taico.tekkitrestrict.config.HackDupeConfig;
 import nl.taico.tekkitrestrict.config.ModModificationsConfig;
 import nl.taico.tekkitrestrict.config.SafeZonesConfig;
 import nl.taico.tekkitrestrict.config.TPerformanceConfig;
+import nl.taico.tekkitrestrict.database.Database;
 import nl.taico.tekkitrestrict.eepatch.EEPSettings;
+import nl.taico.tekkitrestrict.listeners.Assigner;
+import nl.taico.tekkitrestrict.listeners.CraftingListener;
 
 import com.github.dreadslicer.tekkitrestrict.Log.Warning;
-import com.github.dreadslicer.tekkitrestrict.commands.TRCommandAlc;
-import com.github.dreadslicer.tekkitrestrict.commands.TRCommandCheck;
-import com.github.dreadslicer.tekkitrestrict.commands.TRCommandTPIC;
-import com.github.dreadslicer.tekkitrestrict.commands.TRCommandTR;
-import com.github.dreadslicer.tekkitrestrict.database.Database;
 import com.github.dreadslicer.tekkitrestrict.lib.TRFileConfiguration;
 import com.github.dreadslicer.tekkitrestrict.lib.YamlConfiguration;
-import com.github.dreadslicer.tekkitrestrict.listeners.Assigner;
-import com.github.dreadslicer.tekkitrestrict.listeners.CraftingListener;
-import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
-import com.github.dreadslicer.tekkitrestrict.objects.TREnums.DBType;
-import com.github.dreadslicer.tekkitrestrict.objects.TRItem;
-import com.github.dreadslicer.tekkitrestrict.objects.TRVersion;
 
 public class tekkitrestrict extends JavaPlugin {
 	private static tekkitrestrict instance;

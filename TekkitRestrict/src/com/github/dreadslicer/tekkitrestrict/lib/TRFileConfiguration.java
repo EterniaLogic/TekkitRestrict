@@ -24,13 +24,13 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.representer.Representer;
 
+import nl.taico.tekkitrestict.objects.TREnums.ConfigFile;
 import nl.taico.tekkitrestrict.config.AdvancedConfig;
 import nl.taico.tekkitrestrict.config.GeneralConfig;
 import nl.taico.tekkitrestrict.config.TPerformanceConfig;
 
 import com.github.dreadslicer.tekkitrestrict.Log;
 import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
-import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
 
 @SuppressWarnings("rawtypes")
 public class TRFileConfiguration extends FileConfiguration {

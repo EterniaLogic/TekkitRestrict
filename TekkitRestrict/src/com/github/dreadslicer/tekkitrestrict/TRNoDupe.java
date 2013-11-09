@@ -5,8 +5,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import nl.taico.tekkitrestict.objects.TREnums.DupeType;
+
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Dupes;
-import com.github.dreadslicer.tekkitrestrict.objects.TREnums.DupeType;
 
 public class TRNoDupe {
 	public static ConcurrentHashMap<String, Integer> cmdRM = new ConcurrentHashMap<String, Integer>();

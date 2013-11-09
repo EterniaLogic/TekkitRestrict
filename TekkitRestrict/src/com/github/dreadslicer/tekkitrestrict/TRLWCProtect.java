@@ -11,9 +11,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.plugin.PluginManager;
 
+import nl.taico.tekkitrestict.objects.TRItem;
+import nl.taico.tekkitrestict.objects.TREnums.ConfigFile;
+
 import com.github.dreadslicer.tekkitrestrict.Log.Warning;
-import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
-import com.github.dreadslicer.tekkitrestrict.objects.TRItem;
 import com.griefcraft.lwc.LWC;
 import com.griefcraft.lwc.LWCPlugin;
 import com.griefcraft.model.Permission;

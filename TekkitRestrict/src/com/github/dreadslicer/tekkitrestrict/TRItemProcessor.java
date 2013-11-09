@@ -10,9 +10,10 @@ import java.util.Set;
 
 import org.bukkit.configuration.ConfigurationSection;
 
+import nl.taico.tekkitrestict.objects.TRItem;
+import nl.taico.tekkitrestict.objects.TREnums.ConfigFile;
+
 import com.github.dreadslicer.tekkitrestrict.Log.Warning;
-import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
-import com.github.dreadslicer.tekkitrestrict.objects.TRItem;
 
 public class TRItemProcessor {
 	//Block ID's Forge: 0-4095

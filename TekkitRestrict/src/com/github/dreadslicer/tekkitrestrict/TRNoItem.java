@@ -8,10 +8,11 @@ import java.util.List;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
+import nl.taico.tekkitrestict.objects.TRItem;
+import nl.taico.tekkitrestict.objects.TREnums.ConfigFile;
+
 import com.github.dreadslicer.tekkitrestrict.Log.Warning;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Listeners;
-import com.github.dreadslicer.tekkitrestrict.objects.TRItem;
-import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
 
 /**
  * This class defines and enables the use of determining what items

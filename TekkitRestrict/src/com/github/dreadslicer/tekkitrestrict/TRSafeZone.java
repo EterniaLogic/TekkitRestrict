@@ -17,6 +17,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 
+import nl.taico.tekkitrestict.objects.TRPos;
+import nl.taico.tekkitrestict.objects.TREnums.SSMode;
+import nl.taico.tekkitrestict.objects.TREnums.SafeZone;
+import nl.taico.tekkitrestrict.api.SafeZones.SafeZoneCreate;
+
 import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import net.sacredlabyrinth.Phaed.PreciousStones.FieldFlag;
@@ -24,10 +29,6 @@ import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
 import net.sacredlabyrinth.Phaed.PreciousStones.vectors.Field;
 
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.SafeZones;
-import com.github.dreadslicer.tekkitrestrict.api.SafeZones.SafeZoneCreate;
-import com.github.dreadslicer.tekkitrestrict.objects.TREnums.SSMode;
-import com.github.dreadslicer.tekkitrestrict.objects.TREnums.SafeZone;
-import com.github.dreadslicer.tekkitrestrict.objects.TRPos;
 import com.massivecraft.factions.Board;
 import com.massivecraft.factions.Conf;
 import com.massivecraft.factions.FLocation;

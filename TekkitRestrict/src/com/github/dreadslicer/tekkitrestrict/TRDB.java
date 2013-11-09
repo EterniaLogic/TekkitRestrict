@@ -5,12 +5,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
 
+import nl.taico.tekkitrestict.objects.TREnums.ConfigFile;
+import nl.taico.tekkitrestict.objects.TREnums.DBType;
+import nl.taico.tekkitrestrict.database.DBException;
+import nl.taico.tekkitrestrict.database.MySQL;
+import nl.taico.tekkitrestrict.database.SQLite;
+
 import com.github.dreadslicer.tekkitrestrict.Log.Warning;
-import com.github.dreadslicer.tekkitrestrict.database.DBException;
-import com.github.dreadslicer.tekkitrestrict.database.MySQL;
-import com.github.dreadslicer.tekkitrestrict.database.SQLite;
-import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
-import com.github.dreadslicer.tekkitrestrict.objects.TREnums.DBType;
 
 public class TRDB {
 	private static boolean newdb = false;

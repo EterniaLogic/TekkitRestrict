@@ -33,10 +33,11 @@ import org.bukkit.entity.Vehicle;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.ItemStack;
 
+import nl.taico.tekkitrestict.objects.TRCharge;
+import nl.taico.tekkitrestict.objects.TRItem;
+
 import com.github.dreadslicer.tekkitrestrict.Log.Warning;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Threads;
-import com.github.dreadslicer.tekkitrestrict.objects.TRCharge;
-import com.github.dreadslicer.tekkitrestrict.objects.TRItem;
 
 import ee.EEBase;
 import ee.ItemEECharged;

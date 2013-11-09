@@ -22,14 +22,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 
+import nl.taico.tekkitrestict.objects.TRConfigLimit;
+import nl.taico.tekkitrestict.objects.TRItem;
+import nl.taico.tekkitrestict.objects.TRLimit;
+import nl.taico.tekkitrestict.objects.TRPermLimit;
+import nl.taico.tekkitrestict.objects.TREnums.ConfigFile;
 import nl.taico.tekkitrestrict.annotations.Safe;
 
 import com.github.dreadslicer.tekkitrestrict.Log.Warning;
-import com.github.dreadslicer.tekkitrestrict.objects.TRConfigLimit;
-import com.github.dreadslicer.tekkitrestrict.objects.TRItem;
-import com.github.dreadslicer.tekkitrestrict.objects.TRLimit;
-import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
-import com.github.dreadslicer.tekkitrestrict.objects.TRPermLimit;
 
 public class TRLimiter {
 	private int expire = -1;
@@ -477,7 +477,7 @@ public class TRLimiter {
 
 	/**
 	 * Called by QuitListener.quit(Player) to make a players limits expire (after 6x32 = 192 ticks) when he logs off.
-	 * @see com.github.dreadslicer.tekkitrestrict.listeners.QuitListener#quit(Player) QuitListener.quit(Player)
+	 * @see nl.taico.tekkitrestrict.listeners.QuitListener#quit(Player) QuitListener.quit(Player)
 	 * @see tekkitrestrict#initHeartBeat()
 	 */
 	public static void setExpire(String player) {

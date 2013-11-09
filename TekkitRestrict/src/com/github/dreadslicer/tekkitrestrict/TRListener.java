@@ -22,10 +22,11 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
+import nl.taico.tekkitrestict.objects.TRItem;
+import nl.taico.tekkitrestrict.commands.TRCommandAlc;
+
 import com.github.dreadslicer.tekkitrestrict.Log.Warning;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Listeners;
-import com.github.dreadslicer.tekkitrestrict.commands.TRCommandAlc;
-import com.github.dreadslicer.tekkitrestrict.objects.TRItem;
 
 import eloraam.core.TileCovered;
 
