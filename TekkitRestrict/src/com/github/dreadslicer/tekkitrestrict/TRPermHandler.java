@@ -15,8 +15,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
-import nl.taico.tekkitrestict.objects.TRItem;
-import nl.taico.tekkitrestict.objects.TRPermLimit;
+import nl.taico.tekkitrestrict.objects.TRItem;
+import nl.taico.tekkitrestrict.objects.TRPermLimit;
 
 import com.github.dreadslicer.tekkitrestrict.Log.Warning;
 

@@ -1,4 +1,4 @@
-package com.github.dreadslicer.tekkitrestrict.lib;
+package nl.taico.tekkitrestrict.lib.config;
 
 import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.configuration.MemoryConfigurationOptions;

@@ -9,8 +9,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import nl.taico.tekkitrestrict.lib.RandomString;
+
 import com.github.dreadslicer.tekkitrestrict.Log.Warning;
-import com.github.dreadslicer.tekkitrestrict.lib.RandomString;
 
 public class PatchCC {
 	static final String s = File.separator;

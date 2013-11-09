@@ -20,7 +20,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import nl.taico.tekkitrestict.objects.TREnums.HackType;
+import nl.taico.tekkitrestrict.objects.TREnums.HackType;
 
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Hacks;
 import com.github.dreadslicer.tekkitrestrict.TRNoHack;

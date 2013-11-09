@@ -1,4 +1,4 @@
-package nl.taico.tekkitrestict.objects;
+package nl.taico.tekkitrestrict.objects;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;

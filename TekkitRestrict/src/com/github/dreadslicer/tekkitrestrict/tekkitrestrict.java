@@ -27,10 +27,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import nl.taico.tekkitrestict.objects.TRItem;
-import nl.taico.tekkitrestict.objects.TRVersion;
-import nl.taico.tekkitrestict.objects.TREnums.ConfigFile;
-import nl.taico.tekkitrestict.objects.TREnums.DBType;
 import nl.taico.tekkitrestrict.commands.TRCommandAlc;
 import nl.taico.tekkitrestrict.commands.TRCommandCheck;
 import nl.taico.tekkitrestrict.commands.TRCommandTPIC;
@@ -43,12 +39,16 @@ import nl.taico.tekkitrestrict.config.SafeZonesConfig;
 import nl.taico.tekkitrestrict.config.TPerformanceConfig;
 import nl.taico.tekkitrestrict.database.Database;
 import nl.taico.tekkitrestrict.eepatch.EEPSettings;
+import nl.taico.tekkitrestrict.lib.config.TRFileConfiguration;
+import nl.taico.tekkitrestrict.lib.config.YamlConfiguration;
 import nl.taico.tekkitrestrict.listeners.Assigner;
 import nl.taico.tekkitrestrict.listeners.CraftingListener;
+import nl.taico.tekkitrestrict.objects.TRItem;
+import nl.taico.tekkitrestrict.objects.TRVersion;
+import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
+import nl.taico.tekkitrestrict.objects.TREnums.DBType;
 
 import com.github.dreadslicer.tekkitrestrict.Log.Warning;
-import com.github.dreadslicer.tekkitrestrict.lib.TRFileConfiguration;
-import com.github.dreadslicer.tekkitrestrict.lib.YamlConfiguration;
 
 public class tekkitrestrict extends JavaPlugin {
 	private static tekkitrestrict instance;

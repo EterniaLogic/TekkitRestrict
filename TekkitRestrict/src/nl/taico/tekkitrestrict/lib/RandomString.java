@@ -1,4 +1,4 @@
-package com.github.dreadslicer.tekkitrestrict.lib;
+package nl.taico.tekkitrestrict.lib;
 
 import java.util.Random;
 

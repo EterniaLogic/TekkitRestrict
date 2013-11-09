@@ -1,4 +1,4 @@
-package nl.taico.tekkitrestict.objects;
+package nl.taico.tekkitrestrict.objects;
 
 public class TRCharge extends TRItem {
 	public int maxcharge, chargerate;
@@ -12,7 +12,7 @@ public class TRCharge extends TRItem {
 	/**
 	 * An object equals this object if id, data, maxcharge and chargerate are the same.<br>
 	 * This does not check if the itemstack is the same.
-	 * @see nl.taico.tekkitrestict.objects.TRItem#equals(java.lang.Object)
+	 * @see nl.taico.tekkitrestrict.objects.TRItem#equals(java.lang.Object)
 	 */
 	@Override
 	public boolean equals(Object obj){

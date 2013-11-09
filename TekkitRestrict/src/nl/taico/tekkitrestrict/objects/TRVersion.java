@@ -1,6 +1,6 @@
-package nl.taico.tekkitrestict.objects;
+package nl.taico.tekkitrestrict.objects;
 
-import nl.taico.tekkitrestict.objects.TREnums.ConfigFile;
+import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 
 import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;
 

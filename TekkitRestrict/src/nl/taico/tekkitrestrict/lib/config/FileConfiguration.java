@@ -1,4 +1,4 @@
-package com.github.dreadslicer.tekkitrestrict.lib;
+package nl.taico.tekkitrestrict.lib.config;
 
 import java.io.BufferedReader;
 import java.io.File;

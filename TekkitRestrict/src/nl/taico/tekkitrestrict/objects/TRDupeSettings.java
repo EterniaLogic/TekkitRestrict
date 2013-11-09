@@ -1,4 +1,4 @@
-package nl.taico.tekkitrestict.objects;
+package nl.taico.tekkitrestrict.objects;
 
 public class TRDupeSettings {
 	public boolean prevent, broadcast, kick, useCommand;

@@ -8,8 +8,8 @@ import java.util.List;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-import nl.taico.tekkitrestict.objects.TRItem;
-import nl.taico.tekkitrestict.objects.TREnums.ConfigFile;
+import nl.taico.tekkitrestrict.objects.TRItem;
+import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 
 import com.github.dreadslicer.tekkitrestrict.Log.Warning;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Listeners;

@@ -17,12 +17,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 
-import nl.taico.tekkitrestict.objects.TRItem;
-import nl.taico.tekkitrestict.objects.TRLimit;
-import nl.taico.tekkitrestict.objects.TRPos;
-import nl.taico.tekkitrestict.objects.TREnums.ConfigFile;
-import nl.taico.tekkitrestict.objects.TREnums.SafeZone;
 import nl.taico.tekkitrestrict.api.SafeZones.SafeZoneCreate;
+import nl.taico.tekkitrestrict.objects.TRItem;
+import nl.taico.tekkitrestrict.objects.TRLimit;
+import nl.taico.tekkitrestrict.objects.TRPos;
+import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
+import nl.taico.tekkitrestrict.objects.TREnums.SafeZone;
 
 import com.github.dreadslicer.tekkitrestrict.Log;
 import com.github.dreadslicer.tekkitrestrict.Send;

@@ -10,8 +10,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import nl.taico.tekkitrestict.objects.TRLimit;
-import nl.taico.tekkitrestict.objects.TRPermLimit;
+import nl.taico.tekkitrestrict.objects.TRLimit;
+import nl.taico.tekkitrestrict.objects.TRPermLimit;
 
 import com.github.dreadslicer.tekkitrestrict.Send;
 import com.github.dreadslicer.tekkitrestrict.TRLimiter;

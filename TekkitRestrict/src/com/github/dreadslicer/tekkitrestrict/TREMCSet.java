@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import nl.taico.tekkitrestict.objects.TREnums.ConfigFile;
+import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 
 public class TREMCSet {
 	public static void reload() {

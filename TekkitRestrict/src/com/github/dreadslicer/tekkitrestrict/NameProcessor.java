@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import nl.taico.tekkitrestict.objects.TRItem;
+import nl.taico.tekkitrestrict.objects.TRItem;
 
 public class NameProcessor {
 	/*

@@ -7,7 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
-import nl.taico.tekkitrestict.objects.TREnums.HackType;
+import nl.taico.tekkitrestrict.objects.TREnums.HackType;
 
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Hacks;
 import com.github.dreadslicer.tekkitrestrict.TRNoHack;

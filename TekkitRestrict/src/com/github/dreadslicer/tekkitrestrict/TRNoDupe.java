@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import nl.taico.tekkitrestict.objects.TREnums.DupeType;
+import nl.taico.tekkitrestrict.objects.TREnums.DupeType;
 
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Dupes;
 

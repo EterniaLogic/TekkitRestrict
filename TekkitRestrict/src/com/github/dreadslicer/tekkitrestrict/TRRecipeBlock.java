@@ -11,8 +11,8 @@ import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
 
-import nl.taico.tekkitrestict.objects.TRItem;
-import nl.taico.tekkitrestict.objects.TREnums.ConfigFile;
+import nl.taico.tekkitrestrict.objects.TRItem;
+import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 
 import com.github.dreadslicer.tekkitrestrict.Log.Warning;
 

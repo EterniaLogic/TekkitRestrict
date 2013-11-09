@@ -1,4 +1,4 @@
-package com.github.dreadslicer.tekkitrestrict.lib;
+package nl.taico.tekkitrestrict.lib.config;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -24,10 +24,10 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.representer.Representer;
 
-import nl.taico.tekkitrestict.objects.TREnums.ConfigFile;
 import nl.taico.tekkitrestrict.config.AdvancedConfig;
 import nl.taico.tekkitrestrict.config.GeneralConfig;
 import nl.taico.tekkitrestrict.config.TPerformanceConfig;
+import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 
 import com.github.dreadslicer.tekkitrestrict.Log;
 import com.github.dreadslicer.tekkitrestrict.tekkitrestrict;

@@ -22,8 +22,8 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
-import nl.taico.tekkitrestict.objects.TRItem;
 import nl.taico.tekkitrestrict.commands.TRCommandAlc;
+import nl.taico.tekkitrestrict.objects.TRItem;
 
 import com.github.dreadslicer.tekkitrestrict.Log.Warning;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.Listeners;

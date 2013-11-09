@@ -1,9 +1,6 @@
-package com.github.dreadslicer.tekkitrestrict.lib;
+package nl.taico.tekkitrestrict.lib.config;
 
 import org.apache.commons.lang.Validate;
-
-//Referenced classes of package org.bukkit.configuration.file:
-//         FileConfigurationOptions, YamlConfiguration, FileConfiguration
 
 public class YamlConfigurationOptions extends FileConfigurationOptions {
 
@@ -60,11 +57,3 @@ public class YamlConfigurationOptions extends FileConfigurationOptions {
 
 	private int indent;
 }
-
-/*
- * DECOMPILATION REPORT
- * 
- * Decompiled from: /home/dread/tekkit_server/Tekkit_.jar Total time: 32 ms Jad
- * reported messages/errors: The class file version is 49.0 (only 45.3, 46.0 and
- * 47.0 are supported) Exit status: 0 Caught exceptions:
- */

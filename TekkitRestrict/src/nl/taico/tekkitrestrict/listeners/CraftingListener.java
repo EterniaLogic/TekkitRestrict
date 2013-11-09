@@ -5,7 +5,7 @@ import java.util.HashMap;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
-import nl.taico.tekkitrestict.objects.TRItem;
+import nl.taico.tekkitrestrict.objects.TRItem;
 
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache;
 import com.github.dreadslicer.tekkitrestrict.TRNoItem;

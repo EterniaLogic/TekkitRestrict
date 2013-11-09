@@ -22,12 +22,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 
-import nl.taico.tekkitrestict.objects.TRConfigLimit;
-import nl.taico.tekkitrestict.objects.TRItem;
-import nl.taico.tekkitrestict.objects.TRLimit;
-import nl.taico.tekkitrestict.objects.TRPermLimit;
-import nl.taico.tekkitrestict.objects.TREnums.ConfigFile;
 import nl.taico.tekkitrestrict.annotations.Safe;
+import nl.taico.tekkitrestrict.objects.TRConfigLimit;
+import nl.taico.tekkitrestrict.objects.TRItem;
+import nl.taico.tekkitrestrict.objects.TRLimit;
+import nl.taico.tekkitrestrict.objects.TRPermLimit;
+import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 
 import com.github.dreadslicer.tekkitrestrict.Log.Warning;
 

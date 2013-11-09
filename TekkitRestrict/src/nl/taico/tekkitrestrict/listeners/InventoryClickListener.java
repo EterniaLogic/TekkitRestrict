@@ -8,8 +8,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
-import nl.taico.tekkitrestict.objects.TRItem;
-import nl.taico.tekkitrestict.objects.TREnums.DupeType;
+import nl.taico.tekkitrestrict.objects.TRItem;
+import nl.taico.tekkitrestrict.objects.TREnums.DupeType;
 
 import com.github.dreadslicer.tekkitrestrict.TRNoDupe;
 import com.github.dreadslicer.tekkitrestrict.TRNoItem;

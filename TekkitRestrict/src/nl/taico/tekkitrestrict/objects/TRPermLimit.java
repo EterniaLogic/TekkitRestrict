@@ -1,4 +1,4 @@
-package nl.taico.tekkitrestict.objects;
+package nl.taico.tekkitrestrict.objects;
 
 public class TRPermLimit extends TRItem {
 	public int max = 0;

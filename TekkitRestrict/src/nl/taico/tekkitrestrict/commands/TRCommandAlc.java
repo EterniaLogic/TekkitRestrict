@@ -21,7 +21,7 @@ import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.event.CraftEventFactory;
 import org.bukkit.entity.Player;
 
-import nl.taico.tekkitrestict.objects.OpenAlcObj;
+import nl.taico.tekkitrestrict.objects.OpenAlcObj;
 
 import com.github.dreadslicer.tekkitrestrict.Log;
 import com.github.dreadslicer.tekkitrestrict.Log.Warning;

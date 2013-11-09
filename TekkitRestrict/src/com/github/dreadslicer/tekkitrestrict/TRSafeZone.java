@@ -17,10 +17,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 
-import nl.taico.tekkitrestict.objects.TRPos;
-import nl.taico.tekkitrestict.objects.TREnums.SSMode;
-import nl.taico.tekkitrestict.objects.TREnums.SafeZone;
 import nl.taico.tekkitrestrict.api.SafeZones.SafeZoneCreate;
+import nl.taico.tekkitrestrict.objects.TRPos;
+import nl.taico.tekkitrestrict.objects.TREnums.SSMode;
+import nl.taico.tekkitrestrict.objects.TREnums.SafeZone;
 
 import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
