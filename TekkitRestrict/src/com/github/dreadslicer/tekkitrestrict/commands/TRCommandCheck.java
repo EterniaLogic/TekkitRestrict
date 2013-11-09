@@ -78,6 +78,10 @@ public class TRCommandCheck implements CommandExecutor {
 				send.msg("[" + l.id + ":" + l.data + "] - " + l.placedBlock.size() + "/" + cccl + " blocks");
 			}
 		} else {
+			if(cc.itemlimits.isEmpty()){
+				send.msg(ChatColor.RED + "You don't have any limits!");
+				return true;
+			}
 			List<TRLimit> skip = new ArrayList<TRLimit>();
 			for (TRLimit l : cc.itemlimits) {
 				int cccl = cc.getMax(player, l.id, l.data);

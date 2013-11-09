@@ -118,7 +118,7 @@ public class TRListener implements Listener {
 		Block block = event.getBlock();
 		int id = block.getTypeId();
 		if (exempt(id)) return;
-		
+
 		Player player = event.getPlayer();
 		
 		if (player == null) {
@@ -126,16 +126,14 @@ public class TRListener implements Listener {
 			return;
 		}
 		
+		String pname = player.getName();
+		
 		try {
 			if (!TRLWCProtect.checkLWCAllowed(event)) return;
 			
 			int data = block.getData();
-			WorldServer ws = ((CraftWorld) block.getWorld()).getHandle();
 			
-			TileEntity te1 = ws.getTileEntity(block.getX(), block.getY(), block.getZ());
-			
-			String pname = player.getName();
-			if (!pname.equalsIgnoreCase("[BuildCraft]") && !pname.equalsIgnoreCase("[RedPower]")){
+			if (!pname.equals("[BuildCraft]") && !pname.equals("[RedPower]")){
 				if (Listeners.UseBlockLimit && !player.hasPermission("tekkitrestrict.bypass.limiter")) {
 					TRLimiter il = TRLimiter.getOnlineLimiter(player);
 					String limited = il.checkLimit(event, false);
@@ -143,25 +141,31 @@ public class TRListener implements Listener {
 						if (limited.equals("")) limited = ChatColor.RED + "[TRItemLimiter] You cannot place down any more of that block!";
 						TRItem.sendBannedMessage(player, limited);
 						event.setCancelled(true);
-						if (te1 instanceof TileCovered) {
-							TileCovered tc = (TileCovered) te1;
-							for (int i = 0; i < 6; i++) {
-								if (tc.getCover(i) != -1 && tc.getCover(i) == data) {
-									tc.tryRemoveCover(i);
+
+						if (id == 136){
+							WorldServer ws = ((CraftWorld) block.getWorld()).getHandle();
+							TileEntity te1 = ws.getTileEntity(block.getX(), block.getY(), block.getZ());
+							if (te1 instanceof TileCovered) {
+								TileCovered tc = (TileCovered) te1;
+								for (int i = 0; i < 6; i++) {
+									if (tc.getCover(i) != -1 && tc.getCover(i) == data) {
+										tc.tryRemoveCover(i);
+									}
 								}
+								tc.updateBlockChange();
 							}
-							tc.updateBlockChange();
 						}
 					}
 				}
-	
-				if (te1 != null && data == 0) {
-					if (te1 instanceof TileCovered) {
-						// TileCovered tc = (TileCovered)te1;
-						// tekkitrestrict.log.info("ar "+lastdata);
+				
+				if (id == 136 && data == 0){
+					WorldServer ws = ((CraftWorld) block.getWorld()).getHandle();
+					TileEntity te1 = ws.getTileEntity(block.getX(), block.getY(), block.getZ());
+					if (te1 != null && te1 instanceof TileCovered) {
 						data = lastdata;
 					}
 				}
+				
 			}
 			
 			String msg = TRNoItem.isItemBanned(player, id, data, true);
@@ -171,17 +175,22 @@ public class TRListener implements Listener {
 				if (msg.equals("")) msg = ChatColor.RED + "[TRItemDisabler] You are not allowed to place down this type of block!";
 				TRItem.sendBannedMessage(player, msg);
 				event.setCancelled(true);
-				if (te1 instanceof TileCovered) {
-					TileCovered tc = (TileCovered) te1;
-					for (int i = 0; i < 6; i++) {
-						if (tc.getCover(i) != -1 && tc.getCover(i) == data) {
-							tc.tryRemoveCover(i);
+				
+				if (id == 136){
+					WorldServer ws = ((CraftWorld) block.getWorld()).getHandle();
+					TileEntity te1 = ws.getTileEntity(block.getX(), block.getY(), block.getZ());
+					if (te1 instanceof TileCovered) {
+						TileCovered tc = (TileCovered) te1;
+						for (int i = 0; i < 6; i++) {
+							if (tc.getCover(i) != -1 && tc.getCover(i) == data) {
+								tc.tryRemoveCover(i);
+							}
 						}
+						tc.updateBlockChange();
 					}
-					tc.updateBlockChange();
 				}
 			}
-			lastdata = event.getBlock().getData();
+			lastdata = block.getData();
 		} catch(Exception ex){
 			if (!errorBlockPlace){
 				Warning.other("An error occurred in the BlockPlace Listener! Please inform the author (This error will only be logged once).");
@@ -213,9 +222,6 @@ public class TRListener implements Listener {
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
 		if (player == null) return;
-		
-		String pname = player.getName(); // determine if this is Buildcraft or RedPower... Then exempt.
-		if (pname.equalsIgnoreCase("[BuildCraft]") || pname.equalsIgnoreCase("[RedPower]")) return;
 		
 		// lets do this based on a white-listed approach.
 		// First, lets loop through the DisableClick list to stop clicks.

@@ -49,6 +49,15 @@ public class TRItem {
 		return ti;
 	}
 	
+	public static boolean compareNP(TRItem item, TRItem np){
+		if (item.id != np.id) return false;
+		
+		if (item.data == np.data || (item.data == -10 && np.data == 0)) return true;//:0 = :0, :-1 = :-1.
+		if (np.data == -1) return true;
+		
+		return false;
+	}
+	
 	/**
 	 * Compare this TRItem with the given id and data
 	 * @return True if:<br>

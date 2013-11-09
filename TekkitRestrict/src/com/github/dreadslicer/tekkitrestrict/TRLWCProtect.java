@@ -81,6 +81,7 @@ public class TRLWCProtect {
 				if (blocked.equals("")) blocked = ChatColor.RED + "You are not allowed to place this here!";
 				TRItem.sendBannedMessage(player, blocked);
 				event.setCancelled(true);
+
 				return false;
 			}
 		return true;

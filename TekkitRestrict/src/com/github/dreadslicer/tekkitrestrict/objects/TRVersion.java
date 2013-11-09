@@ -17,9 +17,9 @@ public class TRVersion {
 			str = str.replace("tekkitrestrict", "");
 		}
 		str = str.trim();
-		
+		fullVer = str;
 		{
-			String[] temp = fullVer.split("\\.");
+			String[] temp = fullVer.split(" ")[0].split("\\.");
 			major = Integer.parseInt(temp[0]);
 			minor = Integer.parseInt(temp[1]);
 		}

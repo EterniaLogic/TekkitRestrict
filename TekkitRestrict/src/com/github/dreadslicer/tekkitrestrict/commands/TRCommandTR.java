@@ -20,6 +20,7 @@ import org.bukkit.plugin.PluginManager;
 import com.github.dreadslicer.tekkitrestrict.Log;
 import com.github.dreadslicer.tekkitrestrict.Send;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache.LogFilter;
+import com.github.dreadslicer.tekkitrestrict.NameProcessor;
 import com.github.dreadslicer.tekkitrestrict.TRConfigCache;
 import com.github.dreadslicer.tekkitrestrict.TREMCSet;
 import com.github.dreadslicer.tekkitrestrict.TRItemProcessor;
@@ -85,6 +86,11 @@ public class TRCommandTR implements CommandExecutor {
 		
 		if (largs[0].equals("debug") && !(send.sender instanceof Player)){
 			debugInfo();
+			return true;
+		}
+		
+		if (largs[0].equals("banned")){
+			banned(largs, true);
 			return true;
 		}
 		
@@ -982,6 +988,39 @@ public class TRCommandTR implements CommandExecutor {
 					send.msg("[" + l.id + ":" + l.data + "] - " + l.placedBlock.size()+"/? blocks");
 				}
 			}
+		}
+	}
+
+	private void banned(String[] largs, boolean tr){
+		int page = 1;
+		if (largs.length > 2){
+			send.msg(ChatColor.RED + "Incorrect syntax! Correct usage: "+(tr?"/tr banned ":"/banned ")+"<page>");
+			return;
+		}
+		try {
+			if (largs.length == 2) page = Integer.parseInt(largs[1]);
+			else page = 1;
+		} catch (NumberFormatException ex){
+			send.msg(ChatColor.RED + largs[1] + " is not a valid number!");
+			return;
+		}
+		int start = (page-1) * 8; //8
+		int end = page * 8; //15
+		if (start > TRNoItem.DisabledItems.size()){
+			send.msg(ChatColor.RED + "Page " + page + " does not exist!");
+			int lastpage = Math.round(TRNoItem.DisabledItems.size()/8);
+			send.msg(ChatColor.RED + "Last page: " + lastpage+".");
+			return;
+		}
+		send.msg(ChatColor.BLUE + "Banned Items - Page " + page);
+		send.msg(ChatColor.RED +""+ChatColor.BOLD + "Banned Item - " + ChatColor.RED +"Reason");
+		for (int i=start;i<TRNoItem.DisabledItems.size() && i < end;i++){
+			TRItem it = TRNoItem.DisabledItems.get(i);
+			String reason = it.msg;
+			if (reason == null || reason.equals("")) reason = "None";
+			String name = NameProcessor.getName(it);
+			if (name == null) continue;
+			send.msg(ChatColor.RED + NameProcessor.getName(it) + " - " + ChatColor.BLUE + it.msg);
 		}
 	}
 }

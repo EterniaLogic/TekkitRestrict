@@ -5,11 +5,11 @@ import java.util.Random;
 public class RandomString
 {
 
-  private static final char[] symbols = new char[36];
+  private static final char[] symbols = new char[26];
 
   static {
-    for (int idx = 10; idx < 36; ++idx)
-      symbols[idx] = (char) ('a' + idx - 10);
+    for (int idx = 0; idx < 26; ++idx)
+      symbols[idx] = (char) ('a' + idx);
   }
 
   private final Random random = new Random();

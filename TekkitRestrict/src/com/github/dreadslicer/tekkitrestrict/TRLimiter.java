@@ -253,6 +253,34 @@ public class TRLimiter {
 			
 		}
 	}
+	
+	public void checkBreakLimit(int id, byte data, Location bloc) {
+
+		// loop through player's limits.
+		for (int i = 0; i < itemlimits.size(); i++) {
+			TRLimit limit = itemlimits.get(i);
+
+			if (limit.id != id || limit.data != data) continue;
+			
+			int currentnum = limit.placedBlock.size();
+			if (currentnum <= 0) {
+				// this would be at minimum
+				// (LOG) maxed out
+				return;
+			} else {
+				// add to it!
+				limit.placedBlock.remove(bloc);
+				
+				int x = bloc.getBlockX();
+				int y = bloc.getBlockY();
+				int z = bloc.getBlockZ();
+				allBlockOwners.remove(bloc.getWorld().getName() + ":" + x + ":" + y + ":" + z);
+				isModified = true;
+				return;
+			}
+			
+		}
+	}
 
 	/**
 	 * First checks all loaded limiters.<br>

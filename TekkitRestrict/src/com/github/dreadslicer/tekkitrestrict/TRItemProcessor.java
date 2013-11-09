@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 
 import com.github.dreadslicer.tekkitrestrict.Log.Warning;
@@ -1168,7 +1167,7 @@ public class TRItemProcessor {
 	 */
 	public static List<TRItem> processItemString(String item) throws TRException {
 		String itemx;
-		String message = null;
+		String message = "";
 		if (item.contains("{")){
 			String temp[] = item.split("\\{");
 			itemx = temp[0].replace(" ", "");
@@ -1176,7 +1175,7 @@ public class TRItemProcessor {
 			message = Log.replaceColors(message);
 		} else {
 			itemx = item;
-			message = ChatColor.RED + "You are not allowed to modify/obtain this item!";
+			//message = ChatColor.RED + "You are not allowed to modify/obtain this item!";
 		}
 		itemx = itemx.toLowerCase().replace(":-", ":=");
 		LinkedList<TRItem> tci = new LinkedList<TRItem>();
@@ -1286,6 +1285,152 @@ public class TRItemProcessor {
 						it2.msg = message;
 						tci.add(it2);
 					}
+					return tci; //All :*
+				}
+				
+				items = processItemName(itemx, -1, message);
+				if (items != null) return items;
+				
+				throw new TRException("\""+itemx+"\" is not a valid ID, modgroup, permissiongroup, EE itemname or IC2 itemname!");
+			}
+
+			tci.add(TRItem.parseItem(id, -1, message));
+			return tci;
+		}
+	}
+	
+	/**
+	 * Processes an item string of the following kinds:<br>
+	 * - Ranges + 1 Damage value (1-5:1)<br>
+	 * - Ranges without damage value (1-5)<br>
+	 * - Single item + 1 Damage value (1:2)<br>
+	 * - Single item without damage value (3)<br>
+	 * - Group names (data is always *) (ee)<br>
+	 * - EE2 and IC2 item names + 1 Damage value (rmaxe:1)<br>
+	 * - EE2 and IC2 item names without damage value (quantumhelmet)<br>
+	 */
+	public static List<TRItem> processItemStringAndAddToLIst(String item, List<String> addedGroups) throws TRException {
+		String itemx;
+		String message = "";
+		if (item.contains("{")){
+			String temp[] = item.split("\\{");
+			itemx = temp[0].replace(" ", "");
+			message = temp[1].replace("}", "");
+			message = Log.replaceColors(message);
+		} else {
+			itemx = item;
+			//message = ChatColor.RED + "You are not allowed to modify/obtain this item!";
+		}
+		itemx = itemx.toLowerCase().replace(":-", ":=");
+		LinkedList<TRItem> tci = new LinkedList<TRItem>();
+		if (itemx.contains(";")){
+			throw new TRException("You cannot use ; to separate items in a single item string. You can only use ranges, single items, itemnames or groups.");
+		}
+		// converts a variable string into a list of data.
+
+		//############################## RANGE OF ITEMS ###########################
+		if (itemx.contains("-")) {
+			// loop through this range and add each to the return stack.
+			int data = 0;
+			if (itemx.contains(":")) {
+				String dataString = itemx.split(":")[1];
+				if (dataString.equals("*")) data = -1;
+				else {
+					try {
+						data = Integer.parseInt(dataString.replace("=", "-"));
+						if (data == 0) data = -10;
+					} catch (NumberFormatException ex){
+						throw new TRException("Invalid data value: \"" + dataString + "\" in \"" + itemx + "\"!");//Throw exception
+					}
+				}
+				
+				itemx = itemx.split(":")[0];
+			} else {
+				data = -1;
+			}
+			
+			String[] t = itemx.split("-");
+			int fromId = 0, toId = 0;
+			try {
+				fromId = Integer.parseInt(t[0]);
+				toId = Integer.parseInt(t[1]);
+			} catch (NumberFormatException ex){
+				throw new TRException("Invalid range: \"" + t[0]+"-"+t[1] + "\"");
+			}
+
+			for (int i = fromId; i <= toId; i++) {
+				tci.add(TRItem.parseItem(i, data, message));
+			}
+			return tci;
+		}
+		
+		//############################## SINGLE ID WITH DATA ###########################
+		else if (itemx.contains(":")) {
+			String[] t = itemx.split(":");
+			int id = 0, data = 0;
+			
+			try {
+				if (t[1].equals("*"))
+					data = -1;
+				else
+					data = Integer.parseInt(t[1].replace('=', '-'));
+				
+			} catch (NumberFormatException ex){
+				throw new TRException("Invalid data value in \""+itemx+"\"!");
+			}
+			
+			if (data == 0) { //If :0, then :-10
+				data = -10;
+			}
+			
+			if (t[0].matches("\\d+")){//ID
+				try {
+					id = Integer.parseInt(t[0]);
+				} catch (NumberFormatException ex){
+					throw new TRException("Invalid entry: \"" + itemx + "\"!");
+				}
+				
+				tci.add(TRItem.parseItem(id, data, message));
+				return tci;
+			} else {//GROUP / NAME
+				List<TRItem> items = groups.get(t[0]);
+				
+				if (items != null){
+					for (TRItem it : items){
+						TRItem it2 = (TRItem) it.clone();
+						it2.msg = message;
+						tci.add(it2);
+					}
+					if (addedGroups != null) addedGroups.add(t[0]);
+					return tci; //All :*
+				}
+				
+				items = processItemName(t[0], data, message);
+				if (items != null) return items;
+				
+				throw new TRException("\""+t[0]+"\" is not a valid modgroup, permissiongroup, EE or IC2 itemname!");
+			}
+		}
+		
+		//############################## ALL ITEMS ###########################
+		else if(itemx.equals("*")) {
+			throw new TRException("Using * to define all items is no longer supported. Please give the permission tekkitrestrict.[feature].blockall instead.");
+		}
+		
+		//############################## SINGLE ID ###########################
+		else {
+			int id = 0;
+			try {
+				id = Integer.parseInt(itemx);
+			} catch (NumberFormatException ex){
+				List<TRItem> items = groups.get(itemx);
+				if (items != null){
+					for (TRItem it : items){
+						TRItem it2 = (TRItem) it.clone();
+						it2.msg = message;
+						tci.add(it2);
+					}
+					if (addedGroups != null) addedGroups.add(itemx);
 					return tci; //All :*
 				}
 				

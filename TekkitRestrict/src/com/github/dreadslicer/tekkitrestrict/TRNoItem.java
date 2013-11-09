@@ -19,7 +19,7 @@ import com.github.dreadslicer.tekkitrestrict.objects.TREnums.ConfigFile;
  */
 public class TRNoItem {
 	/** A list of all the (by config) banned items. */
-	private static LinkedList<TRItem> DisabledItems = new LinkedList<TRItem>();
+	public static LinkedList<TRItem> DisabledItems = new LinkedList<TRItem>();
 	/** A list of all the (by config) banned creative items. */
 	private static LinkedList<TRItem> DisabledCreativeItems = new LinkedList<TRItem>();
 	

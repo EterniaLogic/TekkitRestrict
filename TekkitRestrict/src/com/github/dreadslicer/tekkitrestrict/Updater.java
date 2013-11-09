@@ -279,12 +279,15 @@ public class Updater {
 				this.plugin.getLogger().info("About to download a new update: " + this.versionName);
 			}
 			long downloaded = 0;
+			int last = -1;
 			while ((count = in.read(data, 0, Updater.BYTE_SIZE)) != -1) {
 				downloaded += count;
 				fout.write(data, 0, count);
-				final int percent = (int) ((downloaded * 100) / fileLength);
-				if (this.announce && ((percent % 10) == 0)) {
+				if (!announce) continue;
+				final int percent = ((int) ((downloaded * 100) / fileLength)) % 10;
+				if (percent == 0 && percent != last) {
 					this.plugin.getLogger().info("Downloading update: " + percent + "% of " + fileLength + " bytes.");
+					last = percent;
 				}
 			}
 			//Just a quick check to make sure we didn't leave any files from last time...

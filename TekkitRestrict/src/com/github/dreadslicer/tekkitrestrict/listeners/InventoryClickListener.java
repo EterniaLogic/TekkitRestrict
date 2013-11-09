@@ -49,8 +49,8 @@ public class InventoryClickListener implements Listener {
 			}
 			
 			if (banned != null){
-				if (banned.equals("")) banned = ChatColor.RED + "[TRItemDisabler] This item is banned!";
-				TRItem.sendBannedMessage(player, banned);
+				String msg = ChatColor.RED + "[TRItemDisabler] This item is banned!" + (banned.equals("") ? "" : " Reason: "+ChatColor.RESET+banned);
+				TRItem.sendBannedMessage(player, msg);
 				event.setCancelled(true);
 				return;
 			}
