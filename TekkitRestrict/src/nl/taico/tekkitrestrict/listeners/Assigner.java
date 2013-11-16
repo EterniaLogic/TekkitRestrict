@@ -31,6 +31,9 @@ public class Assigner {
 			Dupes.transmutes.prevent)
 			InventoryClickListener.doDupeCheck = true;
 
+		if (Listeners.UseLimitedCreative)
+			PM.registerEvents(new DropListener(), plugin);
+		
 		if (Dupes.teleports.prevent)
 			PM.registerEvents(new TeleportListener(), plugin);
 		

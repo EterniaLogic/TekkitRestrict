@@ -5,6 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.eclipse.jdt.annotation.NonNull;
 
 import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.Util;
@@ -19,7 +20,7 @@ public class TRNoHack {
 	public static ConcurrentHashMap<String, Integer> cmdFly = new ConcurrentHashMap<String, Integer>();
 	public static ConcurrentHashMap<String, Integer> cmdForcefield = new ConcurrentHashMap<String, Integer>();
 	public static ConcurrentHashMap<String, Integer> cmdSpeed = new ConcurrentHashMap<String, Integer>();
-	public static void handleHack(Player player, HackType type) {
+	public static void handleHack(@NonNull Player player, HackType type) {
 		//int x = player.getLocation().getBlockX();
 		//int y = player.getLocation().getBlockY();
 		//int z = player.getLocation().getBlockZ();
@@ -107,7 +108,7 @@ public class TRNoHack {
 		Log.Hack(message);
 	}
 	
-	private static String convert(String str, String type, Player player){
+	@NonNull private static String convert(@NonNull String str, @NonNull String type, @NonNull Player player){
 		str = Log.replaceColors(str);
 		str = str.replace("{PLAYER}", player.getName());
 		str = str.replace("{TYPE}", type);
@@ -119,7 +120,7 @@ public class TRNoHack {
 	}
 
 	/** Teleport the player to the highest block at his position. Will not teleport players above their current position. */
-	public static void groundPlayer(Player player) {
+	public static void groundPlayer(@NonNull Player player) {
 		Block highest = player.getWorld().getHighestBlockAt(player.getLocation());
 		int yblock = highest.getLocation().getBlockY();
 		int yplayer = player.getLocation().getBlockY();
@@ -132,7 +133,7 @@ public class TRNoHack {
 		NoHackForcefield.clearMaps();
 	}
 
-	public static void playerLogout(Player player) {
+	public static void playerLogout(@NonNull Player player) {
 		// clears ALL lists for said player
 		NoHackSpeed.playerLogout(player.getName());
 		NoHackFly.playerLogout(player.getName());

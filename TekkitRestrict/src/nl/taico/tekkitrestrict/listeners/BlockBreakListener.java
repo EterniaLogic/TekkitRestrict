@@ -49,7 +49,7 @@ public class BlockBreakListener implements Listener{
 				}
 			}
 			
-			block.getWorld().dropItemNaturally(block.getLocation(), new org.bukkit.inventory.ItemStack(12, 1, (short) 0));
+			block.getWorld().dropItemNaturally(block.getLocation(), new org.bukkit.inventory.ItemStack(128, 1, (short) 0));
 		}
 		
 		Player player = event.getPlayer();

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 public class GeneralConfig extends TRConfig {
 	public static String s = File.separator;
 	public static ArrayList<String> defaultContents(boolean extra){
-		ArrayList<String> tbr = new ArrayList<String>();
+		ArrayList<String> tbr = new ArrayList<String>(120);
 		tbr.add("######################################################################");
 		tbr.add("## Configuration file for TekkitRestrict                            ##");
 		tbr.add("## Authors: Taeir, DreadEnd (aka DreadSlicer)                       ##");

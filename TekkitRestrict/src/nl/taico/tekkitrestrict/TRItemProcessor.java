@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bukkit.configuration.ConfigurationSection;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 
 import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.objects.TRItem;
@@ -98,7 +100,7 @@ public class TRItemProcessor {
 		}
 	}
 	
-	public static boolean isInRange(String range, int id, int data, String perm){
+	public static boolean isInRange(@NonNull String range, int id, int data, @NonNull String perm){
 		String itemx = range.replace(":-", ":=");
 		if (itemx.contains("-")) {
 			// loop through this range and add each to the return stack.
@@ -237,7 +239,7 @@ public class TRItemProcessor {
 	 * Processes an item string that contains ;'s.<br>
 	 * This uses {@link #processItemString(String, boolean)} to process each item string.
 	 */
-	private static List<TRItem> processMultiString(String ins) throws TRException {
+	@NonNull private static List<TRItem> processMultiString(@NonNull String ins) throws TRException {
 		if (ins.contains(";")) {
 			String[] itemsStr = ins.split(";");
 			List<TRItem> l = new LinkedList<TRItem>();
@@ -254,7 +256,7 @@ public class TRItemProcessor {
 	 * Processes an item string that contains ;'s.<br>
 	 * This uses {@link #processItemString(String, boolean, String)} to process each item string.
 	 */
-	private static List<TRItem> processMultiString(String ins, String message) throws TRException {
+	@NonNull private static List<TRItem> processMultiString(@NonNull String ins, @Nullable String message) throws TRException {
 		String msg;
 		if (message == null || message.equals("")) msg = "";
 		else msg = " {"+message+"}";
@@ -271,13 +273,13 @@ public class TRItemProcessor {
 		return new LinkedList<TRItem>();
 	}
 
-	public static List<TRItem> processItemName(String name, int data) throws TRException {
+	@Nullable public static List<TRItem> processItemName(@NonNull String name, int data) throws TRException {
 		List<TRItem> tbr = processIC2Item(name, data);
 		if (tbr == null) tbr = processEEItem(name, data);
 		
 		return tbr;
 	}
-	public static List<TRItem> processIC2Item(String name, int data) throws TRException {
+	@Nullable public static List<TRItem> processIC2Item(@NonNull String name, int data) throws TRException {
 		name = name.toLowerCase();
 		List<TRItem> tbr = new LinkedList<TRItem>();
 		switch (name){
@@ -399,7 +401,7 @@ public class TRItemProcessor {
 				return null;
 		}
 	}
-	public static List<TRItem> processEEItem(String name, int data) throws TRException {
+	@Nullable public static List<TRItem> processEEItem(@NonNull String name, int data) throws TRException {
 		List<TRItem> tbr = new LinkedList<TRItem>();
 		name = name.toLowerCase();
 		switch (name){
@@ -665,13 +667,13 @@ public class TRItemProcessor {
 				return null;
 		}
 	}
-	private static List<TRItem> processItemName(String name, int data, String message) throws TRException {
+	@Nullable private static List<TRItem> processItemName(@NonNull String name, int data, @Nullable String message) throws TRException {
 		List<TRItem> tbr = processIC2Item(name, data, message);
 		if (tbr == null) tbr = processEEItem(name, data, message);
 		
 		return tbr;
 	}
-	private static List<TRItem> processIC2Item(String name, int data, String message) throws TRException {
+	@Nullable private static List<TRItem> processIC2Item(@NonNull String name, int data, @Nullable String message) throws TRException {
 		name = name.toLowerCase();
 		String msg;
 		if (message == null || message.equals("")) msg = "";
@@ -796,7 +798,7 @@ public class TRItemProcessor {
 				return null;
 		}
 	}
-	private static List<TRItem> processEEItem(String name, int data, String message) throws TRException {
+	@Nullable private static List<TRItem> processEEItem(@NonNull String name, int data, @Nullable String message) throws TRException {
 		List<TRItem> tbr = new LinkedList<TRItem>();
 		String msg;
 		if (message == null || message.equals("")) msg = "";
@@ -1066,7 +1068,7 @@ public class TRItemProcessor {
 		}
 	}
 	
-	public static int getIdFromIC2Name(String name){
+	public static int getIdFromIC2Name(@NonNull String name){
 		name = name.toLowerCase();
 		switch (name){
 			case "quantumhelmet":
@@ -1165,7 +1167,7 @@ public class TRItemProcessor {
 	 * - EE2 and IC2 item names + 1 Damage value (rmaxe:1)<br>
 	 * - EE2 and IC2 item names without damage value (quantumhelmet)<br>
 	 */
-	public static List<TRItem> processItemString(String item) throws TRException {
+	@NonNull public static List<TRItem> processItemString(@NonNull String item) throws TRException {
 		String itemx;
 		String message = "";
 		if (item.contains("{")){
@@ -1309,7 +1311,7 @@ public class TRItemProcessor {
 	 * - EE2 and IC2 item names + 1 Damage value (rmaxe:1)<br>
 	 * - EE2 and IC2 item names without damage value (quantumhelmet)<br>
 	 */
-	public static List<TRItem> processItemStringAndAddToLIst(String item, List<String> addedGroups) throws TRException {
+	@NonNull public static List<TRItem> processItemStringAndAddToLIst(@NonNull String item, @Nullable List<String> addedGroups) throws TRException {
 		String itemx;
 		String message = "";
 		if (item.contains("{")){

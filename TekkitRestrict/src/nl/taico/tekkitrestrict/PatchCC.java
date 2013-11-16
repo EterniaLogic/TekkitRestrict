@@ -7,7 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.lib.RandomString;
@@ -33,7 +33,7 @@ public class PatchCC {
 		}
 		
 		
-		ArrayList<String> lines = new ArrayList<String>();
+		LinkedList<String> lines = new LinkedList<String>();
 		try {
 			String line;
 			while ((line = input.readLine()) != null){

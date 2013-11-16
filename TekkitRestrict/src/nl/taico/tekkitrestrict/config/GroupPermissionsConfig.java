@@ -6,7 +6,7 @@ import nl.taico.tekkitrestrict.Log.Warning;
 
 public class GroupPermissionsConfig extends TRConfig {
 	public static ArrayList<String> defaultContents(boolean extra){
-		ArrayList<String> tbr = new ArrayList<String>();
+		ArrayList<String> tbr = new ArrayList<String>(50);
 		
 		tbr.add("##############################################################################################");
 		tbr.add("## Configuration file for TekkitRestrict                                                    ##");

@@ -466,7 +466,21 @@ Actions:
 
             # Activate: Defines whether a player can activate the ArchangelsSmite or not.
             Activate: true
+    Armor:
+        Offensive:
+            # Activate: Defines whether a player can activate offensive powers or not.
+            Activate: true
 
+            # Explode: If you press the C key while wearing Gem armor, an explosion
+            # will be created around a player.
+            Explode: true
+
+            # Strike: If you press the R key while wearing a Gem armor Helmet, a
+            # lightning bolt will hit where you look.
+            Strike: true
+        Movement:
+            # Activate: Defines whether a player can activate movement powers or not.
+            Activate: true
 #########################################################################################
 # By default, the RM furnace doubles the amount of ingots you get from smelting
 # ores. If you set AllowRMFurnaceOreDuplication: false, you will always get one ingot

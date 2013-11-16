@@ -8,7 +8,6 @@ import ic2.common.StackUtil;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -32,6 +31,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.ItemStack;
+import org.eclipse.jdt.annotation.NonNull;
 
 import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.TRConfigCache.Threads;
@@ -88,7 +88,7 @@ public class TRThread {
 
 class TRLimitFlyThread extends Thread {
 	private int reset = 0;
-	private List<Player> isFlying = Collections.synchronizedList(new LinkedList<Player>());
+	private List<Player> isFlying = Collections.synchronizedList(new ArrayList<Player>());
 	private ConcurrentHashMap<Player, Integer> playerTimes = new ConcurrentHashMap<Player, Integer>();
 	private int groundTime = 99999999;
 	
@@ -324,14 +324,10 @@ class TEntityRemover extends Thread {
 }
 
 class DisableItemThread extends Thread {
-	private List<TRItem> SSDecharged = Collections.synchronizedList(new LinkedList<TRItem>());
-	private List<TRCharge> MCharges = Collections.synchronizedList(new LinkedList<TRCharge>());
-	private List<TRCharge> maxEU = Collections.synchronizedList(new LinkedList<TRCharge>());
-	//private List<TRCharge> originalEU = Collections.synchronizedList(new LinkedList<TRCharge>());
-	private List<String> MChargeStr = Collections.synchronizedList(new LinkedList<String>());
-	private List<String> SSDechargedStr = Collections.synchronizedList(new LinkedList<String>());
-	private List<String> maxEUStr = Collections.synchronizedList(new LinkedList<String>());
-
+	private ConcurrentHashMap<Integer, TRItem> ssDecharged = new ConcurrentHashMap<Integer, TRItem>();
+	private ConcurrentHashMap<Integer, TRCharge> mCharges = new ConcurrentHashMap<Integer, TRCharge>();
+	private ConcurrentHashMap<Integer, TRCharge> maxEU = new ConcurrentHashMap<Integer, TRCharge>();
+	
 	@Override
 	public void run() {
 		load();
@@ -371,7 +367,7 @@ class DisableItemThread extends Thread {
 		boolean bypassn = player.hasPermission("tekkitrestrict.bypass.noitem");
 		boolean bypassc = player.hasPermission("tekkitrestrict.bypass.creative");
 		boolean bypassSafezone = player.hasPermission("tekkitrestrict.bypass.safezone");
-		boolean isCreative = player.getGameMode() == GameMode.CREATIVE;
+		boolean isCreative = (player.getGameMode() == GameMode.CREATIVE);
 		
 		try {
 			for (int i = 0; i < st1.length; i++) {
@@ -462,14 +458,12 @@ class DisableItemThread extends Thread {
 
 	private boolean checkCharge(ItemStack is){
 		int id = is.getTypeId();
-		int index = maxEUStr.indexOf("" + id);
-		
-		if (index < 0) return false;
+		TRCharge s = maxEU.get(id);
+		if (s == null) return false;
 		
 		try {
 			net.minecraft.server.ItemStack mcItemStack = ((CraftItemStack) is).getHandle();
-			
-			TRCharge s = maxEU.get(index);
+
 			Item si = mcItemStack.getItem();
 			NBTTagCompound nbttagcompound = StackUtil.getOrCreateNbtData(mcItemStack);
 			if (si instanceof ItemArmorElectric) {
@@ -559,14 +553,10 @@ class DisableItemThread extends Thread {
 		if (!tekkitrestrict.EEEnabled) return false;
 		
 		int id = is.getTypeId();
-		int index = MChargeStr.indexOf("" + id);
-		
-		if (index < 0) return false;
+		TRCharge g = mCharges.get(id);
+		if (g == null) return false;
 		
 		try {
-			TRCharge g = MCharges.get(index);
-			if (g.id != id) return false;
-			
 			net.minecraft.server.ItemStack mcItemStack = ((CraftItemStack) is).getHandle();
 			if (!(mcItemStack.getItem() instanceof ItemEECharged)) return false;
 			
@@ -595,17 +585,14 @@ class DisableItemThread extends Thread {
 		return false;
 	}
 	
-	private boolean checkEEChargeSafeZone(ItemStack is){
+	private boolean checkEEChargeSafeZone(@NonNull ItemStack is){
 		if (!Threads.SSDechargeEE) return false;
 		
 		int id = is.getTypeId();
-		int index = SSDechargedStr.indexOf("" + id);
+		TRItem g = ssDecharged.get(id);
+		if (g == null) return false;
 		
-		if (index < 0) return false;
 		try {
-			TRItem g = SSDecharged.get(index);
-			if (g.id != id) return false;
-			
 			net.minecraft.server.ItemStack mcItemStack = ((CraftItemStack) is).getHandle();
 			
 			if (!(mcItemStack.getItem() instanceof ItemEECharged)) return false;
@@ -644,23 +631,14 @@ class DisableItemThread extends Thread {
 	
 	private void load(){ reload(); }
 	public void reload() {
-		if (SSDecharged == null) SSDecharged = Collections.synchronizedList(new LinkedList<TRItem>());
-		else SSDecharged.clear();
-	
-		if (SSDechargedStr == null) SSDechargedStr = Collections.synchronizedList(new LinkedList<String>());
-		else SSDechargedStr.clear();
+		if (ssDecharged == null) ssDecharged = new ConcurrentHashMap<Integer, TRItem>();
+		else ssDecharged.clear();
 		
-		if (MCharges == null) MCharges = Collections.synchronizedList(new LinkedList<TRCharge>());
-		else MCharges.clear();
+		if (mCharges == null) mCharges = new ConcurrentHashMap<Integer, TRCharge>();
+		else mCharges.clear();
 		
-		if (MChargeStr == null) MChargeStr = Collections.synchronizedList(new LinkedList<String>());
-		else MChargeStr.clear();
-		
-		if (maxEU == null) maxEU = Collections.synchronizedList(new LinkedList<TRCharge>());
+		if (maxEU == null) maxEU = new ConcurrentHashMap<Integer, TRCharge>();
 		else maxEU.clear();
-		
-		if (maxEUStr == null) maxEUStr = Collections.synchronizedList(new LinkedList<String>());
-		else maxEUStr.clear();
 		
 		//this.throttle = tekkitrestrict.config.getBoolean("ThrottleInventoryThread");
 		
@@ -676,8 +654,7 @@ class DisableItemThread extends Thread {
 			}
 			
 			for (TRItem iss1 : iss) {
-				SSDecharged.add(iss1);
-				SSDechargedStr.add("" + iss1.id);
+				ssDecharged.put(iss1.id, iss1);
 			}
 		}
 
@@ -726,8 +703,7 @@ class DisableItemThread extends Thread {
 				gg.data = iss1.data;
 				gg.maxcharge = eu;
 				gg.chargerate = chrate;
-				this.maxEU.add(gg);
-				this.maxEUStr.add("" + iss1.id);
+				maxEU.put(gg.id, gg);
 			}
 		}
 
@@ -762,8 +738,7 @@ class DisableItemThread extends Thread {
 				gg.id = isr.id;
 				gg.data = isr.data;
 				gg.maxcharge = max;
-				this.MCharges.add(gg);
-				this.MChargeStr.add("" + gg.id);
+				mCharges.put(gg.id, gg);
 			}
 		}
 	}

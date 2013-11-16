@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.eclipse.jdt.annotation.NonNull;
 
 import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.TRException;
@@ -192,7 +193,7 @@ public class TRNoClick {
 	}
 
 	public static boolean errorLogged = false;
-	public static boolean isDisabled(PlayerInteractEvent event) {
+	public static boolean isDisabled(@NonNull PlayerInteractEvent event) {
 		Player player = event.getPlayer();
 		if (event.getItem() == null) return false;
 		if (player.hasPermission("tekkitrestrict.bypass.noclick")) return false;
@@ -247,7 +248,7 @@ public class TRNoClick {
 		return false;
 	}
 	
-	private static boolean hasPerm(Player player, ItemStack item, Action action){
+	private static boolean hasPerm(@NonNull Player player, @NonNull ItemStack item, @NonNull Action action){
 		int id = item.getTypeId();
 		
 		//String base1 = new StringBuilder(28).append("tekkitrestrict.noclick.").append(id).toString();

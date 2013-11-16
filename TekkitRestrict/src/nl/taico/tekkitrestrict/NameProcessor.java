@@ -1,15 +1,16 @@
 package nl.taico.tekkitrestrict;
 
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
+import java.util.LinkedHashMap;
 import java.util.Map.Entry;
+
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 
 import nl.taico.tekkitrestrict.objects.TRItem;
 
 public class NameProcessor {
-	/*
-	private static final HashMap<Integer, String> EEItems = new HashMap<Integer, String>();
+	private static final LinkedHashMap<Integer, String> EEItems = new LinkedHashMap<Integer, String>(73);
 	static {
 		EEItems.put(27526,"Philosopher Stone");
 		EEItems.put(27527,"Destruction Catalyst");
@@ -85,6 +86,12 @@ public class NameProcessor {
 		EEItems.put(27593,"Void Ring");
 		EEItems.put(27594,"Alchemy Tome");
 	}
+	@NonNull public static String getEEName(int id){
+		String s = EEItems.get(id);
+		return (s == null ? "x"+id : s);
+	}
+	
+	/*
 
 	private static final HashMap<Integer, String> IC2Items = new HashMap<Integer, String>();
 	static {
@@ -125,7 +132,7 @@ public class NameProcessor {
 	}
 	*/
 	
-	private static final HashMap<TRItem, String> All = new HashMap<TRItem, String>();
+	private static final LinkedHashMap<TRItem, String> All = new LinkedHashMap<TRItem, String>();
 	static {
 		All.put(TRItem.parseItem(1,-1),"Stone");
 		All.put(TRItem.parseItem(2,-1),"Grass Block");
@@ -2178,7 +2185,7 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(136,16952),"Sapphire Block Jacketed Bluewire");
 		*/
 		All.put(TRItem.parseItem(136,-1),"RedPower Microblocks and Wires");
-		
+		//IMPORTANT Marker at the end of Redpower
 		All.put(TRItem.parseItem(137,0),"Alloy Furnace");
 		All.put(TRItem.parseItem(137,1),"Blulectric Furnace");
 		All.put(TRItem.parseItem(137,2),"Buffer");
@@ -3361,7 +3368,7 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(31264,-1),"Energy Array Location Card");
 	}
 	
-	private static final HashMap<String, TRItem> AllNames = new HashMap<String, TRItem>();
+	private static final LinkedHashMap<String, TRItem> AllNames = new LinkedHashMap<String, TRItem>();
 	static {
 		Iterator<Entry<TRItem, String>> all = All.entrySet().iterator();
 		while (all.hasNext()){
@@ -3373,7 +3380,7 @@ public class NameProcessor {
 	/** 
 	 * @return The name of the given item, or null if not found.
 	 */
-	public static String getName(TRItem item){
+	@Nullable public static String getName(@NonNull TRItem item){
 		Iterator<Entry<TRItem, String>> it = All.entrySet().iterator();
 		while (it.hasNext()){
 			Entry<TRItem, String> entry = it.next();
@@ -3387,15 +3394,15 @@ public class NameProcessor {
 	/**
 	 * @return An item representing the given String, or null if not found.
 	 */
-	public static TRItem getItem(String string){
+	@Nullable public static TRItem getItem(@NonNull String string){
 		string = string.replace(" ", "").toLowerCase();
 		TRItem it = AllNames.get(string);
 		if (it == null) return null;
 		return (TRItem) it.clone();
 	}
 	
-	public static Map<TRItem, String> getDefaultBlocks(Map<TRItem, String> map){
-		if (map == null) map = new HashMap<TRItem, String>();
+	@NonNull public static LinkedHashMap<TRItem, String> getDefaultBlocks(@Nullable LinkedHashMap<TRItem, String> map){
+		if (map == null) map = new LinkedHashMap<TRItem, String>();
 		Iterator<Entry<TRItem, String>> all = All.entrySet().iterator();
 		while (all.hasNext()){
 			Entry<TRItem, String> entry = all.next(); 
@@ -3405,8 +3412,8 @@ public class NameProcessor {
 		return map;
 	}
 	
-	public static Map<TRItem, String> getEEBlocks(Map<TRItem, String> map){
-		if (map == null) map = new HashMap<TRItem, String>();
+	@NonNull public static LinkedHashMap<TRItem, String> getEEBlocks(@Nullable LinkedHashMap<TRItem, String> map){
+		if (map == null) map = new LinkedHashMap<TRItem, String>();
 		
 		Iterator<Entry<TRItem, String>> all = All.entrySet().iterator();
 		while (all.hasNext()){

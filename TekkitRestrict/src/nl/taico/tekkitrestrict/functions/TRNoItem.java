@@ -7,6 +7,8 @@ import java.util.List;
 
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 
 import nl.taico.tekkitrestrict.TRException;
 import nl.taico.tekkitrestrict.TRItemProcessor;
@@ -74,7 +76,7 @@ public class TRNoItem {
 	 * 
 	 * @return If the given block is a disabled item (set in the config).
 	 */
-	public static boolean isBlockBanned(Block block) {
+	public static boolean isBlockBanned(@NonNull Block block) {
 		if (!Listeners.UseNoItem) return false;
 		
 		int id = block.getTypeId();
@@ -94,7 +96,7 @@ public class TRNoItem {
 	 * 
 	 * @see #isItemBanned(Player, int, int, boolean) Same as isItemBanned(player, id, 0, doBypassCheck)
 	 */
-	public static String isItemBanned(Player player, int id, boolean doBypassCheck) {
+	@Nullable public static String isItemBanned(@NonNull Player player, int id, boolean doBypassCheck) {
 		return isItemBanned(player, id, 0, doBypassCheck);
 	}
 	/**
@@ -103,7 +105,7 @@ public class TRNoItem {
 	 * 
 	 * @return If the given id:data combination is banned for this player.
 	 */
-	public static String isItemBanned(Player player, int id, int data, boolean doBypassCheck) {
+	@Nullable public static String isItemBanned(@NonNull Player player, int id, int data, boolean doBypassCheck) {
 		return Listeners.UseNoItem ? isTypeNoItemBanned(player, id, data, doBypassCheck) : null;
 	}
 	
@@ -112,7 +114,7 @@ public class TRNoItem {
 	 * 
 	 * @return If the given item/block is banned in the config.
 	 */
-	public static String isItemGloballyBanned(int id, int data) {
+	@Nullable public static String isItemGloballyBanned(int id, int data) {
 		if (!Listeners.UseNoItem) return null;
 		
 		for (TRItem bannedItem : DisabledItems) {
@@ -129,11 +131,11 @@ public class TRNoItem {
 	 * @return If the given id:data combination is banned for this player when he/she is
 	 * in creative mode.
 	 */
-	public static String isItemBannedInCreative(Player player, int id, int data, boolean doBypassCheck) {
+	@Nullable public static String isItemBannedInCreative(@NonNull Player player, int id, int data, boolean doBypassCheck) {
 		return Listeners.UseLimitedCreative ? isTypeCreativeBanned(player, id, data, doBypassCheck) : null;
 	}
 
-	private static String isTypeCreativeBanned(Player player, int id, int data, boolean doBypassCheck) {
+	@Nullable private static String isTypeCreativeBanned(@NonNull Player player, int id, int data, boolean doBypassCheck) {
 		if (id < 8) return null;
 		if (doBypassCheck && player.hasPermission("tekkitrestrict.bypass.creative")) return null;
 		
@@ -169,7 +171,7 @@ public class TRNoItem {
 		return null;
 	}
 	
-	private static String isTypeNoItemBanned(Player player, int id, int data, boolean doBypassCheck) {
+	@Nullable private static String isTypeNoItemBanned(@NonNull Player player, int id, int data, boolean doBypassCheck) {
 		if (id < 8) return null;
 		if (doBypassCheck && player.hasPermission("tekkitrestrict.bypass.noitem")) return null;
 

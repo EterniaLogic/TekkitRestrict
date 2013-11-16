@@ -4,6 +4,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.eclipse.jdt.annotation.NonNull;
 
 import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.Util;
@@ -19,7 +20,7 @@ public class TRNoDupe {
 	public static ConcurrentHashMap<String, Integer> cmdTCG = new ConcurrentHashMap<String, Integer>();
 	public static ConcurrentHashMap<String, Integer> cmdPedestal = new ConcurrentHashMap<String, Integer>();
 	
-	public static void handleDupe(Player player, DupeType type, int id, int data){
+	public static void handleDupe(@NonNull Player player, DupeType type, int id, int data){
 		String message = "";
 		if (type == DupeType.alcBag){
 			if (Dupes.alcBags.useCommand){
@@ -165,7 +166,7 @@ public class TRNoDupe {
 		Log.Dupe(message);
 	}
 	
-	private static String convert(String str, String type, Player player, int id, int data){
+	@NonNull private static String convert(@NonNull String str, @NonNull String type, @NonNull Player player, int id, int data){
 		str = Log.replaceColors(str);
 		str = str.replace("{PLAYER}", player.getName());
 		str = str.replace("{TYPE}", type);
@@ -182,7 +183,7 @@ public class TRNoDupe {
 		return str;
 	}
 	
-	private static String convert(String str, String type, Player player){
+	@NonNull private static String convert(@NonNull String str, @NonNull String type, @NonNull Player player){
 		str = Log.replaceColors(str);
 		str = str.replace("{PLAYER}", player.getName());
 		str = str.replace("{TYPE}", type);
@@ -193,7 +194,7 @@ public class TRNoDupe {
 		return str;
 	}
 	
-	public static void playerLogout(Player player){
+	public static void playerLogout(@NonNull Player player){
 		String n = player.getName();
 		cmdRM.remove(n);
 		cmdBag.remove(n);

@@ -164,7 +164,7 @@ public class TRPermHandler {
 	}
 
 	public static List<TRPermLimit> getAllLimiterPerms(Player player){
-		ArrayList<TRPermLimit> tbr = new ArrayList<TRPermLimit>();
+		ArrayList<TRPermLimit> tbr = new ArrayList<TRPermLimit>(100);
 		
 		Set<String> negPerms = getNegPermissions(player, "tekkitrestrict.limiter");
 		for (String negPerm : negPerms) {

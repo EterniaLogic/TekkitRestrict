@@ -2,10 +2,10 @@ package nl.taico.tekkitrestrict.functions;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
 //import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +16,8 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 
 import nl.taico.tekkitrestrict.TRDB;
 import nl.taico.tekkitrestrict.tekkitrestrict;
@@ -68,11 +70,11 @@ public class TRSafeZone {
 	 */
 	public int mode = 0;
 
-	public static List<TRSafeZone> zones = Collections.synchronizedList(new LinkedList<TRSafeZone>());
+	public static List<TRSafeZone> zones = Collections.synchronizedList(new ArrayList<TRSafeZone>());
 	private static Plugin worldGuard = null, griefPrevention = null, preciousStones = null;
 	//private static HashMap<TRPos, TRSafeZone> regions = new HashMap<TRPos, TRSafeZone>();
 	
-	private String getData(){
+	@NonNull private String getData(){
 		if (data != null) return data;
 		if (!locSet) return "";
 		
@@ -148,7 +150,7 @@ public class TRSafeZone {
 		}
 	}
 	
-	private static ProtectedRegion getWGRegion(String name){
+	@Nullable private static ProtectedRegion getWGRegion(@NonNull String name){
 		if (worldGuard == null) return null;
 		try {
 			WorldGuardPlugin wgPlugin = (WorldGuardPlugin) worldGuard;
@@ -160,7 +162,7 @@ public class TRSafeZone {
 		}
 		return null;
 	}
-	private static ProtectedRegion getWGRegion(String name, Location loc){
+	@Nullable private static ProtectedRegion getWGRegion(@NonNull String name, @NonNull Location loc){
 		if (worldGuard == null) return null;
 		try {
 			WorldGuardPlugin wgPlugin = (WorldGuardPlugin) worldGuard;
@@ -179,7 +181,7 @@ public class TRSafeZone {
 	 * Note: Does not actually get SafeZones from the database.
 	 */
 	@SuppressWarnings("unused")
-	private static String getGPSafeZone(Location loc){
+	@NonNull private static String getGPSafeZone(@NonNull Location loc){
 		if (griefPrevention == null) return "";
 		
 		GriefPrevention gpPlugin = (GriefPrevention) griefPrevention;
@@ -217,7 +219,7 @@ public class TRSafeZone {
 		return ownername;
 	}
 	
-	private static Claim getGPClaim(Location loc){
+	@Nullable private static Claim getGPClaim(@NonNull Location loc){
 		if (griefPrevention == null) return null;
 		
 		GriefPrevention gpPlugin = (GriefPrevention) griefPrevention;
@@ -287,11 +289,11 @@ public class TRSafeZone {
 		}
 	}
 	
-	private static PluginManager PM(){
+	@NonNull private static PluginManager PM(){
 		return Bukkit.getPluginManager();
 	}
 	
-	private static void delete(TRSafeZone zone){
+	private static void delete(@NonNull TRSafeZone zone){
 		try {
 			tekkitrestrict.db.query("DELETE FROM `tr_saferegion` WHERE name='" + zone.name +"');");
 		} catch (Exception ex) {
@@ -304,7 +306,7 @@ public class TRSafeZone {
 	 * Do not use this method in a loop. It will cause concurrentmodification exceptions.
 	 * @return True if the removal succeeded.
 	 */
-	public static boolean removeSafeZone(TRSafeZone zone){
+	public static boolean removeSafeZone(@NonNull TRSafeZone zone){
 		if (zone.mode == 1){
 			zones.remove(zone); //Remove from database
 			delete(zone);
@@ -344,7 +346,7 @@ public class TRSafeZone {
 		return false;
 	}
 	
-	public static SafeZoneCreate addSafeZone(Player player, String pluginName, String name){
+	@NonNull public static SafeZoneCreate addSafeZone(@NonNull Player player, @NonNull String pluginName, @NonNull String name){
 		if (!SafeZones.UseSafeZones) return SafeZoneCreate.SafeZonesDisabled;
 		
 		name = name.toLowerCase();
@@ -416,7 +418,7 @@ public class TRSafeZone {
 	}
 	
 	/** @return If the given player is allowed to turn the given claim into a safezone. */
-	private static boolean allowedToMakeGPSafeZone(Player player, Claim claim){
+	private static boolean allowedToMakeGPSafeZone(@NonNull Player player, @NonNull Claim claim){
 		if (SafeZones.GPMode.isAdmin()){
 			if (!claim.isAdminClaim()) return false; //Only admin claims can be made safezones.
 			return player.hasPermission("griefprevention.adminclaims"); //Only admins can make admin claims safezones.
@@ -443,7 +445,7 @@ public class TRSafeZone {
 	 * @return A string with information about the type of safezone and its name/owner.<br>
 	 * Returns "" if there is none.
 	 */
-	public static String getSafeZoneByLocation(Location loc, boolean doGP) {
+	@NonNull public static String getSafeZoneByLocation(@NonNull Location loc, boolean doGP) {
 		if (!SafeZones.UseSafeZones) return "";
 		if (lastZone != null){
 			if (lastZone.mode == 1){
@@ -535,7 +537,7 @@ public class TRSafeZone {
 		
 	}
 	
-	public static boolean isSafeZoneFor(Player player, boolean strict, boolean doBypassCheck){
+	public static boolean isSafeZoneFor(@NonNull Player player, boolean strict, boolean doBypassCheck){
 		if (!SafeZones.UseSafeZones) return false;
 		if (doBypassCheck && player.hasPermission("tekkitrestrict.bypass.safezone")) return false;
 		
@@ -551,7 +553,7 @@ public class TRSafeZone {
 	
 
 	/** Only used by /tr admin safezone check */
-	public static Object[] getSafeZoneStatusFor(Player player){
+	@NonNull public static Object[] getSafeZoneStatusFor(@NonNull Player player){
 		Object[] obj = new Object[3];
 		obj[0] = "GriefPrevention";
 		SafeZone status = GP.getSafeZoneStatusFor(player);
@@ -583,7 +585,7 @@ public class TRSafeZone {
 	
 	public static class WG {
 		public static String lastWG = "";
-		public static SafeZone getSafeZoneStatusFor(Player player){
+		@NonNull public static SafeZone getSafeZoneStatusFor(@NonNull Player player){
 			if (!SafeZones.UseSafeZones || worldGuard == null) return SafeZone.pluginDisabled;
 			WorldGuardPlugin wgPlugin = (WorldGuardPlugin) worldGuard;
 			if (SafeZones.WGMode == SSMode.All) {
@@ -616,7 +618,7 @@ public class TRSafeZone {
 			}
 		}
 		
-		public static boolean isSafeZoneFor(Player player){
+		public static boolean isSafeZoneFor(@NonNull Player player){
 			if (worldGuard == null) return false;
 			try {
 				WorldGuardPlugin wgPlugin = (WorldGuardPlugin) worldGuard;
@@ -646,7 +648,7 @@ public class TRSafeZone {
 	public static class GP {
 		public static String lastGP = "";
 		
-		public static SafeZone getSafeZoneStatusFor(Player player){
+		@NonNull public static SafeZone getSafeZoneStatusFor(@NonNull Player player){
 			if (!SafeZones.UseSafeZones || griefPrevention == null) return SafeZone.pluginDisabled;
 			
 			GriefPrevention gpPlugin = (GriefPrevention) griefPrevention;
@@ -764,7 +766,7 @@ public class TRSafeZone {
 			return SafeZone.isDisallowed;
 		}
 		
-		public static boolean isSafeZoneFor(Player player){
+		public static boolean isSafeZoneFor(@NonNull Player player){
 			if (!SafeZones.UseGP || griefPrevention == null) return false; //If plugin disabled or not used for SafeZones, return false. (allowed)
 			
 			Location loc = player.getLocation();
@@ -870,7 +872,7 @@ public class TRSafeZone {
 	
 	public static class PS {
 		public static String lastPS = "";
-		public static SafeZone getSafeZoneStatusFor(Player player){
+		@NonNull public static SafeZone getSafeZoneStatusFor(@NonNull Player player){
 			if (!SafeZones.UseSafeZones || preciousStones == null) return SafeZone.pluginDisabled;
 			
 			Location loc = player.getLocation();
@@ -894,7 +896,7 @@ public class TRSafeZone {
 			}
 		}
 		
-		public static boolean isSafeZoneFor(Player player, boolean strict){
+		public static boolean isSafeZoneFor(@NonNull Player player, boolean strict){
 			if (!SafeZones.UseSafeZones || preciousStones == null) return false;
 			
 			Location loc = player.getLocation();
@@ -926,7 +928,7 @@ public class TRSafeZone {
 	
 	public static class Factions {
 		public static String lastFaction = "";
-		public static SafeZone getSafeZoneStatusFor(Player player){
+		@NonNull public static SafeZone getSafeZoneStatusFor(@NonNull Player player){
 			if (!SafeZones.UseSafeZones || !SafeZones.UseFactions || !PM().isPluginEnabled("Factions")) return SafeZone.pluginDisabled;
 			String name = player.getName();
 			
@@ -950,7 +952,7 @@ public class TRSafeZone {
 			}
 		}
 		
-		public static boolean isSafeZoneFor(Player player, boolean strict){
+		public static boolean isSafeZoneFor(@NonNull Player player, boolean strict){
 			if (!SafeZones.UseSafeZones || !SafeZones.UseFactions || !PM().isPluginEnabled("Factions")) return false;
 			String name = player.getName();
 			
@@ -980,7 +982,7 @@ public class TRSafeZone {
 	
 	public static class Towny {
 		public static String lastTown = "";
-		public static SafeZone getSafeZoneStatusFor(Player player){
+		@NonNull public static SafeZone getSafeZoneStatusFor(@NonNull Player player){
 			if (!SafeZones.UseSafeZones || !SafeZones.UseTowny || !PM().isPluginEnabled("Towny")) return SafeZone.pluginDisabled;
 			Location loc = player.getLocation();
 			
@@ -1009,7 +1011,7 @@ public class TRSafeZone {
 			return SafeZone.isDisallowed;
 		}
 		
-		public static boolean isSafeZoneFor(Player player, boolean strict){
+		public static boolean isSafeZoneFor(@NonNull Player player, boolean strict){
 			if (!SafeZones.UseSafeZones || !SafeZones.UseTowny || !PM().isPluginEnabled("Towny")) return false;
 			Location loc = player.getLocation();
 			

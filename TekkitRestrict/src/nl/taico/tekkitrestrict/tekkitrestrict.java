@@ -10,7 +10,6 @@ import java.io.InputStream;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -79,7 +78,7 @@ public class tekkitrestrict extends JavaPlugin {
 	
 	private static TRThread ttt = null;
 	private static TRLogFilter filter = null;
-	public static LinkedList<YamlConfiguration> configList = new LinkedList<YamlConfiguration>();
+	public static ArrayList<YamlConfiguration> configList = new ArrayList<YamlConfiguration>();
 	
 	public static boolean useTMetrics = true;
 	private static TMetrics tmetrics;

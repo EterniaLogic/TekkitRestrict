@@ -4,6 +4,7 @@ import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
+import java.util.List;
 
 import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.database.DBException;
@@ -241,7 +242,7 @@ public class TRDB {
 		tekkitrestrict.dbworking = 0;
 		tekkitrestrict.log.info("[SQLite] Transfering old database into the new database format...");
 		
-		LinkedList<LinkedList<String>> srvals = null, limvals=null;
+		List<LinkedList<String>> srvals = null, limvals=null;
 		
 		//tr_saferegion =	id name mode data world
 		//tr_limiter = 		id player blockdata
@@ -378,13 +379,13 @@ public class TRDB {
 			tekkitrestrict.loadWarning(prefix+"All database actions failed! Safezones and the limiter will NOT be stored!");
 	}
 	
-	private static LinkedList<LinkedList<String>> getTableVals(String table) throws SQLException {
+	private static List<LinkedList<String>> getTableVals(String table) throws SQLException {
 		ResultSet rs = tekkitrestrict.db.query("SELECT * FROM `"+table+"`");
-		LinkedList<LinkedList<String>> values = new LinkedList<LinkedList<String>>();
+		List<LinkedList<String>> values = new LinkedList<LinkedList<String>>();
 		if (rs == null) return values;
 		while(rs.next()) {
 			LinkedList<String> row = new LinkedList<String>();
-			for (int i=1;i<=20;i++){
+			for (int i=1;i<=10;i++){
 				try {
 					row.add(rs.getString(i));
 				} catch (Exception ex){

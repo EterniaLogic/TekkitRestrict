@@ -1,5 +1,5 @@
 name: tekkitrestrict
-main: com.github.dreadslicer.tekkitrestrict.tekkitrestrict
+main: nl.taico.tekkitrestrict.tekkitrestrict
 authors: [Taeir, DreadSlicer]
 prefix: TekkitRestrict
 version: 1.20 Dev 2

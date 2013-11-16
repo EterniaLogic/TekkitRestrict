@@ -1,6 +1,6 @@
 package nl.taico.tekkitrestrict;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -136,9 +136,9 @@ public class Log {
 			otherWarnings.add(message);
 		}
 		
-		public static ArrayList<String> loadWarnings = new ArrayList<String>();
-		public static ArrayList<String> configWarnings = new ArrayList<String>();
-		public static ArrayList<String> otherWarnings = new ArrayList<String>();
+		public static LinkedList<String> loadWarnings = new LinkedList<String>();
+		public static LinkedList<String> configWarnings = new LinkedList<String>();
+		public static LinkedList<String> otherWarnings = new LinkedList<String>();
 		public static boolean loadWarnings(){
 			return !loadWarnings.isEmpty();
 		}

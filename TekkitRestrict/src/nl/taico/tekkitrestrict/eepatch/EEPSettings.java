@@ -11,6 +11,7 @@ import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 import ee.events.EEEnums.EEAction2;
 import ee.events.EEEnums.EEAmuletAction;
 import ee.events.EEEnums.EERingAction;
+import ee.events.EEEnums.EEArmorAction;
 
 public class EEPSettings {
 	public static HashMap<Integer, Integer> MaxCharge = new HashMap<Integer, Integer>();
@@ -216,6 +217,7 @@ public class EEPSettings {
 		loadDMToolActions();
 		loadRMToolActions();
 		loadRedToolActions();
+		loadArmorActions();
 	}
 	
 	public static ArrayList<Integer> zeroring = new ArrayList<Integer>();
@@ -469,5 +471,17 @@ public class EEPSettings {
 			morningstar.add(EEAction2.MegaBreak.ordinal());
 		if (!tekkitrestrict.config.getBoolean("Actions.Tools.MorningStar.BreakRadius", true))
 			morningstar.add(EEAction2.BreakRadius.ordinal());
+	}
+	
+	public static ArrayList<Integer> armor = new ArrayList<Integer>();
+	public static void loadArmorActions(){
+		if (!tekkitrestrict.config.getBoolean("Actions.Armor.Offensive.Activate"))
+			armor.add(EEArmorAction.OffensiveActivate.ordinal());
+		if (!tekkitrestrict.config.getBoolean("Actions.Armor.Offensive.Explode"))
+			armor.add(EEArmorAction.OffensiveExplode.ordinal());
+		if (!tekkitrestrict.config.getBoolean("Actions.Armor.Offensive.Strike"))
+			armor.add(EEArmorAction.OffensiveStrike.ordinal());
+		if (!tekkitrestrict.config.getBoolean("Actions.Armor.Movement.Activate"))
+			armor.add(EEArmorAction.MovementActivate.ordinal());
 	}
 }

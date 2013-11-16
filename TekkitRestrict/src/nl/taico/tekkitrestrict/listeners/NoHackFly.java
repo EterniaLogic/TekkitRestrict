@@ -1,6 +1,6 @@
 package nl.taico.tekkitrestrict.listeners;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.minecraft.server.EntityPlayer;
@@ -41,7 +41,7 @@ public class NoHackFly implements Listener {
 		TRNoHack.handleHack(player, HackType.fly);
 	}
 
-	private static LinkedList<Integer> nearBlocks = new LinkedList<Integer>();
+	private static ArrayList<Integer> nearBlocks = new ArrayList<Integer>();
 	static {
 		nearBlocks.add(220);//Scaffold
 		nearBlocks.add(235);//Iron scaffold

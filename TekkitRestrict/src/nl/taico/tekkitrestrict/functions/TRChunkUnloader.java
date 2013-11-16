@@ -73,7 +73,7 @@ public class TRChunkUnloader {
 		try {
 			List<World> worlds = Bukkit.getWorlds();
 			
-			ArrayList<Chunk> toRemove = new ArrayList<Chunk>();
+			ArrayList<Chunk> toRemove = new ArrayList<Chunk>(amount+1);
 			
 			for (World world : worlds) {
 				if (world.getEnvironment() != Environment.THE_END) continue; //Only the end
@@ -133,7 +133,7 @@ public class TRChunkUnloader {
 		try {
 			List<World> worlds = Bukkit.getWorlds();
 			
-			ArrayList<Chunk> toRemove = new ArrayList<Chunk>();
+			ArrayList<Chunk> toRemove = new ArrayList<Chunk>(amount+1);
 			
 			for (World world : worlds) {
 				if (world.getEnvironment() != Environment.NETHER) continue; //Only the nether
@@ -195,7 +195,7 @@ public class TRChunkUnloader {
 		try {
 			List<World> worlds = Bukkit.getWorlds();
 			
-			ArrayList<Chunk> toRemove = new ArrayList<Chunk>();
+			ArrayList<Chunk> toRemove = new ArrayList<Chunk>(amount+1);
 			
 			for (World world : worlds) {
 				if (world.getEnvironment() != Environment.NORMAL) continue; //Only normal

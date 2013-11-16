@@ -10,6 +10,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.plugin.PluginManager;
+import org.eclipse.jdt.annotation.NonNull;
 
 import nl.taico.tekkitrestrict.TRConfigCache;
 import nl.taico.tekkitrestrict.TRException;
@@ -44,7 +45,7 @@ public class TRLWCProtect {
 	 * Checks tekkitrestrict.bypass.lwc permission.
 	 * @return False if the event was cancelled.
 	 */
-	public static boolean checkLWCAllowed(BlockPlaceEvent event) {
+	public static boolean checkLWCAllowed(@NonNull BlockPlaceEvent event) {
 		if (TRConfigCache.LWC.lwcPlugin == null){
 			PluginManager PM = tekkitrestrict.getInstance().getServer().getPluginManager();
 			if (PM.isPluginEnabled("LWC")) TRConfigCache.LWC.lwcPlugin = (LWCPlugin) PM.getPlugin("LWC");

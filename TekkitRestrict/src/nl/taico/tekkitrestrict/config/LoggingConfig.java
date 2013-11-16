@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class LoggingConfig extends TRConfig {
 	public static ArrayList<String> defaultContents(boolean extra){
-		ArrayList<String> tbr = new ArrayList<String>();
+		ArrayList<String> tbr = new ArrayList<String>(130);
 		
 		tbr.add("###########################################################################");
 		tbr.add("## Configuration file for TekkitRestrict                                 ##");

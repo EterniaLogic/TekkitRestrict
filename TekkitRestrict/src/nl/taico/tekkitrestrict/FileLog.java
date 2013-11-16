@@ -11,6 +11,8 @@ import java.util.Date;
 import java.util.HashMap;
 
 import org.bukkit.ChatColor;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 
 import nl.taico.tekkitrestrict.Log.Warning;
 
@@ -24,9 +26,8 @@ public class FileLog {
 	private static final String sep = File.separator;
 	
 	@SuppressWarnings("deprecation")
-	public FileLog(String type, boolean alternate){
+	public FileLog(@NonNull String type, boolean alternate){
 		this.alternate = alternate;
-		if (type == null) type = "null";
 		this.type = type;
 		Date curdate = new Date(System.currentTimeMillis());
 		this.day = curdate.getDay();
@@ -62,9 +63,8 @@ public class FileLog {
 	}
 	
 	@SuppressWarnings("deprecation")
-	public FileLog(String type){
+	public FileLog(@NonNull String type){
 		this.alternate = false;
-		if (type == null) type = "null";
 		this.type = type;
 		Date curdate = new Date(System.currentTimeMillis());
 		this.day = curdate.getDay();
@@ -91,7 +91,7 @@ public class FileLog {
 		Logs.put(type, this);
 	}
 	
-	public static FileLog getLog(String type){
+	public static FileLog getLog(@NonNull String type){
 		return Logs.get(type);
 	}
 	
@@ -103,8 +103,8 @@ public class FileLog {
 	}
 	
 	public static FileLog getLogOrMake(String type, boolean alternate){
-		FileLog tbr = Logs.get(type);
 		if (type == null) type = "null";
+		FileLog tbr = Logs.get(type);
 		if (tbr == null) return new FileLog(type, alternate);
 		return tbr;
 	}
@@ -205,7 +205,7 @@ public class FileLog {
 		Logs.put(type, this);
 	}
 	
-	private String replacecolors(String input){
+	private String replacecolors(@NonNull String input){
 		input = input.replace("\033[30;22m", "§0");
 		input = input.replace("\033[34;22m", "§1");
 		input = input.replace("\033[32;22m", "§2");
@@ -269,13 +269,13 @@ public class FileLog {
 		return input;
 	}
 
-	private String replaceshort(String input){
+	private String replaceshort(@NonNull String input){
 		return input.replace("\033[m", "");
 	}
 	
 	private boolean logged = false;
 	private boolean logged2 = false;
-	private String formatName(String type){
+	private String formatName(@NonNull String type){
 		Date curdate = new Date(System.currentTimeMillis());
 		DateFormat formatter = new SimpleDateFormat("dd-MM-yy");
 		String data = formatter.format(curdate);
@@ -299,7 +299,8 @@ public class FileLog {
 		return name;
 	}
 
-	private String formatMsg(String msg){
+	private String formatMsg(@Nullable String msg){
+		if (msg == null) msg = "null";
 		DateFormat formatter = new SimpleDateFormat("kk:mm:ss");
 		String times = formatter.format(new Date(System.currentTimeMillis()));
 		

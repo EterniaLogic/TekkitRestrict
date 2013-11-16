@@ -16,6 +16,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
+import org.eclipse.jdt.annotation.NonNull;
 
 import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.NameProcessor;
@@ -54,7 +55,7 @@ public class TRCommandTR implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		send.sender = sender;
 		
-		String[] largs = args.clone();
+		@NonNull String[] largs = args.clone();
 		
 		for (int i = 0; i < largs.length; i++){
 			largs[i] = largs[i].toLowerCase();
@@ -120,7 +121,7 @@ public class TRCommandTR implements CommandExecutor {
 		}
 		
 		if (largs[1].equals("load")){
-			ArrayList<String> msgs = Warning.loadWarnings;
+			LinkedList<String> msgs = Warning.loadWarnings;
 			if (msgs.isEmpty()){
 				send.msg("There were no warnings during load.");
 				return;
@@ -133,7 +134,7 @@ public class TRCommandTR implements CommandExecutor {
 		}
 		
 		if (largs[1].equals("config")){
-			ArrayList<String> msgs = Warning.configWarnings;
+			LinkedList<String> msgs = Warning.configWarnings;
 			if (msgs.isEmpty()){
 				send.msg("There were no config warnings.");
 				return;
@@ -146,7 +147,7 @@ public class TRCommandTR implements CommandExecutor {
 		}
 		
 		if (largs[1].equals("other")){
-			ArrayList<String> msgs = Warning.otherWarnings;
+			LinkedList<String> msgs = Warning.otherWarnings;
 			if (msgs.isEmpty()){
 				send.msg("There were no other warnings.");
 				return;
@@ -159,7 +160,7 @@ public class TRCommandTR implements CommandExecutor {
 		}
 		
 		if (largs[1].equals("all")){
-			ArrayList<String> msgs = Warning.loadWarnings;
+			LinkedList<String> msgs = Warning.loadWarnings;
 			if (msgs.isEmpty()){
 				send.msg("Load Warnings: None");
 			} else {
@@ -737,7 +738,7 @@ public class TRCommandTR implements CommandExecutor {
 			found = true;
 		}
 		
-		if (found){
+		if (found && zone != null){
 			if (!TRSafeZone.removeSafeZone(zone)){
 				send.msg(ChatColor.RED + "Unable to remove the safezone. Was the claim already removed?");
 				return;
@@ -894,10 +895,10 @@ public class TRCommandTR implements CommandExecutor {
 		}
 		
 		TRLimiter cc = TRLimiter.getLimiter(largs[3]);
-		if (cc == null){
-			send.msg(ChatColor.RED + "This player doesn't exist!");
-			return;
-		}
+		//if (cc == null){
+		//	send.msg(ChatColor.RED + "This player doesn't exist!");
+		//	return;
+		//}
 		
 		if (largs.length == 4){
 			cc.clearLimits();
@@ -1005,23 +1006,27 @@ public class TRCommandTR implements CommandExecutor {
 			send.msg(ChatColor.RED + largs[1] + " is not a valid number!");
 			return;
 		}
+		int lastpage = Math.round(TRNoItem.DisabledItems.size()/8);
 		int start = (page-1) * 8; //8
 		int end = page * 8; //15
 		if (start > TRNoItem.DisabledItems.size()){
 			send.msg(ChatColor.RED + "Page " + page + " does not exist!");
-			int lastpage = Math.round(TRNoItem.DisabledItems.size()/8);
 			send.msg(ChatColor.RED + "Last page: " + lastpage+".");
 			return;
 		}
-		send.msg(ChatColor.BLUE + "Banned Items - Page " + page);
+		send.msg(ChatColor.BLUE + "Banned Items - Page " + page + " of "+lastpage);
 		send.msg(ChatColor.RED +""+ChatColor.BOLD + "Banned Item - " + ChatColor.RED +"Reason");
 		for (int i=start;i<TRNoItem.DisabledItems.size() && i < end;i++){
 			TRItem it = TRNoItem.DisabledItems.get(i);
 			String reason = it.msg;
-			if (reason == null || reason.equals("")) reason = "None";
 			String name = NameProcessor.getName(it);
+			if (reason == null || reason.equals("")) reason = "None";
+			if (reason.contains("Reason:")){
+				reason = reason.split("Reason:")[1].trim();
+			}
+			
 			if (name == null) continue;
-			send.msg(ChatColor.RED + NameProcessor.getName(it) + " - " + ChatColor.BLUE + it.msg);
+			send.msg(ChatColor.GREEN + NameProcessor.getName(it) + " - " + ChatColor.BLUE + it.msg);
 		}
 	}
 }

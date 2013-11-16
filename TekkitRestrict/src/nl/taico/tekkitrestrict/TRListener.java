@@ -1,14 +1,11 @@
 package nl.taico.tekkitrestrict;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import net.minecraft.server.TileEntity;
 import net.minecraft.server.WorldServer;
 
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.entity.Player;
@@ -18,7 +15,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -35,86 +31,14 @@ import nl.taico.tekkitrestrict.objects.TRItem;
 import eloraam.core.TileCovered;
 
 public class TRListener implements Listener {
-	private static Map<Integer, String> EENames = Collections.synchronizedMap(new HashMap<Integer, String>());
-	static {
-		EENames.put(27526, "Philosopher Stone");
-		EENames.put(27527, "Destruction Catalyst");
-		EENames.put(27528, "Iron Band");
-		EENames.put(27529, "Soul Stone");
-		EENames.put(27530, "Evertide Amulet");
-		EENames.put(27531, "Volcanite Amulet");
-		EENames.put(27532, "Black Hole Band");
-		EENames.put(27533, "Ring of Ignition");
-		EENames.put(27534, "Archangel's Smite");
-		EENames.put(27535, "Hyperkinetic Lens");
-
-		EENames.put(27536, "SwiftWolf's Rending Gale");
-		EENames.put(27537, "Harvest Ring");
-		EENames.put(27538, "Watch of Flowing Time");
-		EENames.put(27539, "Alchemical Coal");
-		EENames.put(27540, "Mobius Fuel");
-		EENames.put(27541, "Dark Matter");
-		EENames.put(27542, "Covalence Dust");
-
-		EENames.put(27543, "Dark Matter Pickaxe");
-		EENames.put(27544, "Dark Matter Spade");
-		EENames.put(27545, "Dark Matter Hoe");
-		EENames.put(27546, "Dark Matter Sword");
-		EENames.put(27547, "Dark Matter Axe");
-		EENames.put(27548, "Dark Matter Shears");
-
-		EENames.put(27549, "Dark Matter Armor");
-		EENames.put(27550, "Dark Matter Helmet");
-		EENames.put(27551, "Dark Matter Greaves");
-		EENames.put(27552, "Dark Matter Boots");
-
-		EENames.put(27553, "Gem of Eternal Density");
-		EENames.put(27554, "Repair Talisman");
-		EENames.put(27555, "Dark Matter Hammer");
-		EENames.put(27556, "Cataclyctic Lens");
-		EENames.put(27557, "Klein Star Ein");
-		EENames.put(27558, "Klein Star Zwei");
-		EENames.put(27559, "Klein Star Drei");
-		EENames.put(27560, "Klein Star Vier");
-		EENames.put(27561, "Klein Star Sphere");
-		EENames.put(27591, "Klein Star Omega");
-		EENames.put(27562, "Alchemy Bag");
-		EENames.put(27563, "Red Matter");
-		EENames.put(27564, "Red Matter Pickaxe");
-		EENames.put(27565, "Red Matter Spade");
-		EENames.put(27566, "Red Matter Hoe");
-		EENames.put(27567, "Red Matter Sword");
-		EENames.put(27568, "Red Matter Axe");
-		EENames.put(27569, "Red Matter Shears");
-		EENames.put(27570, "Red Matter Hammer");
-		EENames.put(27571, "Aeternalis Fuel");
-		EENames.put(27572, "Red Katar");
-		EENames.put(27573, "Red Morning Star");
-		EENames.put(27574, "Zero Ring");
-		EENames.put(27575, "Red Matter Armor");
-		EENames.put(27576, "Red Matter Helmet");
-		EENames.put(27577, "Red Matter Greaves");
-		EENames.put(27578, "Red Matter Boots");
-		EENames.put(27579, "Infernal Armor (Gem)");
-		EENames.put(27580, "Abyss Helmet (Gem)");
-		EENames.put(27581, "Gravity Greaves (Gem)");
-		EENames.put(27582, "Hurricane Boots (Gem)");
-		EENames.put(27583, "Mercurial Eye");
-		EENames.put(27584, "Ring of Arcana");
-		EENames.put(27585, "Divining Rod");
-		EENames.put(27588, "Body Stone");
-		EENames.put(27589, "Life Stone");
-		EENames.put(27590, "Mind Stone");
-		EENames.put(27592, "Transmutation Tablet");
-		EENames.put(27593, "Void Ring");
-		EENames.put(27594, "Alchemy Tome");
-	}
-	
 	private int lastdata = 0;
 
-	/** @return <b>True</b> if id < 8 or id = 12, 13, 17, 24, 35, 44, 98 or 142. <b>False</b> otherwise. */
+	/**
+	 * @return <b>True</b> if id < 7 or id = 12 (sand), 13 (gravel), 17 (logs), 20 (glass), 24 (sandstone), 35 (wool), 44, 98 (stonebricks) or 142 (marble).
+	 * <b>False</b> otherwise.
+	 */
 	private static boolean exempt(int id){
-		return (id < 8 || id == 12 || id == 13 || id == 17 || id == 24 || id == 35 || id == 44 || id == 98 || id == 142);
+		return (id < 7 || id == 12 || id == 13 || id == 17 || id == 20 || id == 24 || id == 35 || id == 44 || id == 98 || id == 142);
 	}
 	
 	public static boolean errorBlockPlace = false;
@@ -206,21 +130,6 @@ public class TRListener implements Listener {
 		
 	}
 
-	public static boolean errorDrop = false;
-	@EventHandler(ignoreCancelled = true)
-	public void onDropItem(PlayerDropItemEvent event) {
-		Player player = event.getPlayer();
-		if (player == null) return;
-		
-		if (Listeners.UseLimitedCreative && player.getGameMode() == GameMode.CREATIVE){
-			if (!player.hasPermission("tekkitrestrict.bypass.creative")) {
-				event.setCancelled(true);
-				player.sendMessage(ChatColor.RED + "[TRLimitedCreative] You cannot drop items!");
-				return;
-			}
-		}
-	}
-
 	public static boolean errorInteract = false;
 	// /////// START INTERACT //////////////
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
@@ -274,19 +183,19 @@ public class TRListener implements Listener {
 		Player player = event.getPlayer();
 		if (player == null) return;
 		
-		itemLogUse(player, event.getAction());
+		itemLogUse(player, event.getItem(), event.getAction());
 	}
 
 	/** Log EE tools. */
-	private void itemLogUse(Player player, Action action) {
+	private void itemLogUse(Player player, ItemStack item, Action action) {
 		ItemStack a = player.getItemInHand();
 		if (a == null) return;
 
 		int id = a.getTypeId();
 		
-		if (inRange(id, 27530, 27531))
+		if (id == 27530 || id == 27531)
 			logUse("EEAmulet", player, id);
-		else if (inRange(id, 27532, 27534) || id == 27536 || id == 27537 || id == 27574 || id == 27584 || id == 27593)
+		else if (id == 27532 || id == 27534 || id == 27536 || id == 27537 || id == 27574 || id == 27584 || id == 27593)
 			logUse("EERing", player, id);
 		else if (inRange(id, 27543, 27548) || id == 27555){
 			if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)
@@ -301,11 +210,12 @@ public class TRListener implements Listener {
 	}
 	
 	private void logUse(String logname, Player player, int id){
-		int x = player.getLocation().getBlockX();
-		int y = player.getLocation().getBlockY();
-		int z = player.getLocation().getBlockZ();
+		Location loc = player.getLocation();
+		int x = loc.getBlockX();
+		int y = loc.getBlockY();
+		int z = loc.getBlockZ();
 		TRLogger.Log(logname, "[" + player.getName() + "][" + player.getWorld().getName() +
-				" - " + x + "," + y + "," + z + "] used (" + id + ") `" + EENames.get(id) + "`");
+				" - " + x + "," + y + "," + z + "] used (" + id + ") `" + NameProcessor.getEEName(id) + "`");
 	}
 
 	private boolean inRange(int stack, int from, int to) {
@@ -322,5 +232,4 @@ public class TRListener implements Listener {
 		TRNoDupeProjectTable.playerUnuse(player.getName());
 		TRCommandAlc.setPlayerInv(player, true);
 	}
-
 }

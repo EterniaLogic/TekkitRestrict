@@ -3,6 +3,7 @@ package nl.taico.tekkitrestrict;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.eclipse.jdt.annotation.NonNull;
 
 public class Send {
 	public CommandSender sender;
@@ -11,7 +12,7 @@ public class Send {
 		sender.sendMessage(msg);
 	}
 
-	public void msg(String command, String explanation, ChatColor color, ChatColor color2){
+	public void msg(@NonNull String command, @NonNull String explanation, ChatColor color, ChatColor color2){
 		int msglength = command.length() + 3 + explanation.length();
 		if (msglength<=55)
 			sender.sendMessage(color + command + " - " + ChatColor.RESET + color2 + explanation);
@@ -20,7 +21,7 @@ public class Send {
 			sender.sendMessage(color2 + " - " + explanation);
 		}
 	}
-	public void msg(String command, String explanation){
+	public void msg(@NonNull String command, @NonNull String explanation){
 		int msglength = command.length() + 3 + explanation.length();
 		if (msglength<=55) sender.sendMessage(ChatColor.BLUE + command + " - " + ChatColor.GREEN + explanation);
 		else {
