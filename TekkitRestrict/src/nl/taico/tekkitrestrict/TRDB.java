@@ -71,6 +71,7 @@ public class TRDB {
 			double verX = -1d;
 			boolean purged = true;
 			prev = tekkitrestrict.db.query("SELECT version FROM tr_dbversion");
+			if (prev == null) return false;
 			if(prev.next()) verX = prev.getDouble("version");
 			if(prev.next()) purged = false;
 			
@@ -115,6 +116,7 @@ public class TRDB {
 			double verX = -1d;
 			boolean purged = true;
 			prev = tekkitrestrict.db.query("SELECT version FROM tr_dbversion");
+			if (prev == null) return false;
 			if(prev.next()) verX = prev.getDouble("version");
 			if(prev.next()) purged = false;
 			
@@ -134,7 +136,6 @@ public class TRDB {
 				try {prev.close();} catch (SQLException ex2) {}
 			
 			initNewMySQLDB();
-			
 		}
 		if (tekkitrestrict.dbworking == 0) return true;
 		return false;

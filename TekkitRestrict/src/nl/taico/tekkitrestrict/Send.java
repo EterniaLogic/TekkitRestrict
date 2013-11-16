@@ -8,7 +8,7 @@ import org.eclipse.jdt.annotation.NonNull;
 public class Send {
 	public CommandSender sender;
 	
-	public void msg(String msg){
+	public void msg(@NonNull String msg){
 		sender.sendMessage(msg);
 	}
 
@@ -30,7 +30,7 @@ public class Send {
 		}
 	}
 	
-	public boolean noPerm(String perm){
+	public boolean noPerm(@NonNull String perm){
 		if (sender.hasPermission("tekkitrestrict." + perm)) return false;
 		sender.sendMessage(ChatColor.RED + "You don't have permission to use this command!");
 		return true;

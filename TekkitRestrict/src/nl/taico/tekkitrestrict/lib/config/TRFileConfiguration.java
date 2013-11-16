@@ -19,6 +19,8 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.MemoryConfigurationOptions;
 import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.YAMLException;
@@ -48,7 +50,7 @@ public class TRFileConfiguration extends FileConfiguration {
 		return null;
 	}
 	
-	public Object getDefault(ConfigFile file, String path) {
+	@Nullable public Object getDefault(ConfigFile file, @NonNull String path) {
 		YamlConfiguration conf = tekkitrestrict.configList.get(file.ordinal());
 		Object j;
 		if ((j = conf.getDefault(path)) != null) {
@@ -62,7 +64,7 @@ public class TRFileConfiguration extends FileConfiguration {
 		return get(path, getDefault(path));
 	}
 	
-	public Object get(ConfigFile file, String path) {
+	public Object get(ConfigFile file, @NonNull String path) {
 		return get(file, path, getDefault(file, path));
 	}
 
@@ -77,7 +79,7 @@ public class TRFileConfiguration extends FileConfiguration {
 		return def;
 	}
 	
-	public Object get(ConfigFile file, String path, Object def) {
+	public Object get(ConfigFile file, @NonNull String path, Object def) {
 		YamlConfiguration conf = tekkitrestrict.configList.get(file.ordinal());
 		Object j;
 		if ((j = conf.get(path, def)) != def) {
@@ -86,19 +88,21 @@ public class TRFileConfiguration extends FileConfiguration {
 		return def;
 	}
 
+	@Deprecated
 	@Override
 	public String getString(String path) {
 		Object def = getDefault(path);
 		return getString(path, def == null ? null : def.toString());
 	}
 
+	@Deprecated
 	@Override
 	public String getString(String path, String def) {
 		Object val = get(path, def);
 		return val == null ? def : val.toString();
 	}
 	
-	public String getString(ConfigFile file, String path, String def) {
+	public String getString(ConfigFile file, @NonNull String path, String def) {
 		Object val = get(file, path, def);
 		return val == null ? def : val.toString();
 	}
@@ -109,6 +113,7 @@ public class TRFileConfiguration extends FileConfiguration {
 		return val instanceof String;
 	}
 
+	@Deprecated
 	@Override
 	public int getInt(String path) {
 		Object def = getDefault(path);
@@ -116,13 +121,14 @@ public class TRFileConfiguration extends FileConfiguration {
 				(def instanceof Number) ? NumberConversions.toInt(def) : 0);
 	}
 
+	@Deprecated
 	@Override
 	public int getInt(String path, int def) {
 		Object val = get(path, Integer.valueOf(def));
 		return (val instanceof Number) ? NumberConversions.toInt(val) : def;
 	}
 	
-	public int getInt(ConfigFile file, String path, int def) {
+	public int getInt(ConfigFile file, @NonNull String path, int def) {
 		Object val = get(file, path, Integer.valueOf(def));
 		return (val instanceof Number) ? NumberConversions.toInt(val) : def;
 	}
@@ -133,6 +139,7 @@ public class TRFileConfiguration extends FileConfiguration {
 		return val instanceof Integer;
 	}
 
+	@Deprecated
 	@Override
 	public boolean getBoolean(String path) {
 		Object def = getDefault(path);
@@ -141,18 +148,19 @@ public class TRFileConfiguration extends FileConfiguration {
 						: false);
 	}
 
+	@Deprecated
 	@Override
 	public boolean getBoolean(String path, boolean def) {
 		Object val = get(path, Boolean.valueOf(def));
 		return (val instanceof Boolean) ? ((Boolean) val).booleanValue() : def;
 	}
 	
-	public boolean getBoolean(ConfigFile file, String path, boolean def) {
+	public boolean getBoolean(ConfigFile file, @NonNull String path, boolean def) {
 		Object val = get(file, path, Boolean.valueOf(def));
 		return (val instanceof Boolean) ? ((Boolean) val).booleanValue() : def;
 	}
 	
-	public boolean getBoolean2(ConfigFile file, String path, boolean def){
+	public boolean getBoolean2(ConfigFile file, @NonNull String path, boolean def){
 		Object val = get(file, path, null);
 		return (val instanceof Boolean) ? ((Boolean) val).booleanValue() : missingSettings(def, file, path);
 	}
@@ -163,19 +171,21 @@ public class TRFileConfiguration extends FileConfiguration {
 		return val instanceof Boolean;
 	}
 
+	@Deprecated
 	@Override
 	public double getDouble(String path) {
 		Object def = getDefault(path);
 		return getDouble(path, (def instanceof Number) ? NumberConversions.toDouble(def) : 0.0D);
 	}
 
+	@Deprecated
 	@Override
 	public double getDouble(String path, double def) {
 		Object val = get(path, Double.valueOf(def));
 		return (val instanceof Number) ? NumberConversions.toDouble(val) : def;
 	}
 	
-	public double getDouble(ConfigFile file, String path, double def) {
+	public double getDouble(ConfigFile file, @NonNull String path, double def) {
 		Object val = get(file, path, Double.valueOf(def));
 		return (val instanceof Number) ? NumberConversions.toDouble(val) : def;
 	}
@@ -186,6 +196,7 @@ public class TRFileConfiguration extends FileConfiguration {
 		return val instanceof Double;
 	}
 
+	@Deprecated
 	@Override
 	public long getLong(String path) {
 		Object def = getDefault(path);
@@ -199,7 +210,7 @@ public class TRFileConfiguration extends FileConfiguration {
 		return (val instanceof Number) ? NumberConversions.toLong(val) : def;
 	}
 	
-	public long getLong(ConfigFile file, String path, long def) {
+	public long getLong(ConfigFile file, @NonNull String path, long def) {
 		Object val = get(file, path, Long.valueOf(def));
 		return (val instanceof Number) ? NumberConversions.toLong(val) : def;
 	}
@@ -216,7 +227,7 @@ public class TRFileConfiguration extends FileConfiguration {
 		return getList(path, (def instanceof List) ? (List) def : null);
 	}
 	
-	public List<Object> getList(ConfigFile file, String path) {
+	@Nullable public List<Object> getList(ConfigFile file, @NonNull String path) {
 		Object def = getDefault(file, path);
 		return getList(file, path, (def instanceof List) ? (List) def : null);
 	}
@@ -229,7 +240,7 @@ public class TRFileConfiguration extends FileConfiguration {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<Object> getList(ConfigFile file, String path, List def) {
+	public List<Object> getList(ConfigFile file, @NonNull String path, List def) {
 		Object val = get(file, path, def);
 		return (List<Object>) ((val instanceof List) ? val : def);
 	}
@@ -240,6 +251,7 @@ public class TRFileConfiguration extends FileConfiguration {
 		return val instanceof List;
 	}
 
+	@Deprecated
 	@Override
 	public List<String> getStringList(String path) {
 		List<Object> list = getList(path);
@@ -248,34 +260,28 @@ public class TRFileConfiguration extends FileConfiguration {
 		}
 		List<String> result = new ArrayList<String>();
 		Iterator<Object> i$ = list.iterator();
-		do {
-			if (!i$.hasNext()) {
-				break;
-			}
+		while (i$.hasNext()) {
 			Object object = i$.next();
 			if ((object instanceof String) || isPrimitiveWrapper(object)) {
 				result.add(String.valueOf(object));
 			}
-		} while (true);
+		}
 		return result;
 	}
 	
-	public List<String> getStringList(ConfigFile file, String path) {
+	@NonNull public List<String> getStringList(ConfigFile file, @NonNull String path) {
 		List<Object> list = getList(file, path);
 		if (list == null) {
 			return new ArrayList<String>(0);
 		}
 		List<String> result = new ArrayList<String>();
 		Iterator<Object> i$ = list.iterator();
-		do {
-			if (!i$.hasNext()) {
-				break;
-			}
+		while (i$.hasNext()){
 			Object object = i$.next();
 			if ((object instanceof String) || isPrimitiveWrapper(object)) {
 				result.add(String.valueOf(object));
 			}
-		} while (true);
+		}
 		return result;
 	}
 
@@ -694,7 +700,7 @@ public class TRFileConfiguration extends FileConfiguration {
 		return (YamlConfigurationOptions) options;
 	}
 
-	public ConfigurationSection getConfigurationSection(ConfigFile file, String path) {
+	@Nullable public ConfigurationSection getConfigurationSection(ConfigFile file, @NonNull String path) {
 	    Object val = get(file, path, null);
 	    if (val != null) {
 	        return (val instanceof ConfigurationSection) ? (ConfigurationSection) val : null;
@@ -704,7 +710,7 @@ public class TRFileConfiguration extends FileConfiguration {
 	    return (val instanceof ConfigurationSection) ? createSection(path) : null;
 	}
 	
-	private boolean missingSettings(boolean val, ConfigFile file, String setting){
+	private boolean missingSettings(boolean val, ConfigFile file, @NonNull String setting){
 		if (file == ConfigFile.General) GeneralConfig.upgradeFile();
 		else if (file == ConfigFile.Advanced) AdvancedConfig.upgradeFile();
 		else if (file == ConfigFile.TPerformance) TPerformanceConfig.upgradeFile();

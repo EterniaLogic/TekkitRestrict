@@ -15,6 +15,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
+
 import nl.taico.tekkitrestrict.tekkitrestrict;
 
 @SuppressWarnings("resource")
@@ -25,7 +28,7 @@ public class MySQL extends Database {
 	private String password = "";
 	private String database = "minecraft";
 
-	public MySQL(String hostname, String port, String database, String username, String password) {
+	public MySQL(@NonNull String hostname, @NonNull String port, @NonNull String database, @NonNull String username, @NonNull String password) {
 		this.connection = null;
 		this.hostname = hostname;
 		if (!port.matches("\\d+")){
@@ -37,6 +40,7 @@ public class MySQL extends Database {
 		this.password = password;
 	}
 
+	@Override
 	protected boolean initialize() {
 		if (initialized) return working;
 		
@@ -51,6 +55,7 @@ public class MySQL extends Database {
 		}
 	}
 
+	@Override
 	public boolean open() {
 		if (!initialize()) return false;
 		String url = "";
@@ -69,6 +74,7 @@ public class MySQL extends Database {
 	 * If the connection is already closed this is a no-op and will return true.<br>
 	 * Returns true if the connection is null.
 	 */
+	@Override
 	public boolean close() {
 		if (connection == null) return true;
 		try {
@@ -80,6 +86,7 @@ public class MySQL extends Database {
 		}
 	}
 
+	@Override
 	public Connection getConnection() {
 		return connection;
 	}
@@ -88,6 +95,7 @@ public class MySQL extends Database {
 	 * Checks if the connection is open (valid).
 	 * @return If the connection is closed or null will return false. Otherwise will return true.
 	 */
+	@Override
 	public boolean isOpen() {
 		if (connection == null) return false;
 		
@@ -104,7 +112,8 @@ public class MySQL extends Database {
 	 * If the query was an update, delete or insert type query it will return null.<br>
 	 * If the query Failed, it will throw an SQLExcpetion. 
 	 */
-	public ResultSet query(String query) throws SQLException {
+	@Override
+	@Nullable public ResultSet query(@NonNull String query) throws SQLException {
 		Statement statement = null;
 		try {
 			statement = connection.createStatement();
@@ -124,7 +133,8 @@ public class MySQL extends Database {
 	 * If the query was an update, delete or insert type query it will return null.<br>
 	 * If the query Failed, it will throw an SQLExcpetion.
 	 */
-	public ResultSet query(PreparedStatement ps) throws SQLException {
+	@Override
+	@Nullable public ResultSet query(@NonNull PreparedStatement ps) throws SQLException {
 		try {
 			if (ps.execute())
 				return ps.getResultSet();
@@ -136,7 +146,8 @@ public class MySQL extends Database {
 		}
 	}
 
-	public PreparedStatement prepare(String query) {
+	@Override
+	@Nullable public PreparedStatement prepare(@NonNull String query) {
 		try {
 			PreparedStatement ps = connection.prepareStatement(query);
 			return ps;
@@ -148,7 +159,7 @@ public class MySQL extends Database {
 		return null;
 	}
 	
-	protected void write(String toWrite, Level level) {
+	protected void write(@Nullable String toWrite, @NonNull Level level) {
 		if (toWrite == null || toWrite.equals("")) return;
 		tekkitrestrict.log.log(level, "[MySQL] " + toWrite);
 	}

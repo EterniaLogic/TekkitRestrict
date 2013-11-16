@@ -240,80 +240,80 @@ public class EEPSettings {
 		archangelring.clear();
 		
 		//tekkitrestrict.config.getConfigurationSection("Actions.Rings");
-		if (!tekkitrestrict.config.getBoolean("Actions.Rings.ZeroRing.FreezeRadius", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Rings.ZeroRing.FreezeRadius", true))
 			zeroring.add(EERingAction.Freeze.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Rings.ZeroRing.ThrowSnowball", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Rings.ZeroRing.ThrowSnowball", true))
 			zeroring.add(EERingAction.ThrowSnowball.ordinal());
 		
-		if (!tekkitrestrict.config.getBoolean("Actions.Rings.RingOfIgnition.BurnRadius", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Rings.RingOfIgnition.BurnRadius", true))
 			firering.add(EERingAction.Burn.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Rings.RingOfIgnition.PassiveExtinguishNearPlayer", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Rings.RingOfIgnition.PassiveExtinguishNearPlayer", true))
 			firering.add(EERingAction.Extinguish.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Rings.RingOfIgnition.ThrowPyrokinesis", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Rings.RingOfIgnition.ThrowPyrokinesis", true))
 			firering.add(EERingAction.ThrowPyrokinesis.ordinal());
 		
-		if (!tekkitrestrict.config.getBoolean("Actions.Rings.HarvestGodessBand.Fertilize", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Rings.HarvestGodessBand.Fertilize", true))
 			harvestring.add(EERingAction.Fertilize.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Rings.HarvestGodessBand.PlantRadius", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Rings.HarvestGodessBand.PlantRadius", true))
 			harvestring.add(EERingAction.PlantRadius.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Rings.HarvestGodessBand.HarvestRadius", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Rings.HarvestGodessBand.HarvestRadius", true))
 			harvestring.add(EERingAction.Harvest.ordinal());
 		
-		if (!tekkitrestrict.config.getBoolean("Actions.Rings.SwiftwolfsRendingGale.NegateFallDamage", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Rings.SwiftwolfsRendingGale.NegateFallDamage", true))
 			flyring.add(EERingAction.NegateFallDamage.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Rings.SwiftwolfsRendingGale.Interdict", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Rings.SwiftwolfsRendingGale.Interdict", true))
 			flyring.add(EERingAction.Interdict.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Rings.SwiftwolfsRendingGale.Gust", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Rings.SwiftwolfsRendingGale.Gust", true))
 			flyring.add(EERingAction.Gust.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Rings.SwiftwolfsRendingGale.ActivateInterdict", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Rings.SwiftwolfsRendingGale.ActivateInterdict", true))
 			flyring.add(EERingAction.ActivateInterdict.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Rings.SwiftwolfsRendingGale.ActivateFlight", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Rings.SwiftwolfsRendingGale.ActivateFlight", true))
 			flyring.add(EERingAction.Activate.ordinal());
 		
-		if (!tekkitrestrict.config.getBoolean("Actions.Rings.RingOfArcana.StrikeLightning", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Rings.RingOfArcana.StrikeLightning", true))
 			arcanering.add(EERingAction.StrikeLightning.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Rings.RingOfArcana.Fertilize", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Rings.RingOfArcana.Fertilize", true))
 			arcanering.add(EERingAction.Fertilize.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Rings.RingOfArcana.Interdict", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Rings.RingOfArcana.Interdict", true))
 			arcanering.add(EERingAction.Interdict.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Rings.RingOfArcana.FreezeRadius", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Rings.RingOfArcana.FreezeRadius", true))
 			arcanering.add(EERingAction.Freeze.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Rings.RingOfArcana.BurnRadius", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Rings.RingOfArcana.BurnRadius", true))
 			arcanering.add(EERingAction.Burn.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Rings.RingOfArcana.HarvestRadius", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Rings.RingOfArcana.HarvestRadius", true))
 			arcanering.add(EERingAction.Harvest.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Rings.RingOfArcana.Gust", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Rings.RingOfArcana.Gust", true))
 			arcanering.add(EERingAction.Gust.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Rings.RingOfArcana.ThrowSnowball", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Rings.RingOfArcana.ThrowSnowball", true))
 			arcanering.add(EERingAction.ThrowSnowball.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Rings.RingOfArcana.ThrowPyrokinesis", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Rings.RingOfArcana.ThrowPyrokinesis", true))
 			arcanering.add(EERingAction.ThrowPyrokinesis.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Rings.RingOfArcana.NegateFallDamage", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Rings.RingOfArcana.NegateFallDamage", true))
 			arcanering.add(EERingAction.NegateFallDamage.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Rings.RingOfArcana.Activate", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Rings.RingOfArcana.Activate", true))
 			arcanering.add(EERingAction.Activate.ordinal());
 		
-		if (!tekkitrestrict.config.getBoolean("Actions.Rings.BlackHoleBand.AttractItems", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Rings.BlackHoleBand.AttractItems", true))
 			blackholeband.add(EERingAction.AttractItems.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Rings.BlackHoleBand.DeleteLiquid", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Rings.BlackHoleBand.DeleteLiquid", true))
 			blackholeband.add(EERingAction.DeleteLiquid.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Rings.BlackHoleBand.Activate", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Rings.BlackHoleBand.Activate", true))
 			blackholeband.add(EERingAction.Activate.ordinal());
 		
-		if (!tekkitrestrict.config.getBoolean("Actions.Rings.VoidRing.AttractItems", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Rings.VoidRing.AttractItems", true))
 			voidring.add(EERingAction.AttractItems.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Rings.VoidRing.DeleteLiquid", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Rings.VoidRing.DeleteLiquid", true))
 			voidring.add(EERingAction.DeleteLiquid.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Rings.VoidRing.Teleport", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Rings.VoidRing.Teleport", true))
 			voidring.add(EERingAction.Teleport.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Rings.VoidRing.Condense", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Rings.VoidRing.Condense", true))
 			voidring.add(EERingAction.Condense.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Rings.VoidRing.Activate", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Rings.VoidRing.Activate", true))
 			voidring.add(EERingAction.Activate.ordinal());
 		
-		if (!tekkitrestrict.config.getBoolean("Actions.Rings.ArchangelsSmite.ShootArrows", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Rings.ArchangelsSmite.ShootArrows", true))
 			archangelring.add(EERingAction.ShootArrows.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Rings.ArchangelsSmite.Activate", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Rings.ArchangelsSmite.Activate", true))
 			archangelring.add(EERingAction.Activate.ordinal());
 	}
 
@@ -325,11 +325,11 @@ public class EEPSettings {
 		dest2.clear();
 		dest3.clear();
 		
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.Destruction.DestructionCatalyst.BreakRadius", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.Destruction.DestructionCatalyst.BreakRadius", true))
 			dest1.add(EEAction2.BreakRadius.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.Destruction.HyperKineticLens.BreakRadius", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.Destruction.HyperKineticLens.BreakRadius", true))
 			dest2.add(EEAction2.BreakRadius.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.Destruction.CatalyticLens.BreakRadius", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.Destruction.CatalyticLens.BreakRadius", true))
 			dest3.add(EEAction2.BreakRadius.ordinal());
 	}
 	
@@ -337,20 +337,20 @@ public class EEPSettings {
 	public static ArrayList<Integer> volcanite = new ArrayList<Integer>();
 	
 	public static void loadDisabledAmuletActions(){
-		if (!tekkitrestrict.config.getBoolean("Actions.Amulets.Evertide.CreateWater", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Amulets.Evertide.CreateWater", true))
 			evertide.add(EEAmuletAction.CreateWater.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Amulets.Evertide.CreateWaterBall", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Amulets.Evertide.CreateWaterBall", true))
 			evertide.add(EEAmuletAction.CreateWaterBall.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Amulets.Evertide.PreventDrowning", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Amulets.Evertide.PreventDrowning", true))
 			evertide.add(EEAmuletAction.StopDrowning.ordinal());
 		
-		if (!tekkitrestrict.config.getBoolean("Actions.Amulets.Volcanite.CreateLava", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Amulets.Volcanite.CreateLava", true))
 			volcanite.add(EEAmuletAction.CreateLava.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Amulets.Volcanite.CreateLavaBall", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Amulets.Volcanite.CreateLavaBall", true))
 			volcanite.add(EEAmuletAction.CreateLavaBall.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Amulets.Volcanite.Vaporize", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Amulets.Volcanite.Vaporize", true))
 			volcanite.add(EEAmuletAction.Vaporize.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Amulets.Volcanite.FireImmune", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Amulets.Volcanite.FireImmune", true))
 			volcanite.add(EEAmuletAction.FireImmune.ordinal());
 	}
 
@@ -363,41 +363,41 @@ public class EEPSettings {
 	public static ArrayList<Integer> dmsword = new ArrayList<Integer>();
 
 	public static void loadDMToolActions(){
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.DarkMatter.Pickaxe.Break-3.Tall", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.DarkMatter.Pickaxe.Break-3.Tall", true))
 			dmpick.add(EEAction2.TallBreak.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.DarkMatter.Pickaxe.Break-3.Wide", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.DarkMatter.Pickaxe.Break-3.Wide", true))
 			dmpick.add(EEAction2.WideBreak.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.DarkMatter.Pickaxe.Break-3.Long", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.DarkMatter.Pickaxe.Break-3.Long", true))
 			dmpick.add(EEAction2.LongBreak.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.DarkMatter.Pickaxe.BreakOreVein", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.DarkMatter.Pickaxe.BreakOreVein", true))
 			dmpick.add(EEAction2.BreakRadius.ordinal());
 		
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.DarkMatter.Axe.BreakRadius", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.DarkMatter.Axe.BreakRadius", true))
 			dmaxe.add(EEAction2.BreakRadius.ordinal());
 		
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.DarkMatter.Shovel.Break-3.Tall", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.DarkMatter.Shovel.Break-3.Tall", true))
 			dmshovel.add(EEAction2.TallBreak.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.DarkMatter.Shovel.Break-3.Wide", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.DarkMatter.Shovel.Break-3.Wide", true))
 			dmshovel.add(EEAction2.WideBreak.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.DarkMatter.Shovel.Break-3.Long", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.DarkMatter.Shovel.Break-3.Long", true))
 			dmshovel.add(EEAction2.LongBreak.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.DarkMatter.Shovel.BreakRadius", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.DarkMatter.Shovel.BreakRadius", true))
 			dmshovel.add(EEAction2.BreakRadius.ordinal());
 		
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.DarkMatter.Hoe.TillRadius", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.DarkMatter.Hoe.TillRadius", true))
 			dmhoe.add(EEAction2.TillRadius.ordinal());
 		
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.DarkMatter.Shears.BreakRadius", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.DarkMatter.Shears.BreakRadius", true))
 			dmshears.add(EEAction2.BreakRadius.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.DarkMatter.Shears.Shear", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.DarkMatter.Shears.Shear", true))
 			dmshears.add(EEAction2.Shear.ordinal());
 		
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.DarkMatter.Hammer.MegaBreak", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.DarkMatter.Hammer.MegaBreak", true))
 			dmhammer.add(EEAction2.MegaBreak.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.DarkMatter.Hammer.BreakRadius", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.DarkMatter.Hammer.BreakRadius", true))
 			dmhammer.add(EEAction2.BreakRadius.ordinal());
 		
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.DarkMatter.Sword.AttackRadius", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.DarkMatter.Sword.AttackRadius", true))
 			dmsword.add(EEAction2.AttackRadius.ordinal());
 	}
 	
@@ -410,41 +410,41 @@ public class EEPSettings {
 	public static ArrayList<Integer> rmsword = new ArrayList<Integer>();
 
 	public static void loadRMToolActions(){
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.RedMatter.Pickaxe.Break-3.Tall", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.RedMatter.Pickaxe.Break-3.Tall", true))
 			rmpick.add(EEAction2.TallBreak.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.RedMatter.Pickaxe.Break-3.Wide", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.RedMatter.Pickaxe.Break-3.Wide", true))
 			rmpick.add(EEAction2.WideBreak.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.RedMatter.Pickaxe.Break-3.Long", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.RedMatter.Pickaxe.Break-3.Long", true))
 			rmpick.add(EEAction2.LongBreak.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.RedMatter.Pickaxe.BreakOreVein", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.RedMatter.Pickaxe.BreakOreVein", true))
 			rmpick.add(EEAction2.BreakRadius.ordinal());
 		
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.RedMatter.Axe.BreakRadius", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.RedMatter.Axe.BreakRadius", true))
 			rmaxe.add(EEAction2.BreakRadius.ordinal());
 		
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.RedMatter.Shovel.Break-3.Tall", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.RedMatter.Shovel.Break-3.Tall", true))
 			rmshovel.add(EEAction2.TallBreak.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.RedMatter.Shovel.Break-3.Wide", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.RedMatter.Shovel.Break-3.Wide", true))
 			rmshovel.add(EEAction2.WideBreak.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.RedMatter.Shovel.Break-3.Long", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.RedMatter.Shovel.Break-3.Long", true))
 			rmshovel.add(EEAction2.LongBreak.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.RedMatter.Shovel.BreakRadius", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.RedMatter.Shovel.BreakRadius", true))
 			rmshovel.add(EEAction2.BreakRadius.ordinal());
 		
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.RedMatter.Hoe.TillRadius", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.RedMatter.Hoe.TillRadius", true))
 			rmhoe.add(EEAction2.TillRadius.ordinal());
 		
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.RedMatter.Shears.BreakRadius", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.RedMatter.Shears.BreakRadius", true))
 			rmshears.add(EEAction2.BreakRadius.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.RedMatter.Shears.Shear", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.RedMatter.Shears.Shear", true))
 			rmshears.add(EEAction2.Shear.ordinal());
 		
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.RedMatter.Hammer.MegaBreak", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.RedMatter.Hammer.MegaBreak", true))
 			rmhammer.add(EEAction2.MegaBreak.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.RedMatter.Hammer.BreakRadius", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.RedMatter.Hammer.BreakRadius", true))
 			rmhammer.add(EEAction2.BreakRadius.ordinal());
 		
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.RedMatter.Sword.AttackRadius", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.RedMatter.Sword.AttackRadius", true))
 			rmsword.add(EEAction2.AttackRadius.ordinal());
 	}
 	
@@ -452,36 +452,36 @@ public class EEPSettings {
 	public static ArrayList<Integer> morningstar = new ArrayList<Integer>();
 	
 	public static void loadRedToolActions(){
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.Katar.BreakRadius", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.Katar.BreakRadius", true))
 			katar.add(EEAction2.BreakRadius.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.Katar.TillRadius", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.Katar.TillRadius", true))
 			katar.add(EEAction2.TillRadius.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.Katar.AttackRadius", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.Katar.AttackRadius", true))
 			katar.add(EEAction2.AttackRadius.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.Katar.Shear", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.Katar.Shear", true))
 			katar.add(EEAction2.Shear.ordinal());
 		
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.MorningStar.Break-3.Tall", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.MorningStar.Break-3.Tall", true))
 			morningstar.add(EEAction2.TallBreak.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.MorningStar.Break-3.Wide", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.MorningStar.Break-3.Wide", true))
 			morningstar.add(EEAction2.WideBreak.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.MorningStar.Break-3.Long", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.MorningStar.Break-3.Long", true))
 			morningstar.add(EEAction2.LongBreak.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.MorningStar.MegaBreak", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.MorningStar.MegaBreak", true))
 			morningstar.add(EEAction2.MegaBreak.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Tools.MorningStar.BreakRadius", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Tools.MorningStar.BreakRadius", true))
 			morningstar.add(EEAction2.BreakRadius.ordinal());
 	}
 	
 	public static ArrayList<Integer> armor = new ArrayList<Integer>();
 	public static void loadArmorActions(){
-		if (!tekkitrestrict.config.getBoolean("Actions.Armor.Offensive.Activate"))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Armor.Offensive.Activate", true))
 			armor.add(EEArmorAction.OffensiveActivate.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Armor.Offensive.Explode"))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Armor.Offensive.Explode", true))
 			armor.add(EEArmorAction.OffensiveExplode.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Armor.Offensive.Strike"))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Armor.Offensive.Strike", true))
 			armor.add(EEArmorAction.OffensiveStrike.ordinal());
-		if (!tekkitrestrict.config.getBoolean("Actions.Armor.Movement.Activate"))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Armor.Movement.Activate", true))
 			armor.add(EEArmorAction.MovementActivate.ordinal());
 	}
 }

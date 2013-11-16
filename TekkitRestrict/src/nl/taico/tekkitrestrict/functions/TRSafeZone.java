@@ -21,6 +21,7 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import nl.taico.tekkitrestrict.TRDB;
 import nl.taico.tekkitrestrict.tekkitrestrict;
+import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.TRConfigCache.SafeZones;
 import nl.taico.tekkitrestrict.api.SafeZones.SafeZoneCreate;
 import nl.taico.tekkitrestrict.objects.TRPos;
@@ -90,6 +91,11 @@ public class TRSafeZone {
 		ResultSet rs = null;
 		try {
 			rs = tekkitrestrict.db.query("SELECT * FROM `tr_saferegion`;");
+			if (rs == null){
+				Warning.other("Unable to get SafeZones from database!");
+				return;
+			}
+			
 			while (rs.next()) {
 				TRSafeZone sz = new TRSafeZone();
 				sz.name = rs.getString("name");
@@ -289,7 +295,7 @@ public class TRSafeZone {
 		}
 	}
 	
-	@NonNull private static PluginManager PM(){
+	private static PluginManager PM(){
 		return Bukkit.getPluginManager();
 	}
 	

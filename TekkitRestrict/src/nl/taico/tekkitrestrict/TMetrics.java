@@ -195,7 +195,6 @@ public class TMetrics {
 		try {
 			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "utf-8"));
 			writer.write(""+uid);
-			writer.close();
 		} catch (IOException ex){
 			if (showWarnings) Bukkit.getLogger().warning("[TMetrics] Unable to write UID to file!");
 		} finally {

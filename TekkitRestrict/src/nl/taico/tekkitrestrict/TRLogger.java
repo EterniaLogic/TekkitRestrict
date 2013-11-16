@@ -5,13 +5,15 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 import nl.taico.tekkitrestrict.TRConfigCache.Global;
 import nl.taico.tekkitrestrict.TRConfigCache.Logger;
 
 public class TRLogger {
 	private static HashMap<String, ArrayList<String>> logMessages = new HashMap<String, ArrayList<String>>();
 
-	public static void Log(String type, String info) {
+	public static void Log(@NonNull String type, @NonNull String info) {
 		if (!isLoggable(type)) return;
 
 		Calendar c = new GregorianCalendar();
@@ -52,7 +54,7 @@ public class TRLogger {
 		}
 	}
 
-	private static boolean isLoggable(String type) {
+	private static boolean isLoggable(@NonNull String type) {
 		type = type.toLowerCase();
 		if (type.equals("eering")) return Logger.LogRings;
 		if (type.equals("eedmtool")) return Logger.LogDMTools;
@@ -77,7 +79,7 @@ public class TRLogger {
 		logMessages.clear();
 	}
 	
-	private static String replacecolors(String input){
+	@NonNull private static String replacecolors(@NonNull String input){
 		input = input.replace("\033[30;22m", "§0");
 		input = input.replace("\033[34;22m", "§1");
 		input = input.replace("\033[32;22m", "§2");

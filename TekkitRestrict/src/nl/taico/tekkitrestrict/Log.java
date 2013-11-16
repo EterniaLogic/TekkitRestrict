@@ -7,6 +7,8 @@ import java.util.logging.Logger;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.Command;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 
 public class Log {
 	/**
@@ -24,10 +26,10 @@ public class Log {
 	}
 	
 	public static Logger McLogger;
-	public static void Command(Command cmd, CommandSender sender, String allArgs) {
+	public static void Command(@NonNull Command cmd, @NonNull CommandSender sender, @NonNull String allArgs) {
 		McLogger.log(Level.parse("Command"), sender.getName()+": /"+cmd.getName()+" "+allArgs);
 	}
-	public static void Command(String cmd, CommandSender sender, String allArgs) {
+	public static void Command(@NonNull String cmd, @NonNull CommandSender sender, @NonNull String allArgs) {
 		McLogger.log(Level.parse("Command"), sender.getName()+": /"+cmd+" "+allArgs);
 	}
 	
@@ -65,7 +67,7 @@ public class Log {
 		}
 	}
 	
-	public static void Debug(String msg){
+	public static void Debug(@NonNull String msg){
 		TRLogger.Log("debug", msg);
 	}
 	public static void Dupe(String message){
@@ -79,13 +81,13 @@ public class Log {
 		McLogger.log(Level.parse("TRDupe"), message);
 	}
 	/** For each stackTrace element, it will write it to the debug log. */
-	public static void debugEx(Exception ex){
+	public static void debugEx(@NonNull Exception ex){
 		for (StackTraceElement element : ex.getStackTrace()) {
 			TRLogger.Log("debug", "     " + element.toString());
 		}
 	}
 	/** For each stackTrace element, log to console */
-	public static void Exception(Exception ex, boolean severe){
+	public static void Exception(@NonNull Exception ex, boolean severe){
 		if (severe){
 			for (StackTraceElement element : ex.getStackTrace())
 				tekkitrestrict.log.severe(element.toString());
@@ -95,31 +97,32 @@ public class Log {
 		}
 	}
 	
-	public static String replaceColors(String str){
+	@NonNull public static String replaceColors(@Nullable String str){
 		if (str == null) return "null";
-		str = str.replace("&0", ChatColor.BLACK + "");
-		str = str.replace("&1", ChatColor.DARK_BLUE + "");
-		str = str.replace("&2", ChatColor.DARK_GREEN + "");
-		str = str.replace("&3", ChatColor.DARK_AQUA + "");
-		str = str.replace("&4", ChatColor.DARK_RED + "");
-		str = str.replace("&5", ChatColor.DARK_PURPLE + "");
-		str = str.replace("&6", ChatColor.GOLD + "");
-		str = str.replace("&7", ChatColor.GRAY + "");
-		str = str.replace("&8", ChatColor.DARK_GRAY + "");
-		str = str.replace("&9", ChatColor.BLUE + "");
-		str = str.replace("&a", ChatColor.GREEN + "");
-		str = str.replace("&b", ChatColor.AQUA + "");
-		str = str.replace("&c", ChatColor.RED + "");
-		str = str.replace("&d", ChatColor.LIGHT_PURPLE + "");
-		str = str.replace("&e", ChatColor.YELLOW + "");
-		str = str.replace("&f", ChatColor.WHITE + "");
-		str = str.replace("&k", ChatColor.MAGIC + "");
-		str = str.replace("&l", ChatColor.BOLD + "");
-		str = str.replace("&m", ChatColor.STRIKETHROUGH + "");
-		str = str.replace("&n", ChatColor.UNDERLINE + "");
-		str = str.replace("&o", ChatColor.ITALIC + "");
-		str = str.replace("&r", ChatColor.RESET + "");
-		return str;
+		String tbr = str;
+		tbr = tbr.replace("&0", ChatColor.BLACK + "");
+		tbr = tbr.replace("&1", ChatColor.DARK_BLUE + "");
+		tbr = tbr.replace("&2", ChatColor.DARK_GREEN + "");
+		tbr = tbr.replace("&3", ChatColor.DARK_AQUA + "");
+		tbr = tbr.replace("&4", ChatColor.DARK_RED + "");
+		tbr = tbr.replace("&5", ChatColor.DARK_PURPLE + "");
+		tbr = tbr.replace("&6", ChatColor.GOLD + "");
+		tbr = tbr.replace("&7", ChatColor.GRAY + "");
+		tbr = tbr.replace("&8", ChatColor.DARK_GRAY + "");
+		tbr = tbr.replace("&9", ChatColor.BLUE + "");
+		tbr = tbr.replace("&a", ChatColor.GREEN + "");
+		tbr = tbr.replace("&b", ChatColor.AQUA + "");
+		tbr = tbr.replace("&c", ChatColor.RED + "");
+		tbr = tbr.replace("&d", ChatColor.LIGHT_PURPLE + "");
+		tbr = tbr.replace("&e", ChatColor.YELLOW + "");
+		tbr = tbr.replace("&f", ChatColor.WHITE + "");
+		tbr = tbr.replace("&k", ChatColor.MAGIC + "");
+		tbr = tbr.replace("&l", ChatColor.BOLD + "");
+		tbr = tbr.replace("&m", ChatColor.STRIKETHROUGH + "");
+		tbr = tbr.replace("&n", ChatColor.UNDERLINE + "");
+		tbr = tbr.replace("&o", ChatColor.ITALIC + "");
+		tbr = tbr.replace("&r", ChatColor.RESET + "");
+		return tbr;
 	}
 
 	public static class Warning {

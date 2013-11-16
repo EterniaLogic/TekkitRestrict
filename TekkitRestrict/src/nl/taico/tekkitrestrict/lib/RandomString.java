@@ -2,6 +2,8 @@ package nl.taico.tekkitrestrict.lib;
 
 import java.util.Random;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 public class RandomString {
 	private static final char[] symbols = new char[26];
 	static {
@@ -18,7 +20,7 @@ public class RandomString {
 		buf = new char[length];
 	}
 
-	public String nextString() {
+	@NonNull public String nextString() {
 		for (int idx = 0; idx < buf.length; ++idx){
 			buf[idx] = symbols[random.nextInt(symbols.length)];
 		}

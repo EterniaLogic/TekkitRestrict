@@ -2,6 +2,8 @@ package nl.taico.tekkitrestrict.objects;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 
 import nl.taico.tekkitrestrict.annotations.Safe;
 
@@ -10,7 +12,7 @@ public class TRItem {
 	public int data;
 	public String msg = "";
 	
-	public static TRItem parseItem(int id, int data, String msg) {
+	@NonNull public static TRItem parseItem(int id, int data, @Nullable String msg) {
 		TRItem item = new TRItem();
 		item.id = id;
 		item.data = data;
@@ -18,7 +20,7 @@ public class TRItem {
 		return item;
 	}
 	
-	public static TRItem parseItem(int id, int data) {
+	@NonNull public static TRItem parseItem(int id, int data) {
 		TRItem item = new TRItem();
 		item.id = id;
 		item.data = data;
@@ -49,7 +51,7 @@ public class TRItem {
 		return ti;
 	}
 	
-	public static boolean compareNP(TRItem item, TRItem np){
+	public static boolean compareNP(@NonNull TRItem item, @NonNull TRItem np){
 		if (item.id != np.id) return false;
 		
 		if (item.data == np.data || (item.data == -10 && np.data == 0)) return true;//:0 = :0, :-1 = :-1.
@@ -72,7 +74,7 @@ public class TRItem {
 		return this.id == id && (this.data == data || this.data == -1 || (data == 0 && this.data == -10));
 	}
 	//IMPORTANT does not check messages!
-	public static boolean compare(int id, int data, TRItem mainItem){
+	public static boolean compare(int id, int data, @NonNull TRItem mainItem){
 		return id == mainItem.id && (data == mainItem.data || mainItem.data == -1 || (data == 0 && mainItem.data == -10));
 	}
 	//IMPORTANT does not check messages!
@@ -80,11 +82,11 @@ public class TRItem {
 		return id == mainId && (data == mainData || mainData == -1 || (data == 0 && mainData == -10));
 	}
 	
-	public static String defaultMessage(){
+	@NonNull public static String defaultMessage(){
 		return ChatColor.RED + "You are not allowed to modify/obtain this item!";
 	}
 	
-	public static void sendBannedMessage(Player player, String message){
+	public static void sendBannedMessage(@NonNull Player player, @NonNull String message){
 		if (message.contains("\n")){
 			String temp[] = message.split("\n");
 			for (String msg : temp) player.sendMessage(msg);

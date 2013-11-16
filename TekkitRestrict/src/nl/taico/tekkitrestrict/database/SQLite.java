@@ -9,6 +9,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
+
 import nl.taico.tekkitrestrict.tekkitrestrict;
 
 @SuppressWarnings("resource")
@@ -17,7 +20,7 @@ public class SQLite extends Database {
 	public String name;
 	private File sqlFile;
 
-	public SQLite(String name, String location) {
+	public SQLite(@NonNull String name, @NonNull String location) {
 		this.connection = null;
 		this.name = name;
 		this.location = location;
@@ -30,6 +33,7 @@ public class SQLite extends Database {
 		sqlFile = new File(folder.getAbsolutePath() + File.separator + name + ".db");
 	}
 	
+	@Override
 	protected boolean initialize() {
 		if (initialized) return working;
 		
@@ -44,6 +48,7 @@ public class SQLite extends Database {
 		}
 	}
 
+	@Override
 	public boolean open() {
 		if (!initialize()) return false;
 		try {
@@ -55,6 +60,7 @@ public class SQLite extends Database {
 		}
 	}
 
+	@Override
 	public boolean close() {
 		if (connection == null) return true;
 		try {
@@ -67,11 +73,13 @@ public class SQLite extends Database {
 	}
 
 	/** Opens the connection if it is null. */
-	public Connection getConnection() {
+	@Override
+	@NonNull public Connection getConnection() {
 		if (connection == null) open();
 		return connection;
 	}
 
+	@Override
 	public boolean isOpen() {
 		if (connection == null) return false;
 		try {
@@ -87,7 +95,7 @@ public class SQLite extends Database {
 	 * If the query was an update, delete or insert query it will return null.<br>
 	 * If the query Failed, it will throw an SQLExcpetion.
 	 */
-	public ResultSet query(String query) throws SQLException {
+	@Nullable public ResultSet query(@NonNull String query) throws SQLException {
 		try {
 			Statement statement = getConnection().createStatement();
 			if (statement.execute(query))
@@ -106,7 +114,8 @@ public class SQLite extends Database {
 	 * If the query was an update, delete or insert query it will return null.<br>
 	 * If the query Failed, it will throw an SQLExcpetion.
 	 */
-	public ResultSet query(PreparedStatement ps) throws SQLException {
+	@Override
+	@Nullable public ResultSet query(@NonNull PreparedStatement ps) throws SQLException {
 		try {
 			if (ps.execute())
 				return ps.getResultSet();
@@ -118,7 +127,8 @@ public class SQLite extends Database {
 		}
 	}
 
-	public PreparedStatement prepare(String query) {
+	@Override
+	@Nullable public PreparedStatement prepare(@NonNull String query) {
 		try {
 			PreparedStatement ps = getConnection().prepareStatement(query);
 			return ps;
@@ -130,7 +140,7 @@ public class SQLite extends Database {
 		return null;
 	}
 	
-	protected void write(String toWrite, Level level) {
+	protected void write(@Nullable String toWrite, @NonNull Level level) {
 		if (toWrite == null || toWrite.equals("")) return;
 		tekkitrestrict.log.log(level, "[SQLite] " + toWrite);
 	}

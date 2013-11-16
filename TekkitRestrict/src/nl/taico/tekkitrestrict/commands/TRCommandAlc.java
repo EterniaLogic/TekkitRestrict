@@ -25,6 +25,7 @@ import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.tekkitrestrict;
 import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.objects.OpenAlcObj;
+import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 
 import ee.AlchemyBagData;
 import forge.IGuiHandler;
@@ -45,7 +46,7 @@ public class TRCommandAlc implements CommandExecutor {
 			return true;
 		}
 		
-		if (!tekkitrestrict.config.getBoolean("UseOpenAlc")){
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.General, "UseOpenAlc", true)){
 			sender.sendMessage(ChatColor.RED + "Openalc is disabled!");
 		}
 		
@@ -105,6 +106,8 @@ public class TRCommandAlc implements CommandExecutor {
 			AlchemyBagData alcdata = openGui(looker, holder, mod_EE.getInstance(), 56, world, color, (int) looker.locY, (int) looker.locZ);
 			if (alcdata == null){
 				Warning.other("An error occurred. " + OName + "'s bag will not save properly if he is offline.");
+				sender.sendMessage(ChatColor.RED + "An error occured: Unable to find the specified bag!");
+				return true;
 			}
 			
 			new OpenAlcObj(alcdata, OPlayer, player); //Add new OpenAlcObject

@@ -2,6 +2,7 @@ package nl.taico.tekkitrestrict.objects;
 
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.eclipse.jdt.annotation.NonNull;
 
 import com.sk89q.worldedit.BlockVector;
 
@@ -9,7 +10,7 @@ public class TRPos {
 	public int x1, y1, z1, x2, y2, z2;
 	
 	public TRPos(){}
-	public TRPos(Location loc1, Location loc2){
+	public TRPos(@NonNull Location loc1, @NonNull Location loc2){
 		x1 = loc1.getBlockX();
 		x2 = loc2.getBlockX();
 		y1 = loc1.getBlockY();
@@ -32,7 +33,7 @@ public class TRPos {
 			z2 = t;
 		}
 	}
-	public static TRPos parse(BlockVector loc1, BlockVector loc2){
+	public static TRPos parse(@NonNull BlockVector loc1, @NonNull BlockVector loc2){
 		TRPos p = new TRPos();
 		p.x1 = loc1.getBlockX();
 		p.x2 = loc2.getBlockX();
@@ -80,7 +81,7 @@ public class TRPos {
 			this.z2 = z2;
 		}
 	}
-	public TRPos(String[] temp){
+	public TRPos(@NonNull String[] temp){
 		x1 = Integer.parseInt(temp[0]);
 		y1 = Integer.parseInt(temp[1]);
 		z1 = Integer.parseInt(temp[2]);
@@ -104,7 +105,7 @@ public class TRPos {
 		}
 	}
 	
-	public boolean contains(Location loc){
+	public boolean contains(@NonNull Location loc){
 		int x = loc.getBlockX();
 		if (x < x1 || x > x2) return false;
 		int z = loc.getBlockZ();
@@ -114,7 +115,7 @@ public class TRPos {
 		return true;
 	}
 	
-	public boolean containsIgnoreY(Location loc){
+	public boolean containsIgnoreY(@NonNull Location loc){
 		int x = loc.getBlockX();
 		if (x < x1 || x > x2) return false;
 		int z = loc.getBlockZ();
@@ -122,10 +123,11 @@ public class TRPos {
 		return true;
 	}
 	
-	public Location toLoc(World world){
+	@NonNull public Location toLoc(@NonNull World world){
 		return new Location(world, (x1+x2)/2, (y1+y2)/2, (z1+z2)/2);
 	}
 	
+	@Override
 	public String toString(){
 		return ""+x1+","+y1+","+z1+","+x2+","+y2+","+z2;
 	}

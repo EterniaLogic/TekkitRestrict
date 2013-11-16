@@ -2,18 +2,20 @@ package nl.taico.tekkitrestrict;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 
 import nl.taico.tekkitrestrict.TRConfigCache.Global;
 
 public class Util {
-	public static void kick(Player player, String message){
+	public static void kick(@NonNull Player player, @NonNull String message){
 		if (Global.kickFromConsole)
 			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "kick " + player.getName() + " " + message);
 		else
 			player.kickPlayer(message);
 	}
 	
-	public static String inGroup(int id){
+	@Nullable public static String inGroup(int id){
 		if (inRange(id, 27520, 27599) || inRange(id, 126, 130)) return "ee";
 		if (inRange(id, 153, 174) || inRange(id, 4056, 4066) || inRange(id, 4298, 4324)) return "buildcraft";
 		if (inRange(id, 4299, 4305) || id == 179) return "additionalpipes";

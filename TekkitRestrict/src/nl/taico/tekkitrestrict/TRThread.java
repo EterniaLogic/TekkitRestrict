@@ -42,6 +42,7 @@ import nl.taico.tekkitrestrict.functions.TRNoItem;
 import nl.taico.tekkitrestrict.functions.TRSafeZone;
 import nl.taico.tekkitrestrict.objects.TRCharge;
 import nl.taico.tekkitrestrict.objects.TRItem;
+import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 
 import ee.EEBase;
 import ee.ItemEECharged;
@@ -145,7 +146,7 @@ class TRLimitFlyThread extends Thread {
 	
 	private void load(){ reload(); }
 	public void reload() {
-		groundTime = tekkitrestrict.config.getInt("FlyLimitDailyMinutes");
+		groundTime = tekkitrestrict.config.getInt(ConfigFile.ModModifications, "FlyLimitDailyMinutes", 999999);
 	}
 }
 
@@ -642,7 +643,7 @@ class DisableItemThread extends Thread {
 		
 		//this.throttle = tekkitrestrict.config.getBoolean("ThrottleInventoryThread");
 		
-		List<String> dechargeSS = tekkitrestrict.config.getStringList("DechargeInSS");
+		List<String> dechargeSS = tekkitrestrict.config.getStringList(ConfigFile.ModModifications, "DechargeInSS");
 		for (String s : dechargeSS) {
 			List<TRItem> iss;
 			try {
@@ -658,7 +659,7 @@ class DisableItemThread extends Thread {
 			}
 		}
 
-		List<String> meu = tekkitrestrict.config.getStringList("MaxEU");
+		List<String> meu = tekkitrestrict.config.getStringList(ConfigFile.ModModifications, "MaxEU");
 		for (String s : meu) {
 			if (!s.contains(" ")){
 				Warning.config("You have an error in your ModModifications.config in MaxEU!");
@@ -708,7 +709,7 @@ class DisableItemThread extends Thread {
 		}
 
 		// process charges...
-		List<String> MaxCharges = tekkitrestrict.config.getStringList("MaxCharge");
+		List<String> MaxCharges = tekkitrestrict.config.getStringList(ConfigFile.ModModifications, "MaxCharge");
 		for (String charge : MaxCharges) {
 			if (!charge.contains(" ")) {
 				Log.Warning.config("You have an error in your maxchare list in ModModifications.config: \""+charge+"\" does not follow the format: \"itemstr percentage\"");

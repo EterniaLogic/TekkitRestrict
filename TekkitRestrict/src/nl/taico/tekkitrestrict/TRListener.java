@@ -17,6 +17,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.eclipse.jdt.annotation.NonNull;
 
 import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.TRConfigCache.Listeners;
@@ -183,11 +184,11 @@ public class TRListener implements Listener {
 		Player player = event.getPlayer();
 		if (player == null) return;
 		
-		itemLogUse(player, event.getItem(), event.getAction());
+		itemLogUse(player, event.getAction());
 	}
 
 	/** Log EE tools. */
-	private void itemLogUse(Player player, ItemStack item, Action action) {
+	private void itemLogUse(@NonNull Player player, @NonNull Action action) {
 		ItemStack a = player.getItemInHand();
 		if (a == null) return;
 
@@ -209,7 +210,7 @@ public class TRListener implements Listener {
 			logUse("EEMisc", player, id);
 	}
 	
-	private void logUse(String logname, Player player, int id){
+	private void logUse(@NonNull String logname, @NonNull Player player, int id){
 		Location loc = player.getLocation();
 		int x = loc.getBlockX();
 		int y = loc.getBlockY();

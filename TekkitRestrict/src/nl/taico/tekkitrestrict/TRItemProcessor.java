@@ -1,12 +1,10 @@
 package nl.taico.tekkitrestrict;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.eclipse.jdt.annotation.NonNull;
@@ -23,7 +21,7 @@ public class TRItemProcessor {
 	//Block Dmg values: 0-15 (4bits)
 	//Item Dmg values: 0-65536 (2 bytes)
 	//Data: 5 chars
-	public static Map<String, List<TRItem>> groups = Collections.synchronizedMap(new HashMap<String, List<TRItem>>());
+	public static ConcurrentHashMap<String, List<TRItem>> groups = new ConcurrentHashMap<String, List<TRItem>>();
 	private static final String[] modItems = new String[] {
 		"ee=27520-27599;126-130",
 		"buildcraft=153-174;4056-4066;4298-4324",

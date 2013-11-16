@@ -14,6 +14,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 
 import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.objects.TRItem;
@@ -33,7 +35,7 @@ public class TRPermHandler {
 	/**
 	 * @deprecated Unnecessary, use player.hasPermission("tekkitrestrict."+type+"."+node1) instead
 	 */
-	public static boolean hasPermission(Player player, String type, String node1, String node2) {
+	public static boolean hasPermission(@NonNull Player player, @NonNull String type, @NonNull String node1, @NonNull String node2) {
 		try {
 			String n1 = node1.equals("") ? "" : "." + node1;
 			String n2 = node2.equals("") ? "" : "." + node2;
@@ -65,7 +67,7 @@ public class TRPermHandler {
 	}
 
 	private static boolean logged = false;
-	public static TRPermLimit getPermLimitFromPerm(Player player, String permBase, int id, int data) {
+	@Nullable public static TRPermLimit getPermLimitFromPerm(@NonNull Player player, @NonNull String permBase, int id, int data) {
 		TRPermLimit t = new TRPermLimit();
 		Set<String> negPerms = getNegPermissions(player, permBase);
 		
@@ -100,8 +102,7 @@ public class TRPermHandler {
 
 		Set<String> perms = getPermissions(player, permBase);
 		
-		if (perms == null){
-			perms = new HashSet<String>();
+		if (perms.isEmpty()){
 			for (int i = 0; i <= 20; i++){
 				if (player.hasPermission("tekkitrestrict.limiter."+id+"."+data+"."+i)) {
 					t.id = id;
@@ -163,7 +164,7 @@ public class TRPermHandler {
 		return null;
 	}
 
-	public static List<TRPermLimit> getAllLimiterPerms(Player player){
+	@NonNull public static List<TRPermLimit> getAllLimiterPerms(@NonNull Player player){
 		ArrayList<TRPermLimit> tbr = new ArrayList<TRPermLimit>(100);
 		
 		Set<String> negPerms = getNegPermissions(player, "tekkitrestrict.limiter");
@@ -201,7 +202,6 @@ public class TRPermHandler {
 		}
 
 		Set<String> perms = getPermissions(player, "tekkitrestrict.limiter");
-		if (perms == null) perms = new HashSet<String>();
 		for (String perm : perms) {
 			String gp[] = perm.split("\\.");//tekkitrestrict;limiter;id
 			try {
@@ -278,7 +278,7 @@ public class TRPermHandler {
 	/**
 	 * @return A String Array of negated permissions, or a <code>new String[0]</code> if permissions plugin is not found.
 	 */
-	private static Set<String> getNegPermissions(Player player, String permBase) {
+	@NonNull private static Set<String> getNegPermissions(@NonNull Player player, @NonNull String permBase) {
 		PluginManager pm = Bukkit.getPluginManager();
 		if (pm.isPluginEnabled("PermissionsEx")) {
 			return getAllPEXPlayerPerms(player, "-"+permBase);
@@ -286,7 +286,7 @@ public class TRPermHandler {
 		
 		if (pm.isPluginEnabled("bPermissions")) {
 			Permission ps[] = ApiLayer.getPermissions(player.getWorld().getName(), CalculableType.USER, player.getName());
-			HashSet<String> sr = new HashSet<String>();
+			HashSet<String> sr = new HashSet<String>(30);
 			Permission apermission[];
 			int k = (apermission = ps).length;
 			for (int j = 0; j < k; j++) {
@@ -302,7 +302,7 @@ public class TRPermHandler {
 		
 		if (pm.isPluginEnabled("GroupManager")) {
 			GroupManager ps = (GroupManager) pm.getPlugin("GroupManager");
-			HashSet<String> sr = new HashSet<String>();
+			HashSet<String> sr = new HashSet<String>(30);
 			User user = ps.getWorldsHolder().getWorldData(player).getUser(player.getName());
 			sr.addAll(user.getPermissionList());
 			for (Group group : user.subGroupListCopy()){
@@ -326,25 +326,25 @@ public class TRPermHandler {
 			return sr;
 		}
 		
-		return new HashSet<String>();
+		return new HashSet<String>(0);
 	}
 	
-	private static Set<String> getPermissions(Player player, String s) {
+	@NonNull private static Set<String> getPermissions(@NonNull Player player, @NonNull String permBase) {
 		PluginManager pm = Bukkit.getPluginManager();
 		if (pm.isPluginEnabled("PermissionsEx")) {
-			return getAllPEXPlayerPerms(player, s);
+			return getAllPEXPlayerPerms(player, permBase);
 		}
 		
 		if (pm.isPluginEnabled("bPermissions")) {
 			Permission ps[] = ApiLayer.getPermissions(player.getWorld().getName(), CalculableType.USER, player.getName());
-			HashSet<String> sr = new HashSet<String>();
+			HashSet<String> sr = new HashSet<String>(30);
 			Permission apermission[];
 			int k = (apermission = ps).length;
 			for (int j = 0; j < k; j++) {
 				Permission px = apermission[j];
 				if (!px.isTrue()) continue; //Only positive permissions
 				String perm = px.nameLowerCase();
-				if (!perm.startsWith(s)) continue;
+				if (!perm.startsWith(permBase)) continue;
 				sr.add(perm);
 			}
 
@@ -353,7 +353,7 @@ public class TRPermHandler {
 		
 		if (pm.isPluginEnabled("GroupManager")) {
 			GroupManager ps = (GroupManager) pm.getPlugin("GroupManager");
-			HashSet<String> sr = new HashSet<String>();
+			HashSet<String> sr = new HashSet<String>(30);
 			User user = ps.getWorldsHolder().getWorldData(player).getUser(player.getName());
 			sr.addAll(user.getPermissionList());
 			for (Group group : user.subGroupListCopy()){
@@ -371,7 +371,7 @@ public class TRPermHandler {
 			Iterator<String> it = sr.iterator();
 			while (it.hasNext()){
 				String str = it.next();
-				if (!str.startsWith(s)) {
+				if (!str.startsWith(permBase)) {
 					it.remove();
 				}
 			}
@@ -379,11 +379,11 @@ public class TRPermHandler {
 			return sr;
 		}
 		
-		return null;
+		return new HashSet<String>(0);
 	}
 
-	private static Set<String> getAllPEXPlayerPerms(Player player, String permBase) {
-		HashSet<String> tbr = new HashSet<String>();
+	@NonNull private static Set<String> getAllPEXPlayerPerms(@NonNull Player player, @NonNull String permBase) {
+		HashSet<String> tbr = new HashSet<String>(30);
 		if (permEx == null) permEx = ru.tehkode.permissions.bukkit.PermissionsEx.getPermissionManager();
 		PermissionUser user = permEx.getUser(player);
 		

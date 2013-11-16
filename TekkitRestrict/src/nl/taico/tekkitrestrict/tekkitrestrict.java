@@ -25,6 +25,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.eclipse.jdt.annotation.NonNull;
 
 import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.commands.TRCommandAlc;
@@ -50,7 +51,6 @@ import nl.taico.tekkitrestrict.lib.config.TRFileConfiguration;
 import nl.taico.tekkitrestrict.lib.config.YamlConfiguration;
 import nl.taico.tekkitrestrict.listeners.Assigner;
 import nl.taico.tekkitrestrict.listeners.CraftingListener;
-import nl.taico.tekkitrestrict.objects.TRItem;
 import nl.taico.tekkitrestrict.objects.TRVersion;
 import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 import nl.taico.tekkitrestrict.objects.TREnums.DBType;
@@ -87,7 +87,7 @@ public class tekkitrestrict extends JavaPlugin {
 	 * Log a warning while the plugin is still loading.
 	 * If you type /tr warnings, you will see the warnings again.
 	 */
-	public static void loadWarning(String warning){
+	public static void loadWarning(@NonNull String warning){
 		Warning.loadWarnings.add(warning);
 		log.warning(warning);
 	}
@@ -104,7 +104,7 @@ public class tekkitrestrict extends JavaPlugin {
 		saveDefaultConfig(false); //Copy config files
 
 		config = this.getConfigx(); //Load the configuration files
-		double configVer = config.getDouble("ConfigVersion", 0.9);
+		double configVer = config.getDouble(ConfigFile.General, "ConfigVersion", 0.9);
 		if (configVer < 1.1)
 			UpdateConfigFiles.v09();//0 --> newest
 		else if (configVer < 1.5) {
@@ -154,7 +154,7 @@ public class tekkitrestrict extends JavaPlugin {
 		//###################### RPTimer ######################
 		if (config.getBoolean2(ConfigFile.General, "UseAutoRPTimer", false)){
 			try {
-				double value = config.getDouble("RPTimerMin", 0.2d);
+				double value = config.getDouble(ConfigFile.ModModifications, "RPTimerMin", 0.2d);
 				int ticks = (int) Math.round((value-0.1d) * 20d);
 				RedPowerLogic.minInterval = ticks; // set minimum interval for logic timers...
 				log.info("Set the RedPower Timer Min interval to " + value + " seconds.");
@@ -285,7 +285,7 @@ public class tekkitrestrict extends JavaPlugin {
 		}
 		
 		//##################### Log Filter ####################
-		if (config.getBoolean("UseLogFilter", true)){
+		if (config.getBoolean(ConfigFile.Logging, "FilterLogs", true) || config.getBoolean(ConfigFile.Logging, "SplitLogs", true)){
 			Enumeration<String> cc = LogManager.getLogManager().getLoggerNames();
 			filter = new TRLogFilter();
 			while (cc.hasMoreElements()){
@@ -336,7 +336,7 @@ public class tekkitrestrict extends JavaPlugin {
 		log.info("TekkitRestrict v " + version.fullVer + " disabled!");
 	}
 	
-	public static tekkitrestrict getInstance() {
+	@NonNull public static tekkitrestrict getInstance() {
 		return instance;
 	}
 
@@ -357,25 +357,23 @@ public class tekkitrestrict extends JavaPlugin {
 				public int getValue() {
 					try{
 						int size = 0;
-						List<String> ssr = tekkitrestrict.config.getStringList("RecipeBlock");
-						for (int i = 0; i < ssr.size(); i++) {
-							List<TRItem> iss;
+						List<String> ssr = tekkitrestrict.config.getStringList(ConfigFile.Advanced, "RecipeBlock");
+						for (String s : ssr) {
+							
 							try {
-								iss = TRItemProcessor.processItemString(ssr.get(i));
+								size += TRItemProcessor.processItemString(s).size();
 							} catch (TRException e) {
 								continue;
 							}
-							size += iss.size();
+
 						}
-						ssr = tekkitrestrict.config.getStringList("RecipeFurnaceBlock");
-						for (int i = 0; i < ssr.size(); i++) {
-							List<TRItem> iss;
+						ssr = tekkitrestrict.config.getStringList(ConfigFile.Advanced, "RecipeFurnaceBlock");
+						for (String s : ssr) {
 							try {
-								iss = TRItemProcessor.processItemString(ssr.get(i));
+								size += TRItemProcessor.processItemString(s).size();
 							} catch (TRException e) {
 								continue;
 							}
-							size += iss.size();
 						}
 						return size;
 					} catch(Exception ex){
@@ -462,7 +460,7 @@ public class tekkitrestrict extends JavaPlugin {
 		if (!silent) log.info("TekkitRestrict Reloaded!");
 	}
 
-	private TRFileConfiguration getConfigx() {
+	@NonNull private TRFileConfiguration getConfigx() {
 		if (configList.size() == 0) {
 			reloadConfigOldHack();
 		}
@@ -509,7 +507,7 @@ public class tekkitrestrict extends JavaPlugin {
 		if (linkEEPatch()) configList.add(reloadc("EEPatch.config.yml"));
 	}
 
-	private YamlConfiguration reloadc(String loc) {
+	@NonNull private YamlConfiguration reloadc(@NonNull String loc) {
 		File cf = new File("plugins"+File.separator+"tekkitrestrict"+File.separator + loc);
 		// tekkitrestrict.log.info(cf.getAbsolutePath());
 		YamlConfiguration conf = YamlConfiguration.loadConfiguration(cf);
@@ -628,7 +626,7 @@ public class tekkitrestrict extends JavaPlugin {
 		updater2 = new Updater(this, 44061, this.getFile(), Updater.UpdateType.DEFAULT, true);
 	}
 	
-	public boolean backupConfig(String sourceString, String destString){
+	public boolean backupConfig(@NonNull String sourceString, @NonNull String destString){
 		try {
 			File sourceFile = new File(sourceString);
 			File destFile = new File(destString);
@@ -659,16 +657,16 @@ public class tekkitrestrict extends JavaPlugin {
 
 	}
 
-	public static String getFullVersion(){
+	@NonNull public static String getFullVersion(){
 		return getMajorVersion() + "." + getMinorVersion() + getExtraVersion();
 	}
-	public static String getMajorVersion(){
+	@NonNull public static String getMajorVersion(){
 		return instance.getDescription().getVersion().split("\\D+")[0];
 	}
-	public static String getMinorVersion(){
+	@NonNull public static String getMinorVersion(){
 		return instance.getDescription().getVersion().split("\\D+")[1];
 	}
-	public static String getExtraVersion(){
+	@NonNull public static String getExtraVersion(){
 		String ver = instance.getDescription().getVersion().toLowerCase();
 		if (ver.contains("beta")){
 			String temp[] = ver.split(" ");
@@ -687,10 +685,6 @@ public class tekkitrestrict extends JavaPlugin {
 		} else {
 			return "";
 		}
-	}
-	
-	public static ArrayList<Integer> getAdvVersion(){
-		return null;
 	}
 	
 	public static boolean isBeta(){

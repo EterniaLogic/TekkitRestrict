@@ -3,6 +3,8 @@ package nl.taico.tekkitrestrict.objects;
 import java.util.ArrayList;
 
 import org.bukkit.entity.Player;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 
 import ee.AlchemyBagData;
 
@@ -14,7 +16,7 @@ public class OpenAlcObj {
 	private String bagOwnerName;
 	private static ArrayList<OpenAlcObj> allOpenAlcs = new ArrayList<OpenAlcObj>();
 	
-	public OpenAlcObj(AlchemyBagData bag, Player bagOwner, Player viewer){
+	public OpenAlcObj(@NonNull AlchemyBagData bag, @NonNull Player bagOwner, @NonNull Player viewer){
 		this.bag = bag;
 		this.bagOwner = bagOwner;
 		this.bagOwnerName = bagOwner.getName();
@@ -24,42 +26,42 @@ public class OpenAlcObj {
 		allOpenAlcs.add(this);
 	}
 	
-	public String getBagOwnerName(){
+	@NonNull public String getBagOwnerName(){
 		return bagOwnerName;
 	}
-	public String getViewerName(){
+	@NonNull public String getViewerName(){
 		return viewerName;
 	}
-	public Player getViewer(){
+	@NonNull public Player getViewer(){
 		return viewer;
 	}
-	public Player getBagOwner(){
+	@NonNull public Player getBagOwner(){
 		return bagOwner;
 	}
-	public AlchemyBagData getBag(){
+	@NonNull public AlchemyBagData getBag(){
 		return bag;
 	}
 	
-	public static OpenAlcObj getOpenAlcByOwner(String owner){
+	@Nullable public static OpenAlcObj getOpenAlcByOwner(@NonNull String owner){
 		for (OpenAlcObj current : allOpenAlcs){
 			if (current.bagOwnerName.equalsIgnoreCase(owner)) return current;
 		}
 		return null;
 	}
 	
-	public static OpenAlcObj getOpenAlcByViewer(String viewer){
+	@Nullable public static OpenAlcObj getOpenAlcByViewer(@NonNull String viewer){
 		for (OpenAlcObj current : allOpenAlcs){
 			if (current.viewerName.equalsIgnoreCase(viewer)) return current;
 		}
 		return null;
 	}
 	
-	public static boolean isViewing(String player){
+	public static boolean isViewing(@NonNull String player){
 		if (getOpenAlcByViewer(player) != null) return true;
 		return false;
 	}
 	
-	public static boolean isViewed(String player){
+	public static boolean isViewed(@NonNull String player){
 		if (getOpenAlcByOwner(player) != null) return true;
 		return false;
 	}

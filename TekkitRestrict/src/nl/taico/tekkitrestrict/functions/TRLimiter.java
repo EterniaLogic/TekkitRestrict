@@ -312,6 +312,10 @@ public class TRLimiter {
 		ResultSet dbin = null;
 		try {
 			dbin = tekkitrestrict.db.query("SELECT * FROM `tr_limiter` WHERE `player` = '" + playerName + "';");
+			if (dbin == null){
+				Warning.other("Unknown error occured when trying to get limits from database!");
+				return r;
+			}
 			if (dbin.next()) {
 				//This player exists in the database, so now we have to load him/her up.
 
@@ -371,6 +375,10 @@ public class TRLimiter {
 		ResultSet dbin = null;
 		try {
 			dbin = tekkitrestrict.db.query("SELECT * FROM `tr_limiter` WHERE `player` = '" + playerName + "';");
+			if (dbin == null){
+				Warning.other("Unknown error occured when trying to get limits from database!");
+				return r;
+			}
 			if (dbin.next()) {
 				// This player exists in the database!!!
 				// load them up!
@@ -608,6 +616,10 @@ public class TRLimiter {
 		ResultSet dbin = null;
 		try {
 			dbin = tekkitrestrict.db.query("SELECT * FROM `tr_limiter`;");
+			if (dbin == null){
+				Warning.other("Unable to load the limits from the database!");
+				return;
+			}
 			while (dbin.next()) {
 				// This player exists in the database!!!
 				// load them up!

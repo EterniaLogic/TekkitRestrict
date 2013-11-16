@@ -1,5 +1,7 @@
 package nl.taico.tekkitrestrict.objects;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 import nl.taico.tekkitrestrict.tekkitrestrict;
 import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 
@@ -11,7 +13,7 @@ public class TRVersion {
 	public boolean dev;
 	public int extra = -1;
 	
-	public TRVersion(String str){
+	public TRVersion(@NonNull String str){
 		str = str.toLowerCase();
 		if (str.contains("tekkitrestrict")){
 			str = str.replace("tekkitrestrict", "");
@@ -49,7 +51,7 @@ public class TRVersion {
 		}
 	}
 	
-	public boolean isNewer(TRVersion ver2){
+	public boolean isNewer(@NonNull TRVersion ver2){
 		if (this.major > ver2.major) return false;
 		if (this.minor > ver2.minor) return false;
 		
@@ -84,7 +86,7 @@ public class TRVersion {
 		}
 	}
 	
-	public boolean shouldUpdate(TRVersion ver2){
+	public boolean shouldUpdate(@NonNull TRVersion ver2){
 		if (this.major > ver2.major) return false;
 		if (this.minor > ver2.minor) return false;
 		
@@ -140,7 +142,7 @@ public class TRVersion {
 		}
 	}
 	
-	public String toMetricsVersion(){
+	@NonNull public String toMetricsVersion(){
 		String base = "" + major + "." + minor;
 		if (beta) base += " Beta " + extra;
 		else if (dev) base += " Dev " + extra;

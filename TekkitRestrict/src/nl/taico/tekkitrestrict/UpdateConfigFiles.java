@@ -7,7 +7,7 @@ import java.io.File;
 
 public class UpdateConfigFiles {
 
-	public static String s = File.separator;
+	public static final String s = File.separator;
 	
 	public static void v09(){
 		tekkitrestrict.loadWarning("The config file version differs from the current one.");

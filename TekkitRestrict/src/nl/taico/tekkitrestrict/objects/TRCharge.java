@@ -1,5 +1,7 @@
 package nl.taico.tekkitrestrict.objects;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 public class TRCharge extends TRItem {
 	public int maxcharge, chargerate;
 	public Object itemstack;
@@ -24,7 +26,7 @@ public class TRCharge extends TRItem {
 	}
 	
 	@Override
-	public Object clone(){
+	@NonNull public Object clone(){
 		TRCharge tc = new TRCharge();
 		tc.id = this.id;
 		tc.data = this.data;

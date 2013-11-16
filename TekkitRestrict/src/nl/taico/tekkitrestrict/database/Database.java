@@ -5,6 +5,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
+
 public abstract class Database {
 	protected Connection connection;
 	protected boolean working = false, initialized = false;
@@ -16,8 +19,8 @@ public abstract class Database {
 	public abstract Connection getConnection();
 	public abstract boolean isOpen();
 	
-	public abstract ResultSet query(String query) throws SQLException;
-	public abstract ResultSet query(PreparedStatement ps) throws SQLException;
+	@Nullable public abstract ResultSet query(@NonNull String query) throws SQLException;
+	@Nullable public abstract ResultSet query(@NonNull PreparedStatement ps) throws SQLException;
 	
-	public abstract PreparedStatement prepare(String query);
+	@Nullable public abstract PreparedStatement prepare(@NonNull String query);
 }

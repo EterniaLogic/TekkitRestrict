@@ -9,6 +9,7 @@ import nl.taico.tekkitrestrict.eepatch.destlisteners.EEDestructionListener;
 import nl.taico.tekkitrestrict.eepatch.ringlisteners.EERingListener;
 import nl.taico.tekkitrestrict.eepatch.toollisteners.EEDMToolListener;
 import nl.taico.tekkitrestrict.eepatch.toollisteners.EERMToolListener;
+import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 
 public class EEAssigner {
 	public static void assign(){
@@ -31,7 +32,7 @@ public class EEAssigner {
 			!EEPSettings.rmhammer.isEmpty() || !EEPSettings.rmshears.isEmpty() || !EEPSettings.rmsword.isEmpty() || !EEPSettings.katar.isEmpty() || !EEPSettings.morningstar.isEmpty())
 			PM.registerEvents(new EERMToolListener(), tr);
 		
-		if (!tekkitrestrict.config.getBoolean("AllowRMFurnaceOreDuplication", true))
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "AllowRMFurnaceOreDuplication", true))
 			PM.registerEvents(new EEDuplicateListener(), tr);
 		
 		if (!EEPSettings.MaxCharge.isEmpty())
