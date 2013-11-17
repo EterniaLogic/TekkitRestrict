@@ -35,6 +35,7 @@ import nl.taico.tekkitrestrict.commands.TRCommandTR;
 import nl.taico.tekkitrestrict.config.AdvancedConfig;
 import nl.taico.tekkitrestrict.config.GeneralConfig;
 import nl.taico.tekkitrestrict.config.HackDupeConfig;
+import nl.taico.tekkitrestrict.config.LoggingConfig;
 import nl.taico.tekkitrestrict.config.ModModificationsConfig;
 import nl.taico.tekkitrestrict.config.SafeZonesConfig;
 import nl.taico.tekkitrestrict.config.TPerformanceConfig;
@@ -97,7 +98,8 @@ public class tekkitrestrict extends JavaPlugin {
 		instance = this; //Set the instance
 		log = getLogger(); //Set the logger
 		//version = getDescription().getVersion();
-		version = new TRVersion(getDescription().getVersion());
+		
+		version = new TRVersion(getDescription().getVersion().equals("1.2") ? "1.20" : getDescription().getVersion());
 		Log.init();
 		
 		//#################### load Config ####################
@@ -115,10 +117,13 @@ public class tekkitrestrict extends JavaPlugin {
 			SafeZonesConfig.upgradeFile();
 			TPerformanceConfig.upgradeFile();
 			reloadConfig();
+		} else if (configVer < 1.6){
+			GeneralConfig.upgradeFile();
+			LoggingConfig.upgradeFile();
 		}
 		
 		try {//Load all settings
-			load();
+			load();//TODO loading eepatch
 		} catch (Exception ex) {
 			Log.Warning.load("An error occurred: Unable to load settings!");
 			Log.Exception(ex, true);
@@ -255,11 +260,8 @@ public class tekkitrestrict extends JavaPlugin {
 			Log.Exception(ex, false);
 		}
 		
-		log.info("Linking with EEPatch for extended functionality ...");
 		if (linkEEPatch()){
 			boolean success = true;
-			EEPSettings.loadMaxCharge();
-			EEPSettings.loadAllDisabledActions();
 			try {
 				Assigner.assignEEPatch();
 			} catch (Exception ex){
@@ -267,11 +269,12 @@ public class tekkitrestrict extends JavaPlugin {
 			}
 			
 			if (success)
-				log.info("Linked with EEPatch!");
-			else 
-				log.warning("Linking with EEPatch Failed!");
+				log.info("Linked with EEPatch for extended functionality!");
+			else
+				Warning.other("Linking with EEPatch Failed!");
+			
 		} else {
-			log.info("EEPatch is not available. Extended functionality disabled.");
+			log.info("EEPatch is not available. Extended EE integration disabled.");
 		}
 		
 		if (config.getBoolean2(ConfigFile.General, "Auto-Update", true)){

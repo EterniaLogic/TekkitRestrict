@@ -51,6 +51,7 @@ public class TRLimiter {
 	private static List<TRConfigLimit> configLimits = Collections.synchronizedList(new ArrayList<TRConfigLimit>());
 	private static Map<String, String> allBlockOwners = Collections.synchronizedMap(new HashMap<String, String>());
 	private static ConcurrentHashMap<String, List<TRPermLimit>> limiterPermCache = new ConcurrentHashMap<String, List<TRPermLimit>>();
+	private static boolean changing = false;
 	
 	public static void reload() {
 		//for (String str : limiterPermCache.keySet()){
@@ -108,12 +109,19 @@ public class TRLimiter {
 	}
 	
 	/** Remove all limits from this player. */
-	public void clearLimits() {
+	public void clearLimitsAndClearInDB() {
 		for (TRLimit ll : itemlimits) {
 			ll.placedBlock.clear();
 		}
 		itemlimits.clear();
 		saveLimiter(this);
+	}
+	
+	public void clearLimits() {
+		for (TRLimit ll : itemlimits) {
+			ll.placedBlock.clear();
+		}
+		itemlimits.clear();
 	}
 	
 	public int getMax(@NonNull Player player, int thisid, int thisdata){
@@ -302,7 +310,10 @@ public class TRLimiter {
 		
 		TRLimiter r = new TRLimiter();
 		r.player = playerName;
+		
+		changing = true;
 		limiters.add(r);
+		changing = false;
 		
 		//If player is online, check for bypass.
 		Player p = Bukkit.getPlayer(playerName);
@@ -367,7 +378,9 @@ public class TRLimiter {
 		
 		TRLimiter r = new TRLimiter();
 		r.player = playerName;
+		changing = true;
 		limiters.add(r);
+		changing = false;
 		
 		if (player.hasPermission("tekkitrestrict.bypass.limiter")) return r; //return an empty limiter
 		
@@ -473,10 +486,16 @@ public class TRLimiter {
 	/** Save the limiters to the database. */
 	public static void saveLimiters() {
 		// looping through each player's limiters
-
+		while (changing){
+			try {
+				Thread.sleep(10);
+			} catch (Exception ex){}
+		}
+		changing = true;
 		for (TRLimiter lb : limiters){
 			saveLimiter(lb);
 		}
+		changing = false;
 	}
 
 	/**
@@ -497,6 +516,7 @@ public class TRLimiter {
 	}
 
 	/**
+	 * IMPORTANT: set Changing to true before using this and to false after using this.
 	 * Dynamically unload a player (after they logout).<br>
 	 * Saves the limiter first, then uses <code>limitBlock.clearLimits()</code> and
 	 * then uses <code>limiters.remove(limitBlock)</code>
@@ -512,7 +532,7 @@ public class TRLimiter {
 
 	private static boolean logged = false, logged2 = false;
 	
-	/** Saves 1 limitblock to the database. */
+	/** Saves 1 limiter to the database. */
 	@Safe(allownull = false)
 	private static void saveLimiter(@NonNull TRLimiter lb) {
 		if (lb.player == null){
@@ -673,6 +693,7 @@ public class TRLimiter {
 	/**
 	 * Manages and removes bad data.
 	 * Determines if the limit exists at a location. If not, remove it.
+	 * Called by savethread.
 	 */
 	public static void manageData() {
 		for (TRLimiter lb : limiters) {
@@ -731,10 +752,12 @@ public class TRLimiter {
 				il.expire--;
 			}
 		}
-		
+		if (changing) return;
+		changing = true;
 		for (TRLimiter lb : tbr){
 			deLoadLimiter(lb);
 		}
+		changing = false;
 	}
 
 	/** Called when a player logs in to make his limits not expire any more. */

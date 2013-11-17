@@ -210,7 +210,6 @@ public class EEPSettings {
 	}
 	
 	public static void loadAllDisabledActions(){
-		tekkitrestrict.log.info("[DEBUG] " + "loading EEPatch Settings...");
 		loadDisabledRingActions();
 		loadDisabledDestActions();
 		loadDisabledAmuletActions();

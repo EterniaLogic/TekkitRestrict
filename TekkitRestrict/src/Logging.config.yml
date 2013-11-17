@@ -59,6 +59,7 @@ LogFilter:
 - "slotchanging("
 - "attempted to place a tile entity"
 - "chunk coordinates:"
+- "Sending Triang: "
 
 ###########################################################################
 ############################# Log Hacks/Dupes #############################

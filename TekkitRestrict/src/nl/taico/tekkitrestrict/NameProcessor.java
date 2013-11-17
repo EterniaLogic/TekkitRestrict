@@ -1,5 +1,6 @@
 package nl.taico.tekkitrestrict;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
@@ -3375,6 +3376,51 @@ public class NameProcessor {
 			Entry<TRItem, String> entry = all.next(); 
 			AllNames.put(entry.getValue().replace(" ", "").toLowerCase(), entry.getKey());
 		}
+	}
+	
+	private static final ArrayList<String> mods = new ArrayList<String>();
+	static {
+		mods.add("Equivalent Exchange");
+		mods.add("Buildcraft");
+		mods.add("IndustrialCraft 2");
+		mods.add("TubeStuffs");
+		mods.add("Power Converters");
+		mods.add("Balkons Weapon Mod");
+		mods.add("EnderChest (mod)");
+		mods.add("IronChests (mod)");
+		mods.add("Compact Solars");
+		mods.add("AdditionalPipes");
+		mods.add("Nuclear Control");
+		mods.add("Advanced Machines");
+		mods.add("RedPower Core");
+		mods.add("RedPower Logic");
+		mods.add("RedPower Control");
+		mods.add("RedPower Machines");
+		mods.add("RedPower Lighting");
+		mods.add("WirelessRedstone (mod)");
+		mods.add("MFFS (mod)");
+		mods.add("RailCraft");
+		mods.add("Chunk Loaders");
+	}
+	public static LinkedHashMap<String, TRItem> getAllItems(){
+		LinkedHashMap<String, TRItem> items = new LinkedHashMap<String, TRItem>();
+		Iterator<Entry<TRItem, String>> all = All.entrySet().iterator();
+		while (all.hasNext()){
+			Entry<TRItem, String> entry = all.next(); 
+			items.put(entry.getValue(), entry.getKey());
+		}
+		return items;
+	}
+	
+	public static LinkedHashMap<String, TRItem> getAllItemsAndMods(){
+		LinkedHashMap<String, TRItem> items = new LinkedHashMap<String, TRItem>();
+		Iterator<Entry<TRItem, String>> all = All.entrySet().iterator();
+		while (all.hasNext()){
+			Entry<TRItem, String> entry = all.next(); 
+			items.put(entry.getValue(), entry.getKey());
+		}
+		
+		return items;
 	}
 	
 	/** 

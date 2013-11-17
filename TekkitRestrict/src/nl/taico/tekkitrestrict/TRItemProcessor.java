@@ -23,7 +23,7 @@ public class TRItemProcessor {
 	//Data: 5 chars
 	public static ConcurrentHashMap<String, List<TRItem>> groups = new ConcurrentHashMap<String, List<TRItem>>();
 	private static final String[] modItems = new String[] {
-		"ee=27520-27599;126-130",
+		"ee|equivalentexchange=27520-27599;126-130",
 		"buildcraft=153-174;4056-4066;4298-4324",
 		"additionalpipes=4299-4305;179",
 		"industrialcraft|ic2=219-223;225-250;30171-30256",
@@ -35,7 +35,7 @@ public class TRItemProcessor {
 		"redpowercore=136",
 		"redpowerlogic=138;1258-1328",
 		"redpowercontrol=133-134;148",
-		"redpowermachine=137;150-151",
+		"redpowermachine|redpowermachines=137;150-151",
 		"redpowerlighting=147",
 		"wirelessredstone=177;6358-6363;6406;6408-6412",
 		"mffs=253-254;11366-11374",

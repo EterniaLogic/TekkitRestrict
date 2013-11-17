@@ -901,7 +901,7 @@ public class TRCommandTR implements CommandExecutor {
 		//}
 		
 		if (largs.length == 4){
-			cc.clearLimits();
+			cc.clearLimitsAndClearInDB();
 			send.msg(ChatColor.GREEN + "Cleared " + cc.player + "'s block limits!");
 			return;
 		}

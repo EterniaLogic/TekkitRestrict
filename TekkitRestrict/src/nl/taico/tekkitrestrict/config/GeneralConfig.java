@@ -6,7 +6,7 @@ import java.util.ArrayList;
 public class GeneralConfig extends TRConfig {
 	public static String s = File.separator;
 	public static ArrayList<String> defaultContents(boolean extra){
-		ArrayList<String> tbr = new ArrayList<String>(120);
+		ArrayList<String> tbr = new ArrayList<String>(130);
 		tbr.add("######################################################################");
 		tbr.add("## Configuration file for TekkitRestrict                            ##");
 		tbr.add("## Authors: Taeir, DreadEnd (aka DreadSlicer)                       ##");
@@ -30,12 +30,27 @@ public class GeneralConfig extends TRConfig {
 		tbr.add("PatchComputerCraft: true");
 		if (extra) tbr.add("#:-;-:# PatchComputerCraft");
 		tbr.add("");
+		tbr.add("# Change the lowest possible time for RedPower Timers to the value set");
+		tbr.add("# in ModModifications.config.yml");
+		tbr.add("# Default: true");
 		tbr.add("UseAutoRPTimer: true");
 		if (extra) tbr.add("#:-;-:# UseAutoRPTimer");
+		tbr.add("");
+		tbr.add("# TekkitRestrict has a Limiter. With it, you can set how many of a");
+		tbr.add("# certain block a player may have placed at a time.");
+		tbr.add("# For example, you could limit the amount of collectors Mk. 3 someone");
+		tbr.add("# can have by limiting 126:2 to 1 in the Advanced.config.yml.");
+		tbr.add("#");
+		tbr.add("# This option toggles the use of this limiter on or off.");
+		tbr.add("# Default: true");
 		tbr.add("UseItemLimiter: true");
 		if (extra) tbr.add("#:-;-:# UseItemLimiter");
+		tbr.add("");
+		tbr.add("# Should LimitedCreative be enabled?");
+		tbr.add("# Default: true");
 		tbr.add("UseLimitedCreative: true");
 		if (extra) tbr.add("#:-;-:# UseLimitedCreative");
+		tbr.add("");
 		tbr.add("# If UseOpenAlc is false, the command /openalc will be disabled.");
 		tbr.add("# Default: true");
 		tbr.add("UseOpenAlc: true");
@@ -124,7 +139,7 @@ public class GeneralConfig extends TRConfig {
 		tbr.add("######################################################################");
 		tbr.add("######################################################################");
 		tbr.add("# Do NOT change this. It will reset the config files if you do.");
-		tbr.add("ConfigVersion: 1.5");
+		tbr.add("ConfigVersion: 1.6");
 		tbr.add("");
 		tbr.add("######################################################################");
 		return tbr;

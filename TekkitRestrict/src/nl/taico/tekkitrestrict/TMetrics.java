@@ -76,7 +76,8 @@ public class TMetrics {
 		}
 
 		int playersOnline = Bukkit.getServer().getOnlinePlayers().length;
-		String params = "";
+		//String params = "";
+		String shortparams = "";
 		if (uid == 0 || first){
 			int onlineMode = Bukkit.getServer().getOnlineMode() ? 1 : 0;
 			String pluginVersion = tekkitrestrict.version.fullVer;
@@ -97,7 +98,9 @@ public class TMetrics {
 			}
 			int arch = 0;
 			if (osarch.equals("x86_64")) arch = 1;
+			int eepatch = tekkitrestrict.getInstance().linkEEPatch()?1:0;
 	
+			/*
 			params =  "id="+uid+"&"
 					+ "pver="+pluginVersion+"&"
 					+ "sver="+serverVersion+"&"
@@ -108,10 +111,32 @@ public class TMetrics {
 					+ "osver="+osversion+"&"
 					+ "jver="+java_version+"&"
 					+ "cores="+coreCount+"&"
-					+ "memory="+memory;
+					+ "memory="+memory+"&"
+					+ "eepatch="+eepatch;
+			*/
+			
+			shortparams =
+					  "id="+uid+"&"
+					+ "a="+pluginVersion+"&"
+					+ "b="+serverVersion+"&"
+					+ "c="+onlineMode+"&"
+					+ "z="+playersOnline+"&"
+					+ "d="+osname+"&"
+					+ "e="+arch+"&"
+					+ "f="+osversion+"&"
+					+ "g="+java_version+"&"
+					+ "h="+coreCount+"&"
+					+ "i="+memory+"&"
+					+ "j="+eepatch;
 		} else {
+			/*
 			params =  "id="+uid+"&"
 					+ "players="+playersOnline;
+			*/
+			
+			shortparams =
+					  "id="+uid+"&"
+					+ "z="+playersOnline;
 		}
 		//String request = "http://metrics.taico.nl/tekkitrestrict.php";
 		String request = BASE_URL + REPORT_URL;
@@ -121,7 +146,7 @@ public class TMetrics {
 		}
 		if (debug){
 			Bukkit.getLogger().info("[TMetrics] Prepared request for URL: "+request);
-			Bukkit.getLogger().info("[TMetrics] Prepered params: "+params);
+			Bukkit.getLogger().info("[TMetrics] Prepered params: "+shortparams);
 		}
 		URL url; 
 		HttpURLConnection connection = null;
@@ -135,11 +160,11 @@ public class TMetrics {
 			connection.setRequestProperty("User-Agent", "TMetrics/1");
 			connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded"); 
 			connection.setRequestProperty("charset", "utf-8");
-			connection.setRequestProperty("Content-Length", "" + Integer.toString(params.getBytes().length));
+			connection.setRequestProperty("Content-Length", "" + Integer.toString(shortparams.getBytes().length));
 			connection.setUseCaches(false);
 
 			DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
-			wr.writeBytes(params);
+			wr.writeBytes(shortparams);
 			wr.flush();
 			wr.close();
 
