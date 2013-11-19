@@ -98,7 +98,7 @@ public abstract class TRConfig {
 				
 				if (obj instanceof String){
 					String str2 = defaults.get(i-1);//Method: "1"
-					defaults.set(i-1, str2.split(":")[0] + ": \""+obj.toString()+"\"");
+					defaults.set(i-1, str2.split(":")[0] + ": \""+obj.toString().replace("\\\"", "#;~;#").replace("\"", "\\\"").replace("#;~;#", "\\\"")+"\"");
 					defaults.remove(i);//Remove posString
 					i--; j--;
 				} else if (obj instanceof Integer){
@@ -135,7 +135,7 @@ public abstract class TRConfig {
 						if (isPrimitive(o)){
 							defaults.add(i, "- " + o.toString());//input element after posstring, default values are after this one.
 						} else if (o instanceof String){
-							defaults.add(i, "- \"" + o.toString() + "\"");//input element after posstring, default values are after this one.
+							defaults.add(i, "- \"" + o.toString().replace("\\\"", "#;~;#").replace("\"", "\\\"").replace("#;~;#", "\\\"") + "\"");//input element after posstring, default values are after this one.
 						} else {
 							tekkitrestrict.log.severe("Error in Upgrader: invalid config entry, not Primitive or String");
 							continue;
@@ -170,7 +170,7 @@ public abstract class TRConfig {
 				
 				if (obj instanceof String){
 					String str2 = defaults.get(i-1);//Method: "1"
-					defaults.set(i-1, str2.split(":")[0] + ": \""+obj.toString()+"\"");
+					defaults.set(i-1, str2.split(":")[0] + ": \""+obj.toString().replace("\\\"", "#;~;#").replace("\"", "\\\"").replace("#;~;#", "\\\"")+"\"");
 					defaults.remove(i);//Remove posString
 					i--; j--;
 				} else if (obj instanceof Integer){
@@ -195,7 +195,7 @@ public abstract class TRConfig {
 					String toadd = "";
 					for (Object o : l){
 						if (isPrimitive(o) || o instanceof String){
-							toadd += "\""+o.toString()+"\", ";
+							toadd += "\""+o.toString().replace("\\\"", "#;~;#").replace("\"", "\\\"").replace("#;~;#", "\\\"")+"\", ";
 						} else {
 							tekkitrestrict.log.severe("Error in Upgrader: invalid config entry, not Primitive or String");
 							continue;

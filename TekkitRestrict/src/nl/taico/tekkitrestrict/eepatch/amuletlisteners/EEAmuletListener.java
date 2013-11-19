@@ -7,6 +7,7 @@ import org.bukkit.event.Listener;
 
 import nl.taico.tekkitrestrict.eepatch.EEPSettings;
 
+import ee.events.EEEnums.EEAmuletAction;
 import ee.events.amulet.EEAmuletEvent;
 import ee.events.amulet.EEEvertideAmuletEvent;
 import ee.events.amulet.EEVolcaniteAmuletEvent;
@@ -24,11 +25,11 @@ public class EEAmuletListener implements Listener{
 		Player player = event.getPlayer();
 		if (player.hasPermission("tekkitrestrict.bypass.blockactions.volcaniteamulet")) return;
 		
-		int action = event.getExtraInfo().ordinal();
+		EEAmuletAction action = event.getExtraInfo();
 		
-		for (Integer blocked : EEPSettings.volcanite){
+		for (EEAmuletAction blocked : EEPSettings.volcanite){
 			if (blocked == null) continue;
-			if (blocked.intValue() == action){
+			if (blocked == action){
 				event.setCancelled(true);
 				player.sendMessage(ChatColor.RED + "You are not allowed to do this with the Volcanite Amulet!");
 				return;
@@ -40,11 +41,11 @@ public class EEAmuletListener implements Listener{
 		Player player = event.getPlayer();
 		if (player.hasPermission("tekkitrestrict.bypass.blockactions.volcaniteamulet")) return;
 		
-		int action = event.getExtraInfo().ordinal();
+		EEAmuletAction action = event.getExtraInfo();
 		
-		for (Integer blocked : EEPSettings.evertide){
+		for (EEAmuletAction blocked : EEPSettings.evertide){
 			if (blocked == null) continue;
-			if (blocked.intValue() == action){
+			if (blocked == action){
 				event.setCancelled(true);
 				player.sendMessage(ChatColor.RED + "You are not allowed to do this with the Evertide Amulet!");
 				return;

@@ -287,7 +287,7 @@ Actions:
             # CreateLava: Create a patch of lava. The size depends on the chargelevel
             # of the Volcanite Amulet.
             CreateLava: true
-            
+
             # CreateLavaBall: Shoot a LavaEssence that creates lava where it his.
             CreateLavaBall: true
 
@@ -367,7 +367,7 @@ Actions:
             # it will make lightning strike on hostile mobs near you.
             StrikeLightning: true
 
-            # HarvestRadius: If you have a Ring of Arcana in "Earth" mode in your hotbar,
+            # Fertilize: If you have a Ring of Arcana in "Earth" mode in your hotbar,
             # it will make plants around you mature faster. It will also plant new plants
             # in your vicinity. (Passive)
             #
@@ -481,6 +481,28 @@ Actions:
         Movement:
             # Activate: Defines whether a player can activate movement powers or not.
             Activate: true
+    Other:
+        PhilosopherStone:
+            # ChangeMob: The ability to change a mob into a different one at the cost
+            # of emc.
+            ChangeMob: true
+
+            # PortableCrafting: The ability to open a crafting table by pressing C
+            # while holding the Philosopher's Stone.
+            PortableCrafting: true
+
+            # Transmute: The ability to change a block into a different one by
+            # right-clicking on it with the Philosopher's Stone.
+            Transmute: true
+        TransmutionTablet:
+            # ChangeMob: The ability to change a mob into a different one at the cost
+            # of emc.
+            ChangeMob: true
+
+            # PortableTable: The ability to open your Transmution Table by pressing C
+            # or right-clicking with the Transution Tablet.
+            PortableTable: true
+
 #########################################################################################
 # By default, the RM furnace doubles the amount of ingots you get from smelting
 # ores. If you set AllowRMFurnaceOreDuplication: false, you will always get one ingot
@@ -488,3 +510,5 @@ Actions:
 #
 # Default: true
 AllowRMFurnaceOreDuplication: true
+
+#########################################################################################

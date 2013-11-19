@@ -9,6 +9,7 @@ import org.bukkit.event.Listener;
 
 import nl.taico.tekkitrestrict.eepatch.EEPSettings;
 
+import ee.events.EEEnums.EEAction2;
 import ee.events.dm.EEDMAxeEvent;
 import ee.events.dm.EEDMHammerEvent;
 import ee.events.dm.EEDMHoeEvent;
@@ -22,7 +23,7 @@ public class EEDMToolListener implements Listener {
 	@EventHandler
 	public void onEvent(EEDMToolEvent event){
 		Player player = event.getPlayer();
-		ArrayList<Integer> toSearch = null;
+		ArrayList<EEAction2> toSearch = null;
 		String name = null;
 		
 		if (event instanceof EEDMPickaxeEvent){
@@ -57,10 +58,10 @@ public class EEDMToolListener implements Listener {
 			return;
 		}
 		
-		int action = event.getExtraInfo().ordinal();
-		for (Integer blocked : toSearch){
+		EEAction2 action = event.getExtraInfo();
+		for (EEAction2 blocked : toSearch){
 			if (blocked == null) continue;
-			if (blocked.intValue() == action){
+			if (blocked == action){
 				event.setCancelled(true);
 				player.sendMessage(ChatColor.RED + "You are not allowed to do this with the "+name+"!");
 				return;

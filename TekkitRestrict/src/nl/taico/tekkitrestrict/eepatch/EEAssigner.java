@@ -6,6 +6,8 @@ import org.bukkit.plugin.PluginManager;
 import nl.taico.tekkitrestrict.tekkitrestrict;
 import nl.taico.tekkitrestrict.eepatch.amuletlisteners.EEAmuletListener;
 import nl.taico.tekkitrestrict.eepatch.destlisteners.EEDestructionListener;
+import nl.taico.tekkitrestrict.eepatch.otherlisteners.EEPhilosopherListener;
+import nl.taico.tekkitrestrict.eepatch.otherlisteners.EETransmutionListener;
 import nl.taico.tekkitrestrict.eepatch.ringlisteners.EERingListener;
 import nl.taico.tekkitrestrict.eepatch.toollisteners.EEDMToolListener;
 import nl.taico.tekkitrestrict.eepatch.toollisteners.EERMToolListener;
@@ -37,5 +39,11 @@ public class EEAssigner {
 		
 		if (!EEPSettings.MaxCharge.isEmpty())
 			PM.registerEvents(new EEChargeListener(), tr);
+		
+		if (!EEPSettings.phil.isEmpty())
+			PM.registerEvents(new EEPhilosopherListener(), tr);
+		
+		if (!EEPSettings.trans.isEmpty())
+			PM.registerEvents(new EETransmutionListener(), tr);
 	}
 }

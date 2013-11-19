@@ -7,6 +7,7 @@ import org.bukkit.event.Listener;
 
 import nl.taico.tekkitrestrict.eepatch.EEPSettings;
 
+import ee.events.EEEnums.EEAction2;
 import ee.events.destruction.EEDestructionCatalystEvent;
 import ee.events.destruction.EEDestructionToolEvent;
 import ee.events.destruction.EEHyperCatalystEvent;
@@ -27,11 +28,11 @@ public class EEDestructionListener implements Listener {
 		Player player = event.getPlayer();
 		if (player.hasPermission("tekkitrestrict.bypass.blockactions.catalyticlens")) return;
 		
-		int action = event.getExtraInfo().ordinal();
+		EEAction2 action = event.getExtraInfo();
 		
-		for (Integer blocked : EEPSettings.dest3){
+		for (EEAction2 blocked : EEPSettings.dest3){
 			if (blocked == null) continue;
-			if (blocked.intValue() == action){
+			if (blocked == action){
 				event.setCancelled(true);
 				player.sendMessage(ChatColor.RED + "You are not allowed to do this with the Catalytic Lens!");
 				return;
@@ -43,11 +44,11 @@ public class EEDestructionListener implements Listener {
 		Player player = event.getPlayer();
 		if (player.hasPermission("tekkitrestrict.bypass.blockactions.hyperkineticlens")) return;
 		
-		int action = event.getExtraInfo().ordinal();
+		EEAction2 action = event.getExtraInfo();
 		
-		for (Integer blocked : EEPSettings.dest2){
+		for (EEAction2 blocked : EEPSettings.dest2){
 			if (blocked == null) continue;
-			if (blocked.intValue() == action){
+			if (blocked == action){
 				event.setCancelled(true);
 				player.sendMessage(ChatColor.RED + "You are not allowed to do this with the Hyperkinetic Lens!");
 				return;
@@ -59,11 +60,11 @@ public class EEDestructionListener implements Listener {
 		Player player = event.getPlayer();
 		if (player.hasPermission("tekkitrestrict.bypass.blockactions.destructioncatalyst")) return;
 		
-		int action = event.getExtraInfo().ordinal();
+		EEAction2 action = event.getExtraInfo();
 		
-		for (Integer blocked : EEPSettings.dest1){
+		for (EEAction2 blocked : EEPSettings.dest1){
 			if (blocked == null) continue;
-			if (blocked.intValue() == action){
+			if (blocked == action){
 				event.setCancelled(true);
 				player.sendMessage(ChatColor.RED + "You are not allowed to do this with the Destruction Catalyst!");
 				return;

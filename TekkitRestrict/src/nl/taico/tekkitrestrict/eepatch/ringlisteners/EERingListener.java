@@ -9,6 +9,7 @@ import org.bukkit.event.Listener;
 
 import nl.taico.tekkitrestrict.eepatch.EEPSettings;
 
+import ee.events.EEEnums.EERingAction;
 import ee.events.ring.EEArcaneRingEvent;
 import ee.events.ring.EEArchangelRingEvent;
 import ee.events.ring.EEBHBEvent;
@@ -44,16 +45,12 @@ public class EERingListener implements Listener {
 		Player player = event.getPlayer();
 		if (player.hasPermission("tekkitrestrict.bypass.blockactions.zeroring")) return;
 		
-		int action = event.getExtraInfo().ordinal();
-		String name = event.getExtraInfo().getName();
+		EERingAction action = event.getExtraInfo();
 		
-		for (Integer blocked : EEPSettings.zeroring){
-			if (blocked == null) continue;
-			if (blocked.intValue() == action){
-				event.setCancelled(true);
-				player.sendMessage(ChatColor.RED + "You are not allowed to " + name + " the Zero Ring.");
-				return;
-			}
+		if (EEPSettings.zeroring.contains(action)){
+			event.setCancelled(true);
+			player.sendMessage(ChatColor.RED + "You are not allowed to " + action.getName() + " the Zero Ring.");
+			return;
 		}
 	}
 	
@@ -61,16 +58,12 @@ public class EERingListener implements Listener {
 		Player player = event.getPlayer();
 		if (player.hasPermission("tekkitrestrict.bypass.blockactions.voidring")) return;
 		
-		int action = event.getExtraInfo().ordinal();
-		String name = event.getExtraInfo().getName();
+		EERingAction action = event.getExtraInfo();
 		
-		for (Integer blocked : EEPSettings.voidring){
-			if (blocked == null) continue;
-			if (blocked.intValue() == action){
-				event.setCancelled(true);
-				player.sendMessage(ChatColor.RED + "You are not allowed to " + name + " the Void Ring.");
-				return;
-			}
+		if (EEPSettings.voidring.contains(action)){
+			event.setCancelled(true);
+			player.sendMessage(ChatColor.RED + "You are not allowed to " + action.getName() + " the Void Ring.");
+			return;
 		}
 	}
 	
@@ -80,23 +73,20 @@ public class EERingListener implements Listener {
 		Player player = event.getPlayer();
 		if (player.hasPermission("tekkitrestrict.bypass.blockactions.swiftwolfring")) return;
 		
-		int action = event.getExtraInfo().ordinal();
+		EERingAction action = event.getExtraInfo();
 		String name = event.getExtraInfo().getName();
 		
-		for (Integer blocked : EEPSettings.flyring){
-			if (blocked == null) continue;
-			if (blocked.intValue() == action){
-				event.setCancelled(true);
-				if (!name.equals("negatefalldamage"))
-					player.sendMessage(ChatColor.RED + "You are not allowed to " + name + " Swiftwolf's Rending Gale.");
-				else {
-					if (!swrgNegate.contains(player.getName())){
-						player.sendMessage(ChatColor.RED + "You cannot use Swiftwolf's Rending Gale to negate fall damage.");
-						swrgNegate.add(player.getName());
-					}
+		if (EEPSettings.flyring.contains(action)){
+			event.setCancelled(true);
+			if (!name.equals("negatefalldamage"))
+				player.sendMessage(ChatColor.RED + "You are not allowed to " + name + " Swiftwolf's Rending Gale.");
+			else {
+				if (!swrgNegate.contains(player.getName())){
+					player.sendMessage(ChatColor.RED + "You cannot use Swiftwolf's Rending Gale to negate fall damage.");
+					swrgNegate.add(player.getName());
 				}
-				return;
 			}
+			return;
 		}
 	}
 	
@@ -104,16 +94,12 @@ public class EERingListener implements Listener {
 		Player player = event.getPlayer();
 		if (player.hasPermission("tekkitrestrict.bypass.blockactions.ignitionring")) return;
 		
-		int action = event.getExtraInfo().ordinal();
-		String name = event.getExtraInfo().getName();
+		EERingAction action = event.getExtraInfo();
 		
-		for (Integer blocked : EEPSettings.firering){
-			if (blocked == null) continue;
-			if (blocked.intValue() == action){
-				event.setCancelled(true);
-				player.sendMessage(ChatColor.RED + "You are not allowed to " + name + " the Ring of Ignition.");
-				return;
-			}
+		if (EEPSettings.firering.contains(action)){
+			event.setCancelled(true);
+			player.sendMessage(ChatColor.RED + "You are not allowed to " + action.getName() + " the Ring of Ignition.");
+			return;
 		}
 	}
 	
@@ -121,16 +107,12 @@ public class EERingListener implements Listener {
 		Player player = event.getPlayer();
 		if (player.hasPermission("tekkitrestrict.bypass.blockactions.harvestring")) return;
 		
-		int action = event.getExtraInfo().ordinal();
-		String name = event.getExtraInfo().getName();
+		EERingAction action = event.getExtraInfo();
 		
-		for (Integer blocked : EEPSettings.harvestring){
-			if (blocked == null) continue;
-			if (blocked.intValue() == action){
-				event.setCancelled(true);
-				player.sendMessage(ChatColor.RED + "You are not allowed to " + name + " the Harvest Godess Band.");
-				return;
-			}
+		if (EEPSettings.harvestring.contains(action)){
+			event.setCancelled(true);
+			player.sendMessage(ChatColor.RED + "You are not allowed to " + action.getName() + " the Harvest Godess Band.");
+			return;
 		}
 	}
 	
@@ -138,16 +120,12 @@ public class EERingListener implements Listener {
 		Player player = event.getPlayer();
 		if (player.hasPermission("tekkitrestrict.bypass.blockactions.blackholeband")) return;
 		
-		int action = event.getExtraInfo().ordinal();
-		String name = event.getExtraInfo().getName();
+		EERingAction action = event.getExtraInfo();
 		
-		for (Integer blocked : EEPSettings.blackholeband){
-			if (blocked == null) continue;
-			if (blocked.intValue() == action){
-				event.setCancelled(true);
-				player.sendMessage(ChatColor.RED + "You are not allowed to " + name + " the Black Hole Band.");
-				return;
-			}
+		if (EEPSettings.blackholeband.contains(action)){
+			event.setCancelled(true);
+			player.sendMessage(ChatColor.RED + "You are not allowed to " + action.getName() + " the Black Hole Band.");
+			return;
 		}
 	}
 	
@@ -155,16 +133,12 @@ public class EERingListener implements Listener {
 		Player player = event.getPlayer();
 		if (player.hasPermission("tekkitrestrict.bypass.blockactions.archangelring")) return;
 		
-		int action = event.getExtraInfo().ordinal();
-		String name = event.getExtraInfo().getName();
+		EERingAction action = event.getExtraInfo();
 		
-		for (Integer blocked : EEPSettings.archangelring){
-			if (blocked == null) continue;
-			if (blocked.intValue() == action){
-				event.setCancelled(true);
-				player.sendMessage(ChatColor.RED + "You are not allowed to " + name + " the Zero Ring.");
-				return;
-			}
+		if (EEPSettings.archangelring.contains(action)){
+			event.setCancelled(true);
+			player.sendMessage(ChatColor.RED + "You are not allowed to " + action.getName() + " the Zero Ring.");
+			return;
 		}
 	}
 	
@@ -172,23 +146,19 @@ public class EERingListener implements Listener {
 		Player player = event.getPlayer();
 		if (player.hasPermission("tekkitrestrict.bypass.blockactions.arcanering")) return;
 		
-		int action = event.getExtraInfo().ordinal();
+		EERingAction action = event.getExtraInfo();
 		String name = event.getExtraInfo().getName();
-		
-		for (Integer blocked : EEPSettings.arcanering){
-			if (blocked == null) continue;
-			if (blocked.intValue() == action){
-				event.setCancelled(true);
-				if (!name.equals("negatefalldamage"))
-					player.sendMessage(ChatColor.RED + "You are not allowed to " + name + " the Ring of Arcana.");
-				else {
-					if (!arcaneNegate.contains(player.getName())){
-						player.sendMessage(ChatColor.RED + "You cannot use the Ring of Arcana to negate fall damage.");
-						arcaneNegate.add(player.getName());
-					}
+		if (EEPSettings.arcanering.contains(action)){
+			event.setCancelled(true);
+			if (!name.equals("negatefalldamage"))
+				player.sendMessage(ChatColor.RED + "You are not allowed to " + name + " the Ring of Arcana.");
+			else {
+				if (!arcaneNegate.contains(player.getName())){
+					player.sendMessage(ChatColor.RED + "You cannot use the Ring of Arcana to negate fall damage.");
+					arcaneNegate.add(player.getName());
 				}
-				return;
 			}
+			return;
 		}
 	}
 	

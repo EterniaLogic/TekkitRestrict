@@ -33,6 +33,7 @@ import nl.taico.tekkitrestrict.commands.TRCommandCheck;
 import nl.taico.tekkitrestrict.commands.TRCommandTPIC;
 import nl.taico.tekkitrestrict.commands.TRCommandTR;
 import nl.taico.tekkitrestrict.config.AdvancedConfig;
+import nl.taico.tekkitrestrict.config.EEPatchConfig;
 import nl.taico.tekkitrestrict.config.GeneralConfig;
 import nl.taico.tekkitrestrict.config.HackDupeConfig;
 import nl.taico.tekkitrestrict.config.LoggingConfig;
@@ -109,17 +110,26 @@ public class tekkitrestrict extends JavaPlugin {
 		double configVer = config.getDouble(ConfigFile.General, "ConfigVersion", 0.9);
 		if (configVer < 1.1)
 			UpdateConfigFiles.v09();//0 --> newest
-		else if (configVer < 1.5) {
+		else if (configVer < 1.5) {//Upgrade to 1.7
 			AdvancedConfig.upgradeFile();
 			GeneralConfig.upgradeFile();
 			HackDupeConfig.upgradeOldHackFile();
 			ModModificationsConfig.upgradeFile();
 			SafeZonesConfig.upgradeFile();
 			TPerformanceConfig.upgradeFile();
+			LoggingConfig.upgradeFile();
+			if (linkEEPatch()) EEPatchConfig.upgradeFile();
 			reloadConfig();
-		} else if (configVer < 1.6){
+		} else if (configVer < 1.6){//Upgrade to 1.7
 			GeneralConfig.upgradeFile();
 			LoggingConfig.upgradeFile();
+			if (linkEEPatch()) EEPatchConfig.upgradeFile();
+		} else if (configVer < 1.7){//upgrade to 1.7 only if using EEPatch.
+			if (linkEEPatch()) {
+				GeneralConfig.upgradeFile();
+				EEPatchConfig.upgradeFile();
+				LoggingConfig.upgradeFile();
+			}
 		}
 		
 		try {//Load all settings
