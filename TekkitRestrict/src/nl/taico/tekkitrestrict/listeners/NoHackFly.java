@@ -162,7 +162,7 @@ public class NoHackFly implements Listener {
 				}
 			}
 			return false;
-		} else {
+		} else {//Flying (dropped ring)
 			lowerScore(name, 2);
 			return true;
 		}

@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -655,8 +656,8 @@ public class TRLimiter {
 						String[] prelimits = blockdata.split("%");
 						for (int i = 0; i < prelimits.length; i++) {
 							String g = prelimits[i];
-							TRLimit L = loadLimitFromString(g);
-							List<Location> blks = L.placedBlock;
+							TRLimit l = loadLimitFromString(g);
+							List<Location> blks = l.placedBlock;
 							for (Location loc : blks) {
 								allBlockOwners.put(
 										loc.getWorld().getName() + ":"
@@ -667,8 +668,8 @@ public class TRLimiter {
 						}
 					} else {
 						String g = blockdata;
-						TRLimit L = loadLimitFromString(g);
-						List<Location> blks = L.placedBlock;
+						TRLimit l = loadLimitFromString(g);
+						List<Location> blks = l.placedBlock;
 						for (Location loc : blks) {
 							allBlockOwners.put(loc.getWorld().getName() + ":"
 									+ loc.getBlockX() + ":" + loc.getBlockY()
@@ -699,22 +700,28 @@ public class TRLimiter {
 		for (TRLimiter lb : limiters) {
 			boolean changed = false;
 			for (TRLimit l : lb.itemlimits) {
-				Iterator<Location> it = l.placedBlock.iterator();
-				while (it.hasNext()){
-					Location loc = it.next();
-					tempLoc = loc;
-					try {
-						Future<Chunk> returnFuture = Bukkit.getScheduler().callSyncMethod(tekkitrestrict.getInstance(), new Callable<Chunk>() {
-						   public Chunk call() {
-							   Chunk c = tempLoc.getChunk();
-							   c.load();
-						       return c;
-						   }
-						});
-
-					    // This will block the current thread 
-						Chunk returnValue = returnFuture.get();//Load the chunk
-						if(returnValue != null){
+				try {
+					Iterator<Location> it = l.placedBlock.iterator();
+					while (it.hasNext()){
+						Location loc = it.next();
+						tempLoc = loc;
+						Chunk chunk = tempLoc.getChunk();
+						if (!chunk.isLoaded()){
+							try {
+								Future<Chunk> returnFuture = Bukkit.getScheduler().callSyncMethod(tekkitrestrict.getInstance(), new Callable<Chunk>() {
+								   public Chunk call() {
+									   Chunk c = tempLoc.getChunk();
+									   c.load();
+								       return c;
+								   }
+								});
+								chunk = returnFuture.get();
+							} catch (Exception ex){
+								continue;
+							}
+						}
+						
+						if(chunk != null){
 							Block b = loc.getBlock();
 							if (b.getTypeId() != l.id){
 								it.remove();
@@ -724,8 +731,9 @@ public class TRLimiter {
 								changed = true;
 							}
 						}
-					} catch (Exception e) {
 					}
+				} catch (ConcurrentModificationException ex){
+					continue;
 				}
 			}
 			

@@ -124,12 +124,12 @@ public class tekkitrestrict extends JavaPlugin {
 			GeneralConfig.upgradeFile();
 			LoggingConfig.upgradeFile();
 			if (linkEEPatch()) EEPatchConfig.upgradeFile();
+			reloadConfig();
 		} else if (configVer < 1.7){//upgrade to 1.7 only if using EEPatch.
-			if (linkEEPatch()) {
-				GeneralConfig.upgradeFile();
-				EEPatchConfig.upgradeFile();
-				LoggingConfig.upgradeFile();
-			}
+			GeneralConfig.upgradeFile();
+			LoggingConfig.upgradeFile();
+			if (linkEEPatch()) EEPatchConfig.upgradeFile();
+			reloadConfig();
 		}
 		
 		try {//Load all settings

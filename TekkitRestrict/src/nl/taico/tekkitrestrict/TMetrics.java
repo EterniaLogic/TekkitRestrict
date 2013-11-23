@@ -16,6 +16,8 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class TMetrics {
@@ -26,8 +28,7 @@ public class TMetrics {
 
 	private static final String BASE_URL = "http://metrics.taico.nl/";
 	private static final String REPORT_URL = "tekkitrestrict.php";
-	private static final int PING_INTERVAL = 20;
-	public boolean debug = false;
+	private static final int PING_INTERVAL = 15;
 
 	public int uid = 0;
 	private int savedId = 0;
@@ -46,17 +47,22 @@ public class TMetrics {
 		if (taskId >= 0) {
             return true;
         }
-		taskId = plugin.getServer().getScheduler().scheduleAsyncRepeatingTask(plugin, new Runnable() {
-            public void run() {
-                try {
-                    postPlugin();
-                } catch (TMetricsException e) {
-                    if (showWarnings || debug) {
-                        Bukkit.getLogger().warning("[TMetrics] " + e.getMessage());
-                    }
-                }
-            }
-        }, 0, PING_INTERVAL * 1200);
+		plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable(){
+			public void run() {
+				taskId = plugin.getServer().getScheduler().scheduleAsyncRepeatingTask(plugin, new Runnable() {
+		            public void run() {
+		                try {
+		                    postPlugin();
+		                } catch (TMetricsException e) {
+		                    if (showWarnings) {
+		                        Bukkit.getLogger().warning("[TMetrics] " + e.getMessage());
+		                    }
+		                }
+		            }
+		        }, 0, PING_INTERVAL * 1200);
+			}
+		}, 20);//Execute 20 ticks after all plugins have loaded
+		
 
         return true;
 	}
@@ -93,9 +99,8 @@ public class TMetrics {
 			memory = Math.round(memory/(1024*1024));
 	
 			// normalize os arch .. amd64 -> x86_64
-			if (osarch.equals("amd64")) {
-				osarch = "x86_64";
-			}
+			if (osarch.equals("amd64")) osarch = "x86_64";
+			
 			int arch = 0;
 			if (osarch.equals("x86_64")) arch = 1;
 			int eepatch = tekkitrestrict.getInstance().linkEEPatch()?1:0;
@@ -144,10 +149,6 @@ public class TMetrics {
 			request += "?first=1";
 			first = false;
 		}
-		if (debug){
-			Bukkit.getLogger().info("[TMetrics] Prepared request for URL: "+request);
-			Bukkit.getLogger().info("[TMetrics] Prepered params: "+shortparams);
-		}
 		URL url; 
 		HttpURLConnection connection = null;
 		try {
@@ -192,12 +193,17 @@ public class TMetrics {
 					try {
 						uid = Integer.parseInt(s.replace("id=", ""));
 					} catch (NumberFormatException ex) {
-						if (showWarnings || debug) Bukkit.getLogger().warning("[TMetrics] Invalid response from server!");
+						if (showWarnings) Bukkit.getLogger().warning("[TMetrics] Invalid response from server!");
 					}
-				} else if (!s.contains("OK:")){
-					if (showWarnings || debug) Bukkit.getLogger().warning("[TMetrics] Statistics server responds: " + s);
-				} else if (debug && s.contains("OK: ")) {
-					Bukkit.getLogger().info("[TMetrics] Server responds: "+s);
+				} else if (s.contains("OK:")){
+					continue;
+				} else if (s.contains("IMPORTANT: ")) {
+					if (showWarnings) scheduleRepeatingMSG(s.replace("IMPORTANT: ", ""));
+					Bukkit.getLogger().warning("[TekkitRestrict] Important Message: "+s.replace("IMPORTANT: ", ""));
+				} else if (s.contains("MSG: ")){
+					if (showWarnings) Bukkit.getLogger().info("[TMetrics] Message from server: "+s.replace("MSG: ", ""));
+				} else {
+					if (showWarnings) Bukkit.getLogger().warning("[TMetrics] Statistics server responds: " + s);
 				}
 			}
 
@@ -208,10 +214,20 @@ public class TMetrics {
 			}
 			if (!logged){
 				logged = true;
-				if (debug) ex.printStackTrace();
 				throw new TMetricsException("An error occured while trying to send statistics: "+ex.getMessage()+"\n"+"This error will only be logged once.");
 			}
 		}
+	}
+	
+	private void scheduleRepeatingMSG(final String message){
+		Bukkit.getScheduler().scheduleAsyncRepeatingTask(plugin, new Runnable(){
+			public void run(){
+				Bukkit.getLogger().warning("[TekkitRestrict] Important Message: "+message);
+				for (Player player : Bukkit.getOnlinePlayers()){
+					if (player.isOp()) player.sendMessage(ChatColor.BLUE+"[TekkitRestrict] Important Message: " + message);
+				}
+			}
+		}, 20*60*10, 20*60*60);
 	}
 
 	private void generateUIDFile(File file) {
