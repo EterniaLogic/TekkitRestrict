@@ -163,8 +163,24 @@ public class NoHackFly implements Listener {
 			}
 			return false;
 		} else {//Flying (dropped ring)
-			lowerScore(name, 2);
-			return true;
+			Block cb = player.getLocation().getBlock();
+			for (BlockFace bf : BlockFace.values()) {
+				if (!cb.getRelative(bf).isLiquid()) continue;
+				lowerScore(name, 1);
+				return false;
+			}
+			
+			Integer ticks = tickTolerance.get(name);
+			if (ticks == null) ticks = 1;
+			else ticks = ticks + 1;
+			
+			if (ticks >= flyTolerance) {
+				resetScore(name);
+				return true;
+			} else {
+				tickTolerance.put(name, ticks);//Make if not exist, increase otherwise.
+				return false;
+			}
 		}
 	}
 	

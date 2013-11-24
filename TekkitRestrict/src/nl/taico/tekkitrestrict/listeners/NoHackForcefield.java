@@ -8,6 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import nl.taico.tekkitrestrict.TRConfigCache.Hacks;
@@ -16,19 +17,30 @@ import nl.taico.tekkitrestrict.objects.TREnums.HackType;
 
 public class NoHackForcefield implements Listener {
 	private static ConcurrentHashMap<String, Integer> tickTolerance = new ConcurrentHashMap<String, Integer>();
-
+	
 	@EventHandler
 	private void onEntityDamage(EntityDamageByEntityEvent e) {
 		if (!(e.getDamager() instanceof Player)) return;
-		if (e.getCause() == DamageCause.PROJECTILE || e.getCause() == DamageCause.MAGIC) return;
-
+		if (e.getCause() == DamageCause.PROJECTILE || e.getCause() == DamageCause.MAGIC || e.getCause() == DamageCause.BLOCK_EXPLOSION ||
+			e.getCause() == DamageCause.POISON || e.getCause() == DamageCause.FIRE_TICK) return;
+		
+		if (e.getEntity() == e.getDamager()) return;
 		Player damager = (Player) e.getDamager();
-
+		
 		if (damager.hasPermission("tekkitrestrict.bypass.hack.forcefield")) return;
 		
 		//Ignore rm sword and katar.
 		if (damager.getItemInHand() != null && (damager.getItemInHand().getTypeId() == 27567 || damager.getItemInHand().getTypeId() == 27572)) return;
-
+		
+		if (e.getCause() == DamageCause.CUSTOM){
+			ItemStack[] inv = damager.getInventory().getContents();
+			for (int i = 0; i<9; i++){
+				ItemStack stack = inv[i];
+				if (stack == null) continue;
+				if (stack.getTypeId()==27534 && stack.getDurability()==1) return;//Archangelring damage
+			}
+		}
+		
 		double pdir = damager.getLocation().getYaw();
 		Location Damagedloc = e.getEntity().getLocation();
 		Location Attackerloc = damager.getLocation();
