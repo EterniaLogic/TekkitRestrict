@@ -18,12 +18,11 @@ import forge.MinecraftForge;
 public class CraftingListener {
 	public static void setupCraftHook() {
 		
-		ICraftingHandler var0 = new ICraftingHandler() {
+		ICraftingHandler craftingHandler = new ICraftingHandler() {
 			@SuppressWarnings("deprecation")
 			public void onTakenFromCrafting(EntityHuman var1, ItemStack var2, IInventory var3) {
 				if (var1 == null || var2 == null || !(var1.getBukkitEntity() instanceof Player)) return;
 				
-				if (!(var1.getBukkitEntity() instanceof Player)) return;//AutocraftingTable mk2
 				Player player = (Player) var1.getBukkitEntity();
 				
 				String banned = TRNoItem.isItemBanned(player, var2.id, var2.getData(), true);
@@ -48,6 +47,6 @@ public class CraftingListener {
 				}
 			}
 		};
-		MinecraftForge.registerCraftingHandler(var0);
+		MinecraftForge.registerCraftingHandler(craftingHandler);
 	}
 }

@@ -28,19 +28,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.eclipse.jdt.annotation.NonNull;
 
 import nl.taico.tekkitrestrict.Log.Warning;
-import nl.taico.tekkitrestrict.commands.TRCommandAlc;
-import nl.taico.tekkitrestrict.commands.TRCommandCheck;
-import nl.taico.tekkitrestrict.commands.TRCommandTPIC;
-import nl.taico.tekkitrestrict.commands.TRCommandTR;
-import nl.taico.tekkitrestrict.config.AdvancedConfig;
-import nl.taico.tekkitrestrict.config.DatabaseConfig;
-import nl.taico.tekkitrestrict.config.EEPatchConfig;
-import nl.taico.tekkitrestrict.config.GeneralConfig;
-import nl.taico.tekkitrestrict.config.HackDupeConfig;
-import nl.taico.tekkitrestrict.config.LoggingConfig;
-import nl.taico.tekkitrestrict.config.ModModificationsConfig;
-import nl.taico.tekkitrestrict.config.SafeZonesConfig;
-import nl.taico.tekkitrestrict.config.TPerformanceConfig;
+import nl.taico.tekkitrestrict.commands.*;
+import nl.taico.tekkitrestrict.config.*;
 import nl.taico.tekkitrestrict.database.Database;
 import nl.taico.tekkitrestrict.eepatch.EEPSettings;
 import nl.taico.tekkitrestrict.functions.TREMCSet;
@@ -53,7 +42,6 @@ import nl.taico.tekkitrestrict.functions.TRSafeZone;
 import nl.taico.tekkitrestrict.lib.config.TRFileConfiguration;
 import nl.taico.tekkitrestrict.lib.config.YamlConfiguration;
 import nl.taico.tekkitrestrict.listeners.Assigner;
-import nl.taico.tekkitrestrict.listeners.CraftingListener;
 import nl.taico.tekkitrestrict.objects.TRVersion;
 import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 import nl.taico.tekkitrestrict.objects.TREnums.DBType;
@@ -90,7 +78,6 @@ public class tekkitrestrict extends JavaPlugin {
 	public void onLoad() {
 		instance = this; //Set the instance
 		log = getLogger(); //Set the logger
-		//version = getDescription().getVersion();
 		
 		version = new TRVersion(getDescription().getVersion().equals("1.2") ? "1.20" : getDescription().getVersion());
 		Log.init();
@@ -221,8 +208,6 @@ public class tekkitrestrict extends JavaPlugin {
 	}
 	@Override
 	public void onEnable() {
-		config.getConfigurationSection("").getValues(true).keySet();
-		
 		ttt = new TRThread();
 		try {
 			Assigner.assign(); //Register the required listeners
@@ -287,7 +272,7 @@ public class tekkitrestrict extends JavaPlugin {
 		}
 		
 		
-		Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+		Bukkit.getScheduler().scheduleAsyncDelayedTask(this, new Runnable() {
 			public void run(){
 				if (config.getBoolean2(ConfigFile.General, "Auto-Update", true)){
 					//updater = new Updater_Old(this, "tekkit-restrict", this.getFile(), Updater_Old.UpdateType.DEFAULT, true);
@@ -303,7 +288,7 @@ public class tekkitrestrict extends JavaPlugin {
 		
 		
 		//##################### Log Filter ####################
-		if (config.getBoolean(ConfigFile.Logging, "FilterLogs", true) || config.getBoolean(ConfigFile.Logging, "SplitLogs", true)){
+		if (config.getBoolean2(ConfigFile.Logging, "FilterLogs", true) || config.getBoolean2(ConfigFile.Logging, "SplitLogs", true)){
 			Enumeration<String> cc = LogManager.getLogManager().getLoggerNames();
 			filter = new TRLogFilter();
 			while (cc.hasMoreElements()){
@@ -325,15 +310,13 @@ public class tekkitrestrict extends JavaPlugin {
 				if (Warning.loadWarnings()){
 					log.warning("There were some warnings while loading TekkitRestrict!");
 					log.warning("Use /tr warnings load to view them again (in case you missed them).");
-				}
-				if (!Warning.dbWarnings.isEmpty()){
+				} else if (!Warning.dbWarnings.isEmpty()){
 					log.warning("There were some database warnings while loading TekkitRestrict!");
-					log.warning("Use /tr warnings database to view them again (in case you missed them).");
+					log.warning("Use /tr warnings db to view them again (in case you missed them).");
 				}
 			}
 		});
-		
-		CraftingListener.setupCraftHook();
+	
 		log.info("TekkitRestrict v" + version.fullVer + " Enabled!");
 	}
 	@Override
@@ -459,7 +442,6 @@ public class tekkitrestrict extends JavaPlugin {
 	/**
 	 * @param listeners Reload Listeners as well?
 	 * @param silent If silent is true, no notice of the reload will appear in the console.
-	 * @param startup If startup is true, it will not 
 	 */
 	public void reload(boolean listeners, boolean silent) {
 		if (listeners) Assigner.unregisterAll();

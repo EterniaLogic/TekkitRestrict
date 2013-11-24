@@ -23,6 +23,10 @@ public class Assigner {
 		PM.registerEvents(new QuitListener(), plugin);
 		
 		PM.registerEvents(new InventoryClickListener(), plugin);
+		
+		if (Listeners.UseNoItem)
+			CraftingListener.setupCraftHook();
+		
 		if (Dupes.alcBags.prevent ||
 			Dupes.pedestals.prevent ||
 			Dupes.rmFurnaces.prevent ||

@@ -26,6 +26,7 @@ public class TRDB {
 			{
 				String msg = "[DB] Transferring SQLite database to MySQL...";
 				Warning.dbWarnings.add(msg);
+				Warning.loadWarnings.add(msg);
 				tekkitrestrict.log.info(msg);
 			}
 			
@@ -35,6 +36,7 @@ public class TRDB {
 				tekkitrestrict.dbtype = DBType.Unknown;
 				String msg = "[DB] Unable to find SQLite database to transfer data to MySQL!";
 				Warning.dbWarnings.add("[SEVERE] "+msg);
+				Warning.loadWarnings.add("[SEVERE] "+msg);
 				tekkitrestrict.log.severe(msg);
 				return false;
 			}
@@ -44,6 +46,7 @@ public class TRDB {
 				tekkitrestrict.dbtype = DBType.Unknown;
 				String msg = "[DB] Unable to open SQLite database to transfer data to MySQL!";
 				Warning.dbWarnings.add("[SEVERE] "+msg);
+				Warning.loadWarnings.add("[SEVERE] "+msg);
 				tekkitrestrict.log.severe(msg);
 				return false;
 			}
@@ -51,10 +54,12 @@ public class TRDB {
 			if (transferSQLiteToMySQL()){
 				String msg = "[DB] Transferred SQLite database to MySQL successfully!";
 				Warning.dbWarnings.add(msg);
+				Warning.loadWarnings.add(msg);
 				tekkitrestrict.log.info(msg);
 			} else {
 				String msg = "[DB] Transferring SQLite database to MySQL failed!";
 				Warning.dbWarnings.add("[SEVERE] "+ msg);
+				Warning.loadWarnings.add("[SEVERE] "+ msg);
 				tekkitrestrict.log.severe(msg);
 				return false;
 			}
@@ -66,12 +71,14 @@ public class TRDB {
 			if (!type.equals("mysql")){
 				String msg = "[DB] You have transferred to MySQL but you still have SQLite set as your preferred database type! TekkitRestrict will continue to use SQLite until you change it in the config!";
 				Warning.dbWarnings.add("[SEVERE] "+ msg);
+				Warning.loadWarnings.add("[SEVERE] "+ msg);
 				tekkitrestrict.log.severe(msg);
 			}
 		} else if (tekkitrestrict.config.getBoolean(ConfigFile.Database, "TransferDBFromMySQLToSQLite", false)){
 			{
 				String msg = "[DB] Transferring MySQL database to SQLite...";
 				Warning.dbWarnings.add(msg);
+				Warning.loadWarnings.add(msg);
 				tekkitrestrict.log.info(msg);
 			}
 			
@@ -87,6 +94,7 @@ public class TRDB {
 				tekkitrestrict.dbtype = DBType.Unknown;
 				String msg = "[DB] Unable to connect to MySQL database to transfer data to SQLite!";
 				Warning.dbWarnings.add("[SEVERE] "+msg);
+				Warning.loadWarnings.add("[SEVERE] "+msg);
 				tekkitrestrict.log.severe(msg);
 				
 				return false;
@@ -96,6 +104,7 @@ public class TRDB {
 				tekkitrestrict.dbtype = DBType.Unknown;
 				String msg = "[DB] Unable to connect to MySQL database to transfer data to SQLite!";
 				Warning.dbWarnings.add("[SEVERE] "+msg);
+				Warning.loadWarnings.add("[SEVERE] "+msg);
 				tekkitrestrict.log.severe(msg);
 				return false;
 			}
@@ -103,10 +112,12 @@ public class TRDB {
 			if (transferMySQLToSQLite()){
 				String msg = "[DB] Transferred MySQL database to SQLite successfully!";
 				Warning.dbWarnings.add(msg);
+				Warning.loadWarnings.add(msg);
 				tekkitrestrict.log.info(msg);
 			} else {
 				String msg = "[DB] Transferring MySQL database to SQLite failed!";
 				Warning.dbWarnings.add("[SEVERE] "+ msg);
+				Warning.loadWarnings.add("[SEVERE] "+msg);
 				tekkitrestrict.log.severe(msg);
 				return false;
 			}
@@ -118,6 +129,7 @@ public class TRDB {
 			if (!type.equals("sqlite")){
 				String msg = "[DB] You have transferred to SQLite but you still have MySQL set as your preferred database type! TekkitRestrict will continue to use MySQL until you change it in the config!";
 				Warning.dbWarnings.add("[SEVERE] "+ msg);
+				Warning.loadWarnings.add("[SEVERE] "+msg);
 				tekkitrestrict.log.severe(msg);
 			}
 		}
@@ -146,6 +158,7 @@ public class TRDB {
 			} catch (DBException ex){
 				String msg = "[MySQL] Error: " + ex.getMessage();
 				Warning.dbWarnings.add("[SEVERE] "+msg);
+				Warning.loadWarnings.add("[SEVERE] "+msg);
 				tekkitrestrict.log.severe(msg);
 				
 				return false;
@@ -156,6 +169,7 @@ public class TRDB {
 			tekkitrestrict.dbtype = DBType.Unknown;
 			String msg = "[DB] You set an unknown/unsupported database type! Supported: SQLite and MySQL.";
 			Warning.dbWarnings.add("[SEVERE] "+msg);
+			Warning.loadWarnings.add("[SEVERE] "+msg);
 			tekkitrestrict.log.severe(msg);
 			return false;
 		}
@@ -492,7 +506,7 @@ public class TRDB {
 		HashMap<String, String> limits = new HashMap<String, String>();
 		try {
 			while (rs.next()){
-				limits.put(rs.getString(0), rs.getString(1));
+				limits.put(rs.getString(1), rs.getString(2));
 				i++;
 			}
 		} catch (SQLException ex) {
@@ -624,7 +638,7 @@ public class TRDB {
 		HashMap<String, String> limits = new HashMap<String, String>();
 		try {
 			while (rs.next()){
-				limits.put(rs.getString(0), rs.getString(1));
+				limits.put(rs.getString(1), rs.getString(2));
 				i++;
 			}
 		} catch (SQLException ex) {
@@ -684,6 +698,7 @@ public class TRDB {
 		} catch (DBException ex){
 			String msg = "[MySQL] Unable to connect to MySQL database! Error: " + ex.getMessage();
 			Warning.dbWarnings.add("[SEVERE] "+msg);
+			Warning.loadWarnings.add("[SEVERE] "+msg);
 			tekkitrestrict.log.severe(msg);
 			
 			return false;

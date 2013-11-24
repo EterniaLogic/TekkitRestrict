@@ -34,7 +34,7 @@ public class EEAssigner {
 			!EEPSettings.rmhammer.isEmpty() || !EEPSettings.rmshears.isEmpty() || !EEPSettings.rmsword.isEmpty() || !EEPSettings.katar.isEmpty() || !EEPSettings.morningstar.isEmpty())
 			PM.registerEvents(new EERMToolListener(), tr);
 		
-		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "AllowRMFurnaceOreDuplication", true))
+		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "AllowRMFurnaceOreDuplication", true))
 			PM.registerEvents(new EEDuplicateListener(), tr);
 		
 		if (!EEPSettings.MaxCharge.isEmpty())

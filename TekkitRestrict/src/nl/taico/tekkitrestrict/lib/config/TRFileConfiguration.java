@@ -28,9 +28,6 @@ import org.yaml.snakeyaml.representer.Representer;
 
 import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.tekkitrestrict;
-import nl.taico.tekkitrestrict.config.AdvancedConfig;
-import nl.taico.tekkitrestrict.config.GeneralConfig;
-import nl.taico.tekkitrestrict.config.TPerformanceConfig;
 import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 
 @SuppressWarnings("rawtypes")
@@ -106,6 +103,11 @@ public class TRFileConfiguration extends FileConfiguration {
 		Object val = get(file, path, def);
 		return val == null ? def : val.toString();
 	}
+	
+	public String getString2(ConfigFile file, @NonNull String path, String def) {
+		Object val = get(file, path, null);
+		return val == null ? (String) missingSettings(def, file, path) : val.toString();
+	}
 
 	@Override
 	public boolean isString(String path) {
@@ -131,6 +133,11 @@ public class TRFileConfiguration extends FileConfiguration {
 	public int getInt(ConfigFile file, @NonNull String path, int def) {
 		Object val = get(file, path, Integer.valueOf(def));
 		return (val instanceof Number) ? NumberConversions.toInt(val) : def;
+	}
+	
+	public int getInt2(ConfigFile file, @NonNull String path, int def) {
+		Object val = get(file, path, null);
+		return (val instanceof Number) ? NumberConversions.toInt(val) : (int) missingSettings(def, file, path);
 	}
 
 	@Override
@@ -162,7 +169,7 @@ public class TRFileConfiguration extends FileConfiguration {
 	
 	public boolean getBoolean2(ConfigFile file, @NonNull String path, boolean def){
 		Object val = get(file, path, null);
-		return (val instanceof Boolean) ? ((Boolean) val).booleanValue() : missingSettings(def, file, path);
+		return (val instanceof Boolean) ? ((Boolean) val).booleanValue() : (boolean) missingSettings(def, file, path);
 	}
 
 	@Override
@@ -189,6 +196,11 @@ public class TRFileConfiguration extends FileConfiguration {
 		Object val = get(file, path, Double.valueOf(def));
 		return (val instanceof Number) ? NumberConversions.toDouble(val) : def;
 	}
+	
+	public double getDouble2(ConfigFile file, @NonNull String path, double def) {
+		Object val = get(file, path, null);
+		return (val instanceof Number) ? NumberConversions.toDouble(val) : (double) missingSettings(def, file, path);
+	}
 
 	@Override
 	public boolean isDouble(String path) {
@@ -204,6 +216,7 @@ public class TRFileConfiguration extends FileConfiguration {
 				(def instanceof Number) ? NumberConversions.toLong(def) : 0L);
 	}
 
+	@Deprecated
 	@Override
 	public long getLong(String path, long def) {
 		Object val = get(path, Long.valueOf(def));
@@ -710,15 +723,9 @@ public class TRFileConfiguration extends FileConfiguration {
 	    return (val instanceof ConfigurationSection) ? createSection(path) : null;
 	}
 	
-	private boolean missingSettings(boolean val, ConfigFile file, @NonNull String setting){
-		if (file == ConfigFile.General) GeneralConfig.upgradeFile();
-		else if (file == ConfigFile.Advanced) AdvancedConfig.upgradeFile();
-		else if (file == ConfigFile.TPerformance) TPerformanceConfig.upgradeFile();
-		else {
-			Log.Warning.config("Missing setting " + setting + " in " + file.toString() + ".config.yml!");
-			return val;
-		}
-		tekkitrestrict.getInstance().reload(false, true);
+	private Object missingSettings(Object val, ConfigFile file, @NonNull String setting){
+		Log.Warning.config("Missing setting " + setting + " in " + file.toString() + ".config.yml!");
+		Log.Warning.config("To fix this message, please delete your " + file.toString() + ".config.yml and TekkitRestrict will make you a new one.");
 		return val;
 	}
 	
