@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class DatabaseConfig extends TRConfig {
 	public static ArrayList<String> defaultContents(boolean extra){
-		ArrayList<String> tbr = new ArrayList<String>(40);
+		ArrayList<String> tbr = new ArrayList<String>(50);
 		
 		tbr.add("######################################################################################");
 		tbr.add("## Configuration file for TekkitRestrict                                            ##");
@@ -36,6 +36,22 @@ public class DatabaseConfig extends TRConfig {
 		if (extra) tbr.add("#:-;-:# MySQL.Password");
 		tbr.add("    Database: minecraft");
 		if (extra) tbr.add("#:-;-:# MySQL.Database");
+		tbr.add("");
+		tbr.add("######################################################################################");
+		tbr.add("################################# Transfer settings ##################################");
+		tbr.add("######################################################################################");
+		tbr.add("# Here you can set if you want to transfer a database from SQLite to MySQL or vice");
+		tbr.add("# versa. Only one of these options can be true.");
+		tbr.add("");
+		tbr.add("# Transfer from SQLite to MySQL");
+		tbr.add("# If you set this to true, the data currently in the Data.db file will be written to");
+		tbr.add("# the MySQL database as set above.");
+		tbr.add("TransferDBFromSQLiteToMySQL: false");
+		tbr.add("");
+		tbr.add("# Transfer from MySQL to SQLite");
+		tbr.add("# If you set this to true, the data currently in the MySQL database as set above will");
+		tbr.add("# be written into a SQLite database file named Data.db.");
+		tbr.add("TransferDBFromMySQLToSQLite: false");
 		tbr.add("");
 		tbr.add("######################################################################################");
 		tbr.add("######################################################################################");

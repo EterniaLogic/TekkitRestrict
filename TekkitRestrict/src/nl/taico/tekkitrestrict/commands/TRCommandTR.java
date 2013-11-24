@@ -111,9 +111,9 @@ public class TRCommandTR implements CommandExecutor {
 	private void warnings(String largs[]){
 		if (send.noPerm("warnings")) return;
 		
-		
 		if (largs.length == 1 || largs.length > 2){
 			send.msg("/tr warnings load", "display warnings during loading");
+			send.msg("/tr warnings db", "display database warnings");
 			send.msg("/tr warnings config", "display config warnings");
 			send.msg("/tr warnings other", "display other warnings");
 			send.msg("/tr warnings all", "display all warnings");
@@ -124,6 +124,19 @@ public class TRCommandTR implements CommandExecutor {
 			LinkedList<String> msgs = Warning.loadWarnings;
 			if (msgs.isEmpty()){
 				send.msg("There were no warnings during load.");
+				return;
+			}
+			
+			for (String str : msgs){
+				send.msg(str);
+			}
+			return;
+		}
+		
+		if (largs[1].equals("db")){
+			LinkedList<String> msgs = Warning.dbWarnings;
+			if (msgs.isEmpty()){
+				send.msg("There were no database warnings.");
 				return;
 			}
 			
@@ -165,6 +178,16 @@ public class TRCommandTR implements CommandExecutor {
 				send.msg("Load Warnings: None");
 			} else {
 				send.msg("Load Warnings:");
+				for (String str : msgs){
+					send.msg(str);
+				}
+			}
+			
+			msgs = Warning.dbWarnings;
+			if (msgs.isEmpty()){
+				send.msg("DB Warnings: None");
+			} else {
+				send.msg("DB Warnings:");
 				for (String str : msgs){
 					send.msg(str);
 				}

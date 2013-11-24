@@ -142,8 +142,18 @@ public class Log {
 		public static LinkedList<String> loadWarnings = new LinkedList<String>();
 		public static LinkedList<String> configWarnings = new LinkedList<String>();
 		public static LinkedList<String> otherWarnings = new LinkedList<String>();
+		public static LinkedList<String> dbWarnings = new LinkedList<String>();
 		public static boolean loadWarnings(){
 			return !loadWarnings.isEmpty();
+		}
+		public static void dbAndLoad(String message) {
+			tekkitrestrict.log.warning(message);
+			dbWarnings.add(message);
+			loadWarnings.add(message);
+		}
+		public static void db(String message){
+			tekkitrestrict.log.warning(message);
+			dbWarnings.add(message);
 		}
 	}
 }

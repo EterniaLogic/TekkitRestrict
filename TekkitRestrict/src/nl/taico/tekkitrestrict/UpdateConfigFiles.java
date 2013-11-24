@@ -5,13 +5,15 @@ package nl.taico.tekkitrestrict;
 
 import java.io.File;
 
+import nl.taico.tekkitrestrict.Log.Warning;
+
 public class UpdateConfigFiles {
 
 	public static final String s = File.separator;
 	
 	public static void v09(){
-		tekkitrestrict.loadWarning("The config file version differs from the current one.");
-		tekkitrestrict.loadWarning("Backing up old config files and writing new ones.");
+		Warning.load("The config file version differs from the current one.");
+		Warning.load("Backing up old config files and writing new ones.");
 		
 		String path = "plugins"+s+"tekkitrestrict"+s;
 		String bpath = path+"config_backup";
@@ -37,7 +39,7 @@ public class UpdateConfigFiles {
 		tr.saveDefaultConfig(true);
 		tr.reloadConfig();
 		
-		tekkitrestrict.loadWarning("New config files have been written. Please set the required settings in the new config files.");
+		Warning.load("New config files have been written. Please set the required settings in the new config files.");
 	}
 	
 }

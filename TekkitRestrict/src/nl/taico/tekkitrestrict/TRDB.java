@@ -3,13 +3,18 @@ package nl.taico.tekkitrestrict;
 import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 
 import nl.taico.tekkitrestrict.Log.Warning;
+import nl.taico.tekkitrestrict.config.DatabaseConfig;
 import nl.taico.tekkitrestrict.database.DBException;
 import nl.taico.tekkitrestrict.database.MySQL;
 import nl.taico.tekkitrestrict.database.SQLite;
+import nl.taico.tekkitrestrict.objects.TRDBSS;
 import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 import nl.taico.tekkitrestrict.objects.TREnums.DBType;
 
@@ -17,7 +22,108 @@ public class TRDB {
 	private static boolean newdb = false;
 	/** @return If opening the database was successful. */
 	public static boolean loadDB() {
+		if (tekkitrestrict.config.getBoolean(ConfigFile.Database, "TransferDBFromSQLiteToMySQL", false)){
+			{
+				String msg = "[DB] Transferring SQLite database to MySQL...";
+				Warning.dbWarnings.add(msg);
+				tekkitrestrict.log.info(msg);
+			}
+			
+			tekkitrestrict.dbtype = DBType.SQLite;
+			File dbfile = new File(tekkitrestrict.getInstance().getDataFolder().getPath() + File.separator + "Data.db");
+			if (!dbfile.exists()){
+				tekkitrestrict.dbtype = DBType.Unknown;
+				String msg = "[DB] Unable to find SQLite database to transfer data to MySQL!";
+				Warning.dbWarnings.add("[SEVERE] "+msg);
+				tekkitrestrict.log.severe(msg);
+				return false;
+			}
+			
+			tekkitrestrict.db = new SQLite("Data", tekkitrestrict.getInstance().getDataFolder().getPath());
+			if (!tekkitrestrict.db.open()){
+				tekkitrestrict.dbtype = DBType.Unknown;
+				String msg = "[DB] Unable to open SQLite database to transfer data to MySQL!";
+				Warning.dbWarnings.add("[SEVERE] "+msg);
+				tekkitrestrict.log.severe(msg);
+				return false;
+			}
+			
+			if (transferSQLiteToMySQL()){
+				String msg = "[DB] Transferred SQLite database to MySQL successfully!";
+				Warning.dbWarnings.add(msg);
+				tekkitrestrict.log.info(msg);
+			} else {
+				String msg = "[DB] Transferring SQLite database to MySQL failed!";
+				Warning.dbWarnings.add("[SEVERE] "+ msg);
+				tekkitrestrict.log.severe(msg);
+				return false;
+			}
+			
+			DatabaseConfig.upgradeFile();
+			tekkitrestrict.getInstance().reloadConfig();
+			
+			String type = tekkitrestrict.config.getString(ConfigFile.Database, "DatabaseType", "sqlite").toLowerCase();
+			if (!type.equals("mysql")){
+				String msg = "[DB] You have transferred to MySQL but you still have SQLite set as your preferred database type! TekkitRestrict will continue to use SQLite until you change it in the config!";
+				Warning.dbWarnings.add("[SEVERE] "+ msg);
+				tekkitrestrict.log.severe(msg);
+			}
+		} else if (tekkitrestrict.config.getBoolean(ConfigFile.Database, "TransferDBFromMySQLToSQLite", false)){
+			{
+				String msg = "[DB] Transferring MySQL database to SQLite...";
+				Warning.dbWarnings.add(msg);
+				tekkitrestrict.log.info(msg);
+			}
+			
+			tekkitrestrict.dbtype = DBType.MySQL;
+			String host = tekkitrestrict.config.getString(ConfigFile.Database, "MySQL.Hostname", "localhost");
+			String port = tekkitrestrict.config.getString(ConfigFile.Database, "MySQL.Port", "3306");
+			String database = tekkitrestrict.config.getString(ConfigFile.Database, "MySQL.Database", "minecraft");
+			String user = tekkitrestrict.config.getString(ConfigFile.Database, "MySQL.Username", "root");
+			String password = tekkitrestrict.config.getString(ConfigFile.Database, "MySQL.Password", "");
+			try {
+				tekkitrestrict.db = new MySQL(host, port, database, user, password);
+			} catch (DBException ex){
+				tekkitrestrict.dbtype = DBType.Unknown;
+				String msg = "[DB] Unable to connect to MySQL database to transfer data to SQLite!";
+				Warning.dbWarnings.add("[SEVERE] "+msg);
+				tekkitrestrict.log.severe(msg);
+				
+				return false;
+			}
+			
+			if (!tekkitrestrict.db.open()){
+				tekkitrestrict.dbtype = DBType.Unknown;
+				String msg = "[DB] Unable to connect to MySQL database to transfer data to SQLite!";
+				Warning.dbWarnings.add("[SEVERE] "+msg);
+				tekkitrestrict.log.severe(msg);
+				return false;
+			}
+			
+			if (transferMySQLToSQLite()){
+				String msg = "[DB] Transferred MySQL database to SQLite successfully!";
+				Warning.dbWarnings.add(msg);
+				tekkitrestrict.log.info(msg);
+			} else {
+				String msg = "[DB] Transferring MySQL database to SQLite failed!";
+				Warning.dbWarnings.add("[SEVERE] "+ msg);
+				tekkitrestrict.log.severe(msg);
+				return false;
+			}
+			
+			DatabaseConfig.upgradeFile();
+			tekkitrestrict.getInstance().reloadConfig();
+			
+			String type = tekkitrestrict.config.getString(ConfigFile.Database, "DatabaseType", "sqlite").toLowerCase();
+			if (!type.equals("sqlite")){
+				String msg = "[DB] You have transferred to SQLite but you still have MySQL set as your preferred database type! TekkitRestrict will continue to use MySQL until you change it in the config!";
+				Warning.dbWarnings.add("[SEVERE] "+ msg);
+				tekkitrestrict.log.severe(msg);
+			}
+		}
+		
 		String type = tekkitrestrict.config.getString(ConfigFile.Database, "DatabaseType", "sqlite").toLowerCase();
+		
 		if (type.equals("sqlite")){
 			tekkitrestrict.dbtype = DBType.SQLite;
 			File dbfile = new File(tekkitrestrict.getInstance().getDataFolder().getPath() + File.separator + "Data.db");
@@ -39,7 +145,7 @@ public class TRDB {
 				tekkitrestrict.db = new MySQL(host, port, database, user, password);
 			} catch (DBException ex){
 				String msg = "[MySQL] Error: " + ex.getMessage();
-				Warning.otherWarnings.add("[SEVERE] "+msg);
+				Warning.dbWarnings.add("[SEVERE] "+msg);
 				tekkitrestrict.log.severe(msg);
 				
 				return false;
@@ -49,7 +155,7 @@ public class TRDB {
 		} else {
 			tekkitrestrict.dbtype = DBType.Unknown;
 			String msg = "[DB] You set an unknown/unsupported database type! Supported: SQLite and MySQL.";
-			Warning.otherWarnings.add("[SEVERE] "+msg);
+			Warning.dbWarnings.add("[SEVERE] "+msg);
 			tekkitrestrict.log.severe(msg);
 			return false;
 		}
@@ -59,7 +165,7 @@ public class TRDB {
 	public static boolean initSQLite() {
 		if (!tekkitrestrict.db.isOpen()) {
 			if (!tekkitrestrict.db.open()){
-				tekkitrestrict.loadWarning("[SQLite] Cannot open the database!");
+				Warning.dbAndLoad("[SQLite] Cannot open the database!");
 				tekkitrestrict.dbworking = 20;
 				return false;
 			}
@@ -104,7 +210,7 @@ public class TRDB {
 	public static boolean initMySQL() {
 		if (!tekkitrestrict.db.isOpen()) {
 			if (!tekkitrestrict.db.open()){
-				tekkitrestrict.loadWarning("[MySQL] Cannot open the database connection!");
+				Warning.dbAndLoad("[MySQL] Cannot open the database connection!");
 				tekkitrestrict.dbworking = 20;
 				return false;
 			}
@@ -148,9 +254,9 @@ public class TRDB {
 			tekkitrestrict.db.query("CREATE TABLE IF NOT EXISTS tr_dbversion (version NUMERIC);");
 			tekkitrestrict.db.query("INSERT OR REPLACE INTO tr_dbversion (version) VALUES("+tekkitrestrict.dbversion+");");
 		} catch (Exception ex) {
-			tekkitrestrict.loadWarning("[SQLite] Unable to write version to database!");
+			Warning.dbAndLoad("[SQLite] Unable to write version to database!");
 			for (StackTraceElement cur : ex.getStackTrace()){
-				tekkitrestrict.loadWarning("[SQLite] " + cur.toString());
+				Warning.dbAndLoad("[SQLite] " + cur.toString());
 			}
 			tekkitrestrict.dbworking += 1;
 		}
@@ -163,9 +269,9 @@ public class TRDB {
 					+ "data TEXT,"
 					+ "world TEXT);");
 		} catch (Exception ex) {
-			tekkitrestrict.loadWarning("[SQLite] Unable to create safezones table!");
+			Warning.dbAndLoad("[SQLite] Unable to create safezones table!");
 			for (StackTraceElement cur : ex.getStackTrace()){
-				tekkitrestrict.loadWarning("[SQLite] " + cur.toString());
+				Warning.dbAndLoad("[SQLite] " + cur.toString());
 			}
 			
 			tekkitrestrict.dbworking += 2;
@@ -176,16 +282,16 @@ public class TRDB {
 					+ "player TEXT UNIQUE,"
 					+ "blockdata TEXT);");
 		} catch (Exception ex) {
-			tekkitrestrict.loadWarning("[SQLite] Unable to create limiter table!");
+			Warning.dbAndLoad("[SQLite] Unable to create limiter table!");
 			for (StackTraceElement cur : ex.getStackTrace()){
-				tekkitrestrict.loadWarning("[SQLite] " + cur.toString());
+				Warning.dbAndLoad("[SQLite] " + cur.toString());
 			}
 			tekkitrestrict.dbworking += 4;
 		}
 		
 		dbFailMsg(tekkitrestrict.dbworking);
 		if (tekkitrestrict.dbworking != 0)
-			tekkitrestrict.loadWarning("[SQLite] Not all tables could be created!");
+			Warning.dbAndLoad("[SQLite] Not all tables could be created!");
 		else 
 			tekkitrestrict.log.info("[SQLite] Database created successfully!");
 	}
@@ -194,11 +300,11 @@ public class TRDB {
 		tekkitrestrict.log.info("[MySQL] Creating new database...");
 		try {
 			tekkitrestrict.db.query("CREATE TABLE IF NOT EXISTS tr_dbversion (version NUMERIC(3,2));");
-			tekkitrestrict.db.query("INSERT OR REPLACE INTO tr_dbversion VALUES ("+tekkitrestrict.dbversion+");");
+			tekkitrestrict.db.query("REPLACE INTO tr_dbversion VALUES ("+tekkitrestrict.dbversion+");");
 		} catch (Exception ex) {
-			tekkitrestrict.loadWarning("[MySQL] Unable to write version to database!");
+			Warning.dbAndLoad("[MySQL] Unable to write version to database!");
 			for (StackTraceElement cur : ex.getStackTrace()){
-				tekkitrestrict.loadWarning("[MySQL] " + cur.toString());
+				Warning.dbAndLoad("[MySQL] " + cur.toString());
 			}
 			tekkitrestrict.dbworking += 1;
 		}
@@ -211,9 +317,9 @@ public class TRDB {
 					+ "data TINYTEXT,"
 					+ "world TINYTEXT) CHARACTER SET latin1 COLLATE latin1_swedish_ci;");
 		} catch (Exception ex) {
-			tekkitrestrict.loadWarning("[MySQL] Unable to create safezones table!");
+			Warning.dbAndLoad("[MySQL] Unable to create safezones table!");
 			for (StackTraceElement cur : ex.getStackTrace()){
-				tekkitrestrict.loadWarning("[MySQL] " + cur.toString());
+				Warning.dbAndLoad("[MySQL] " + cur.toString());
 			}
 			
 			tekkitrestrict.dbworking += 2;
@@ -224,16 +330,16 @@ public class TRDB {
 					+ "player VARCHAR(32) UNIQUE,"
 					+ "blockdata TEXT) CHARACTER SET latin1 COLLATE latin1_swedish_ci;");
 		} catch (Exception ex) {
-			tekkitrestrict.loadWarning("[MySQL] Unable to create limiter table!");
+			Warning.dbAndLoad("[MySQL] Unable to create limiter table!");
 			for (StackTraceElement cur : ex.getStackTrace()){
-				tekkitrestrict.loadWarning("[MySQL] " + cur.toString());
+				Warning.dbAndLoad("[MySQL] " + cur.toString());
 			}
 			tekkitrestrict.dbworking += 4;
 		}
 		
 		dbFailMsg(tekkitrestrict.dbworking);
 		if (tekkitrestrict.dbworking != 0)
-			tekkitrestrict.loadWarning("[MySQL] Not all tables could be created!");
+			Warning.dbAndLoad("[MySQL] Not all tables could be created!");
 		else 
 			tekkitrestrict.log.info("[MySQL] Database created successfully!");
 	}
@@ -250,12 +356,12 @@ public class TRDB {
 		try {
 			srvals = getTableVals("tr_saferegion");
 		} catch(SQLException ex){
-			tekkitrestrict.loadWarning("[SQLite] Unable to transfer safezones from the old format to the new one!");
+			Warning.dbAndLoad("[SQLite] Unable to transfer safezones from the old format to the new one!");
 		}
 		try {
 			limvals = getTableVals("tr_limiter");
 		} catch(SQLException ex){
-			tekkitrestrict.loadWarning("[SQLite] Unable to transfer limits from the old format to the new one!");
+			Warning.dbAndLoad("[SQLite] Unable to transfer limits from the old format to the new one!");
 		}
 		
 		//Delete old tables
@@ -267,9 +373,9 @@ public class TRDB {
 			tekkitrestrict.db.query("CREATE TABLE IF NOT EXISTS tr_dbversion (version NUMERIC);");
 			tekkitrestrict.db.query("INSERT OR REPLACE INTO tr_dbversion (version) VALUES("+tekkitrestrict.dbversion+");");
 		} catch (Exception ex) {
-			tekkitrestrict.loadWarning("[SQLite] Unable to write version to database!");
+			Warning.dbAndLoad("[SQLite] Unable to write version to database!");
 			for (StackTraceElement cur : ex.getStackTrace()){
-				tekkitrestrict.loadWarning("[SQLite] " + cur.toString());
+				Warning.dbAndLoad("[SQLite] " + cur.toString());
 			}
 			tekkitrestrict.dbworking += 1;
 		}
@@ -284,9 +390,9 @@ public class TRDB {
 					+ "data TEXT,"
 					+ "world TEXT); ");
 		} catch (Exception ex) {
-			tekkitrestrict.loadWarning("[SQLite] Unable to create safezones table!");
+			Warning.dbAndLoad("[SQLite] Unable to create safezones table!");
 			for (StackTraceElement cur : ex.getStackTrace()){
-				tekkitrestrict.loadWarning("[SQLite] " + cur.toString());
+				Warning.dbAndLoad("[SQLite] " + cur.toString());
 			}
 			
 			tekkitrestrict.dbworking += 2;
@@ -306,9 +412,9 @@ public class TRDB {
 				tekkitrestrict.log.info("[SQLite] Transferred " + srvals.size() + " safezones.");
 			}
 		} catch (Exception ex) {
-			tekkitrestrict.loadWarning("[SQLite] Unable to write safezones to database!");
+			Warning.dbAndLoad("[SQLite] Unable to write safezones to database!");
 			for (StackTraceElement cur : ex.getStackTrace()){
-				tekkitrestrict.loadWarning("[SQLite] " + cur.toString());
+				Warning.dbAndLoad("[SQLite] " + cur.toString());
 			}
 		}
 		//###############################################################################
@@ -319,9 +425,9 @@ public class TRDB {
 						+ "player TEXT UNIQUE,"
 						+ "blockdata TEXT);");
 		} catch (Exception ex) {
-			tekkitrestrict.loadWarning("[SQLite] Unable to create limiter table!");
+			Warning.dbAndLoad("[SQLite] Unable to create limiter table!");
 			for (StackTraceElement cur : ex.getStackTrace()){
-				tekkitrestrict.loadWarning("[SQLite] " + cur.toString());
+				Warning.dbAndLoad("[SQLite] " + cur.toString());
 			}
 			tekkitrestrict.dbworking += 4;
 		}
@@ -338,16 +444,16 @@ public class TRDB {
 				tekkitrestrict.log.info("[SQLite] Transferred "+ limvals.size() + " limits.");
 			}
 		} catch (Exception ex) {
-			tekkitrestrict.loadWarning("[SQLite] Unable to write limits to database!");
+			Warning.dbAndLoad("[SQLite] Unable to write limits to database!");
 			for (StackTraceElement cur : ex.getStackTrace()){
-				tekkitrestrict.loadWarning("[SQLite] " + cur.toString());
+				Warning.dbAndLoad("[SQLite] " + cur.toString());
 			}
 		}
 		if (tekkitrestrict.dbworking == 0) {
 			tekkitrestrict.log.info("[SQLite] Transfering into the new database format succeeded!");
 		} else {
 			dbFailMsg(tekkitrestrict.dbworking);
-			tekkitrestrict.loadWarning("[SQLite] Transfering into the new database format failed!");
+			Warning.dbAndLoad("[SQLite] Transfering into the new database format failed!");
 		}
 		
 	}
@@ -361,23 +467,280 @@ public class TRDB {
 			tekkitrestrict.db.query("INSERT INTO tr_limiter (player, blockdata) SELECT player, blockdata FROM tr_limiter_old ORDER BY player ASC");
 			tekkitrestrict.db.query("DROP TABLE IF EXISTS tr_limiter_old");
 		} catch (SQLException ex) {
-			tekkitrestrict.loadWarning("[SQLite] Error while updating db!");
+			Warning.dbAndLoad("[SQLite] Error while updating db!");
 			for (StackTraceElement st : ex.getStackTrace()){
-				tekkitrestrict.loadWarning("[SQLite] " + st.toString());
+				Warning.dbAndLoad("[SQLite] " + st.toString());
 			}
 		}
+	}
+	
+	public static boolean transferMySQLToSQLite(){
+		ResultSet rs = null;
+		try {
+			rs = tekkitrestrict.db.query("SELECT * FROM tr_limiter;");
+		} catch (SQLException ex) {
+			Warning.dbAndLoad("[MySQL] Unable to read limits from MySql Database! Error: "+ex.getMessage());
+			return false;
+		}
+		
+		if (rs == null){
+			Warning.dbAndLoad("[MySQL] Unable to read limits from MySql Database! Error: ResultSet is null");
+			return false;
+		}
+		
+		int i = 0;
+		HashMap<String, String> limits = new HashMap<String, String>();
+		try {
+			while (rs.next()){
+				limits.put(rs.getString(0), rs.getString(1));
+				i++;
+			}
+		} catch (SQLException ex) {
+			Warning.dbAndLoad("[MySQL] Unable to read limits from MySql Database! Error: "+ex.getMessage());
+			try {
+				rs.close();
+			} catch (SQLException ex2) {}
+			return false;
+		}
+		
+		tekkitrestrict.log.info("[DB] Found "+i+" limiters to transfer.");
+		
+		try {
+			rs.close();
+		} catch (SQLException e) {}
+		
+		HashMap<Integer, TRDBSS> safezones = new HashMap<Integer, TRDBSS>();
+		try {
+			rs = tekkitrestrict.db.query("SELECT * FROM tr_saferegion;");
+		} catch (SQLException ex) {
+			Warning.dbAndLoad("[MySQL] Unable to read safezones from MySql Database! Error: "+ex.getMessage());
+			return false;
+		}
+		
+		if (rs == null){
+			Warning.dbAndLoad("[MySQL] Unable to read safezones from MySql Database! Error: ResultSet is null.");
+			return false;
+		}
+		int j = 0;
+		try {
+			while (rs.next()){
+				safezones.put(rs.getInt("id"), new TRDBSS(rs.getString("name"), rs.getInt("mode"), rs.getString("data"), rs.getString("world")));
+				j++;
+			}
+		} catch (SQLException ex) {
+			Warning.dbAndLoad("[MySQL] Unable to read safezones from MySql Database! Error: "+ex.getMessage());
+			try {
+				rs.close();
+			} catch (SQLException ex2) {}
+			return false;
+		}
+		
+		try {
+			rs.close();
+		} catch (SQLException e) {}
+		
+		tekkitrestrict.log.info("[DB] Found "+j+" SafeZones to transfer.");
+		
+		tekkitrestrict.dbtype = DBType.SQLite;
+		String path = tekkitrestrict.getInstance().getDataFolder().getPath();
+		File dbfile = new File(path + File.separator + "Data.db");
+		File backup = new File(path + File.separator + "Data_backup.db");
+		if (dbfile.exists()){
+			if (!dbfile.renameTo(backup)){
+				backup.delete();
+				dbfile = new File(path + File.separator + "Data.db");
+				if (!dbfile.renameTo(backup)){
+					Warning.dbAndLoad("[DB] Unable to delete/backup old database file!");
+					return false;
+				}
+			}
+			dbfile = new File(path + File.separator + "Data.db");
+		}
+		tekkitrestrict.log.info("[DB] Creating database file...");
+		try {
+			tekkitrestrict.db = new SQLite("Data", path);
+		} catch (DBException ex){
+			Warning.dbAndLoad("[DB] Unable to create database file!");
+			return false;
+		}
+		
+		if (!tekkitrestrict.db.open()){
+			Log.Warning.dbAndLoad("[SQLite] Unable to open Database!");
+			return false;
+		}
+		
+		initNewSQLiteDB();
+		if (tekkitrestrict.dbworking != 0) return false;
+		
+		int k = i;
+		Iterator<Entry<String, String>> limitsit = limits.entrySet().iterator();
+		while (limitsit.hasNext()){
+			Entry<String, String> entry = limitsit.next();
+			try {
+				tekkitrestrict.db.query("INSERT INTO tr_limiter (player, blockdata) VALUES (\""+entry.getKey()+"\", \""+entry.getValue()+"\");");
+			} catch (SQLException ex) {
+				Log.Warning.dbAndLoad("[SQLite] Unable to transfer limits of player " + entry.getKey() + "! Error: "+ex.getMessage());
+				k--;
+				continue;
+			}
+		}
+		
+		tekkitrestrict.log.info("[DB] Transferred "+k+" out of "+i+" limiters successfully.");
+		
+		int l = j;
+		Iterator<Entry<Integer, TRDBSS>> ssit = safezones.entrySet().iterator();
+		while (ssit.hasNext()){
+			Entry<Integer, TRDBSS> entry = ssit.next();
+			TRDBSS ss = entry.getValue();
+			try {
+				tekkitrestrict.db.query("INSERT INTO tr_saferegion (id, name, mode, data, world) VALUES ("+entry.getKey()+", \""+ss.name+"\", "+ss.mode+", \""+ss.data+"\", \""+ss.world+"\");");
+			} catch (SQLException ex) {
+				Log.Warning.dbAndLoad("[SQLite] Unable to transfer safezone " + ss.name + "! Error: "+ex.getMessage());
+				l--;
+				continue;
+			}
+		}
+		
+		tekkitrestrict.log.info("[DB] Transferred "+l+" out of "+j+" safezones successfully.");
+		
+		return true;
+	}
+	
+	public static boolean transferSQLiteToMySQL(){
+		ResultSet rs = null;
+		try {
+			rs = tekkitrestrict.db.query("SELECT * FROM tr_limiter;");
+		} catch (SQLException ex) {
+			Warning.dbAndLoad("[SQLite] Unable to read limits from SQLite Database! Error: "+ex.getMessage());
+			return false;
+		}
+		
+		if (rs == null){
+			Warning.dbAndLoad("[SQLite] Unable to read limits from SQLite Database! Error: ResultSet is null");
+			return false;
+		}
+		
+		int i = 0;
+		HashMap<String, String> limits = new HashMap<String, String>();
+		try {
+			while (rs.next()){
+				limits.put(rs.getString(0), rs.getString(1));
+				i++;
+			}
+		} catch (SQLException ex) {
+			Warning.dbAndLoad("[SQLite] Unable to read limits from SQLite Database! Error: "+ex.getMessage());
+			try {
+				rs.close();
+			} catch (SQLException ex2) {}
+			return false;
+		}
+		
+		tekkitrestrict.log.info("[DB] Found "+i+" limiters to transfer.");
+		
+		try {
+			rs.close();
+		} catch (SQLException e) {}
+		
+		HashMap<Integer, TRDBSS> safezones = new HashMap<Integer, TRDBSS>();
+		try {
+			rs = tekkitrestrict.db.query("SELECT * FROM tr_saferegion;");
+		} catch (SQLException ex) {
+			Warning.dbAndLoad("[SQLite] Unable to read safezones from SQLite Database! Error: "+ex.getMessage());
+			return false;
+		}
+		
+		if (rs == null){
+			Warning.dbAndLoad("[SQLite] Unable to read safezones from SQLite Database! Error: ResultSet is null.");
+			return false;
+		}
+		int j = 0;
+		try {
+			while (rs.next()){
+				safezones.put(rs.getInt("id"), new TRDBSS(rs.getString("name"), rs.getInt("mode"), rs.getString("data"), rs.getString("world")));
+				j++;
+			}
+		} catch (SQLException ex) {
+			Warning.dbAndLoad("[SQLite] Unable to read safezones from SQLite Database! Error: "+ex.getMessage());
+			try {
+				rs.close();
+			} catch (SQLException ex2) {}
+			return false;
+		}
+		
+		try {
+			rs.close();
+		} catch (SQLException e) {}
+		
+		tekkitrestrict.log.info("[DB] Found "+j+" SafeZones to transfer.");
+		
+		tekkitrestrict.dbtype = DBType.MySQL;
+		String host = tekkitrestrict.config.getString(ConfigFile.Database, "MySQL.Hostname", "localhost");
+		String port = tekkitrestrict.config.getString(ConfigFile.Database, "MySQL.Port", "3306");
+		String database = tekkitrestrict.config.getString(ConfigFile.Database, "MySQL.Database", "minecraft");
+		String user = tekkitrestrict.config.getString(ConfigFile.Database, "MySQL.Username", "root");
+		String password = tekkitrestrict.config.getString(ConfigFile.Database, "MySQL.Password", "");
+		try {
+			tekkitrestrict.db = new MySQL(host, port, database, user, password);
+		} catch (DBException ex){
+			String msg = "[MySQL] Unable to connect to MySQL database! Error: " + ex.getMessage();
+			Warning.dbWarnings.add("[SEVERE] "+msg);
+			tekkitrestrict.log.severe(msg);
+			
+			return false;
+		}
+		
+		if (!tekkitrestrict.db.open()){
+			Log.Warning.dbAndLoad("[MySQL] Unable to connect to Database!");
+			return false;
+		}
+		
+		initNewMySQLDB();
+		if (tekkitrestrict.dbworking != 0) return false;
+		
+		int k = i;
+		Iterator<Entry<String, String>> limitsit = limits.entrySet().iterator();
+		while (limitsit.hasNext()){
+			Entry<String, String> entry = limitsit.next();
+			try {
+				tekkitrestrict.db.query("INSERT INTO tr_limiter (player, blockdata) VALUES (\""+entry.getKey()+"\", \""+entry.getValue()+"\");");
+			} catch (SQLException ex) {
+				Log.Warning.dbAndLoad("[MySQL] Unable to transfer limits of player " + entry.getKey() + "! Error: "+ex.getMessage());
+				k--;
+				continue;
+			}
+		}
+		
+		tekkitrestrict.log.info("[DB] Transferred "+k+" out of "+i+" limiters successfully.");
+		
+		int l = j;
+		Iterator<Entry<Integer, TRDBSS>> ssit = safezones.entrySet().iterator();
+		while (ssit.hasNext()){
+			Entry<Integer, TRDBSS> entry = ssit.next();
+			TRDBSS ss = entry.getValue();
+			try {
+				tekkitrestrict.db.query("INSERT INTO tr_saferegion (id, name, mode, data, world) VALUES ("+entry.getKey()+", \""+ss.name+"\", "+ss.mode+", \""+ss.data+"\", \""+ss.world+"\");");
+			} catch (SQLException ex) {
+				Log.Warning.dbAndLoad("[MySQL] Unable to transfer safezone " + ss.name + "! Error: "+ex.getMessage());
+				l--;
+				continue;
+			}
+		}
+		
+		tekkitrestrict.log.info("[DB] Transferred "+l+" out of "+j+" safezones successfully.");
+		
+		return true;
 	}
 	
 	private static void dbFailMsg(int fail){
 		String prefix = (tekkitrestrict.dbtype == DBType.MySQL ? "[MySQL] " : "[SQLite] ");
 		if (fail == 1 || fail == 3 || fail == 5)
-			tekkitrestrict.loadWarning(prefix+"The database will RESET upon next server startup because the version table couldn't be created!");
+			Warning.dbAndLoad(prefix+"The database will RESET upon next server startup because the version table couldn't be created!");
 		if (fail == 2 || fail == 3 || fail == 6)
-			tekkitrestrict.loadWarning(prefix+"Safezones will NOT work properly because the safezones table couldn't be created!");
+			Warning.dbAndLoad(prefix+"Safezones will NOT work properly because the safezones table couldn't be created!");
 		if (fail == 4 || fail == 5 || fail == 6)
-			tekkitrestrict.loadWarning(prefix+"The limiter will NOT work properly because the limiter table couldn't be created!");
+			Warning.dbAndLoad(prefix+"The limiter will NOT work properly because the limiter table couldn't be created!");
 		else if (fail == 7) 
-			tekkitrestrict.loadWarning(prefix+"All database actions failed! Safezones and the limiter will NOT be stored!");
+			Warning.dbAndLoad(prefix+"All database actions failed! Safezones and the limiter will NOT be stored!");
 	}
 	
 	private static List<LinkedList<String>> getTableVals(String table) throws SQLException {

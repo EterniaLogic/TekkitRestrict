@@ -33,6 +33,7 @@ import nl.taico.tekkitrestrict.commands.TRCommandCheck;
 import nl.taico.tekkitrestrict.commands.TRCommandTPIC;
 import nl.taico.tekkitrestrict.commands.TRCommandTR;
 import nl.taico.tekkitrestrict.config.AdvancedConfig;
+import nl.taico.tekkitrestrict.config.DatabaseConfig;
 import nl.taico.tekkitrestrict.config.EEPatchConfig;
 import nl.taico.tekkitrestrict.config.GeneralConfig;
 import nl.taico.tekkitrestrict.config.HackDupeConfig;
@@ -85,15 +86,6 @@ public class tekkitrestrict extends JavaPlugin {
 	public static boolean useTMetrics = true;
 	private static TMetrics tmetrics;
 	
-	/**
-	 * Log a warning while the plugin is still loading.
-	 * If you type /tr warnings, you will see the warnings again.
-	 */
-	public static void loadWarning(@NonNull String warning){
-		Warning.loadWarnings.add(warning);
-		log.warning(warning);
-	}
-	
 	@Override
 	public void onLoad() {
 		instance = this; //Set the instance
@@ -110,8 +102,9 @@ public class tekkitrestrict extends JavaPlugin {
 		double configVer = config.getDouble(ConfigFile.General, "ConfigVersion", 0.9);
 		if (configVer < 1.1)
 			UpdateConfigFiles.v09();//0 --> newest
-		else if (configVer < 1.5) {//Upgrade to 1.7
+		else if (configVer < 1.5) {//Upgrade to 1.8
 			AdvancedConfig.upgradeFile();
+			DatabaseConfig.upgradeFile();
 			GeneralConfig.upgradeFile();
 			HackDupeConfig.upgradeOldHackFile();
 			ModModificationsConfig.upgradeFile();
@@ -120,22 +113,28 @@ public class tekkitrestrict extends JavaPlugin {
 			LoggingConfig.upgradeFile();
 			if (linkEEPatch()) EEPatchConfig.upgradeFile();
 			reloadConfig();
-		} else if (configVer < 1.6){//Upgrade to 1.7
+		} else if (configVer < 1.6){//Upgrade to 1.8
 			GeneralConfig.upgradeFile();
+			DatabaseConfig.upgradeFile();
 			LoggingConfig.upgradeFile();
 			if (linkEEPatch()) EEPatchConfig.upgradeFile();
 			reloadConfig();
-		} else if (configVer < 1.7){//upgrade to 1.7 only if using EEPatch.
+		} else if (configVer < 1.7){//upgrade to 1.8
 			GeneralConfig.upgradeFile();
+			DatabaseConfig.upgradeFile();
 			LoggingConfig.upgradeFile();
 			if (linkEEPatch()) EEPatchConfig.upgradeFile();
+			reloadConfig();
+		} else if (configVer < 1.8){//upgrade to 1.8
+			GeneralConfig.upgradeFile();
+			DatabaseConfig.upgradeFile();
 			reloadConfig();
 		}
 		
 		try {//Load all settings
 			load();//TODO loading eepatch
 		} catch (Exception ex) {
-			Log.Warning.load("An error occurred: Unable to load settings!");
+			Warning.load("An error occurred: Unable to load settings!");
 			Log.Exception(ex, true);
 		}
 		//#####################################################
@@ -145,22 +144,22 @@ public class tekkitrestrict extends JavaPlugin {
 		
 		log.info("[DB] Loading Database...");
 		if (!TRDB.loadDB()){
-			loadWarning("[DB] Failed to load Database!");
+			Warning.dbAndLoad("[DB] Failed to load Database!");
 		} else {
 			if (dbtype == DBType.SQLite) {
 				if (TRDB.initSQLite())
 					log.info("[SQLite] SQLite Database loaded!");
 				else {
-					loadWarning("[SQLite] Failed to load SQLite Database!");
+					Warning.dbAndLoad("[SQLite] Failed to load SQLite Database!");
 				}
 			} else if (dbtype == DBType.MySQL) {
 				if (TRDB.initMySQL()){
 					log.info("[MySQL] Database connection established!");
 				} else {
-					loadWarning("[MySQL] Failed to connect to MySQL Database!");
+					Warning.dbAndLoad("[MySQL] Failed to connect to MySQL Database!");
 				}
 			} else {
-				loadWarning("[DB] Unknown Database type set!");
+				Warning.dbAndLoad("[DB] Unknown Database type set!");
 			}
 		}
 		//#####################################################
@@ -174,7 +173,7 @@ public class tekkitrestrict extends JavaPlugin {
 				RedPowerLogic.minInterval = ticks; // set minimum interval for logic timers...
 				log.info("Set the RedPower Timer Min interval to " + value + " seconds.");
 			} catch (Exception e) {
-				loadWarning("Setting the RedPower Timer failed!");
+				Warning.load("Setting the RedPower Timer failed!");
 			}
 		}
 		//#####################################################
@@ -197,7 +196,7 @@ public class tekkitrestrict extends JavaPlugin {
 			EntityMiningLaser.unmineableBlocks = miningLaser.toArray(new Block[miningLaser.size()]);
 			log.fine("Patched Mining Laser + Auto Crafting Table MK II dupe.");
 		} catch (Exception ex){
-			loadWarning("Unable to patch Mining Laser + Auto Crafting Table MK II dupe!");
+			Warning.load("Unable to patch Mining Laser + Auto Crafting Table MK II dupe!");
 		}
 		
 		try {
@@ -216,8 +215,8 @@ public class tekkitrestrict extends JavaPlugin {
 			log.fine("Patched BlockBreaker + Auto Crafting Table MK II dupe.");
 			log.fine("Patched most Deployer Crash Bugs.");
 		} catch (Exception ex){
-			loadWarning("Unable to patch BlockBreaker + Auto Crafting Table MK II dupe!");
-			loadWarning("Unable to patch Deployer Crash Bugs!");
+			Warning.load("Unable to patch BlockBreaker + Auto Crafting Table MK II dupe!");
+			Warning.load("Unable to patch Deployer Crash Bugs!");
 		}
 	}
 	@Override
@@ -228,7 +227,7 @@ public class tekkitrestrict extends JavaPlugin {
 		try {
 			Assigner.assign(); //Register the required listeners
 		} catch (Exception ex){
-			Log.Warning.load("A severe error occurred: Unable to start listeners!");
+			Warning.load("A severe error occurred: Unable to start listeners!");
 			Log.Exception(ex, true);
 		}
 		
@@ -259,14 +258,14 @@ public class tekkitrestrict extends JavaPlugin {
 		try {
 			ttt.init();
 		} catch (Exception ex) {
-			Log.Warning.load("An error occurred: Unable to start threads!");
+			Warning.load("An error occurred: Unable to start threads!");
 			Log.Exception(ex, true);
 		}
 		
 		try {
 			initHeartBeat();
 		} catch (Exception ex){
-			Log.Warning.load("An error occurred: Unable to initiate Limiter correctly!");
+			Warning.load("An error occurred: Unable to initiate Limiter correctly!");
 			Log.Exception(ex, false);
 		}
 		
@@ -287,15 +286,21 @@ public class tekkitrestrict extends JavaPlugin {
 			log.info("EEPatch is not available. Extended EE integration disabled.");
 		}
 		
-		if (config.getBoolean2(ConfigFile.General, "Auto-Update", true)){
-			//updater = new Updater_Old(this, "tekkit-restrict", this.getFile(), Updater_Old.UpdateType.DEFAULT, true);
-			updater2 = new Updater(this, 44061, this.getFile(), Updater.UpdateType.DEFAULT, true);
-		} else if (config.getBoolean2(ConfigFile.General, "CheckForUpdateOnStartup", true)){
-			//updater = new Updater_Old(this, "tekkit-restrict", this.getFile(), Updater_Old.UpdateType.NO_DOWNLOAD, true);
-			updater2 = new Updater(this, 44061, this.getFile(), Updater.UpdateType.NO_DOWNLOAD, true);
-			//if (updater.getResult() == UpdateResult.UPDATE_AVAILABLE) log.info(ChatColor.GREEN + "There is an update available: " + updater.getLatestVersionString() + ". Use /tr admin update ingame to update.");
-			if (updater2.getResult() == Updater.UpdateResult.UPDATE_AVAILABLE) log.info(ChatColor.GREEN + "There is an update available: " + updater2.getLatestName() + ". Use /tr admin update ingame to update.");
-		}
+		
+		Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+			public void run(){
+				if (config.getBoolean2(ConfigFile.General, "Auto-Update", true)){
+					//updater = new Updater_Old(this, "tekkit-restrict", this.getFile(), Updater_Old.UpdateType.DEFAULT, true);
+					updater2 = new Updater(tekkitrestrict.this, 44061, tekkitrestrict.this.getFile(), Updater.UpdateType.DEFAULT, true);
+				} else if (config.getBoolean2(ConfigFile.General, "CheckForUpdateOnStartup", true)){
+					//updater = new Updater_Old(this, "tekkit-restrict", this.getFile(), Updater_Old.UpdateType.NO_DOWNLOAD, true);
+					updater2 = new Updater(tekkitrestrict.this, 44061, tekkitrestrict.this.getFile(), Updater.UpdateType.NO_DOWNLOAD, true);
+					//if (updater.getResult() == UpdateResult.UPDATE_AVAILABLE) log.info(ChatColor.GREEN + "There is an update available: " + updater.getLatestVersionString() + ". Use /tr admin update ingame to update.");
+					if (updater2.getResult() == Updater.UpdateResult.UPDATE_AVAILABLE) log.info(ChatColor.GREEN + "There is an update available: " + updater2.getLatestName() + ". Use /tr admin update ingame to update.");
+				}
+			}
+		});
+		
 		
 		//##################### Log Filter ####################
 		if (config.getBoolean(ConfigFile.Logging, "FilterLogs", true) || config.getBoolean(ConfigFile.Logging, "SplitLogs", true)){
@@ -320,6 +325,10 @@ public class tekkitrestrict extends JavaPlugin {
 				if (Warning.loadWarnings()){
 					log.warning("There were some warnings while loading TekkitRestrict!");
 					log.warning("Use /tr warnings load to view them again (in case you missed them).");
+				}
+				if (!Warning.dbWarnings.isEmpty()){
+					log.warning("There were some database warnings while loading TekkitRestrict!");
+					log.warning("Use /tr warnings database to view them again (in case you missed them).");
 				}
 			}
 		});
@@ -532,7 +541,7 @@ public class tekkitrestrict extends JavaPlugin {
 			try {
 				defConfigStream.close();
 			} catch (IOException e) {
-				loadWarning("Exception while trying to reload the config!");
+				Warning.load("Exception while trying to reload the config!");
 				e.printStackTrace();
 			}
 		}
@@ -663,7 +672,7 @@ public class tekkitrestrict extends JavaPlugin {
 			if(destination != null) destination.close();
 
 		} catch (IOException ex){
-			loadWarning("Cannot backup config: " + sourceString);
+			Warning.load("Cannot backup config: " + sourceString);
 			return false;
 		}
 		return true;

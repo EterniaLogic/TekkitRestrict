@@ -9,6 +9,7 @@ import java.util.List;
 
 import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.tekkitrestrict;
+import nl.taico.tekkitrestrict.Log.Warning;
 
 public class HackDupeConfig extends TRConfig {
 	public static ArrayList<String> defaultContents(boolean extra){
@@ -384,7 +385,7 @@ public class HackDupeConfig extends TRConfig {
 			}
 			output.close();
 		} catch (IOException e) {
-			tekkitrestrict.loadWarning("Unable to write changes to HackDupe.config.yml!");
+			Warning.load("Unable to write changes to HackDupe.config.yml!");
 			try {if (output != null) output.close();} catch (IOException e1) {}
 			return;
 		}

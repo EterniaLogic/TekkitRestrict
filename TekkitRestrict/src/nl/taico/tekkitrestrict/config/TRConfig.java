@@ -7,8 +7,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.tekkitrestrict;
+import nl.taico.tekkitrestrict.Log.Warning;
 
 public abstract class TRConfig {
 	protected static String s = File.separator;
@@ -69,12 +69,12 @@ public abstract class TRConfig {
 			}
 			output.close();
 		} catch (IOException e) {
-			tekkitrestrict.loadWarning("Unable to write changes to "+name+".config.yml!");
+			Warning.load("Unable to write changes to "+name+".config.yml!");
 			try {if (output != null) output.close();} catch (IOException e1) {}
 			return;
 		}
 		tekkitrestrict.log.info(name+".config.yml file was upgraded successfully!");
-		Log.Warning.loadWarnings.add(name+".config.yml file was upgraded! Please check the new/changed config settings!");
+		Warning.loadWarnings.add(name+".config.yml file was upgraded! Please check the new/changed config settings!");
 	}
 	
 	@SuppressWarnings("unchecked")

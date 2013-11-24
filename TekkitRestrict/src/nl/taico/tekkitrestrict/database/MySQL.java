@@ -114,6 +114,7 @@ public class MySQL extends Database {
 	 */
 	@Override
 	@Nullable public ResultSet query(@NonNull String query) throws SQLException {
+		if (query.contains("INSERT OR REPLACE INTO")) query = query.replace("INSERT OR REPLACE INTO", "REPLACE INTO");
 		Statement statement = null;
 		try {
 			statement = connection.createStatement();
@@ -148,6 +149,7 @@ public class MySQL extends Database {
 
 	@Override
 	@Nullable public PreparedStatement prepare(@NonNull String query) {
+		if (query.contains("INSERT OR REPLACE INTO")) query = query.replace("INSERT OR REPLACE INTO", "REPLACE INTO");
 		try {
 			PreparedStatement ps = connection.prepareStatement(query);
 			return ps;
