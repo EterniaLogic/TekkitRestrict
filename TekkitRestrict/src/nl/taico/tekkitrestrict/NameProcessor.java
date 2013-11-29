@@ -2443,7 +2443,7 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(213,13),"Train Dispenser");
 		All.put(TRItem.parseItem(213,14),"Banded Planks");
 		All.put(TRItem.parseItem(213,15),"Item Loader");
-		All.put(TRItem.parseItem(212,-1),"RailCraft Machines");
+		All.put(TRItem.parseItem(213,-1),"RailCraft Machines");
 		
 		All.put(TRItem.parseItem(214,0),"World Anchor");
 		All.put(TRItem.parseItem(214,1),"Block of Concrete");
@@ -2532,7 +2532,7 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(250,13),"Induction Furnace");
 		All.put(TRItem.parseItem(250,14),"Mass Fabricator");
 		All.put(TRItem.parseItem(250,15),"Terraformer");
-		All.put(TRItem.parseItem(253,-1),"IC2 Machines");
+		All.put(TRItem.parseItem(250,-1),"IC2 Machines");
 		
 		
 		All.put(TRItem.parseItem(253,0),"Forcefield core");

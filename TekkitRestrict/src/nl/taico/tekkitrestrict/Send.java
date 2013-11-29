@@ -14,7 +14,7 @@ public class Send {
 
 	public void msg(@NonNull String command, @NonNull String explanation, ChatColor color, ChatColor color2){
 		int msglength = command.length() + 3 + explanation.length();
-		if (msglength<=55)
+		if (msglength<=55 || !(sender instanceof Player))
 			sender.sendMessage(color + command + " - " + ChatColor.RESET + color2 + explanation);
 		else {
 			sender.sendMessage(color + command);
@@ -23,7 +23,7 @@ public class Send {
 	}
 	public void msg(@NonNull String command, @NonNull String explanation){
 		int msglength = command.length() + 3 + explanation.length();
-		if (msglength<=55) sender.sendMessage(ChatColor.BLUE + command + " - " + ChatColor.GREEN + explanation);
+		if (msglength<=55 || !(sender instanceof Player)) sender.sendMessage(ChatColor.BLUE + command + " - " + ChatColor.GREEN + explanation);
 		else {
 			sender.sendMessage(ChatColor.BLUE + command);
 			sender.sendMessage(ChatColor.GREEN + " - " + explanation);
