@@ -1,5 +1,6 @@
 package nl.taico.tekkitrestrict;
 
+import ic2.api.Ic2Recipes;
 import ic2.common.EntityMiningLaser;
 
 import java.io.File;
@@ -18,6 +19,7 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import net.minecraft.server.Block;
+import net.minecraft.server.ItemStack;
 import net.minecraft.server.RedPowerLogic;
 import net.minecraft.server.RedPowerMachine;
 
@@ -204,6 +206,14 @@ public class tekkitrestrict extends JavaPlugin {
 		} catch (Exception ex){
 			Warning.load("Unable to patch BlockBreaker + Auto Crafting Table MK II dupe!", false);
 			Warning.load("Unable to patch Deployer Crash Bugs!", false);
+		}
+		
+		try {
+			Ic2Recipes.addMaceratorRecipe(new ItemStack(135, 1, 2), new ItemStack(30254, 4, 0));
+			Ic2Recipes.addMaceratorRecipe(new ItemStack(135, 1, 3), new ItemStack(30255, 4, 0));
+			log.fine("Added Missing Nether Ores recipes.");
+		} catch (Exception ex){
+			Warning.load("Unable to add missing Nether Ore recipes.", false);
 		}
 	}
 	@Override

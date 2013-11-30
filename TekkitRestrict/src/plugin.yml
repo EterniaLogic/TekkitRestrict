@@ -2,7 +2,7 @@ name: tekkitrestrict
 main: nl.taico.tekkitrestrict.tekkitrestrict
 authors: [Taeir, DreadSlicer]
 prefix: TekkitRestrict
-version: 1.21 Dev 3
+version: 1.21 Dev 4
 description: TekkitRestrict gives server owners alot of features to prevent and block unwanted tekkit features.
 
 permissions:
@@ -40,7 +40,7 @@ permissions:
         description: Allows the user to use /checklimits
         default: true
     tekkitrestrict.bypass.creative:
-        description: Enables the use of any block in creative. 
+        description: Enables the use of any block in creative.
     tekkitrestrict.bypass.safezone:
         description:  Enables somebody to bypass all safezone.
     tekkitrestrict.bypass.noitem:
@@ -59,6 +59,7 @@ permissions:
         description: Enables someone to use gemarmor offensive.
     tekkitrestrict.bypass.dupe:
         description:  Enables somebody to bypass the anti-dupe.
+        default: false
     tekkitrestrict.bypass.dupe.alcbag:
         description:  Enables somebody to bypass the anti-dupe for alchemy bags.
     tekkitrestrict.bypass.dupe.projecttable:

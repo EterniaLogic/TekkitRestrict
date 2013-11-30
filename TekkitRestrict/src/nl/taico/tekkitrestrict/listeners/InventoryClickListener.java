@@ -95,13 +95,14 @@ public class InventoryClickListener implements Listener {
 					}
 				}
 			} else if (title.equals("tank cart")){
+				int rawslot = event.getRawSlot();
 				if (slot == 35) {
 					if (Dupes.tankcarts.prevent && event.isShiftClick() && !player.hasPermission("tekkitrestrict.bypass.dupe.tankcart")){
 							event.setCancelled(true);
 							player.sendMessage(ChatColor.DARK_RED + "You are not allowed to Shift+Click into a Tank Cart from this slot!");
 							TRNoDupe.handleDupe(player, DupeType.tankCart, id1, data1);
 					}
-				} else if (slot <= 8){
+				} else if (rawslot>29 && rawslot<39){
 					if (event.isShiftClick() && Dupes.tankcartGlitchs.prevent){
 						event.setCancelled(true);
 						player.sendMessage(ChatColor.DARK_RED + "You are not allowed to Shift+Click into a Tank Cart!");
@@ -144,6 +145,7 @@ public class InventoryClickListener implements Listener {
 			Warning.other("Error in the Inventory Click Handler!", false);
 			Log.debugEx(ex);
 		}
+		//Log.Warning.other("RawSlot: "+event.getRawSlot(), false);
 	}
 	
 }

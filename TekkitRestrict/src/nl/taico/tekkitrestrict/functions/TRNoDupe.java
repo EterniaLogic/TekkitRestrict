@@ -8,6 +8,7 @@ import org.eclipse.jdt.annotation.NonNull;
 
 import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.Util;
+import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.TRConfigCache.Dupes;
 import nl.taico.tekkitrestrict.objects.TREnums.DupeType;
 
@@ -31,7 +32,9 @@ public class TRNoDupe {
 				if (cur >= Dupes.alcBags.triggerAfter){
 					try {
 						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), convert(Dupes.alcBags.command, "AlcBag", player, id, data));
-					} catch (Exception ex) {}
+					} catch (Exception ex) {
+						Warning.config("The command set for Anti-Dupes.AlchemyBagDupe returned an error!", false);
+					}
 					cmdBag.remove(player.getName());
 				} else {
 					cmdBag.put(player.getName(), cur);
@@ -39,7 +42,7 @@ public class TRNoDupe {
 			}
 			message = convert(Dupes.broadcastFormat, "Alchemy Bag + BHB / Void Ring", player, id, data);
 			
-			if (Dupes.alcBags.broadcast) Bukkit.broadcast("[TRDupe] " + message, "tekkitrestrict.notify.dupe");
+			if (Dupes.alcBags.broadcast) Util.broadcastNoConsole("[TRDupe] " + message, "tekkitrestrict.notify.dupe");
 			if (Dupes.alcBags.kick) Util.kick(player, "[TRDupe] " + message);
 		}
 		else if (type == DupeType.rmFurnace){
@@ -51,7 +54,9 @@ public class TRNoDupe {
 				if (cur >= Dupes.rmFurnaces.triggerAfter){
 					try {
 						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), convert(Dupes.rmFurnaces.command, "RMFurnace", player, id, data));
-					} catch (Exception ex) {}
+					} catch (Exception ex) {
+						Warning.config("The command set for Anti-Dupes.RMFurnaceDupe returned an error!", false);
+					}
 					cmdRM.remove(player.getName());
 				} else {
 					cmdRM.put(player.getName(), cur);
@@ -59,7 +64,7 @@ public class TRNoDupe {
 			}
 			message = convert(Dupes.broadcastFormat, "Red Matter Furnace", player, id, data);
 			
-			if (Dupes.rmFurnaces.broadcast) Bukkit.broadcast("[TRDupe] " + message, "tekkitrestrict.notify.dupe");
+			if (Dupes.rmFurnaces.broadcast) Util.broadcastNoConsole("[TRDupe] " + message, "tekkitrestrict.notify.dupe");
 			if (Dupes.rmFurnaces.kick) Util.kick(player, "[TRDupe] " + message);
 		}
 		else if (type == DupeType.tankCart){
@@ -71,7 +76,9 @@ public class TRNoDupe {
 				if (cur >= Dupes.tankcarts.triggerAfter){
 					try {
 						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), convert(Dupes.tankcarts.command, "TankCart", player, id, data));
-					} catch (Exception ex) {}
+					} catch (Exception ex) {
+						Warning.config("The command set for Anti-Dupes.TankCartDupe returned an error!", false);
+					}
 					cmdTC.remove(player.getName());
 				} else {
 					cmdTC.put(player.getName(), cur);
@@ -79,7 +86,7 @@ public class TRNoDupe {
 			}
 			message = convert(Dupes.broadcastFormat, "Tank Cart", player, id, data);
 			
-			if (Dupes.tankcarts.broadcast) Bukkit.broadcast("[TRDupe] " + message, "tekkitrestrict.notify.dupe");
+			if (Dupes.tankcarts.broadcast) Util.broadcastNoConsole("[TRDupe] " + message, "tekkitrestrict.notify.dupe");
 			if (Dupes.tankcarts.kick) Util.kick(player, "[TRDupe] " + message);
 		}
 		else if (type == DupeType.tankCartGlitch){
@@ -91,7 +98,9 @@ public class TRNoDupe {
 				if (cur >= Dupes.tankcartGlitchs.triggerAfter){
 					try {
 						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), convert(Dupes.tankcartGlitchs.command, "TankCartGlitch", player, id, data));
-					} catch (Exception ex) {}
+					} catch (Exception ex) {
+						Warning.config("The command set for Anti-Dupes.TankCartGlitch returned an error!", false);
+					}
 					cmdTCG.remove(player.getName());
 				} else {
 					cmdTCG.put(player.getName(), cur);
@@ -99,7 +108,7 @@ public class TRNoDupe {
 			}
 			message = convert(Dupes.broadcastFormat, "Tank Cart", player, id, data);
 			
-			if (Dupes.tankcartGlitchs.broadcast) Bukkit.broadcast("[TRDupe] " + message, "tekkitrestrict.notify.dupe");
+			if (Dupes.tankcartGlitchs.broadcast) Util.broadcastNoConsole("[TRDupe] " + message, "tekkitrestrict.notify.dupe");
 			if (Dupes.tankcartGlitchs.kick) Util.kick(player, "[TRDupe] " + message);
 		}
 		else if (type == DupeType.transmution){
@@ -111,7 +120,9 @@ public class TRNoDupe {
 				if (cur >= Dupes.transmutes.triggerAfter){
 					try {
 						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), convert(Dupes.transmutes.command, "Transmute", player, id, data));
-					} catch (Exception ex) {}
+					} catch (Exception ex) {
+						Warning.config("The command set for Anti-Dupes.TransmuteDupe returned an error!", false);
+					}
 					cmdTransmution.remove(player.getName());
 				} else {
 					cmdTransmution.put(player.getName(), cur);
@@ -119,7 +130,7 @@ public class TRNoDupe {
 			}
 			message = convert(Dupes.broadcastFormat, "Transmution Table(t)", player, id, data);
 			
-			if (Dupes.transmutes.broadcast) Bukkit.broadcast("[TRDupe] " + message, "tekkitrestrict.notify.dupe");
+			if (Dupes.transmutes.broadcast) Util.broadcastNoConsole("[TRDupe] " + message, "tekkitrestrict.notify.dupe");
 			if (Dupes.transmutes.kick) Util.kick(player, "[TRDupe] " + message);
 		}
 		else if (type == DupeType.pedestal){
@@ -131,7 +142,9 @@ public class TRNoDupe {
 				if (cur >= Dupes.pedestals.triggerAfter){
 					try {
 						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), convert(Dupes.pedestals.command, "Pedestal", player, id, data));
-					} catch (Exception ex) {}
+					} catch (Exception ex) {
+						Warning.config("The command set for Anti-Dupes.PedestalEmcGen returned an error!", false);
+					}
 					cmdPedestal.remove(player.getName());
 				} else {
 					cmdPedestal.put(player.getName(), cur);
@@ -139,28 +152,8 @@ public class TRNoDupe {
 			}
 			message = convert(Dupes.broadcastFormat, "DM Pedestal + Harvest Godess Band", player, id, data);
 			
-			if (Dupes.pedestals.broadcast) Bukkit.broadcast("[TRDupe] " + message, "tekkitrestrict.notify.dupe");
+			if (Dupes.pedestals.broadcast) Util.broadcastNoConsole("[TRDupe] " + message, "tekkitrestrict.notify.dupe");
 			if (Dupes.pedestals.kick) Util.kick(player, "[TRDupe] " + message);
-		}
-		else if (type == DupeType.teleport){
-			if (Dupes.teleports.useCommand){
-				Integer cur = cmdTP.get(player.getName());
-				if (cur == null) cur = 0;
-				cur++;
-				
-				if (cur >= Dupes.teleports.triggerAfter){
-					try {
-						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), convert(Dupes.teleports.command, "Teleport", player));
-					} catch (Exception ex) {}
-					cmdTP.remove(player.getName());
-				} else {
-					cmdTP.put(player.getName(), cur);
-				}
-			}
-			message = convert(Dupes.broadcastFormat, "Teleportation", player);
-			
-			if (Dupes.teleports.broadcast) Bukkit.broadcast("[TRDupe] " + message, "tekkitrestrict.notify.dupe");
-			if (Dupes.teleports.kick) Util.kick(player, "[TRDupe] " + message);
 		}
 		
 		Log.Dupe(message);
@@ -168,28 +161,17 @@ public class TRNoDupe {
 	
 	@NonNull private static String convert(@NonNull String str, @NonNull String type, @NonNull Player player, int id, int data){
 		str = Log.replaceColors(str);
-		str = str.replace("{PLAYER}", player.getName());
-		str = str.replace("{TYPE}", type);
+		str = str.replaceAll("(?i)\\{PLAYER\\}", player.getName());
+		str = str.replace("(?i)\\{TYPE\\}", type);
 		if (id == 0){
-			str = str.replace("{ID}","");
-			str = str.replace("{DATA}", "");
-			str = str.replace("{ITEM}", "");
+			str = str.replace("(?i)\\{ID\\}","");
+			str = str.replace("(?i)\\{DATA\\}", "");
+			str = str.replace("(?i)\\{ITEM\\}", "");
 		} else {
-			str = str.replace("{ID}", ""+id);
-			str = str.replace("{DATA}", ""+data);
-			str = str.replace("{ITEM}", ""+id+":"+data);
+			str = str.replace("(?i)\\{ID\\}", ""+id);
+			str = str.replace("(?i)\\{DATA\\}", ""+data);
+			str = str.replace("(?i)\\{ITEM\\}", ""+id+":"+data);
 		}
-		str = str.replace("  ", " ");
-		return str;
-	}
-	
-	@NonNull private static String convert(@NonNull String str, @NonNull String type, @NonNull Player player){
-		str = Log.replaceColors(str);
-		str = str.replace("{PLAYER}", player.getName());
-		str = str.replace("{TYPE}", type);
-		str = str.replace("{ID}","");
-		str = str.replace("{DATA}", "");
-		str = str.replace("{ITEM}", "");
 		str = str.replace("  ", " ");
 		return str;
 	}

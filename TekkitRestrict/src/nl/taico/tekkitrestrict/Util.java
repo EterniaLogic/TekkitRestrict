@@ -15,6 +15,18 @@ public class Util {
 			player.kickPlayer(message);
 	}
 	
+	public static int broadcastNoConsole(@NonNull String message, @NonNull String permission){
+		int count = 0;
+        Player[] players = Bukkit.getOnlinePlayers();
+        
+        for (Player player : players){
+        	if (player.hasPermission(permission)) player.sendMessage(message);
+        	count++;
+        }
+
+        return count;
+	}
+	
 	@Nullable public static String inGroup(int id){
 		if (inRange(id, 27520, 27599) || inRange(id, 126, 130)) return "ee";
 		if (inRange(id, 153, 174) || inRange(id, 4056, 4066) || inRange(id, 4298, 4324)) return "buildcraft";
