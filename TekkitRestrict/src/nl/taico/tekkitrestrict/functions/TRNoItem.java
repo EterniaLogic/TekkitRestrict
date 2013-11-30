@@ -52,8 +52,8 @@ public class TRNoItem {
 			try {
 				DisabledItems.addAll(TRItemProcessor.processItemString(str));
 			} catch (TRException ex) {
-				Warning.config("You have an error in your DisableItems.config.yml in DisableItems:");
-				Warning.config(ex.getMessage());
+				Warning.config("You have an error in your DisableItems.config.yml in DisableItems:", false);
+				Warning.config(ex.getMessage(), false);
 				continue;
 			}
 		}
@@ -64,8 +64,8 @@ public class TRNoItem {
 			try {
 				DisabledCreativeItems.addAll(TRItemProcessor.processItemString(str));
 			} catch (TRException ex) {
-				Warning.config("You have an error in your LimitedCreative.config.yml in LimitedCreative:");
-				Warning.config(ex.getMessage());
+				Warning.config("You have an error in your LimitedCreative.config.yml in LimitedCreative:", false);
+				Warning.config(ex.getMessage(), false);
 				continue;
 			}	
 		}

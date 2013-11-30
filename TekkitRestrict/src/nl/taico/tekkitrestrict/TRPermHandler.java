@@ -36,6 +36,7 @@ public class TRPermHandler {
 	 * @deprecated Unnecessary, use player.hasPermission("tekkitrestrict."+type+"."+node1) instead
 	 */
 	public static boolean hasPermission(@NonNull Player player, @NonNull String type, @NonNull String node1, @NonNull String node2) {
+		Log.Debug("[WARNING] Call to deprecated permission checker!");
 		try {
 			String n1 = node1.equals("") ? "" : "." + node1;
 			String n2 = node2.equals("") ? "" : "." + node2;
@@ -60,7 +61,7 @@ public class TRPermHandler {
 				return player.hasPermission(perm);
 			}
 		} catch (Exception ex) {
-			Warning.other("An error occurred in the PermHandler: "+ex.getMessage());
+			Warning.other("An error occurred in the PermHandler ('+TRPermHandler.hasPermission(...):boolean')!", false);
 			Log.Exception(ex, false);
 		}
 		return false;
@@ -91,9 +92,8 @@ public class TRPermHandler {
 				}
 			} catch (Exception ex){
 				if (!logged){
-					Warning.other("You have set an invalid limiter permission \""+negPerm+"\":");
-					Warning.other("Unexpected error occurred! Please inform the author of this error.");
-					Warning.other(ex.getMessage());
+					Warning.other("You have set an invalid limiter permission \""+negPerm+"\":", false);
+					Warning.other("Unexpected error occurred! Please inform the author of this error.", true);
 					Log.Exception(ex, true);
 					logged = true;
 				}
@@ -131,8 +131,8 @@ public class TRPermHandler {
 							t.max = Integer.parseInt(gp[4]);
 							return t;
 						} catch (NumberFormatException ex){
-							Warning.other("You have set an invalid limiter permission \""+perm+"\":");
-							Warning.other("Invalid max amount: \""+gp[4]+"\"");
+							Warning.other("You have set an invalid limiter permission \""+perm+"\":", false);
+							Warning.other("Invalid max amount: \""+gp[4]+"\"", false);
 							return null;
 						}
 					}
@@ -144,17 +144,16 @@ public class TRPermHandler {
 							t.max = Integer.parseInt(gp[3]);
 							return t;
 						} catch (NumberFormatException ex){
-							Warning.other("You have set an invalid limiter permission \""+perm+"\":");
-							Warning.other("Invalid max amount: \""+gp[3]+"\"");
+							Warning.other("You have set an invalid limiter permission \""+perm+"\":", false);
+							Warning.other("Invalid max amount: \""+gp[3]+"\"", false);
 							return null;
 						}
 					}
 				}
 			} catch (Exception ex){
 				if (!logged){
-					Warning.other("You have set an invalid limiter permission \""+perm+"\":");
-					Warning.other("Unexpected error occurred! Please inform the author of this error.");
-					Warning.other(ex.getMessage());
+					Warning.other("You have set an invalid limiter permission \""+perm+"\":", false);
+					Warning.other("Unexpected error occurred! Please inform the author of this error.", true);
 					Log.Exception(ex, true);
 					logged = true;
 				}
@@ -192,9 +191,8 @@ public class TRPermHandler {
 				}
 			} catch (Exception ex){
 				if (!logged){
-					Warning.other("You have set an invalid limiter permission \""+negPerm+"\":");
-					Warning.other("Unexpected error occurred! Please inform the author of this error.");
-					Warning.other(ex.getMessage());
+					Warning.other("You have set an invalid limiter permission \""+negPerm+"\":", false);
+					Warning.other("Unexpected error occurred! Please inform the author of this error.", true);
 					Log.Exception(ex, true);
 					logged = true;
 				}
@@ -211,8 +209,8 @@ public class TRPermHandler {
 					try {
 						max = Integer.parseInt(gp[4]);
 					} catch (NumberFormatException ex){
-						Warning.other("You have set an invalid limiter permission \""+perm+"\":");
-						Warning.other("Invalid max amount: \""+gp[4]+"\"");
+						Warning.other("You have set an invalid limiter permission \""+perm+"\":", false);
+						Warning.other("Invalid max amount: \""+gp[4]+"\"", false);
 						continue;
 					}
 					
@@ -230,8 +228,8 @@ public class TRPermHandler {
 					try {
 						max = Integer.parseInt(gp[3]);
 					} catch (NumberFormatException ex){
-						Warning.other("You have set an invalid limiter permission \""+perm+"\":");
-						Warning.other("Invalid max amount: \""+gp[3]+"\"");
+						Warning.other("You have set an invalid limiter permission \""+perm+"\":", false);
+						Warning.other("Invalid max amount: \""+gp[3]+"\"", false);
 						continue;
 					}
 					
@@ -246,9 +244,8 @@ public class TRPermHandler {
 				}
 			} catch (Exception ex){
 				if (!logged){
-					Warning.other("You have set an invalid limiter permission \""+perm+"\":");
-					Warning.other("Unexpected error occurred! Please inform the author of this error.");
-					Warning.other(ex.getMessage());
+					Warning.other("You have set an invalid limiter permission \""+perm+"\":", false);
+					Warning.other("Unexpected error occurred! Please inform the author of this error.", true);
 					Log.Exception(ex, true);
 					logged = true;
 				}

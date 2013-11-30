@@ -48,16 +48,16 @@ public class TRChunkUnloader {
 				if (nr > 0) nr = unloadNetherChunks(nr, true);
 				if (nr > 0) nr = unloadEndChunks(nr, true);
 			} else {
-				Warning.config("Invalid value " + ChunkUnloader.unloadOrder + " for UnloadOrder in TPerformance.config.yml!");
-				Warning.config("Valid: 0, 1, 2, 3, 4 or 5.");
+				Warning.config("Invalid value " + ChunkUnloader.unloadOrder + " for UnloadOrder in TPerformance.config.yml!", false);
+				Warning.config("Valid: 0, 1, 2, 3, 4 or 5.", false);
 				ChunkUnloader.unloadOrder = 0;
 			}
 			
 			if (nr > 0) {
-				Warning.other("Chunk Unloader cannot unload enough chunks!");
-				Warning.other(nr + " chunks are loaded above the total maxChunks limit!");
-				Warning.other("If the serverload is not too high, you can raise the total maxchunks count in the config.");
-				Warning.other("If it is too high, please lower maxradii or kick some players.");
+				Warning.other("Chunk Unloader cannot unload enough chunks!", false);
+				Warning.other(nr + " chunks are loaded above the total maxChunks limit!", false);
+				Warning.other("If the serverload is not too high, you can raise the total maxchunks count in the config.", false);
+				Warning.other("If it is too high, please lower maxradii or kick some players.", false);
 			}
 			return;
 		}
@@ -122,7 +122,7 @@ public class TRChunkUnloader {
 			}
 			
 		} catch (Exception ex) {
-			Warning.other("An error occurred in the Chunk Unloader [End]: "+ex.getMessage());
+			Warning.other("An error occurred in the Chunk Unloader [End]!", false);
 			Log.Exception(ex, false);
 		}
 		return amount;
@@ -183,7 +183,7 @@ public class TRChunkUnloader {
 			}
 			
 		} catch (Exception ex) {
-			Warning.other("An error occurred in the Chunk Unloader [Nether]: "+ex.getMessage());
+			Warning.other("An error occurred in the Chunk Unloader [Nether]!", false);
 			Log.Exception(ex, false);
 		}
 		
@@ -244,7 +244,7 @@ public class TRChunkUnloader {
 			}
 			
 		} catch (Exception ex) {
-			Warning.other("An error occurred in the Chunk Unloader [Normal]: "+ex.getMessage());
+			Warning.other("An error occurred in the Chunk Unloader [Normal]!", false);
 			Log.Exception(ex, false);
 		}
 		

@@ -103,7 +103,7 @@ public class SQLite extends Database {
 			else
 				return null;
 		} catch (SQLException ex) {
-			write("Error when trying to execute query! Error: " + ex.getMessage(), Level.WARNING);
+			write("Error when trying to execute query! Error: " + ex.toString(), Level.WARNING);
 			throw ex;
 		}
 	}
@@ -122,7 +122,7 @@ public class SQLite extends Database {
 			else
 				return null;
 		} catch (SQLException ex) {
-			write("Error when trying to execute query! Error: " + ex.getMessage(), Level.WARNING);
+			write("Error when trying to execute query! Error: " + ex.toString(), Level.WARNING);
 			throw ex;
 		}
 	}

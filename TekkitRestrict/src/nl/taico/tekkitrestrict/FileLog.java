@@ -157,7 +157,7 @@ public class FileLog {
 	public static void closeAll(){
 		for (FileLog filelog : Logs.values()){
 			if (!filelog.closeNoRemove()){
-				Warning.other("Unable to close all logs. Some might not save properly.");
+				Warning.other("Unable to close all logs. Some might not save properly.", false);
 			}
 		}
 		Logs = null;
@@ -170,7 +170,7 @@ public class FileLog {
 		if (day == this.day) return;
 		
 		if (!close()){
-			Warning.other("Unable to close the old log!");
+			Warning.other("Unable to close the old log!", false);
 			return;
 		}
 		this.day = day;
@@ -285,7 +285,7 @@ public class FileLog {
 		String name = TRConfigCache.LogFilter.fileFormat;
 		if (name == null || name.equals("") || name.contains("*") || name.endsWith(".")){
 			if (!logged){
-				Warning.other(ChatColor.RED + "The filename format set in the Logging config is invalid!");
+				Warning.other(ChatColor.RED + "The filename format set in the Logging config is invalid!", false);
 				logged = true;
 			}
 			
@@ -308,7 +308,7 @@ public class FileLog {
 		String format = TRConfigCache.LogFilter.logFormat;
 		if (format == null || format.equals("")){
 			if (!logged2){
-				Warning.other(ChatColor.RED + "The log format set in the Logging config is invalid!");
+				Warning.other(ChatColor.RED + "The log format set in the Logging config is invalid!", false);
 				logged2 = true;
 			}
 			

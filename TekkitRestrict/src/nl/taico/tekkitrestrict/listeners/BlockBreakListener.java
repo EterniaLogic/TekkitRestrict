@@ -67,7 +67,7 @@ public class BlockBreakListener implements Listener{
 				il.checkBreakLimit(id, data, block.getLocation());
 			}
 		} catch(Exception ex){
-			Warning.other("Error in onBlockBreak, Block limiter!");
+			Warning.other("Exception in '+BlockBreakListener.onBlockBreak(...)'!", false);
 			Log.Exception(ex, false);
 		}
 	}

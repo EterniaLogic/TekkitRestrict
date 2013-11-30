@@ -34,8 +34,8 @@ public class TRLWCProtect {
 			try {
 				lwcBlocked.addAll(TRItemProcessor.processItemString(str));
 			} catch (TRException ex) {
-				Warning.config("You have an error in your Advanced.config.yml in LWCPreventNearLocked:");
-				Warning.config(ex.getMessage());
+				Warning.config("You have an error in your Advanced.config.yml in LWCPreventNearLocked:", false);
+				Warning.config(ex.getMessage(), false);
 				continue;
 			}
 		}

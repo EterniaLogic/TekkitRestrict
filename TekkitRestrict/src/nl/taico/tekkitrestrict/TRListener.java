@@ -123,7 +123,7 @@ public class TRListener implements Listener {
 			lastdata = block.getData();
 		} catch(Exception ex){
 			if (!errorBlockPlace){
-				Warning.other("An error occurred in the BlockPlace Listener! Please inform the author (This error will only be logged once).");
+				Warning.other("An error occurred in the BlockPlace Listener! Please inform the author (This error will only be logged once).", false);
 				Log.Exception(ex, false);
 				errorBlockPlace = true;
 			}
@@ -160,7 +160,7 @@ public class TRListener implements Listener {
 					msg = TRNoItem.isItemBannedInCreative(player, str.getTypeId(), str.getDurability(), true);
 				} catch (Exception ex) {
 					if (!errorInteract){
-						Warning.other("An error occurred in the InteractListener for LimitedCreative!");
+						Warning.other("An error occurred in the InteractListener for LimitedCreative!", false);
 						Log.Exception(ex, false);
 						errorInteract = true;
 					}

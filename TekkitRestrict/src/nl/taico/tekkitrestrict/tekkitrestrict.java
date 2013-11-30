@@ -121,7 +121,7 @@ public class tekkitrestrict extends JavaPlugin {
 		try {//Load all settings
 			load();//TODO loading eepatch
 		} catch (Exception ex) {
-			Warning.load("An error occurred: Unable to load settings!");
+			Warning.load("An error occurred: Unable to load settings!", true);
 			Log.Exception(ex, true);
 		}
 		//#####################################################
@@ -131,22 +131,22 @@ public class tekkitrestrict extends JavaPlugin {
 		
 		log.info("[DB] Loading Database...");
 		if (!TRDB.loadDB()){
-			Warning.dbAndLoad("[DB] Failed to load Database!");
+			Warning.dbAndLoad("[DB] Failed to load Database!", true);
 		} else {
 			if (dbtype == DBType.SQLite) {
 				if (TRDB.initSQLite())
 					log.info("[SQLite] SQLite Database loaded!");
 				else {
-					Warning.dbAndLoad("[SQLite] Failed to load SQLite Database!");
+					Warning.dbAndLoad("[SQLite] Failed to load SQLite Database!", true);
 				}
 			} else if (dbtype == DBType.MySQL) {
 				if (TRDB.initMySQL()){
 					log.info("[MySQL] Database connection established!");
 				} else {
-					Warning.dbAndLoad("[MySQL] Failed to connect to MySQL Database!");
+					Warning.dbAndLoad("[MySQL] Failed to connect to MySQL Database!", true);
 				}
 			} else {
-				Warning.dbAndLoad("[DB] Unknown Database type set!");
+				Warning.dbAndLoad("[DB] Unknown Database type set!", true);
 			}
 		}
 		//#####################################################
@@ -160,7 +160,7 @@ public class tekkitrestrict extends JavaPlugin {
 				RedPowerLogic.minInterval = ticks; // set minimum interval for logic timers...
 				log.info("Set the RedPower Timer Min interval to " + value + " seconds.");
 			} catch (Exception e) {
-				Warning.load("Setting the RedPower Timer failed!");
+				Warning.load("Setting the RedPower Timer failed!", false);
 			}
 		}
 		//#####################################################
@@ -183,7 +183,7 @@ public class tekkitrestrict extends JavaPlugin {
 			EntityMiningLaser.unmineableBlocks = miningLaser.toArray(new Block[miningLaser.size()]);
 			log.fine("Patched Mining Laser + Auto Crafting Table MK II dupe.");
 		} catch (Exception ex){
-			Warning.load("Unable to patch Mining Laser + Auto Crafting Table MK II dupe!");
+			Warning.load("Unable to patch Mining Laser + Auto Crafting Table MK II dupe!", false);
 		}
 		
 		try {
@@ -202,8 +202,8 @@ public class tekkitrestrict extends JavaPlugin {
 			log.fine("Patched BlockBreaker + Auto Crafting Table MK II dupe.");
 			log.fine("Patched most Deployer Crash Bugs.");
 		} catch (Exception ex){
-			Warning.load("Unable to patch BlockBreaker + Auto Crafting Table MK II dupe!");
-			Warning.load("Unable to patch Deployer Crash Bugs!");
+			Warning.load("Unable to patch BlockBreaker + Auto Crafting Table MK II dupe!", false);
+			Warning.load("Unable to patch Deployer Crash Bugs!", false);
 		}
 	}
 	@Override
@@ -212,7 +212,7 @@ public class tekkitrestrict extends JavaPlugin {
 		try {
 			Assigner.assign(); //Register the required listeners
 		} catch (Exception ex){
-			Warning.load("A severe error occurred: Unable to start listeners!");
+			Warning.load("A severe error occurred: Unable to start listeners!", true);
 			Log.Exception(ex, true);
 		}
 		
@@ -243,14 +243,14 @@ public class tekkitrestrict extends JavaPlugin {
 		try {
 			ttt.init();
 		} catch (Exception ex) {
-			Warning.load("An error occurred: Unable to start threads!");
+			Warning.loadWarnings.add("An error occurred: Unable to start threads!");
 			Log.Exception(ex, true);
 		}
 		
 		try {
 			initHeartBeat();
 		} catch (Exception ex){
-			Warning.load("An error occurred: Unable to initiate Limiter correctly!");
+			Warning.load("An error occurred: Unable to initiate Limiter Manager correctly!", false);
 			Log.Exception(ex, false);
 		}
 		
@@ -265,7 +265,7 @@ public class tekkitrestrict extends JavaPlugin {
 			if (success)
 				log.info("Linked with EEPatch for extended functionality!");
 			else
-				Warning.other("Linking with EEPatch Failed!");
+				Warning.other("Linking with EEPatch Failed!", true);
 			
 		} else {
 			log.info("EEPatch is not available. Extended EE integration disabled.");
@@ -307,7 +307,7 @@ public class tekkitrestrict extends JavaPlugin {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
 			@Override
 			public void run() {
-				if (Warning.loadWarnings()){
+				if (!Warning.loadWarnings.isEmpty()){
 					log.warning("There were some warnings while loading TekkitRestrict!");
 					log.warning("Use /tr warnings load to view them again (in case you missed them).");
 				} else if (!Warning.dbWarnings.isEmpty()){
@@ -399,7 +399,7 @@ public class tekkitrestrict extends JavaPlugin {
 			});
 			metrics.start();
 		} catch (IOException e) {
-			Warning.load("Metrics failed to start.");
+			Warning.load("Metrics failed to start.", false);
 		}
 	}
 	
@@ -522,9 +522,9 @@ public class tekkitrestrict extends JavaPlugin {
 			conf.setDefaults(defConfig);
 			try {
 				defConfigStream.close();
-			} catch (IOException e) {
-				Warning.load("Exception while trying to reload the config!");
-				e.printStackTrace();
+			} catch (IOException ex) {
+				Warning.load("Exception while trying to reload the config!", false);
+				ex.printStackTrace();
 			}
 		}
 		return conf;
@@ -654,7 +654,7 @@ public class tekkitrestrict extends JavaPlugin {
 			if(destination != null) destination.close();
 
 		} catch (IOException ex){
-			Warning.load("Cannot backup config: " + sourceString);
+			Warning.load("Cannot backup config: " + sourceString, false);
 			return false;
 		}
 		return true;

@@ -724,8 +724,8 @@ public class TRFileConfiguration extends FileConfiguration {
 	}
 	
 	private Object missingSettings(Object val, ConfigFile file, @NonNull String setting){
-		Log.Warning.config("Missing setting " + setting + " in " + file.toString() + ".config.yml!");
-		Log.Warning.config("To fix this message, please delete your " + file.toString() + ".config.yml and TekkitRestrict will make you a new one.");
+		Log.Warning.config("Missing setting " + setting + " in " + file.toString() + ".config.yml!", false);
+		Log.Warning.config("To fix this message, please delete your " + file.toString() + ".config.yml and TekkitRestrict will make you a new one.", false);
 		return val;
 	}
 	

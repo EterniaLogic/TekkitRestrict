@@ -178,7 +178,7 @@ public class EEPSettings {
 		for (String current : mc){
 			if (current == null) continue;
 			if (!current.contains(" ")){
-				Log.Warning.config("There is an invalid value in the MaxCharge list in EEPatch.config.yml: \""+current+"\"");
+				Log.Warning.config("There is an invalid value in the MaxCharge list in EEPatch.config.yml: \""+current+"\"", false);
 				continue;
 			}
 			
@@ -188,7 +188,7 @@ public class EEPSettings {
 			try {
 				charge = Integer.parseInt(temp[1]);
 			} catch (NumberFormatException ex){
-				Log.Warning.config("\""+temp[1]+"\" is not a valid chargelevel in the MaxCharge list in EEPatch.config.yml");
+				Log.Warning.config("\""+temp[1]+"\" is not a valid chargelevel in the MaxCharge list in EEPatch.config.yml", false);
 				continue;
 			}
 			
@@ -196,7 +196,7 @@ public class EEPSettings {
 			if (id == null){
 				ArrayList<Integer> ids = getGroup(temp[0]);
 				if (ids == null){
-					Log.Warning.config("\""+temp[0]+"\" is not a valid itemname or itemgroup in the MaxCharge list in EEPatch.config.yml");
+					Log.Warning.config("\""+temp[0]+"\" is not a valid itemname or itemgroup in the MaxCharge list in EEPatch.config.yml", false);
 					continue;
 				}
 				

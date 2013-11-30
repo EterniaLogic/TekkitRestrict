@@ -148,7 +148,7 @@ public class TRConfigCache {
 					Class cl = Class.forName("org.bukkit.entity."+Character.toUpperCase(s.charAt(0)) + s.substring(1));
 					Threads.SSClassBypasses.add(cl);
 				} catch (Exception ex2){
-					Warning.config("Invalid value in ExemptEntityTypes in SafeZones.config: cannot find class org.bukkit.entity."+ s + "!");
+					Warning.config("Invalid value in ExemptEntityTypes in SafeZones.config: cannot find class org.bukkit.entity."+ s + "!", false);
 					continue;
 				}
 			}

@@ -21,14 +21,14 @@ public class PatchCC {
 		BufferedReader input = null;
 		File file = new File("mods"+s+"ComputerCraft"+s+"lua"+s+"rom"+s+"startup"+s);
 		if (!file.exists()){
-			Warning.load("[CCPatch] ComputerCraft file cannot be found! (" + file.getAbsolutePath() + ")");
+			Warning.load("[CCPatch] ComputerCraft file cannot be found! (" + file.getAbsolutePath() + ")", false);
 			return;
 		}
 		
 		try {
 			input = new BufferedReader(new FileReader(file));
 		} catch (FileNotFoundException e2) {
-			Warning.load("[CCPatch] ComputerCraft file cannot be found! (" + file.getAbsolutePath() + ")");
+			Warning.load("[CCPatch] ComputerCraft file cannot be found! (" + file.getAbsolutePath() + ")", false);
 			return;
 		}
 		
@@ -41,7 +41,7 @@ public class PatchCC {
 			}
 			input.close();
 		} catch (IOException e) {
-			Warning.load("[CCPatch] Cannot read ComputerCraft file! (" + file.getAbsolutePath() + ")");
+			Warning.load("[CCPatch] Cannot read ComputerCraft file! (" + file.getAbsolutePath() + ")", false);
 			try {
 				input.close();
 			} catch (IOException e1) {}
@@ -61,7 +61,7 @@ public class PatchCC {
 			try {
 				patched.createNewFile();
 			} catch (IOException e) {
-				Warning.load("[CCPatch] Unable to write patched file!");
+				Warning.load("[CCPatch] Unable to write patched file!", false);
 				return;
 			}
 			return;
@@ -107,14 +107,14 @@ public class PatchCC {
 			}
 			output.close();
 		} catch (IOException e) {
-			Warning.load("[CCPatch] Unable to write changes to file!");
+			Warning.load("[CCPatch] Unable to write changes to file!", false);
 			return;
 		}
 		
 		try {
 			patched.createNewFile();
 		} catch (IOException e) {
-			Warning.other("[CCPatch] Unable to write patched file!");
+			Warning.other("[CCPatch] Unable to write patched file!", false);
 			return;
 		}
 		tekkitrestrict.log.info("[CCPatch] Patching completed!");

@@ -443,7 +443,7 @@ public class TRCommandTR implements CommandExecutor {
 				ssMain(largs);
 			} catch (Exception ex) {
 				send.msg(ChatColor.RED + "An error has occurred processing your command!");
-				Warning.other("Error occurred in /tr admin safezone! Please inform the author.");
+				Warning.other("Error occurred in /tr admin safezone! Please inform the author.", false);
 				Log.Exception(ex, false);
 			}
 			return;
@@ -454,7 +454,7 @@ public class TRCommandTR implements CommandExecutor {
 				limitMain(largs);
 			} catch (Exception ex) {
 				send.msg(ChatColor.RED + "An error has occurred processing your command!");
-				Warning.other("Error occurred in /tr admin limit! Please inform the author.");
+				Warning.other("Error occurred in /tr admin limit! Please inform the author.", false);
 				Log.Exception(ex, false);
 			}
 			return;

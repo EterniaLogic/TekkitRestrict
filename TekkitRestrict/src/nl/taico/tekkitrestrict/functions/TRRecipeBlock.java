@@ -30,20 +30,20 @@ public class TRRecipeBlock {
 			try {
 				iss = TRItemProcessor.processItemString(s);
 			} catch (TRException ex) {
-				Warning.config("You have an error in your Advanced.config.yml in RecipeBlock:");
-				Warning.config(ex.getMessage());
+				Warning.config("You have an error in your Advanced.config.yml in RecipeBlock:", false);
+				Warning.config(ex.getMessage(), false);
 				continue;
 			}
 			for (TRItem ir : iss) {
 				try {
 					blockRecipeVanilla(ir.id, ir.data);
-				} catch (Exception e) {
-					Warning.other("Error! [TRRecipe-RecipeBlockVanilla] " + e.getMessage());
+				} catch (Exception ex) {
+					Warning.other("Exception in '+TRRecipeBLock.blockRecipeVanilla(id:int, data:int):boolean'! Error: " + ex.toString(), false);
 				}
 				try {
 					blockRecipeForge(ir.id, ir.data);
-				} catch (Exception e) {
-					Warning.other("Error! [TRRecipe-RecipeBlockForge] " + e.getMessage());
+				} catch (Exception ex) {
+					Warning.other("Exception in '+TRRecipeBLock.blockRecipeForge(id:int, data:int):boolean'! Error: " + ex.toString(), false);
 				}
 			}
 		}
@@ -54,15 +54,15 @@ public class TRRecipeBlock {
 			try {
 				iss = TRItemProcessor.processItemString(s);
 			} catch (TRException ex) {
-				Warning.config("You have an error in your Advanced.config.yml in RecipeFurnaceBlock:");
-				Warning.config(ex.getMessage());
+				Warning.config("You have an error in your Advanced.config.yml in RecipeFurnaceBlock:", false);
+				Warning.config(ex.getMessage(), false);
 				continue;
 			}
 			for (TRItem ir : iss) {
 				try {
 					blockFurnaceRecipe(ir.id, ir.data);
 				} catch (Exception ex) {
-					Warning.other("Error! [TRRecipe-Furnace Block] " + ex.getMessage());
+					Warning.other("Exception in '+TRRecipeBLock.blockFurnaceRecipe(id:int, data:int):boolean'! Error: " + ex.toString(), false);
 				}
 			}
 		}

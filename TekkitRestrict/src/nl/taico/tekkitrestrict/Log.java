@@ -86,15 +86,20 @@ public class Log {
 			TRLogger.Log("debug", "     " + element.toString());
 		}
 	}
-	/** For each stackTrace element, log to console */
+	/** For each stackTrace element, log to console and to debug log*/
 	public static void Exception(@NonNull Exception ex, boolean severe){
 		if (severe){
-			for (StackTraceElement element : ex.getStackTrace())
+			for (StackTraceElement element : ex.getStackTrace()){
 				tekkitrestrict.log.severe(element.toString());
+				Debug("[SEVERE]     "+element.toString());
+			}
 		} else {
-			for (StackTraceElement element : ex.getStackTrace())
+			for (StackTraceElement element : ex.getStackTrace()){
 				tekkitrestrict.log.warning(element.toString());
+				Debug("[WARNING]     "+element.toString());
+			}
 		}
+		
 	}
 	
 	@NonNull public static String replaceColors(@Nullable String str){
@@ -126,34 +131,41 @@ public class Log {
 	}
 
 	public static class Warning {
-		public static void config(String message){
-			tekkitrestrict.log.warning("[Config] " + message);
-			configWarnings.add(message);
-		}
-		public static void load(String message){
-			tekkitrestrict.log.warning(message);
-			loadWarnings.add(message);
-		}
-		public static void other(String message){
-			tekkitrestrict.log.warning(message);
-			otherWarnings.add(message);
-		}
-		
 		public static LinkedList<String> loadWarnings = new LinkedList<String>();
 		public static LinkedList<String> configWarnings = new LinkedList<String>();
 		public static LinkedList<String> otherWarnings = new LinkedList<String>();
 		public static LinkedList<String> dbWarnings = new LinkedList<String>();
-		public static boolean loadWarnings(){
-			return !loadWarnings.isEmpty();
+		
+		public static void config(String message, boolean severe){
+			if (severe) tekkitrestrict.log.severe("[Config] " + message);
+			else tekkitrestrict.log.warning("[Config] " + message);
+			configWarnings.add(message);
+			Debug("[Config] " + message);
 		}
-		public static void dbAndLoad(String message) {
-			tekkitrestrict.log.warning(message);
+		public static void load(String message, boolean severe){
+			if (severe) tekkitrestrict.log.severe(message);
+			else tekkitrestrict.log.warning(message);
+			loadWarnings.add(message);
+			Debug(message);
+		}
+		public static void other(String message, boolean severe){
+			if (severe) tekkitrestrict.log.severe(message);
+			else tekkitrestrict.log.warning(message);
+			otherWarnings.add(message);
+			Debug(message);
+		}
+		public static void dbAndLoad(String message, boolean severe) {
+			if (severe) tekkitrestrict.log.severe(message);
+			else tekkitrestrict.log.warning(message);
 			dbWarnings.add(message);
 			loadWarnings.add(message);
+			Debug(message);
 		}
-		public static void db(String message){
-			tekkitrestrict.log.warning(message);
+		public static void db(String message, boolean severe){
+			if (severe) tekkitrestrict.log.severe(message);
+			else tekkitrestrict.log.warning(message);
 			dbWarnings.add(message);
+			Debug(message);
 		}
 	}
 }

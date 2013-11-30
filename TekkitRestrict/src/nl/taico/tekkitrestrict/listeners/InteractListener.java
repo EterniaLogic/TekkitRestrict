@@ -51,7 +51,7 @@ public class InteractListener implements Listener {
 					msg = TRNoItem.isItemBannedInCreative(player, str.getTypeId(), str.getDurability(), true);
 				} catch (Exception ex) {
 					if (!errorInteract){
-						Warning.other("An error occurred in the InteractListener for LimitedCreative!");
+						Warning.other("An error occurred in the Limited Creative Interact Listener ('+InteractListener.onPlayerInteract(...)')!", false);
 						Log.Exception(ex, false);
 						errorInteract = true;
 					}

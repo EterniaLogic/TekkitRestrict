@@ -87,7 +87,7 @@ private static boolean disabled = false;
 		} catch (Exception ex){
 			disabled = true;
 			tekkitrestrict.log.warning("Logfilter disabled.");
-			tekkitrestrict.log.warning("Exception in isLoggable: " + ex.getMessage());
+			tekkitrestrict.log.warning("Exception in isLoggable: " + ex.toString());
 			return false;
 		}
 	}

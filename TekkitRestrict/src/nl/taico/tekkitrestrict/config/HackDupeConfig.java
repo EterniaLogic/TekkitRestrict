@@ -371,7 +371,7 @@ public class HackDupeConfig extends TRConfig {
 			try {
 				configFile.createNewFile();
 			} catch (IOException e) {
-				Log.Warning.load("Unable to create file HackDupe.config.yml!");
+				Log.Warning.load("Unable to create file HackDupe.config.yml!", false);
 				return;
 			}
 		}
@@ -385,7 +385,7 @@ public class HackDupeConfig extends TRConfig {
 			}
 			output.close();
 		} catch (IOException e) {
-			Warning.load("Unable to write changes to HackDupe.config.yml!");
+			Warning.load("Unable to write changes to HackDupe.config.yml!", false);
 			try {if (output != null) output.close();} catch (IOException e1) {}
 			return;
 		}

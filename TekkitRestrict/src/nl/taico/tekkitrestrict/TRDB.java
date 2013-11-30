@@ -156,7 +156,7 @@ public class TRDB {
 			try {
 				tekkitrestrict.db = new MySQL(host, port, database, user, password);
 			} catch (DBException ex){
-				String msg = "[MySQL] Error: " + ex.getMessage();
+				String msg = "[MySQL] Error: " + ex.toString();
 				Warning.dbWarnings.add("[SEVERE] "+msg);
 				Warning.loadWarnings.add("[SEVERE] "+msg);
 				tekkitrestrict.log.severe(msg);
@@ -179,7 +179,7 @@ public class TRDB {
 	public static boolean initSQLite() {
 		if (!tekkitrestrict.db.isOpen()) {
 			if (!tekkitrestrict.db.open()){
-				Warning.dbAndLoad("[SQLite] Cannot open the database!");
+				Warning.dbAndLoad("[SQLite] Cannot open the database!", false);
 				tekkitrestrict.dbworking = 20;
 				return false;
 			}
@@ -224,7 +224,7 @@ public class TRDB {
 	public static boolean initMySQL() {
 		if (!tekkitrestrict.db.isOpen()) {
 			if (!tekkitrestrict.db.open()){
-				Warning.dbAndLoad("[MySQL] Cannot open the database connection!");
+				Warning.dbAndLoad("[MySQL] Cannot open the database connection!", false);
 				tekkitrestrict.dbworking = 20;
 				return false;
 			}
@@ -268,9 +268,9 @@ public class TRDB {
 			tekkitrestrict.db.query("CREATE TABLE IF NOT EXISTS tr_dbversion (version NUMERIC);");
 			tekkitrestrict.db.query("INSERT OR REPLACE INTO tr_dbversion (version) VALUES("+tekkitrestrict.dbversion+");");
 		} catch (Exception ex) {
-			Warning.dbAndLoad("[SQLite] Unable to write version to database!");
+			Warning.dbAndLoad("[SQLite] Unable to write version to database!", false);
 			for (StackTraceElement cur : ex.getStackTrace()){
-				Warning.dbAndLoad("[SQLite] " + cur.toString());
+				Warning.dbAndLoad("[SQLite] " + cur.toString(), false);
 			}
 			tekkitrestrict.dbworking += 1;
 		}
@@ -283,9 +283,9 @@ public class TRDB {
 					+ "data TEXT,"
 					+ "world TEXT);");
 		} catch (Exception ex) {
-			Warning.dbAndLoad("[SQLite] Unable to create safezones table!");
+			Warning.dbAndLoad("[SQLite] Unable to create safezones table!", true);
 			for (StackTraceElement cur : ex.getStackTrace()){
-				Warning.dbAndLoad("[SQLite] " + cur.toString());
+				Warning.dbAndLoad("[SQLite] " + cur.toString(), true);
 			}
 			
 			tekkitrestrict.dbworking += 2;
@@ -296,16 +296,16 @@ public class TRDB {
 					+ "player TEXT UNIQUE,"
 					+ "blockdata TEXT);");
 		} catch (Exception ex) {
-			Warning.dbAndLoad("[SQLite] Unable to create limiter table!");
+			Warning.dbAndLoad("[SQLite] Unable to create limiter table!",true);
 			for (StackTraceElement cur : ex.getStackTrace()){
-				Warning.dbAndLoad("[SQLite] " + cur.toString());
+				Warning.dbAndLoad("[SQLite] " + cur.toString(),true);
 			}
 			tekkitrestrict.dbworking += 4;
 		}
 		
 		dbFailMsg(tekkitrestrict.dbworking);
 		if (tekkitrestrict.dbworking != 0)
-			Warning.dbAndLoad("[SQLite] Not all tables could be created!");
+			Warning.dbAndLoad("[SQLite] Not all tables could be created!",true);
 		else 
 			tekkitrestrict.log.info("[SQLite] Database created successfully!");
 	}
@@ -316,9 +316,9 @@ public class TRDB {
 			tekkitrestrict.db.query("CREATE TABLE IF NOT EXISTS tr_dbversion (version NUMERIC(3,2));");
 			tekkitrestrict.db.query("REPLACE INTO tr_dbversion VALUES ("+tekkitrestrict.dbversion+");");
 		} catch (Exception ex) {
-			Warning.dbAndLoad("[MySQL] Unable to write version to database!");
+			Warning.dbAndLoad("[MySQL] Unable to write version to database!", false);
 			for (StackTraceElement cur : ex.getStackTrace()){
-				Warning.dbAndLoad("[MySQL] " + cur.toString());
+				Warning.dbAndLoad("[MySQL] " + cur.toString(), false);
 			}
 			tekkitrestrict.dbworking += 1;
 		}
@@ -331,9 +331,9 @@ public class TRDB {
 					+ "data TINYTEXT,"
 					+ "world TINYTEXT) CHARACTER SET latin1 COLLATE latin1_swedish_ci;");
 		} catch (Exception ex) {
-			Warning.dbAndLoad("[MySQL] Unable to create safezones table!");
+			Warning.dbAndLoad("[MySQL] Unable to create safezones table!", true);
 			for (StackTraceElement cur : ex.getStackTrace()){
-				Warning.dbAndLoad("[MySQL] " + cur.toString());
+				Warning.dbAndLoad("[MySQL] " + cur.toString(), true);
 			}
 			
 			tekkitrestrict.dbworking += 2;
@@ -344,16 +344,16 @@ public class TRDB {
 					+ "player VARCHAR(32) UNIQUE,"
 					+ "blockdata TEXT) CHARACTER SET latin1 COLLATE latin1_swedish_ci;");
 		} catch (Exception ex) {
-			Warning.dbAndLoad("[MySQL] Unable to create limiter table!");
+			Warning.dbAndLoad("[MySQL] Unable to create limiter table!", true);
 			for (StackTraceElement cur : ex.getStackTrace()){
-				Warning.dbAndLoad("[MySQL] " + cur.toString());
+				Warning.dbAndLoad("[MySQL] " + cur.toString(), true);
 			}
 			tekkitrestrict.dbworking += 4;
 		}
 		
 		dbFailMsg(tekkitrestrict.dbworking);
 		if (tekkitrestrict.dbworking != 0)
-			Warning.dbAndLoad("[MySQL] Not all tables could be created!");
+			Warning.dbAndLoad("[MySQL] Not all tables could be created!", true);
 		else 
 			tekkitrestrict.log.info("[MySQL] Database created successfully!");
 	}
@@ -370,12 +370,12 @@ public class TRDB {
 		try {
 			srvals = getTableVals("tr_saferegion");
 		} catch(SQLException ex){
-			Warning.dbAndLoad("[SQLite] Unable to transfer safezones from the old format to the new one!");
+			Warning.dbAndLoad("[SQLite] Unable to transfer safezones from the old format to the new one!", true);
 		}
 		try {
 			limvals = getTableVals("tr_limiter");
 		} catch(SQLException ex){
-			Warning.dbAndLoad("[SQLite] Unable to transfer limits from the old format to the new one!");
+			Warning.dbAndLoad("[SQLite] Unable to transfer limits from the old format to the new one!", true);
 		}
 		
 		//Delete old tables
@@ -387,9 +387,9 @@ public class TRDB {
 			tekkitrestrict.db.query("CREATE TABLE IF NOT EXISTS tr_dbversion (version NUMERIC);");
 			tekkitrestrict.db.query("INSERT OR REPLACE INTO tr_dbversion (version) VALUES("+tekkitrestrict.dbversion+");");
 		} catch (Exception ex) {
-			Warning.dbAndLoad("[SQLite] Unable to write version to database!");
+			Warning.dbAndLoad("[SQLite] Unable to write version to database!", false);
 			for (StackTraceElement cur : ex.getStackTrace()){
-				Warning.dbAndLoad("[SQLite] " + cur.toString());
+				Warning.dbAndLoad("[SQLite] " + cur.toString(), false);
 			}
 			tekkitrestrict.dbworking += 1;
 		}
@@ -404,9 +404,9 @@ public class TRDB {
 					+ "data TEXT,"
 					+ "world TEXT); ");
 		} catch (Exception ex) {
-			Warning.dbAndLoad("[SQLite] Unable to create safezones table!");
+			Warning.dbAndLoad("[SQLite] Unable to create safezones table!", true);
 			for (StackTraceElement cur : ex.getStackTrace()){
-				Warning.dbAndLoad("[SQLite] " + cur.toString());
+				Warning.dbAndLoad("[SQLite] " + cur.toString(), true);
 			}
 			
 			tekkitrestrict.dbworking += 2;
@@ -426,9 +426,9 @@ public class TRDB {
 				tekkitrestrict.log.info("[SQLite] Transferred " + srvals.size() + " safezones.");
 			}
 		} catch (Exception ex) {
-			Warning.dbAndLoad("[SQLite] Unable to write safezones to database!");
+			Warning.dbAndLoad("[SQLite] Unable to write safezones to database!", true);
 			for (StackTraceElement cur : ex.getStackTrace()){
-				Warning.dbAndLoad("[SQLite] " + cur.toString());
+				Warning.dbAndLoad("[SQLite] " + cur.toString(), true);
 			}
 		}
 		//###############################################################################
@@ -439,9 +439,9 @@ public class TRDB {
 						+ "player TEXT UNIQUE,"
 						+ "blockdata TEXT);");
 		} catch (Exception ex) {
-			Warning.dbAndLoad("[SQLite] Unable to create limiter table!");
+			Warning.dbAndLoad("[SQLite] Unable to create limiter table!", true);
 			for (StackTraceElement cur : ex.getStackTrace()){
-				Warning.dbAndLoad("[SQLite] " + cur.toString());
+				Warning.dbAndLoad("[SQLite] " + cur.toString(), true);
 			}
 			tekkitrestrict.dbworking += 4;
 		}
@@ -458,16 +458,16 @@ public class TRDB {
 				tekkitrestrict.log.info("[SQLite] Transferred "+ limvals.size() + " limits.");
 			}
 		} catch (Exception ex) {
-			Warning.dbAndLoad("[SQLite] Unable to write limits to database!");
+			Warning.dbAndLoad("[SQLite] Unable to write limits to database!", true);
 			for (StackTraceElement cur : ex.getStackTrace()){
-				Warning.dbAndLoad("[SQLite] " + cur.toString());
+				Warning.dbAndLoad("[SQLite] " + cur.toString(), true);
 			}
 		}
 		if (tekkitrestrict.dbworking == 0) {
 			tekkitrestrict.log.info("[SQLite] Transfering into the new database format succeeded!");
 		} else {
 			dbFailMsg(tekkitrestrict.dbworking);
-			Warning.dbAndLoad("[SQLite] Transfering into the new database format failed!");
+			Warning.dbAndLoad("[SQLite] Transfering into the new database format failed!", true);
 		}
 		
 	}
@@ -481,9 +481,9 @@ public class TRDB {
 			tekkitrestrict.db.query("INSERT INTO tr_limiter (player, blockdata) SELECT player, blockdata FROM tr_limiter_old ORDER BY player ASC");
 			tekkitrestrict.db.query("DROP TABLE IF EXISTS tr_limiter_old");
 		} catch (SQLException ex) {
-			Warning.dbAndLoad("[SQLite] Error while updating db!");
+			Warning.dbAndLoad("[SQLite] Error while updating db!", false);
 			for (StackTraceElement st : ex.getStackTrace()){
-				Warning.dbAndLoad("[SQLite] " + st.toString());
+				Warning.dbAndLoad("[SQLite] " + st.toString(), false);
 			}
 		}
 	}
@@ -493,12 +493,12 @@ public class TRDB {
 		try {
 			rs = tekkitrestrict.db.query("SELECT * FROM tr_limiter;");
 		} catch (SQLException ex) {
-			Warning.dbAndLoad("[MySQL] Unable to read limits from MySql Database! Error: "+ex.getMessage());
+			Warning.dbAndLoad("[MySQL] Unable to read limits from MySql Database! Error: "+ex.toString(), false);
 			return false;
 		}
 		
 		if (rs == null){
-			Warning.dbAndLoad("[MySQL] Unable to read limits from MySql Database! Error: ResultSet is null");
+			Warning.dbAndLoad("[MySQL] Unable to read limits from MySql Database! Error: ResultSet is null", false);
 			return false;
 		}
 		
@@ -510,7 +510,7 @@ public class TRDB {
 				i++;
 			}
 		} catch (SQLException ex) {
-			Warning.dbAndLoad("[MySQL] Unable to read limits from MySql Database! Error: "+ex.getMessage());
+			Warning.dbAndLoad("[MySQL] Unable to read limits from MySql Database! Error: "+ex.toString(), false);
 			try {
 				rs.close();
 			} catch (SQLException ex2) {}
@@ -527,12 +527,12 @@ public class TRDB {
 		try {
 			rs = tekkitrestrict.db.query("SELECT * FROM tr_saferegion;");
 		} catch (SQLException ex) {
-			Warning.dbAndLoad("[MySQL] Unable to read safezones from MySql Database! Error: "+ex.getMessage());
+			Warning.dbAndLoad("[MySQL] Unable to read safezones from MySql Database! Error: "+ex.toString(), false);
 			return false;
 		}
 		
 		if (rs == null){
-			Warning.dbAndLoad("[MySQL] Unable to read safezones from MySql Database! Error: ResultSet is null.");
+			Warning.dbAndLoad("[MySQL] Unable to read safezones from MySql Database! Error: ResultSet is null.", false);
 			return false;
 		}
 		int j = 0;
@@ -542,7 +542,7 @@ public class TRDB {
 				j++;
 			}
 		} catch (SQLException ex) {
-			Warning.dbAndLoad("[MySQL] Unable to read safezones from MySql Database! Error: "+ex.getMessage());
+			Warning.dbAndLoad("[MySQL] Unable to read safezones from MySql Database! Error: "+ex.toString(), false);
 			try {
 				rs.close();
 			} catch (SQLException ex2) {}
@@ -564,7 +564,7 @@ public class TRDB {
 				backup.delete();
 				dbfile = new File(path + File.separator + "Data.db");
 				if (!dbfile.renameTo(backup)){
-					Warning.dbAndLoad("[DB] Unable to delete/backup old database file!");
+					Warning.dbAndLoad("[DB] Unable to delete/backup old database file!", false);
 					return false;
 				}
 			}
@@ -574,12 +574,12 @@ public class TRDB {
 		try {
 			tekkitrestrict.db = new SQLite("Data", path);
 		} catch (DBException ex){
-			Warning.dbAndLoad("[DB] Unable to create database file!");
+			Warning.dbAndLoad("[DB] Unable to create database file!", false);
 			return false;
 		}
 		
 		if (!tekkitrestrict.db.open()){
-			Log.Warning.dbAndLoad("[SQLite] Unable to open Database!");
+			Log.Warning.dbAndLoad("[SQLite] Unable to open Database!", false);
 			return false;
 		}
 		
@@ -593,7 +593,7 @@ public class TRDB {
 			try {
 				tekkitrestrict.db.query("INSERT INTO tr_limiter (player, blockdata) VALUES (\""+entry.getKey()+"\", \""+entry.getValue()+"\");");
 			} catch (SQLException ex) {
-				Log.Warning.dbAndLoad("[SQLite] Unable to transfer limits of player " + entry.getKey() + "! Error: "+ex.getMessage());
+				Warning.dbAndLoad("[SQLite] Unable to transfer limits of player " + entry.getKey() + "! Error: "+ex.toString(), true);
 				k--;
 				continue;
 			}
@@ -609,7 +609,7 @@ public class TRDB {
 			try {
 				tekkitrestrict.db.query("INSERT INTO tr_saferegion (id, name, mode, data, world) VALUES ("+entry.getKey()+", \""+ss.name+"\", "+ss.mode+", \""+ss.data+"\", \""+ss.world+"\");");
 			} catch (SQLException ex) {
-				Log.Warning.dbAndLoad("[SQLite] Unable to transfer safezone " + ss.name + "! Error: "+ex.getMessage());
+				Warning.dbAndLoad("[SQLite] Unable to transfer safezone " + ss.name + "! Error: "+ex.toString(), true);
 				l--;
 				continue;
 			}
@@ -625,12 +625,12 @@ public class TRDB {
 		try {
 			rs = tekkitrestrict.db.query("SELECT * FROM tr_limiter;");
 		} catch (SQLException ex) {
-			Warning.dbAndLoad("[SQLite] Unable to read limits from SQLite Database! Error: "+ex.getMessage());
+			Warning.dbAndLoad("[SQLite] Unable to read limits from SQLite Database! Error: "+ex.toString(), false);
 			return false;
 		}
 		
 		if (rs == null){
-			Warning.dbAndLoad("[SQLite] Unable to read limits from SQLite Database! Error: ResultSet is null");
+			Warning.dbAndLoad("[SQLite] Unable to read limits from SQLite Database! Error: ResultSet is null", false);
 			return false;
 		}
 		
@@ -642,7 +642,7 @@ public class TRDB {
 				i++;
 			}
 		} catch (SQLException ex) {
-			Warning.dbAndLoad("[SQLite] Unable to read limits from SQLite Database! Error: "+ex.getMessage());
+			Warning.dbAndLoad("[SQLite] Unable to read limits from SQLite Database! Error: "+ex.toString(), false);
 			try {
 				rs.close();
 			} catch (SQLException ex2) {}
@@ -659,12 +659,12 @@ public class TRDB {
 		try {
 			rs = tekkitrestrict.db.query("SELECT * FROM tr_saferegion;");
 		} catch (SQLException ex) {
-			Warning.dbAndLoad("[SQLite] Unable to read safezones from SQLite Database! Error: "+ex.getMessage());
+			Warning.dbAndLoad("[SQLite] Unable to read safezones from SQLite Database! Error: "+ex.toString(), false);
 			return false;
 		}
 		
 		if (rs == null){
-			Warning.dbAndLoad("[SQLite] Unable to read safezones from SQLite Database! Error: ResultSet is null.");
+			Warning.dbAndLoad("[SQLite] Unable to read safezones from SQLite Database! Error: ResultSet is null.", false);
 			return false;
 		}
 		int j = 0;
@@ -674,7 +674,7 @@ public class TRDB {
 				j++;
 			}
 		} catch (SQLException ex) {
-			Warning.dbAndLoad("[SQLite] Unable to read safezones from SQLite Database! Error: "+ex.getMessage());
+			Warning.dbAndLoad("[SQLite] Unable to read safezones from SQLite Database! Error: "+ex.toString(), false);
 			try {
 				rs.close();
 			} catch (SQLException ex2) {}
@@ -696,7 +696,7 @@ public class TRDB {
 		try {
 			tekkitrestrict.db = new MySQL(host, port, database, user, password);
 		} catch (DBException ex){
-			String msg = "[MySQL] Unable to connect to MySQL database! Error: " + ex.getMessage();
+			String msg = "[MySQL] Unable to connect to MySQL database! Error: " + ex.toString();
 			Warning.dbWarnings.add("[SEVERE] "+msg);
 			Warning.loadWarnings.add("[SEVERE] "+msg);
 			tekkitrestrict.log.severe(msg);
@@ -705,7 +705,7 @@ public class TRDB {
 		}
 		
 		if (!tekkitrestrict.db.open()){
-			Log.Warning.dbAndLoad("[MySQL] Unable to connect to Database!");
+			Log.Warning.dbAndLoad("[MySQL] Unable to connect to Database!", false);
 			return false;
 		}
 		
@@ -719,7 +719,7 @@ public class TRDB {
 			try {
 				tekkitrestrict.db.query("INSERT INTO tr_limiter (player, blockdata) VALUES (\""+entry.getKey()+"\", \""+entry.getValue()+"\");");
 			} catch (SQLException ex) {
-				Log.Warning.dbAndLoad("[MySQL] Unable to transfer limits of player " + entry.getKey() + "! Error: "+ex.getMessage());
+				Warning.dbAndLoad("[MySQL] Unable to transfer limits of player " + entry.getKey() + "! Error: "+ex.toString(), true);
 				k--;
 				continue;
 			}
@@ -735,7 +735,7 @@ public class TRDB {
 			try {
 				tekkitrestrict.db.query("INSERT INTO tr_saferegion (id, name, mode, data, world) VALUES ("+entry.getKey()+", \""+ss.name+"\", "+ss.mode+", \""+ss.data+"\", \""+ss.world+"\");");
 			} catch (SQLException ex) {
-				Log.Warning.dbAndLoad("[MySQL] Unable to transfer safezone " + ss.name + "! Error: "+ex.getMessage());
+				Warning.dbAndLoad("[MySQL] Unable to transfer safezone " + ss.name + "! Error: "+ex.toString(), true);
 				l--;
 				continue;
 			}
@@ -749,13 +749,13 @@ public class TRDB {
 	private static void dbFailMsg(int fail){
 		String prefix = (tekkitrestrict.dbtype == DBType.MySQL ? "[MySQL] " : "[SQLite] ");
 		if (fail == 1 || fail == 3 || fail == 5)
-			Warning.dbAndLoad(prefix+"The database will RESET upon next server startup because the version table couldn't be created!");
+			Warning.dbAndLoad(prefix+"The database will RESET upon next server startup because the version table couldn't be created!", true);
 		if (fail == 2 || fail == 3 || fail == 6)
-			Warning.dbAndLoad(prefix+"Safezones will NOT work properly because the safezones table couldn't be created!");
+			Warning.dbAndLoad(prefix+"Safezones will NOT work properly because the safezones table couldn't be created!", true);
 		if (fail == 4 || fail == 5 || fail == 6)
-			Warning.dbAndLoad(prefix+"The limiter will NOT work properly because the limiter table couldn't be created!");
+			Warning.dbAndLoad(prefix+"The limiter will NOT work properly because the limiter table couldn't be created!", true);
 		else if (fail == 7) 
-			Warning.dbAndLoad(prefix+"All database actions failed! Safezones and the limiter will NOT be stored!");
+			Warning.dbAndLoad(prefix+"All database actions failed! Safezones and the limiter will NOT be stored!", true);
 	}
 	
 	private static List<LinkedList<String>> getTableVals(String table) throws SQLException {

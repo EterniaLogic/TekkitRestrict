@@ -81,7 +81,7 @@ public class MySQL extends Database {
 			connection.close();
 			return true;
 		} catch (Exception ex) {
-			write("Unable to close database connection. Error: " + ex.getMessage(), Level.SEVERE);
+			write("Unable to close database connection. Error: " + ex.toString(), Level.SEVERE);
 			return false;
 		}
 	}
@@ -123,7 +123,7 @@ public class MySQL extends Database {
 			else
 				return null;
 		} catch (SQLException ex) {
-			write("Error when trying to execute query! Error: " + ex.getMessage(), Level.WARNING);
+			write("Error when trying to execute query! Error: " + ex.toString(), Level.WARNING);
 			throw ex;
 		}
 	}
@@ -142,7 +142,7 @@ public class MySQL extends Database {
 			else
 				return null;
 		} catch (SQLException ex) {
-			write("Error when trying to execute query! Error: " + ex.getMessage(), Level.WARNING);
+			write("Error when trying to execute query! Error: " + ex.toString(), Level.WARNING);
 			throw ex;
 		}
 	}

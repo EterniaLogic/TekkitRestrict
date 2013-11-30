@@ -53,9 +53,9 @@ public class TMetrics {
 		            public void run() {
 		                try {
 		                    postPlugin();
-		                } catch (TMetricsException e) {
+		                } catch (TMetricsException ex) {
 		                    if (showWarnings) {
-		                        Bukkit.getLogger().warning("[TMetrics] " + e.getMessage());
+		                        Bukkit.getLogger().warning("[TMetrics] Error: " + ex.toString());
 		                    }
 		                }
 		            }
@@ -214,7 +214,7 @@ public class TMetrics {
 			}
 			if (!logged){
 				logged = true;
-				throw new TMetricsException("An error occured while trying to send statistics: "+ex.getMessage()+"\n"+"This error will only be logged once.");
+				throw new TMetricsException("An error occured while trying to send statistics: "+ex.toString()+"\n"+"This error will only be logged once.");
 			}
 		}
 	}

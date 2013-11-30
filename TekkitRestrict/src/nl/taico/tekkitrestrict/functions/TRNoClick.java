@@ -54,7 +54,7 @@ public class TRNoClick {
 				} else if (type.trample()){
 					if (action == Action.PHYSICAL) return true;
 				} else {
-					Warning.other("An error occurred in TRNoClick: Unknown action " + action.toString());
+					Warning.other("An error occurred in TRNoClick: Unknown action " + action.toString(), true);
 				}
 			} else {
 				if (type.both()){
@@ -73,7 +73,7 @@ public class TRNoClick {
 				} else if (type.trample()){
 					if (action == Action.PHYSICAL) return true;
 				} else {
-					Warning.other("An error occurred in TRNoClick: Unknown action " + action.toString());
+					Warning.other("An error occurred in TRNoClick: Unknown action " + action.toString(), true);
 				}
 			}
 		}
@@ -96,7 +96,7 @@ public class TRNoClick {
 			String temp[] = disableClick.split(" ");
 			if (temp[0].equalsIgnoreCase("block")){
 				if (temp.length == 1){
-					Warning.config("You have an error in your DisableClick config: \"block\" is not a valid itemstring");
+					Warning.config("You have an error in your DisableClick config: \"block\" is not a valid itemstring", false);
 					continue;
 				}
 				
@@ -104,8 +104,8 @@ public class TRNoClick {
 				try {
 					iss = TRItemProcessor.processItemString(temp[1]);
 				} catch (TRException ex) {
-					Warning.config("You have an error in your DisableClick.config.yml in DisableClick:");
-					Warning.config(ex.getMessage());
+					Warning.config("You have an error in your DisableClick.config.yml in DisableClick:", false);
+					Warning.config(ex.getMessage(), false);
 					continue;
 				}
 				for (TRItem item : iss) {
@@ -126,8 +126,8 @@ public class TRNoClick {
 				try {
 					iss = TRItemProcessor.processItemString(temp[0]);
 				} catch (TRException ex) {
-					Warning.config("You have an error in your DisableClick.config.yml in DisableClick:");
-					Warning.config(ex.getMessage());
+					Warning.config("You have an error in your DisableClick.config.yml in DisableClick:", false);
+					Warning.config(ex.getMessage(), false);
 					continue;
 				}
 				
@@ -150,8 +150,8 @@ public class TRNoClick {
 							else if (current.equals("block")) noclick.block = true;
 							else if (current.equals("safezone")) noclick.safezone = true;
 							else {
-								Log.Warning.config("You have an error in your DisableClick config: Invalid clicktype \""+current+"\"");
-								Log.Warning.config("Valid types: left, right, both, trample, all, air, block, safezone");
+								Log.Warning.config("You have an error in your DisableClick config: Invalid clicktype \""+current+"\"", false);
+								Log.Warning.config("Valid types: left, right, both, trample, all, air, block, safezone", false);
 								continue;
 							}
 						}
@@ -217,7 +217,7 @@ public class TRNoClick {
 				} else if (action == Action.PHYSICAL){
 					lr = "trampling";
 				} else {
-					Warning.other("An error occurred in TRNoClick: Unknown action: " + action.toString());
+					Warning.other("An error occurred in TRNoClick: Unknown action: " + action.toString(), true);
 				}
 				player.sendMessage(ChatColor.RED + "Sorry, but "+lr+" with this item"+extra+" is disabled");
 				return true;
@@ -239,8 +239,8 @@ public class TRNoClick {
 			}
 		} catch (Exception ex){
 			if (!errorLogged){
-				Warning.other("An error occurred in the [ListenInteract TRNoClick]:" + ex.getMessage());
-				Warning.other("This error will only be logged once.");
+				Warning.other("An error occurred in TRNoClick ('+TRNoClick.isDisabled(...):boolean')!", false);
+				Warning.other("This error will only be logged once.", false);
 				Log.Exception(ex, false);
 				errorLogged = true;
 			}

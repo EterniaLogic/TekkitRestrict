@@ -85,7 +85,9 @@ public class NoHackFly implements Listener {
 			ItemStack item = inventory.getItem(i);
 			if (item == null) continue;
 			int id = item.getTypeId();
-			if (id == 27536 || id == 27584) return false;
+			short data = item.getDurability();
+			if (id == 27536 && (data == 1 || data == 3)) return false;
+			if (id == 27584) return false;
 		}
 		
 		EntityPlayer Eplayer = ((CraftPlayer) player).getHandle();

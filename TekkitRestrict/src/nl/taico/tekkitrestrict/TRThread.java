@@ -157,19 +157,19 @@ class TGemArmorDisabler extends Thread {
 		while (true) {
 			try {
 				if (!tekkitrestrict.EEEnabled){
-					Warning.other("The GemArmorDisabler thread has stopped because EE is disabled.");
+					Warning.other("The GemArmorDisabler thread has stopped because EE is disabled.", false);
 					break; //If ee is disabled, stop the thread.
 				}
 				GemArmorDisabler();
 			} catch (Exception ex) {
 				errors++;
-				Warning.other("Error: [GemArmor thread] " + ex.getMessage());
+				Warning.other("Error: [GemArmor thread] " + ex.toString(), false);
 				if (errors < 2){
 					Log.Exception(ex, true);
 				}
 				
 				if (errors > 50){
-					Warning.other("The GemArmorDisabler thread has errored for more than 50 time now. It will now be disabled.");
+					Warning.other("The GemArmorDisabler thread has errored for more than 50 time now. It will now be disabled.", true);
 					break;
 				}
 			}
@@ -242,7 +242,7 @@ class TEntityRemover extends Thread {
 			try {
 				disableEntities();
 			} catch (Exception ex) {
-				Warning.other("An error occurred trying to disable entities!");
+				Warning.other("An error occurred trying to disable entities!", false);
 				Log.Exception(ex, false);
 			}
 			
@@ -314,7 +314,7 @@ class TEntityRemover extends Thread {
 				*/
 			} catch (Exception ex){
 				if (!err1){
-					Warning.other("An error occurred in the entities Disabler thread: " + ex.getMessage() + " (this error will only be logged once)");
+					Warning.other("An error occurred in the entities Disabler thread! (this error will only be logged once)", false);
 					Log.Exception(ex, false);
 					err1 = true;
 				}
@@ -340,12 +340,12 @@ class DisableItemThread extends Thread {
 					try {
 						disableItems(player);
 					} catch (Exception ex) {
-						Warning.other("Error: [ItemDisabler thread] (1 player) " + ex.getMessage());
+						Warning.other("An error occured in [ItemDisabler thread] (1 player)!", false);
 						Log.debugEx(ex);
 					}
 				}
 			} catch (Exception ex) {
-				Warning.other("Error: [ItemDisabler thread] (player loop) " + ex.getMessage());
+				Warning.other("An error occured in [ItemDisabler thread] (player loop)!", false);
 				Log.Exception(ex, true);
 			}
 			
@@ -401,7 +401,7 @@ class DisableItemThread extends Thread {
 						if (checkEEArcanaSafeZone(st1[i]) || checkEEChargeSafeZone(st1[i])) changedInv = true;
 					}
 				} catch (Exception ex) {
-					Warning.other("Error: [ItemDisabler thread] (check inv) " + ex.getMessage());
+					Warning.other("Error: [ItemDisabler thread] (check inv) " + ex.toString(), false);
 					Log.debugEx(ex);
 				}
 			} //End of first for loop
@@ -437,7 +437,7 @@ class DisableItemThread extends Thread {
 					}
 					
 				} catch (Exception ex) {
-					Warning.other("Error: [ItemDisabler thread] (check armor) " + ex.getMessage());
+					Warning.other("Error: [ItemDisabler thread] (check armor) " + ex.toString(), false);
 					Log.debugEx(ex);
 				}
 			}
@@ -452,7 +452,7 @@ class DisableItemThread extends Thread {
 			}
 			
 		} catch (Exception ex) {
-			Warning.other("Error: [ItemDisabler thread] " + ex.getMessage());
+			Warning.other("Error: [ItemDisabler thread] " + ex.toString(), false);
 			Log.debugEx(ex);
 		}
 	}
@@ -544,7 +544,7 @@ class DisableItemThread extends Thread {
 			 * itemstack.setData(0);
 			 */
 		} catch (Exception ex) {
-			TRLogger.Log("debug", "Error: [Decharger[7] thread] " + ex.getMessage());
+			TRLogger.Log("debug", "Error: [Decharger[7] thread] " + ex.toString());
 			Log.debugEx(ex);
 		}
 		return false;
@@ -649,8 +649,8 @@ class DisableItemThread extends Thread {
 			try {
 				iss = TRItemProcessor.processItemString(s);
 			} catch (TRException ex) {
-				Warning.config("You have an error in your ModModifications.config in DechargeInSS:");
-				Warning.config(ex.getMessage());
+				Warning.config("You have an error in your ModModifications.config in DechargeInSS:", false);
+				Warning.config(ex.toString(), false);
 				continue;
 			}
 			
@@ -662,15 +662,15 @@ class DisableItemThread extends Thread {
 		List<String> meu = tekkitrestrict.config.getStringList(ConfigFile.ModModifications, "MaxEU");
 		for (String s : meu) {
 			if (!s.contains(" ")){
-				Warning.config("You have an error in your ModModifications.config in MaxEU!");
-				Warning.config("Invalid number of arguments in \""+s+"\". Required: 3");
+				Warning.config("You have an error in your ModModifications.config in MaxEU!", false);
+				Warning.config("Invalid number of arguments in \""+s+"\". Required: 3", false);
 				continue;
 			}
 			
 			String[] sseu = s.split(" ");
 			if (sseu.length != 3){
-				Warning.config("You have an error in your ModModifications.config in MaxEU!");
-				Warning.config("Invalid number of arguments in \""+s+"\". Required: 3");
+				Warning.config("You have an error in your ModModifications.config in MaxEU!", false);
+				Warning.config("Invalid number of arguments in \""+s+"\". Required: 3", false);
 				continue;
 			}
 			int eu, chrate;
@@ -678,15 +678,15 @@ class DisableItemThread extends Thread {
 			try {
 				eu = Integer.parseInt(sseu[1]);
 			} catch (NumberFormatException ex){
-				Warning.config("You have an error in your ModModifications.config in MaxEU!");
-				Warning.config("Invalid MaxEU value \""+sseu[1]+"\" in \""+s+"\"!");
+				Warning.config("You have an error in your ModModifications.config in MaxEU!", false);
+				Warning.config("Invalid MaxEU value \""+sseu[1]+"\" in \""+s+"\"!", false);
 				continue;
 			}
 			try {
 				chrate = Integer.parseInt(sseu[2]);
 			} catch (NumberFormatException ex){
-				Warning.config("You have an error in your ModModifications.config in MaxEU!");
-				Warning.config("Invalid charge rate \""+sseu[2]+"\" in \""+s+"\"!");
+				Warning.config("You have an error in your ModModifications.config in MaxEU!", false);
+				Warning.config("Invalid charge rate \""+sseu[2]+"\" in \""+s+"\"!", false);
 				continue;
 			}
 
@@ -694,8 +694,8 @@ class DisableItemThread extends Thread {
 			try {
 				iss = TRItemProcessor.processItemString(sseu[0]);
 			} catch (TRException ex) {
-				Warning.config("You have an error in your ModModifications.config in MaxEU:");
-				Warning.config(ex.getMessage());
+				Warning.config("You have an error in your ModModifications.config in MaxEU:", false);
+				Warning.config(ex.toString(), false);
 				continue;
 			}
 			for (TRItem iss1 : iss) {
@@ -712,7 +712,7 @@ class DisableItemThread extends Thread {
 		List<String> MaxCharges = tekkitrestrict.config.getStringList(ConfigFile.ModModifications, "MaxCharge");
 		for (String charge : MaxCharges) {
 			if (!charge.contains(" ")) {
-				Log.Warning.config("You have an error in your maxchare list in ModModifications.config: \""+charge+"\" does not follow the format: \"itemstr percentage\"");
+				Log.Warning.config("You have an error in your maxchare list in ModModifications.config: \""+charge+"\" does not follow the format: \"itemstr percentage\"", false);
 				continue;
 			}
 			
@@ -722,7 +722,7 @@ class DisableItemThread extends Thread {
 			try {
 				max = Integer.parseInt(sscharge[1]);
 			} catch (NumberFormatException ex){
-				Warning.config("You have an error in your maxchare list in ModModifications.config: \""+sscharge[1]+"\" is not a valid number");
+				Warning.config("You have an error in your maxchare list in ModModifications.config: \""+sscharge[1]+"\" is not a valid number", false);
 				continue;
 			}
 			
@@ -730,8 +730,8 @@ class DisableItemThread extends Thread {
 			try {
 				iss = TRItemProcessor.processItemString(sscharge[0]);
 			} catch (TRException ex) {
-				Warning.config("You have an error in your ModModifications.config in MaxCharge:");
-				Warning.config(ex.getMessage());
+				Warning.config("You have an error in your ModModifications.config in MaxCharge:", false);
+				Warning.config(ex.toString(), false);
 				continue;
 			}
 			for (TRItem isr : iss) {
@@ -824,7 +824,7 @@ class TWorldScrubber extends Thread {
 			TRChunkUnloader.unloadSChunks();
 		} catch (Exception ex) {
 			if (!err1){
-				Warning.other("An error occurred in the ChunkUnloader! (This error will only be logged once)");
+				Warning.other("An error occurred in the ChunkUnloader! (This error will only be logged once)", false);
 				Log.Exception(ex, false);
 				err1 = true;
 			}
@@ -854,7 +854,7 @@ class TWorldScrubber extends Thread {
 			}
 		} catch (Exception ex) {
 			if (!err2){
-				Warning.other("An error occurred in the BannedBlocksRemover! (This error will only be logged once)");
+				Warning.other("An error occurred in the BannedBlocksRemover! (This error will only be logged once)", false);
 				Log.Exception(ex, false);
 				err2 = true;
 			}
@@ -876,7 +876,7 @@ class TSaveThread extends Thread {
 				TRLimiter.saveLimiters();
 			} catch (Exception ex) {
 				if (!err1){
-					Warning.other("An error occurred while trying to save the Limiter: " + ex.getMessage() + "! (This error will only be logged once)");
+					Warning.other("An error occurred while trying to save the Limiter! (This error will only be logged once)", false);
 					Log.Exception(ex, false);
 					err1 = true;
 				}
@@ -886,7 +886,7 @@ class TSaveThread extends Thread {
 				TRSafeZone.save();
 			} catch (Exception ex) {
 				if (!err2){
-					Warning.other("An error occurred while trying to save the SafeZones: " + ex.getMessage() + "! (This error will only be logged once)");
+					Warning.other("An error occurred while trying to save the SafeZones! (This error will only be logged once)", false);
 					Log.Exception(ex, false);
 					err2 = true;
 				}
@@ -896,7 +896,7 @@ class TSaveThread extends Thread {
 				TRLogger.saveLogs();
 			} catch (Exception ex) {
 				if (!err3){
-					Warning.other("An error occurred while trying to save the logs: " + ex.getMessage() + "! (This error will only be logged once)");
+					Warning.other("An error occurred while trying to save the logs! (This error will only be logged once)", false);
 					Log.Exception(ex, false);
 					err3 = true;
 				}
@@ -909,7 +909,7 @@ class TSaveThread extends Thread {
 				TRLimiter.manageData();
 			} catch(Exception ex){
 				if (!err4){
-					Warning.other("An error occurred with the Limiter Data Manager: " + ex.getMessage() + "! (This error will only be logged once)");
+					Warning.other("An error occurred with the Limiter Data Manager! (This error will only be logged once)", false);
 					Log.Exception(ex, false);
 					err4 = true;
 				}

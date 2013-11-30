@@ -157,7 +157,7 @@ public class ModModificationsConfig extends TRConfig {
 				}
 			}
 		}
-		if (fixed) Log.Warning.load("Fixed old incorrect default values for EMC farm fixes. All EMC farm fixes now should work properly.");
+		if (fixed) Log.Warning.load("Fixed old incorrect default values for EMC farm fixes. All EMC farm fixes now should work properly.", false);
 		
 		//Duplicate remover
 		Iterator<String> it = def.iterator();

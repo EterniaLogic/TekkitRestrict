@@ -74,24 +74,24 @@ public class TRLimiter {
 			try {
 				String[] temp = limBlock.split(" ");
 				if (temp.length!=2){
-					Warning.config("You have an error in your Advanced.config.yml in LimitBlocks:");
-					Warning.config("\""+limBlock+"\" does not follow the syntaxis \"itemIndex limit\"!");
+					Warning.config("You have an error in your Advanced.config.yml in LimitBlocks:", false);
+					Warning.config("\""+limBlock+"\" does not follow the syntaxis \"itemIndex limit\"!", false);
 					continue;
 				}
 				int limit = 0;
 				try {
 					limit = Integer.parseInt(temp[1]);
 				} catch (NumberFormatException ex){
-					Warning.config("You have an error in your Advanced.config.yml in LimitBlocks:");
-					Warning.config("\""+temp[1]+"\" is not a valid number!");
+					Warning.config("You have an error in your Advanced.config.yml in LimitBlocks:", false);
+					Warning.config("\""+temp[1]+"\" is not a valid number!", false);
 					continue;
 				}
 				List<TRItem> items;
 				try {
 					items = TRItemProcessor.processItemString(temp[0]);
 				} catch (TRException ex) {
-					Warning.config("You have an error in your Advanced.config.yml in LimitBlocks:");
-					Warning.config(ex.getMessage());
+					Warning.config("You have an error in your Advanced.config.yml in LimitBlocks:", false);
+					Warning.config(ex.getMessage(), false);
 					continue;
 				}
 				
@@ -104,7 +104,7 @@ public class TRLimiter {
 					configLimits.add(cLimit);
 				}
 			} catch (Exception ex) {
-				Warning.config("LimitBlocks: has an error!");
+				Warning.config("LimitBlocks: has an error!", false);
 			}
 		}
 	}
@@ -129,20 +129,22 @@ public class TRLimiter {
 		int max = -1;
 		try {
 			List<TRPermLimit> cached = limiterPermCache.get(player.getName());
-			if (cached == null) cached = new ArrayList<TRPermLimit>();
-			boolean found = false;
-			for (TRPermLimit lim : cached){
-				if (lim.compare(thisid, thisdata)){
-					if (lim.max == -2) return -1;
-					if (lim.max != -1) return lim.max;
-					
-					found = true;
+			if (cached != null){
+				boolean found = false;
+				for (TRPermLimit lim : cached){
+					if (lim.compare(thisid, thisdata)){
+						if (lim.max == -2) return -1;
+						if (lim.max != -1) return lim.max;
+						
+						found = true;
+					}
 				}
+				if (found) return -1;
 			}
-			if (found) return -1;
 			
 			TRPermLimit pl = TRPermHandler.getPermLimitFromPerm(player, "tekkitrestrict.limiter", thisid, thisdata);
 			if (pl != null) {
+				if (cached == null) cached = new ArrayList<TRPermLimit>();
 				cached.add(pl);
 				limiterPermCache.put(player.getName(), cached);
 				if (pl.max == -2) return -1;
@@ -157,7 +159,7 @@ public class TRLimiter {
 				}
 			}
 		} catch (Exception ex){
-			Warning.other("An error occurred in TRLimiter in getMax: "+ ex.getMessage());
+			Warning.other("An error occurred while trying to get the maxlimit of a player ('+TRLimiter.getMax(...):int')!", false);
 			Log.Exception(ex, false);
 		}
 		return max;
@@ -325,7 +327,7 @@ public class TRLimiter {
 		try {
 			dbin = tekkitrestrict.db.query("SELECT * FROM `tr_limiter` WHERE `player` = '" + playerName + "';");
 			if (dbin == null){
-				Warning.other("Unknown error occured when trying to get limits from database!");
+				Warning.other("Unknown error occured when trying to get limits from database!", false);
 				return r;
 			}
 			if (dbin.next()) {
@@ -390,7 +392,7 @@ public class TRLimiter {
 		try {
 			dbin = tekkitrestrict.db.query("SELECT * FROM `tr_limiter` WHERE `player` = '" + playerName + "';");
 			if (dbin == null){
-				Warning.other("Unknown error occured when trying to get limits from database!");
+				Warning.other("Unknown error occured when trying to get limits from database!", false);
 				return r;
 			}
 			if (dbin.next()) {
@@ -450,7 +452,7 @@ public class TRLimiter {
 						l.id = Integer.parseInt(mat[0]);
 						l.data = Byte.parseByte(mat[1]);
 					} catch (NumberFormatException ex){
-						Warning.config("Invalid limiter value in database: \""+item+"\"!");
+						Warning.config("Invalid limiter value in database: \""+item+"\"!", false);
 						l.id = 0;
 						l.data = 0;
 					}
@@ -459,7 +461,7 @@ public class TRLimiter {
 						l.id = Integer.parseInt(item);
 						l.data = 0;
 					} catch (NumberFormatException ex){
-						Warning.config("Invalid limiter value in database: \""+item+"\"!");
+						Warning.config("Invalid limiter value in database: \""+item+"\"!", false);
 						l.id = 0;
 						l.data = 0;
 					}
@@ -537,7 +539,7 @@ public class TRLimiter {
 	@Safe(allownull = false)
 	private static void saveLimiter(@NonNull TRLimiter lb) {
 		if (lb.player == null){
-			Warning.other("An error occurred while saving the limits! Error: Null player name!");
+			Warning.other("An error occurred while saving the limits! Error: Null player name!", false);
 			return;
 		}
 		String player = lb.player.toLowerCase();
@@ -592,7 +594,7 @@ public class TRLimiter {
 			if (blockdata == null) blockdata = "";
 		} catch (Exception ex) {
 			if (!logged){
-				Warning.other("An error occurred while saving the limits! Error: Cannot create string to save to database!");
+				Warning.other("An error occurred while saving the limits! Error: Cannot create string to save to database!", false);
 				logged = true;
 			}
 		}
@@ -607,7 +609,7 @@ public class TRLimiter {
 			
 		} catch (SQLException ex) {
 			if (!logged2){
-				Warning.other("An error occurred while saving the limits! Error: Cannot insert into database!");
+				Warning.other("An error occurred while saving the limits! Error: Cannot insert into database!", false);
 				logged2 = true;
 			}
 		}
@@ -626,7 +628,7 @@ public class TRLimiter {
 				}
 			}
 		} catch (Exception ex){
-			Warning.other("Error while loading a limiter: malformed limiter location in the database!");
+			Warning.other("Error while loading a limiter: malformed limiter location in the database!", false);
 		}
 
 		return l;
@@ -638,7 +640,7 @@ public class TRLimiter {
 		try {
 			dbin = tekkitrestrict.db.query("SELECT * FROM `tr_limiter`;");
 			if (dbin == null){
-				Warning.other("Unable to load the limits from the database!");
+				Warning.other("Unable to load the limits from the database!", true);
 				return;
 			}
 			while (dbin.next()) {

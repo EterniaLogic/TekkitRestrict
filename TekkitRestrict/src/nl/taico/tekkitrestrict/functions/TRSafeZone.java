@@ -92,7 +92,7 @@ public class TRSafeZone {
 		try {
 			rs = tekkitrestrict.db.query("SELECT * FROM `tr_saferegion`;");
 			if (rs == null){
-				Warning.other("Unable to get SafeZones from database!");
+				Warning.other("Unable to get SafeZones from database!", true);
 				return;
 			}
 			

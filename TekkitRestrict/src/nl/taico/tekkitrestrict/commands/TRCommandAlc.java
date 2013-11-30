@@ -105,7 +105,7 @@ public class TRCommandAlc implements CommandExecutor {
 			World world = ((CraftWorld) player.getWorld()).getHandle();
 			AlchemyBagData alcdata = openGui(looker, holder, mod_EE.getInstance(), 56, world, color, (int) looker.locY, (int) looker.locZ);
 			if (alcdata == null){
-				Warning.other("An error occurred. " + OName + "'s bag will not save properly if he is offline.");
+				Warning.other("An error occurred. " + OName + "'s bag will not save properly if he is offline.", false);
 				sender.sendMessage(ChatColor.RED + "An error occured: Unable to find the specified bag!");
 				return true;
 			}
@@ -120,7 +120,7 @@ public class TRCommandAlc implements CommandExecutor {
 			
 		} catch (Exception ex) {
 			sender.sendMessage(ChatColor.RED + "An error has occurred processing your command.");
-			Warning.other("Exception in OpenAlc : " + ex.getMessage());
+			Warning.other("Exception in OpenAlc 'TRCommandAlc.onCommand(...)'! Error: " + ex.toString(), false);
 		}
 
 			return true;
@@ -270,7 +270,7 @@ public class TRCommandAlc implements CommandExecutor {
 		try {
 			test = (AlchemyBagData) container.getInventory();
 		} catch (Exception ex){
-			Warning.other("Cannot Cast: ");
+			Warning.other("An error occured in OpenAlc ('+TRCommandAlc.openGui(...):AlchemyBagData')!", false);
 			Log.Exception(ex, false);
 			test = null;
 		}
@@ -353,7 +353,7 @@ public class TRCommandAlc implements CommandExecutor {
 			sender.sendMessage(ChatColor.RED + "Player " + name + " can not be found!");
 		} catch (Exception ex) {
 			sender.sendMessage("Error while retrieving offline player data!");
-			Warning.other("Exception in TRCommandAlc.Playerz: ");
+			Warning.other("An error occured in OpenAlc ('-TRCommandAlc.Playerz(...):Player')!", false);
 			Log.Exception(ex, false);
 			return null;
 		}

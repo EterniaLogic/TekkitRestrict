@@ -59,14 +59,14 @@ public class TRItemProcessor {
 						try {
 							groups.put(mod2, processMultiString(gg[1]));
 						} catch (TRException ex) {
-							Warning.config(ex.getMessage());
+							Warning.config(ex.toString(), false);
 						}
 					}
 				} else {
 					try {
 						groups.put(mod, processMultiString(gg[1]));
 					} catch (TRException ex) {
-						Warning.config(ex.getMessage());
+						Warning.config(ex.toString(), false);
 					}
 				}
 			}
@@ -85,13 +85,13 @@ public class TRItemProcessor {
 					if (value == null || value.equals("")) continue;
 					
 					if (value.contains(" ")) {
-						Log.Warning.config("Invalid value in PermissionGroups: Invalid value \""+value+"\"!");
+						Log.Warning.config("Invalid value in PermissionGroups: Invalid value \""+value+"\"!", false);
 						continue;
 					}
 					groups.put(groupName, processMultiString(value));
 
 				} catch (Exception ex) {
-					Warning.other("Error in PermissionGroups: " + ex.getMessage());
+					Warning.other("Error in PermissionGroups: " + ex.toString(), false);
 					Log.Exception(ex, false);
 				}
 			}
@@ -111,8 +111,8 @@ public class TRItemProcessor {
 						data2 = Integer.parseInt(dataString.replace("=", "-"));
 						if (data2 == 0) data2 = -10;
 					} catch (NumberFormatException ex){
-						Warning.other("You have set an invalid limiter permission \""+perm+"\":");
-						Warning.other("Invalid data value: \"" + dataString.replace("=", "-") + "\"!");
+						Warning.other("You have set an invalid limiter permission \""+perm+"\":", false);
+						Warning.other("Invalid data value: \"" + dataString.replace("=", "-") + "\"!", false);
 						return false;
 					}
 				}
@@ -130,8 +130,8 @@ public class TRItemProcessor {
 				fromId = Integer.parseInt(t[0]);
 				toId = Integer.parseInt(t[1]);
 			} catch (NumberFormatException ex){
-				Warning.other("You have set an invalid limiter permission \""+perm+"\":");
-				Warning.other("Invalid range: \"" + t[0]+"-"+t[1] + "\"");
+				Warning.other("You have set an invalid limiter permission \""+perm+"\":", false);
+				Warning.other("Invalid range: \"" + t[0]+"-"+t[1] + "\"", false);
 				return false;
 			}
 			
@@ -149,8 +149,8 @@ public class TRItemProcessor {
 				
 				if (data2 == 0) data2 = -10;
 			} catch (NumberFormatException ex){
-				Warning.other("You have set an invalid limiter permission \""+perm+"\":");
-				Warning.other("Invalid data value in \""+itemx+"\"!");
+				Warning.other("You have set an invalid limiter permission \""+perm+"\":", false);
+				Warning.other("Invalid data value in \""+itemx+"\"!", false);
 				return false;
 			}
 			
@@ -160,8 +160,8 @@ public class TRItemProcessor {
 				try {
 					id2 = Integer.parseInt(t[0]);
 				} catch (NumberFormatException ex){
-					Warning.other("You have set an invalid limiter permission \""+perm+"\":");
-					Warning.other("Invalid entry: \"" + itemx + "\"!");
+					Warning.other("You have set an invalid limiter permission \""+perm+"\":", false);
+					Warning.other("Invalid entry: \"" + itemx + "\"!", false);
 					return false;
 				}
 				
@@ -190,8 +190,8 @@ public class TRItemProcessor {
 				
 				if (found) return false;
 				
-				Warning.other("You have set an invalid limiter permission \""+perm+"\":");
-				Warning.other("\""+t[0]+"\" is not a valid modgroup, permissiongroup, EE or IC2 itemname!");
+				Warning.other("You have set an invalid limiter permission \""+perm+"\":", false);
+				Warning.other("\""+t[0]+"\" is not a valid modgroup, permissiongroup, EE or IC2 itemname!", false);
 				return false;
 			}
 		}
@@ -226,8 +226,8 @@ public class TRItemProcessor {
 				
 				if (found) return false;
 				
-				Warning.other("You have set an invalid limiter permission \""+perm+"\":");
-				Warning.other("\""+itemx+"\" is not a valid ID, modgroup, permissiongroup, EE itemname or IC2 itemname!");
+				Warning.other("You have set an invalid limiter permission \""+perm+"\":", false);
+				Warning.other("\""+itemx+"\" is not a valid ID, modgroup, permissiongroup, EE itemname or IC2 itemname!", false);
 				return false;
 			}
 		}

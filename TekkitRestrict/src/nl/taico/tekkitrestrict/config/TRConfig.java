@@ -69,7 +69,7 @@ public abstract class TRConfig {
 			}
 			output.close();
 		} catch (IOException e) {
-			Warning.load("Unable to write changes to "+name+".config.yml!");
+			Warning.load("Unable to write changes to "+name+".config.yml!", false);
 			try {if (output != null) output.close();} catch (IOException e1) {}
 			return;
 		}
