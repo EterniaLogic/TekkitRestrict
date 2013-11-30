@@ -162,15 +162,15 @@ public class TRNoDupe {
 	@NonNull private static String convert(@NonNull String str, @NonNull String type, @NonNull Player player, int id, int data){
 		str = Log.replaceColors(str);
 		str = str.replaceAll("(?i)\\{PLAYER\\}", player.getName());
-		str = str.replace("(?i)\\{TYPE\\}", type);
+		str = str.replaceAll("(?i)\\{TYPE\\}", type);
 		if (id == 0){
-			str = str.replace("(?i)\\{ID\\}","");
-			str = str.replace("(?i)\\{DATA\\}", "");
-			str = str.replace("(?i)\\{ITEM\\}", "");
+			str = str.replaceAll("(?i)\\{ID\\}","");
+			str = str.replaceAll("(?i)\\{DATA\\}", "");
+			str = str.replaceAll("(?i)\\{ITEM\\}", "");
 		} else {
-			str = str.replace("(?i)\\{ID\\}", ""+id);
-			str = str.replace("(?i)\\{DATA\\}", ""+data);
-			str = str.replace("(?i)\\{ITEM\\}", ""+id+":"+data);
+			str = str.replaceAll("(?i)\\{ID\\}", ""+id);
+			str = str.replaceAll("(?i)\\{DATA\\}", ""+data);
+			str = str.replaceAll("(?i)\\{ITEM\\}", ""+id+":"+data);
 		}
 		str = str.replace("  ", " ");
 		return str;
