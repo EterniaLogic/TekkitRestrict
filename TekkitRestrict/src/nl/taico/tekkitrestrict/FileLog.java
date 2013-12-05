@@ -206,68 +206,66 @@ public class FileLog {
 	}
 	
 	@NonNull private String replacecolors(@NonNull String input){
-		String output = input;
-		output = output.replace("\033[30;22m", "§0");
-		output = output.replace("\033[34;22m", "§1");
-		output = output.replace("\033[32;22m", "§2");
-		output = output.replace("\033[36;22m", "§3");
-		output = output.replace("\033[31;22m", "§4");
-		output = output.replace("\033[35;22m", "§5");
-		output = output.replace("\033[33;22m", "§6");
-		output = output.replace("\033[37;22m", "§7");
-		output = output.replace("\033[30;1m", "§8");
-		output = output.replace("\033[34;1m", "§9");
-		output = output.replace("\033[32;1m", "§a");
-		output = output.replace("\033[36;1m", "§b");
-		output = output.replace("\033[31;1m", "§c");
-		output = output.replace("\033[35;1m", "§d");
-		output = output.replace("\033[33;1m", "§e");
-		output = output.replace("\033[37;1m", "§f");
-
-		/*output = output.replace("\033[0;30;22m", "§0");
-		output = output.replace("\033[0;34;22m", "§1");
-		output = output.replace("\033[0;32;22m", "§2");
-		output = output.replace("\033[0;36;22m", "§3");
-		output = output.replace("\033[0;31;22m", "§4");
-		output = output.replace("\033[0;35;22m", "§5");
-		output = output.replace("\033[0;33;22m", "§6");
-		output = output.replace("\033[0;37;22m", "§7");
-		output = output.replace("\033[0;30;1m", "§8");
-		output = output.replace("\033[0;34;1m", "§9");
-		output = output.replace("\033[0;32;1m", "§a");
-		output = output.replace("\033[0;36;1m", "§b");
-		output = output.replace("\033[0;31;1m", "§c");
-		output = output.replace("\033[0;35;1m", "§d");
-		output = output.replace("\033[0;33;1m", "§e");
-		output = output.replace("\033[0;37;1m", "§f");
-
-		output = output.replace("\033[30m", "§0");
-		output = output.replace("\033[32m", "§2");
-		output = output.replace("\033[36m", "§3");
-		output = output.replace("\033[31m", "§4");
-		output = output.replace("\033[35m", "§5");
-		output = output.replace("\033[33m", "§6");
-		output = output.replace("\033[37m", "§7");
-		output = output.replace("\033[30m", "§8");
-		output = output.replace("\033[34m", "§9");
-		output = output.replace("\033[32m", "§a");
-		output = output.replace("\033[36m", "§b");
-		output = output.replace("\033[31m", "§c");
-		output = output.replace("\033[35m", "§d");
-		output = output.replace("\033[33m", "§e");
-		output = output.replace("\033[37m", "§f");*/
-
-		output = output.replace("\033[5m", "§k");
-		output = output.replace("\033[21m", "§l");
-		output = output.replace("\033[9m", "§m");
-		output = output.replace("\033[4m", "§n");
-		output = output.replace("\033[3m", "§o");
-		output = output.replace("\033[0;39m", "§r");
-
-		output = output.replace("\033[0m", "§r");
-
-		output = output.replace("\033[m", "");
-		return output;
+		return input.replace("\033[30;22m", "§0")
+					.replace("\033[34;22m", "§1")
+					.replace("\033[32;22m", "§2")
+					.replace("\033[36;22m", "§3")
+					.replace("\033[31;22m", "§4")
+					.replace("\033[35;22m", "§5")
+					.replace("\033[33;22m", "§6")
+					.replace("\033[37;22m", "§7")
+					.replace("\033[30;1m", "§8")
+					.replace("\033[34;1m", "§9")
+					.replace("\033[32;1m", "§a")
+					.replace("\033[36;1m", "§b")
+					.replace("\033[31;1m", "§c")
+					.replace("\033[35;1m", "§d")
+					.replace("\033[33;1m", "§e")
+					.replace("\033[37;1m", "§f")
+			
+					/*.replace("\033[0;30;22m", "§0");
+					.replace("\033[0;34;22m", "§1");
+					.replace("\033[0;32;22m", "§2");
+					.replace("\033[0;36;22m", "§3");
+					.replace("\033[0;31;22m", "§4");
+					.replace("\033[0;35;22m", "§5");
+					.replace("\033[0;33;22m", "§6");
+					.replace("\033[0;37;22m", "§7");
+					.replace("\033[0;30;1m", "§8");
+					.replace("\033[0;34;1m", "§9");
+					.replace("\033[0;32;1m", "§a");
+					.replace("\033[0;36;1m", "§b");
+					.replace("\033[0;31;1m", "§c");
+					.replace("\033[0;35;1m", "§d");
+					.replace("\033[0;33;1m", "§e");
+					.replace("\033[0;37;1m", "§f");
+			
+					.replace("\033[30m", "§0");
+					.replace("\033[32m", "§2");
+					.replace("\033[36m", "§3");
+					.replace("\033[31m", "§4");
+					.replace("\033[35m", "§5");
+					.replace("\033[33m", "§6");
+					.replace("\033[37m", "§7");
+					.replace("\033[30m", "§8");
+					.replace("\033[34m", "§9");
+					.replace("\033[32m", "§a");
+					.replace("\033[36m", "§b");
+					.replace("\033[31m", "§c");
+					.replace("\033[35m", "§d");
+					.replace("\033[33m", "§e");
+					.replace("\033[37m", "§f");*/
+			
+					.replace("\033[5m", "§k")
+					.replace("\033[21m", "§l")
+					.replace("\033[9m", "§m")
+					.replace("\033[4m", "§n")
+					.replace("\033[3m", "§o")
+					.replace("\033[0;39m", "§r")
+			
+					.replace("\033[0m", "§r")
+			
+					.replace("\033[m", "");
 	}
 
 	@NonNull private String replaceshort(@NonNull String input){
@@ -292,12 +290,12 @@ public class FileLog {
 			name = type + "-" + data + ".log";
 		}
 		
-		name = name.replace("{DAY}", date[0]);
-		name = name.replace("{MONTH}", date[1]);
-		name = name.replace("{YEAR}", date[2]);
-		name = name.replace("{TYPE}", type);
-		name = name.replace("\\", "").replace("/", "");
-		return name;
+		return name.replace("{DAY}", date[0])
+					.replace("{MONTH}", date[1])
+					.replace("{YEAR}", date[2])
+					.replace("{TYPE}", type)
+					.replace("\\", "")
+					.replace("/", "");
 	}
 
 	@NonNull private String formatMsg(@Nullable String msg){
@@ -315,10 +313,10 @@ public class FileLog {
 			format = new StringBuilder("[").append(times).append("] ").append(msg).toString();
 		} else {
 			String time[] = times.split(":");
-			format = format.replace("{HOUR}", time[0]);
-			format = format.replace("{MINUTE}", time[1]);
-			format = format.replace("{SECOND}", time[2]);
-			format = format.replace("{INFO}", msg);
+			format = format.replace("{HOUR}", time[0])
+							.replace("{MINUTE}", time[1])
+							.replace("{SECOND}", time[2])
+							.replace("{INFO}", msg);
 		}
 		return format;
 	}

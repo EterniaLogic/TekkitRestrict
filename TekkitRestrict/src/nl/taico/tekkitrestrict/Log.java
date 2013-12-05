@@ -104,30 +104,28 @@ public class Log {
 	
 	@NonNull public static String replaceColors(@Nullable String str){
 		if (str == null) return "null";
-		String tbr = str;
-		tbr = tbr.replace("&0", ChatColor.BLACK + "");
-		tbr = tbr.replace("&1", ChatColor.DARK_BLUE + "");
-		tbr = tbr.replace("&2", ChatColor.DARK_GREEN + "");
-		tbr = tbr.replace("&3", ChatColor.DARK_AQUA + "");
-		tbr = tbr.replace("&4", ChatColor.DARK_RED + "");
-		tbr = tbr.replace("&5", ChatColor.DARK_PURPLE + "");
-		tbr = tbr.replace("&6", ChatColor.GOLD + "");
-		tbr = tbr.replace("&7", ChatColor.GRAY + "");
-		tbr = tbr.replace("&8", ChatColor.DARK_GRAY + "");
-		tbr = tbr.replace("&9", ChatColor.BLUE + "");
-		tbr = tbr.replace("&a", ChatColor.GREEN + "");
-		tbr = tbr.replace("&b", ChatColor.AQUA + "");
-		tbr = tbr.replace("&c", ChatColor.RED + "");
-		tbr = tbr.replace("&d", ChatColor.LIGHT_PURPLE + "");
-		tbr = tbr.replace("&e", ChatColor.YELLOW + "");
-		tbr = tbr.replace("&f", ChatColor.WHITE + "");
-		tbr = tbr.replace("&k", ChatColor.MAGIC + "");
-		tbr = tbr.replace("&l", ChatColor.BOLD + "");
-		tbr = tbr.replace("&m", ChatColor.STRIKETHROUGH + "");
-		tbr = tbr.replace("&n", ChatColor.UNDERLINE + "");
-		tbr = tbr.replace("&o", ChatColor.ITALIC + "");
-		tbr = tbr.replace("&r", ChatColor.RESET + "");
-		return tbr;
+		return str.replace("&0", ChatColor.BLACK + "")
+					.replace("&1", ChatColor.DARK_BLUE + "")
+					.replace("&2", ChatColor.DARK_GREEN + "")
+					.replace("&3", ChatColor.DARK_AQUA + "")
+					.replace("&4", ChatColor.DARK_RED + "")
+					.replace("&5", ChatColor.DARK_PURPLE + "")
+					.replace("&6", ChatColor.GOLD + "")
+					.replace("&7", ChatColor.GRAY + "")
+					.replace("&8", ChatColor.DARK_GRAY + "")
+					.replace("&9", ChatColor.BLUE + "")
+					.replace("&a", ChatColor.GREEN + "")
+					.replace("&b", ChatColor.AQUA + "")
+					.replace("&c", ChatColor.RED + "")
+					.replace("&d", ChatColor.LIGHT_PURPLE + "")
+					.replace("&e", ChatColor.YELLOW + "")
+					.replace("&f", ChatColor.WHITE + "")
+					.replace("&k", ChatColor.MAGIC + "")
+					.replace("&l", ChatColor.BOLD + "")
+					.replace("&m", ChatColor.STRIKETHROUGH + "")
+					.replace("&n", ChatColor.UNDERLINE + "")
+					.replace("&o", ChatColor.ITALIC + "")
+					.replace("&r", ChatColor.RESET + "");
 	}
 
 	public static class Warning {
