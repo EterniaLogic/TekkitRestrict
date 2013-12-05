@@ -57,7 +57,7 @@ public class tekkitrestrict extends JavaPlugin {
 	
 	/** Indicates if tekkitrestrict is disabling. Threads use this to check if they should stop. */
 	public static boolean disable = false;
-	
+	////
 	public static TRVersion version;
 	public static double dbversion = 1.2;
 	public static int dbworking = 0;
