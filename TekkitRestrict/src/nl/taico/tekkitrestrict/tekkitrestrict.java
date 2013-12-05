@@ -64,7 +64,6 @@ public class tekkitrestrict extends JavaPlugin {
 	
 	public static DBType dbtype = DBType.Unknown;
 	public static Database db;
-	//public static Updater_Old updater = null;
 	public static Updater updater2 = null;
 	
 	public static ExecutorService basfo = Executors.newCachedThreadPool();
