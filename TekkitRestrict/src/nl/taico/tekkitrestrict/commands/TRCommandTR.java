@@ -223,7 +223,7 @@ public class TRCommandTR implements CommandExecutor {
 	}
 	private void about(){
 		send.msg("[TekkitRestrict About]");
-		send.msg("Original author and creator: DreadSlicer/EterniaLogic");
+		send.msg("Former author and creator: DreadSlicer/EterniaLogic");
 		send.msg("Current author: Taeir");
 		if (!send.sender.hasPermission("tekkitrestrict.admin")) return;
 		send.msg("");

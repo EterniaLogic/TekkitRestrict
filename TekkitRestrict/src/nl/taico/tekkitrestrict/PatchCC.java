@@ -14,6 +14,7 @@ import nl.taico.tekkitrestrict.lib.RandomString;
 
 public class PatchCC {
 	static final String s = File.separator;
+	static final char nul = '\000';
 	public static void start(){
 		File patched = new File("mods"+s+"ComputerCraft"+s+"lua"+s+"rom"+s+"patched2"+s);
 		if (patched.exists()) return;
@@ -52,7 +53,7 @@ public class PatchCC {
 			if (curline == null) continue;
 			if (curline.contains("os.reboot = nil") || curline.contains("os.reboot=nil")) rebootPatch = false;
 			else if (curline.contains("bypassAntiRedstoneCrashBug = rs.setOutput") || curline.contains("rs.setOutput = function(side, bool)")) rsCrashPatch = false;
-			else if (curline.contains("\000")) nulPatch = true;
+			else if (curline.contains(nul+"")) nulPatch = true;
 			
 			if (!rebootPatch && !rsCrashPatch && nulPatch) break;
 		}
