@@ -228,6 +228,9 @@ public class TRCommandTR implements CommandExecutor {
 		if (!send.sender.hasPermission("tekkitrestrict.admin")) return;
 		send.msg("");
 		send.msg("Version: " + tekkitrestrict.getFullVersion());
+		
+		double eepver = tekkitrestrict.getEEPatchVersion();
+		send.msg("EEPatch version: " + (eepver==-1d?"<1.4":eepver));
 		send.msg("Database version: " + tekkitrestrict.dbversion);
 
 		switch (tekkitrestrict.dbworking){

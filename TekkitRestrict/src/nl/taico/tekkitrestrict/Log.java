@@ -10,6 +10,8 @@ import org.bukkit.command.Command;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
+import nl.taico.tekkitrestrict.TRConfigCache.Global;
+
 public class Log {
 	/**
 	 * Creates 2 custom levels and assigns the loggers.
@@ -68,7 +70,9 @@ public class Log {
 	}
 	
 	public static void Debug(@NonNull String msg){
-		TRLogger.Log("debug", msg);
+		if (!Global.debug) return;
+		FileLog log = FileLog.getLogOrMake("Debug", true, false);
+		log.log(msg);
 	}
 	public static void Dupe(String message){
 		McLogger.log(Level.parse("TRDupe"), message);
@@ -82,8 +86,10 @@ public class Log {
 	}
 	/** For each stackTrace element, it will write it to the debug log. */
 	public static void debugEx(@NonNull Exception ex){
+		if (!Global.debug) return;
+		FileLog log = FileLog.getLogOrMake("Debug", true, false);
 		for (StackTraceElement element : ex.getStackTrace()) {
-			TRLogger.Log("debug", "     " + element.toString());
+			log.log("     " + element.toString());
 		}
 	}
 	/** For each stackTrace element, log to console and to debug log*/

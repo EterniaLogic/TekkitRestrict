@@ -544,7 +544,7 @@ class DisableItemThread extends Thread {
 			 * itemstack.setData(0);
 			 */
 		} catch (Exception ex) {
-			TRLogger.Log("debug", "Error: [Decharger[7] thread] " + ex.toString());
+			Log.Debug("Error: [Decharger[7] thread] " + ex.toString());
 			Log.debugEx(ex);
 		}
 		return false;
@@ -580,7 +580,7 @@ class DisableItemThread extends Thread {
 				return true;
 			}
 		} catch (Exception ex) {
-			TRLogger.Log("debug", "Error: [EECharge thread] " + ex.getMessage());
+			Log.Debug("Error: [EECharge thread] " + ex.getMessage());
 			Log.debugEx(ex);
 		}
 		return false;
@@ -604,7 +604,7 @@ class DisableItemThread extends Thread {
 				return true;
 			}
 		} catch (Exception ex) {
-			TRLogger.Log("debug", "SSDisableItem[9] Error! " + ex.getMessage());
+			Log.Debug("SSDisableItem[9] Error! " + ex.getMessage());
 			Log.debugEx(ex);
 		}
 		return false;
@@ -624,7 +624,7 @@ class DisableItemThread extends Thread {
 				return true;
 			}
 		} catch (Exception ex) {
-			TRLogger.Log("debug", "SSDisableArcane[2] Error! " + ex.getMessage());
+			Log.Debug("SSDisableArcane[2] Error! " + ex.getMessage());
 			Log.debugEx(ex);
 		}
 		return false;

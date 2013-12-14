@@ -4,6 +4,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
 
+import nl.taico.tekkitrestrict.TRConfigCache.Logger;
 import nl.taico.tekkitrestrict.TRListener;
 import nl.taico.tekkitrestrict.tekkitrestrict;
 import nl.taico.tekkitrestrict.TRConfigCache.Dupes;
@@ -26,6 +27,11 @@ public class Assigner {
 		
 		if (Listeners.UseNoItem)
 			CraftingListener.setupCraftHook();
+		
+		if (Logger.LogAmulets || Logger.LogDMTools || Logger.LogEEDestructive || Logger.LogEEMisc || Logger.LogRings || Logger.LogRMTools){
+			//if (!tekkitrestrict.EEPatch)
+				PM.registerEvents(new InteractListener(), plugin);
+		}
 		
 		if (Dupes.alcBags.prevent ||
 			Dupes.pedestals.prevent ||

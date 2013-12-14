@@ -25,8 +25,8 @@ private static boolean disabled = false;
 	private static FileLog chat, info, login, command, spawnitem, privatechat, banskicks;
 	
 	public TRLogFilter(){
-		chat = new FileLog("Chat");
-		info = new FileLog("Info");
+		chat = new FileLog("Chat", true);
+		info = new FileLog("Info", true);
 	}
 	
 	public static void disable(){
@@ -101,18 +101,18 @@ private static boolean disabled = false;
 		try {
 		//boolean LogSplitOccuredM = false, LogSplitOccuredP = false;
 		if (c(b, " disconnected: ") || c(b, "logged in with") || c(b, "joined with: [") || c(b, "sending serverside check to")){
-			if (login == null) login = FileLog.getLogOrMake("Login");
+			if (login == null) login = FileLog.getLogOrMake("Login", true);
 			login.log(a);
 		} else if (c(b, "player_command") || record.getLevel() == Level.parse("Command")) {
-			if (command == null) command = FileLog.getLogOrMake("Command");
+			if (command == null) command = FileLog.getLogOrMake("Command", true);
 			command.log(a);
 			
 			if (c(b, "/i ") || c(b, "/give ") || c(b, "/more ") || c(b, "/unlimited ")){
-				if (spawnitem == null) spawnitem = FileLog.getLogOrMake("SpawnItem");
+				if (spawnitem == null) spawnitem = FileLog.getLogOrMake("SpawnItem", true);
 				spawnitem.log(a);
 			} else if (c(b, "/msg ") || c(b, "/emsg ") || c(b, "/m ") || c(b, "/tell ") || c(b, "/etell ") || c(b, "/whisper ") || c(b, "/ewhisper ") ||
 					   c(b, "/r ") || c(b, "/er ") || c(b, "/reply ") || c(b, "/ereply ") || c(b, "/mail ") || c(b, "/email ")) {
-				if (privatechat == null) privatechat = FileLog.getLogOrMake("PrivateChat");
+				if (privatechat == null) privatechat = FileLog.getLogOrMake("PrivateChat", true);
 				privatechat.log(a);
 			} else if (c(b, "/kick ") || c(b, "/ekick ") || c(b, "/bmkick ") ||
 					   c(b, "/ban ") || c(b, "/eban ") || c(b, "/bmban ") ||
@@ -120,7 +120,7 @@ private static boolean disabled = false;
 					   c(b, "/banip ") || c(b, "/ebanip ") || c(b, "/bmbanip ") ||
 					   c(b, "/unban ") || c(b, "/eunban ") || c(b, "/bmunban ") || c(b, "/pardon ") || c(b, "/epardon ") ||
 					   c(b, "/unbanip ") || c(b, "/eunbanip ") || c(b, "/bmunbanip ") || c(b, "/pardonip ") || c(b, "/epardonip ")){
-				if (banskicks == null) banskicks = FileLog.getLogOrMake("BansKicks");
+				if (banskicks == null) banskicks = FileLog.getLogOrMake("BansKicks", true);
 				banskicks.log(a);
 			}
 		} else {
@@ -143,13 +143,13 @@ private static boolean disabled = false;
 				if (!containsPlayer(current, b)) continue;
 				
 				if (b.contains("[34;1mgiving")) {
-					if (spawnitem == null) spawnitem = FileLog.getLogOrMake("SpawnItem");
+					if (spawnitem == null) spawnitem = FileLog.getLogOrMake("SpawnItem", true);
 					spawnitem.log("[CONSOLE] " + a);
 					return;
 				} else if ((b.contains("giving " + current.getName().toLowerCase())
 						|| b.contains("giving " + current.getDisplayName().toLowerCase())
 						|| b.contains("giving " + current.getPlayerListName().toLowerCase())) && b.contains(" of ")) {
-					if (spawnitem == null) spawnitem = FileLog.getLogOrMake("SpawnItem");
+					if (spawnitem == null) spawnitem = FileLog.getLogOrMake("SpawnItem", true);
 					spawnitem.log("[NEI] " + a);
 					return;					
 				} else {

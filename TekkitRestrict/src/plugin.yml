@@ -2,7 +2,7 @@ name: tekkitrestrict
 main: nl.taico.tekkitrestrict.tekkitrestrict
 authors: [Taeir, DreadSlicer]
 prefix: TekkitRestrict
-version: 1.21 Dev 4
+version: 1.21 Dev 5
 description: TekkitRestrict gives server owners alot of features to prevent and block unwanted tekkit features.
 
 permissions:

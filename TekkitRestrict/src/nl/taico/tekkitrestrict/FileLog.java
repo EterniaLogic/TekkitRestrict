@@ -17,17 +17,19 @@ import org.eclipse.jdt.annotation.Nullable;
 import nl.taico.tekkitrestrict.Log.Warning;
 
 public class FileLog {
-	private BufferedWriter out;
-	private String type = "";
-	private int day = 0;
-	private int counter = 0;
-	private static HashMap<String, FileLog> Logs = new HashMap<String, FileLog>();
-	private boolean alternate;
-	private static final String sep = File.separator;
+	protected BufferedWriter out;
+	protected String type = "";
+	protected int day = 0;
+	protected int counter = 0;
+	protected static HashMap<String, FileLog> Logs = new HashMap<String, FileLog>();
+	protected boolean alternate;
+	protected boolean consoleLog;
+	protected static final String sep = File.separator;
 	
 	@SuppressWarnings("deprecation")
-	public FileLog(@NonNull String type, boolean alternate){
+	public FileLog(@NonNull String type, boolean alternate, boolean consoleLog){
 		this.alternate = alternate;
+		this.consoleLog = consoleLog;
 		this.type = type;
 		Date curdate = new Date(System.currentTimeMillis());
 		this.day = curdate.getDay();
@@ -63,9 +65,10 @@ public class FileLog {
 	}
 	
 	@SuppressWarnings("deprecation")
-	public FileLog(@NonNull String type){
+	public FileLog(@NonNull String type, boolean consoleLog){
 		this.alternate = false;
 		this.type = type;
+		this.consoleLog = consoleLog;
 		Date curdate = new Date(System.currentTimeMillis());
 		this.day = curdate.getDay();
 		
@@ -95,26 +98,30 @@ public class FileLog {
 		return Logs.get(type);
 	}
 	
-	@NonNull public static FileLog getLogOrMake(@Nullable String type){
+	@NonNull public static FileLog getLogOrMake(@Nullable String type, boolean consoleLog){
 		if (type == null) type = "null";
 		FileLog tbr = Logs.get(type);
-		if (tbr == null) return new FileLog(type);
+		if (tbr == null) return new FileLog(type, consoleLog);
 		return tbr;
 	}
 	
-	@NonNull public static FileLog getLogOrMake(@Nullable String type, boolean alternate){
+	@NonNull public static FileLog getLogOrMake(@Nullable String type, boolean alternate, boolean consoleLog){
 		if (type == null) type = "null";
 		FileLog tbr = Logs.get(type);
-		if (tbr == null) return new FileLog(type, alternate);
+		if (tbr == null) return new FileLog(type, alternate, consoleLog);
 		return tbr;
 	}
 	
 	public void log(@Nullable String msg){
 		try {
-			if (type.equals("Chat"))
-				out.write(replacecolors(formatMsg(msg)));
-			else
-				out.write(replaceshort(formatMsg(msg)));
+			if (consoleLog){
+				if (type.equals("Chat"))
+					out.write(replacecolors(formatMsg(msg)));
+				else
+					out.write(replaceshort(formatMsg(msg)));
+			} else {
+				out.write(Util.replaceColors(formatMsg(msg)));
+			}
 			out.newLine();
 		} catch (IOException ex) {}
 		
@@ -205,7 +212,7 @@ public class FileLog {
 		Logs.put(type, this);
 	}
 	
-	@NonNull private String replacecolors(@NonNull String input){
+	@NonNull protected String replacecolors(@NonNull String input){
 		return input.replace("\033[30;22m", "§0")
 					.replace("\033[34;22m", "§1")
 					.replace("\033[32;22m", "§2")
@@ -268,13 +275,13 @@ public class FileLog {
 					.replace("\033[m", "");
 	}
 
-	@NonNull private String replaceshort(@NonNull String input){
+	@NonNull protected String replaceshort(@NonNull String input){
 		return input.replace("\033[m", "");
 	}
 	
-	private boolean logged = false;
-	private boolean logged2 = false;
-	@NonNull private String formatName(@NonNull String type){
+	protected boolean logged = false;
+	protected boolean logged2 = false;
+	@NonNull protected String formatName(@NonNull String type){
 		Date curdate = new Date(System.currentTimeMillis());
 		DateFormat formatter = new SimpleDateFormat("dd-MM-yy");
 		String data = formatter.format(curdate);
@@ -298,7 +305,7 @@ public class FileLog {
 					.replace("/", "");
 	}
 
-	@NonNull private String formatMsg(@Nullable String msg){
+	@NonNull protected String formatMsg(@Nullable String msg){
 		if (msg == null) msg = "null";
 		DateFormat formatter = new SimpleDateFormat("kk:mm:ss");
 		String times = formatter.format(new Date(System.currentTimeMillis()));

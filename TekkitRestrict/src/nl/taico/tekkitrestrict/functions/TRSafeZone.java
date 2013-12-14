@@ -29,6 +29,7 @@ import nl.taico.tekkitrestrict.objects.TREnums.SSMode;
 import nl.taico.tekkitrestrict.objects.TREnums.SafeZone;
 
 import me.ryanhamshire.GriefPrevention.Claim;
+import me.ryanhamshire.GriefPrevention.DataStore;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import net.sacredlabyrinth.Phaed.PreciousStones.FieldFlag;
 import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
@@ -657,10 +658,11 @@ public class TRSafeZone {
 		@NonNull public static SafeZone getSafeZoneStatusFor(@NonNull Player player){
 			if (!SafeZones.UseSafeZones || griefPrevention == null) return SafeZone.pluginDisabled;
 			
-			GriefPrevention gpPlugin = (GriefPrevention) griefPrevention;
+			DataStore ds = ((GriefPrevention) griefPrevention).dataStore;
+			if (ds == null) return SafeZone.pluginDisabled;
 			Location loc = player.getLocation();
 			
-			Claim claim = gpPlugin.dataStore.getClaimAt(loc, false, null);
+			Claim claim = ds.getClaimAt(loc, false, null);
 			if (claim == null) return SafeZone.isNone;
 			lastGP = (claim.ownerName == "" ? "Admin" : claim.ownerName);
 			
@@ -777,8 +779,9 @@ public class TRSafeZone {
 			
 			Location loc = player.getLocation();
 			
-			GriefPrevention pl = (GriefPrevention) griefPrevention;
-			Claim claim = pl.dataStore.getClaimAt(loc, false, null);
+			DataStore ds = ((GriefPrevention) griefPrevention).dataStore;
+			if (ds == null) return false;
+			Claim claim = ds.getClaimAt(loc, false, null);
 			if (claim == null) return false; //If no claim here, return false. (allowed)
 			
 			String name = player.getName().toLowerCase();

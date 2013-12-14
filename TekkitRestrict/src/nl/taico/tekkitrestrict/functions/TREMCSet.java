@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.bukkit.Bukkit;
+
 import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.tekkitrestrict;
 import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
@@ -36,8 +38,19 @@ public class TREMCSet {
 		ee.EEMaps.alchemicalValues.put(id, old);
 	}
 
+	private static boolean delayed = false;
 	private static void loadConfigEMC() {
-		if (!tekkitrestrict.EEEnabled) return;
+		if (!tekkitrestrict.EEEnabled){
+			if (!delayed){
+				Bukkit.getScheduler().scheduleAsyncDelayedTask(tekkitrestrict.getInstance(), new Runnable(){
+					public void run(){
+						delayed = true;
+						loadConfigEMC();
+					}
+				}, 1);
+			}
+			return;
+		}
 		
 		List<String> configEMC = tekkitrestrict.config.getStringList(ConfigFile.ModModifications, "SetEMC");
 		
@@ -85,7 +98,7 @@ public class TREMCSet {
 				setEMC(id, currentdata, EMC);
 			}
 		}
-		
+		delayed = false;
 		/*for (int i = 0; i < configEMC.size(); i++) {
 			String ic = configEMC.get(i);
 			if (ic.contains(" ")) {

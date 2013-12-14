@@ -418,9 +418,18 @@ public class tekkitrestrict extends JavaPlugin {
 			Class.forName("ee.events.EEEvent");
 			EEPatch = true;
 			return true;
-		} catch (ClassNotFoundException e) {
+		} catch (ClassNotFoundException ex) {
 			EEPatch = false;
 			return false;
+		}
+	}
+	
+	public static double getEEPatchVersion(){
+		try {
+			Class.forName("ee.EEPatch");
+			return ee.EEPatch.version;
+		} catch (ClassNotFoundException ex){
+			return -1d;
 		}
 	}
 	
