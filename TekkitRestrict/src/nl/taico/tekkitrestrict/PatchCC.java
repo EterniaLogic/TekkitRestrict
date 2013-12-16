@@ -10,11 +10,12 @@ import java.io.IOException;
 import java.util.LinkedList;
 
 import nl.taico.tekkitrestrict.Log.Warning;
+import nl.taico.tekkitrestrict.lib.BrokenRandomString;
 import nl.taico.tekkitrestrict.lib.RandomString;
 
 public class PatchCC {
 	static final String s = File.separator;
-	static final char nul = '\000';
+	static Character nul = '\000';
 	public static void start(){
 		File patched = new File("mods"+s+"ComputerCraft"+s+"lua"+s+"rom"+s+"patched2"+s);
 		if (patched.exists()) return;
@@ -48,14 +49,13 @@ public class PatchCC {
 			} catch (IOException e1) {}
 			return;
 		}
-		boolean rebootPatch = true, rsCrashPatch = true, nulPatch = false;
+		boolean rebootPatch = true, rsCrashPatch = true, nulPatch = true;
 		for (String curline : lines){
 			if (curline == null) continue;
 			if (curline.contains("os.reboot = nil") || curline.contains("os.reboot=nil")) rebootPatch = false;
 			else if (curline.contains("bypassAntiRedstoneCrashBug = rs.setOutput") || curline.contains("rs.setOutput = function(side, bool)")) rsCrashPatch = false;
-			else if (curline.contains(nul+"")) nulPatch = true;
 			
-			if (!rebootPatch && !rsCrashPatch && nulPatch) break;
+			if (!rebootPatch && !rsCrashPatch) break;
 		}
 		
 		if (!rebootPatch && !rsCrashPatch && !nulPatch){
@@ -92,9 +92,11 @@ public class PatchCC {
 		
 		if (nulPatch){
 			tekkitrestrict.log.info("[CCPatch] Your Computers startupfile is corrupt! Repairing...");
-			char c = RandomString.randomChar();
-			for (String line : lines){
-				line.replace('\000', c);
+			char d = RandomString.randomChar();
+			for (char c : BrokenRandomString.symbols){
+				for (String line : lines){
+					line.replace(c, d);
+				}
 			}
 			tekkitrestrict.log.info("[CCPatch] Repair complete!");
 		}

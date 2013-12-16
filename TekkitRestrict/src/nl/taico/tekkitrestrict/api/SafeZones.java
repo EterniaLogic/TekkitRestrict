@@ -61,7 +61,7 @@ public class SafeZones {
 	 * @return The reason why the creation succeeded or failed.
 	 */
 	public static SafeZoneCreate createSafeZone(Player player, String pluginName, String zoneName){
-		return TRSafeZone.addSafeZone(player, pluginName, zoneName);
+		return TRSafeZone.addSafeZone(player, pluginName, zoneName, null);
 	}
 	
 	/**

@@ -212,7 +212,7 @@ public class TRConfigCache {
 		//public static boolean SSDisableFly;
 		public static boolean UseSafeZones;
 		//public static List<String> SSPlugins;
-		public static boolean UseGP, UseTowny, UsePS, UseFactions, UseWG;
+		public static boolean UseGP, UseTowny, UsePS, UseFactions, UseWG, useNative;
 		public static SSMode GPMode = SSMode.Admin;
 		public static SSMode WGMode = SSMode.Specific;
 	}

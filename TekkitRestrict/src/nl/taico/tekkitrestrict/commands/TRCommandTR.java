@@ -82,7 +82,7 @@ public class TRCommandTR implements CommandExecutor {
 		}
 		
 		if (largs[0].equals("admin")) {
-			adminMain(largs);
+			adminMain(args, largs);
 			return true;
 		}
 		
@@ -399,7 +399,7 @@ public class TRCommandTR implements CommandExecutor {
 		}
 	}
 	
-	private void adminMain(String largs[]){
+	private void adminMain(String[] args, String largs[]){
 		if (send.noPerm("admin")) return;
 
 		if (largs.length == 1) {
@@ -443,7 +443,7 @@ public class TRCommandTR implements CommandExecutor {
 		
 		if (largs[1].equals("safezone")) {
 			try {
-				ssMain(largs);
+				ssMain(args, largs);
 			} catch (Exception ex) {
 				send.msg(ChatColor.RED + "An error has occurred processing your command!");
 				Warning.other("Error occurred in /tr admin safezone! Please inform the author.", false);
@@ -617,7 +617,7 @@ public class TRCommandTR implements CommandExecutor {
 		}
 	}
 	
-	private void ssMain(String[] largs){
+	private void ssMain(String[] args, String[] largs){
 		if (send.noPerm("admin.safezone")) return;
 		
 		if (largs.length == 2 || largs[2].equals("help")){
@@ -647,6 +647,11 @@ public class TRCommandTR implements CommandExecutor {
 		
 		if (largs[2].equals("addgp")){
 			ssAddGP(largs);
+			return;
+		}
+		
+		if (largs[2].equals("addnative")){
+			ssAddNative(args, largs);
 			return;
 		}
 		
@@ -867,7 +872,7 @@ public class TRCommandTR implements CommandExecutor {
 			return;
 		}
 		
-		SafeZoneCreate response = TRSafeZone.addSafeZone(player, "griefprevention", name);
+		SafeZoneCreate response = TRSafeZone.addSafeZone(player, "griefprevention", name, null);
 		if (response == SafeZoneCreate.AlreadyExists)
 			send.msg(ChatColor.RED + "This region is already a safezone!");
 		else if (response == SafeZoneCreate.RegionNotFound)
@@ -881,6 +886,52 @@ public class TRCommandTR implements CommandExecutor {
 		else 
 			send.msg(ChatColor.RED + "An undefined error occurred!");
 
+	}
+	private void ssAddNative(String[] args, String[] largs){
+		if (send.noConsole()) return;
+		
+		if (send.noPerm("admin.safezone.addnative")) return;
+		
+		if (largs.length != 8){
+			send.msg(ChatColor.RED + "Incorrect syntaxis!");
+			send.msg(ChatColor.RED + "Correct usage: /tr admin safezone addnative <x> <z> <x> <z> <name>");
+			return;
+		}
+		
+		String name = largs[7];
+
+		for (TRSafeZone current : TRSafeZone.zones){
+			if (current.name.toLowerCase().equals(name)){
+				send.msg(ChatColor.RED + "There is already a safezone by this name!");
+				return;
+			}
+		}
+		
+		int x1, x2, z1, z2;
+		try {
+			x1 = Integer.parseInt(args[3]);
+			z1 = Integer.parseInt(args[4]);
+			x2 = Integer.parseInt(args[5]);
+			z2 = Integer.parseInt(args[6]);
+		} catch (NumberFormatException ex){
+			send.msg(ChatColor.RED + "Incorrect syntax!");
+			send.msg(ChatColor.RED + "Correct usage: /tr admin safezone addnative <x> <z> <x> <z> <name>");
+			return;
+		}
+		
+		SafeZoneCreate response = TRSafeZone.addSafeZone((Player) send.sender, "griefprevention", name, new TRPos(x1, 0, z1, x2, 0, z2));
+		if (response == SafeZoneCreate.AlreadyExists)
+			send.msg(ChatColor.RED + "This region is already a safezone!");
+		else if (response == SafeZoneCreate.RegionNotFound)
+			send.msg(ChatColor.RED + "There is no region at your current position!");
+		else if (response == SafeZoneCreate.PluginNotFound)
+			send.msg(ChatColor.RED + "Native TekkitRestrict safezones are disabled.");
+		else if (response == SafeZoneCreate.NoPermission)
+			send.msg(ChatColor.RED + "You are not allowed to make safezones.");
+		else if (response == SafeZoneCreate.Success)
+			send.msg(ChatColor.GREEN + "Successfully created safezone!");
+		else 
+			send.msg(ChatColor.RED + "An undefined error occurred!");
 	}
 	
 	private void limitMain(String[] largs){
