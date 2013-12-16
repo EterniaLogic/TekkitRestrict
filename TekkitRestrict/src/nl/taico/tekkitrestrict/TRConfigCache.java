@@ -159,6 +159,7 @@ public class TRConfigCache {
 		Threads.ChangeDisabledItemsIntoId = config.getInt2(ConfigFile.DisableItems, "ChangeDisabledItemsIntoId", 3);
 		//Threads.RPTickTime = (int) Math.round((config.getDouble(ConfigFile.ModModifications, "RPTimerMin", 0.2)-0.1d) * 20d);
 		
+		SafeZones.useNative = config.getBoolean2(ConfigFile.SafeZones, "UseNativeTekkitRestrictSafezones", true);
 		SafeZones.UseSafeZones = config.getBoolean2(ConfigFile.SafeZones, "UseSafeZones", true);
 		SafeZones.UseFactions = config.getBoolean2(ConfigFile.SafeZones, "SSEnabledPlugins.Factions", true);
 		SafeZones.UseGP = config.getBoolean2(ConfigFile.SafeZones, "SSEnabledPlugins.GriefPrevention", true);

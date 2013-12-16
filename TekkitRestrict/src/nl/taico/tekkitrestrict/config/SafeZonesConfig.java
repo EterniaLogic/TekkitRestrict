@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class SafeZonesConfig extends TRConfig {
 	public static ArrayList<String> defaultContents(boolean extra){
-		ArrayList<String> tbr = new ArrayList<String>(110);
+		ArrayList<String> tbr = new ArrayList<String>(120);
 		
 		tbr.add("##########################################################################################");
 		tbr.add("## Configuration file for TekkitRestrict                                                ##");
@@ -58,6 +58,11 @@ public class SafeZonesConfig extends TRConfig {
 		tbr.add("    # - All flying items will be disabled when you are in a SafeZone.");
 		tbr.add("    # DisableFlying: false");
 		tbr.add("    # This feature does not work (yet).");
+		tbr.add("");
+		tbr.add("# If TekkitRestrict should use native safezones (better performance)");
+		tbr.add("# Add them with /tr admin safezone addnative <x1> <z1> <x2> <z2> <name>");
+		tbr.add("UseNativeTekkitRestrictSafezones: true");
+		if (extra) tbr.add("#;-;-;# UseNativeTekkitRestrictSafezones");
 		tbr.add("");
 		tbr.add("# The plugins TekkitRestrict should use to make safezones.");
 		tbr.add("#");
