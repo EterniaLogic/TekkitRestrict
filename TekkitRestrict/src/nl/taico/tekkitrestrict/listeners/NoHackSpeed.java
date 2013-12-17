@@ -31,9 +31,9 @@ public class NoHackSpeed implements Listener{
 		if (XZ != null) {
 			double xOld = XZ[0], zOld = XZ[1];
 			
-
-			double xe = xOld - xNew, ze = zOld - zNew;
-			double velo = Math.sqrt(Math.pow(xe, 2D) + Math.pow(ze, 2D));
+			double xe = xOld - xNew;
+			double ze = zOld - zNew;
+			double velo = Math.sqrt(xe*xe+ze*ze);
 
 			if (velo >= Hacks.speeds.value && velo <= maxmove) {
 				Integer oldValue = tickTolerance.get(name);

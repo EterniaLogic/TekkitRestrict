@@ -4,14 +4,15 @@ import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.minecraft.server.EntityPlayer;
+import net.minecraft.server.NBTTagCompound;
 import net.minecraft.server.TileEntity;
 
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
+import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -20,7 +21,6 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import nl.taico.tekkitrestrict.tekkitrestrict;
 import nl.taico.tekkitrestrict.TRConfigCache.Hacks;
 import nl.taico.tekkitrestrict.functions.TRNoHack;
 import nl.taico.tekkitrestrict.objects.TREnums.HackType;
@@ -82,20 +82,24 @@ public class NoHackFly implements Listener {
 		}
 		
 		for (int i = 0; i<=8; i++){ //Ring on hotbar check
-			ItemStack item = inventory.getItem(i);
-			if (item == null) continue;
-			int id = item.getTypeId();
-			short data = item.getDurability();
-			if (id == 27536 && (data == 1 || data == 3)) return false;
-			if (id == 27584) return false;
+			ItemStack itemStack = inventory.getItem(i);
+			if (itemStack == null) continue;
+			int id = itemStack.getTypeId();
+			
+			if (id == 27536){
+				NBTTagCompound tag = ((CraftItemStack)itemStack).getHandle().tag;
+				if (tag == null){
+					if ((itemStack.getData().getData() & 1) == 1) return false;
+				} else {
+					if (tag.getBoolean("active")) return false;
+					if ((itemStack.getData().getData() & 1) == 1) return false;
+				}
+			}
+			else if (id == 27584) return false;
 		}
 		
 		EntityPlayer Eplayer = ((CraftPlayer) player).getHandle();
 		if (player.isInsideVehicle()) return false;
-		if (Eplayer.vehicle != null) {
-			tekkitrestrict.log.info("[DEBUG] "+ChatColor.RED + "player.isInsideVehicle()==false, but Eplayer.vehicle != null!");
-			return false;
-		}
 		
 		String name = player.getName();
 		if (!Eplayer.abilities.isFlying) {
