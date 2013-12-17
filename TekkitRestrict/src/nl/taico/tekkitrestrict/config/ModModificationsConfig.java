@@ -136,21 +136,28 @@ public class ModModificationsConfig extends TRConfig {
 			if (s.startsWith("-")){
 				switch (s){
 					case "- \"335 100\"":
+					case "- 335 100":
 						def.set(i, "- \"335 768\"");
 						fixed = true;
 						break;
 					case "- \"369 780\"":
+					case "- 369 780":
 						def.set(i, "- \"377 308\"");
 						fixed = true;
 						break;
 					case "- \"351:15 30\"":
+					case "- 351:15 30":
 						def.set(i, "- \"351:15 29\"");
 						fixed = true;
 						break;
 					case "- \"139 4\"":
+					case "- 139 4":
 					case "- \"37 4\"":
+					case "- 37 4":
 					case "- \"38 4\"":
+					case "- 38 4":
 					case "- \"295 4\"":
+					case "- 295 4":
 						def.remove(i);
 						i--;j--;
 						break;

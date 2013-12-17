@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class SafeZonesConfig extends TRConfig {
 	public static ArrayList<String> defaultContents(boolean extra){
-		ArrayList<String> tbr = new ArrayList<String>(120);
+		ArrayList<String> tbr = new ArrayList<String>(130);
 		
 		tbr.add("##########################################################################################");
 		tbr.add("## Configuration file for TekkitRestrict                                                ##");
@@ -31,6 +31,16 @@ public class SafeZonesConfig extends TRConfig {
 		tbr.add("    # Default: true");
 		tbr.add("    DisableEntities: true");
 		if (extra) tbr.add("#:-;-:# InSafeZones.DisableEntities");
+		tbr.add("    ");
+		tbr.add("    # This is a feature that allows tekkitrestrict to run the entities disabler");
+		tbr.add("    # thread with less lag and problems. Entities can get removed at range blocks");
+		tbr.add("    # from the corner of the safezone.");
+		tbr.add("    #");
+		tbr.add("    # Increase this value if you have problems with the entity remover or if you want");
+		tbr.add("    # to slightly increase performance.");
+		tbr.add("    # Default: 10");
+		tbr.add("    DisableEntitiesRange: 10");
+		if (extra) tbr.add("#:-;-:# InSafeZones.DisableEntitiesRange");
 		tbr.add("    ");
 		tbr.add("    # WARNING: Case Sensitive!");
 		tbr.add("    # Tries to exclude org.bukkit.entity.[name] entities from SafeZone entity removal.");
@@ -61,6 +71,7 @@ public class SafeZonesConfig extends TRConfig {
 		tbr.add("");
 		tbr.add("# If TekkitRestrict should use native safezones (better performance)");
 		tbr.add("# Add them with /tr admin safezone addnative <x1> <z1> <x2> <z2> <name>");
+		tbr.add("# Default: true");
 		tbr.add("UseNativeTekkitRestrictSafezones: true");
 		if (extra) tbr.add("#;-;-;# UseNativeTekkitRestrictSafezones");
 		tbr.add("");

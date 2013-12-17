@@ -139,7 +139,7 @@ public class GeneralConfig extends TRConfig {
 		tbr.add("######################################################################");
 		tbr.add("######################################################################");
 		tbr.add("# Do NOT change this. It will reset the config files if you do.");
-		tbr.add("ConfigVersion: 1.9");
+		tbr.add("ConfigVersion: 2.0");
 		tbr.add("");
 		tbr.add("######################################################################");
 		return tbr;

@@ -22,6 +22,15 @@ InSafeZones:
     # Default: true
     DisableEntities: true
     
+    # This is a feature that allows tekkitrestrict to run the entities disabler
+    # thread with less lag and problems. Entities can get removed at range blocks
+    # from the corner of the safezone.
+    #
+    # Increase this value if you have problems with the entity remover or if you want
+    # to increase performance.
+    # Default: 10
+    DisableEntitiesRange: 10
+    
     # WARNING: Case Sensitive!
     # Tries to exclude org.bukkit.entity.[name] entities from SafeZone entity removal.
     # Examples:
@@ -46,6 +55,10 @@ InSafeZones:
     # DisableFlying: false
     # This feature does not work (yet).
 
+# If TekkitRestrict should use native safezones (better performance)
+# Add them with /tr admin safezone addnative <x1> <z1> <x2> <z2> <name>
+# Default: true
+UseNativeTekkitRestrictSafezones: true
 
 # The plugins TekkitRestrict should use to make safezones.
 #

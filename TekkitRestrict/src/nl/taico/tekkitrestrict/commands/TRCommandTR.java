@@ -1,5 +1,6 @@
 package nl.taico.tekkitrestrict.commands;
 
+import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,6 +32,7 @@ import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.TRConfigCache.LogFilter;
 import nl.taico.tekkitrestrict.Updater.UpdateResult;
 import nl.taico.tekkitrestrict.api.SafeZones.SafeZoneCreate;
+import nl.taico.tekkitrestrict.eepatch.EEPSettings;
 import nl.taico.tekkitrestrict.functions.TREMCSet;
 import nl.taico.tekkitrestrict.functions.TRLimiter;
 import nl.taico.tekkitrestrict.functions.TRNoClick;
@@ -462,6 +464,11 @@ public class TRCommandTR implements CommandExecutor {
 			}
 			return;
 		}
+		
+		if (largs[1].equals("test")) {
+			adminTest(largs);
+			return;
+		}
 
 		send.msg(ChatColor.RED + "Unknown subcommand /tr admin " + largs[1] + "!");
 		send.msg("Use /tr admin help to see all subcommands.");
@@ -590,6 +597,87 @@ public class TRCommandTR implements CommandExecutor {
 		send.msg(ChatColor.RED + "Reinitializing server.");
 		tekkitrestrict.getInstance().getServer().reload();
 	}
+	private void adminTest(String largs[]){
+		if (send.noPerm("admin.testsettings")) return;
+		
+		if (largs.length == 4){
+			if (largs[2].equals("eepatch")){
+				Field[] fields = EEPSettings.class.getDeclaredFields();
+				for (final Field f : fields){
+					if (!f.getName().equalsIgnoreCase(largs[3])) continue;
+					if (!f.isAccessible()) f.setAccessible(true);
+					Object vals;
+					try {
+						vals = f.get(null);
+						if (vals != null && vals instanceof ArrayList){
+							ArrayList<?> arr = (ArrayList<?>) vals;
+							send.msg(ChatColor.GOLD + "Blocked actions for " + f.getName() + ":");
+							int i = 0;
+							for (Object val : arr){
+								send.msg("["+i+"] "+val.toString());
+								i++;
+							}
+							return;
+						} else {
+							send.msg(ChatColor.RED + "There are no blocked actions for " + f.getName() + ".");
+							return;
+						}
+					} catch (IllegalArgumentException | IllegalAccessException e){
+						send.msg(ChatColor.RED + "An error occurred!");
+						return;
+					}
+				}
+				String pFields = "";
+				for (Field f : fields) pFields += " " + f.getName();
+				pFields = pFields.trim().replace(" ", ", ");
+				send.msg(ChatColor.RED + "Unknown field! "+ChatColor.GOLD + "Available fields: " + pFields);
+				return;
+			}
+			
+			Class<?>[] classes = TRConfigCache.class.getDeclaredClasses();
+			
+			Field[] fields = null;
+			for (Class<?> c : classes){
+				if (c.getSimpleName().equalsIgnoreCase(largs[2])){
+					fields = c.getDeclaredFields();
+					
+					for (final Field f : fields){
+						if (!f.getName().equalsIgnoreCase(largs[3])) continue;
+						if (!f.isAccessible()) f.setAccessible(true);
+						Object val;
+						try {
+							val = f.get(null);
+							send.msg(c.getSimpleName()+"."+f.getName() + ": " + val);
+							return;
+						} catch (IllegalArgumentException | IllegalAccessException e) {
+							send.msg(ChatColor.RED + "An error occurred!");
+							return;
+						}
+					}
+					//Not found the field
+					
+					String pFields = "";
+					for (Field f : fields) pFields += " " + f.getName();
+					pFields = pFields.trim().replace(" ", ", ");
+					
+					send.msg(ChatColor.RED + "Unknown field! "+ChatColor.GOLD+"Available fields: " + pFields);
+					return;
+				}
+			}
+			
+			
+			
+			String pClasses = "";
+			for (Class<?> c : classes) pClasses += " " + c.getSimpleName();
+			pClasses = pClasses.trim().replace(" ", ", ");
+			
+			send.msg(ChatColor.RED + "Unknown class! "+ChatColor.GOLD+"Available classes: " + pClasses + " and EEPatch");
+			return;
+		} else {
+			send.msg(ChatColor.RED + "Invalid syntax! Usage: /tr admin test <class> <field>");
+			return;
+		}
+	}
 	private void adminHelp(int page) {
 		if (page == 1) {
 			send.msg(ChatColor.YELLOW + "[TekkitRestrict " + tekkitrestrict.version.fullVer + " Admin Commands] Page 1 / 3");
@@ -612,6 +700,7 @@ public class TRCommandTR implements CommandExecutor {
 			send.msg("/tr admin limit clear <player>", "Clear a players limits.");
 			send.msg("/tr admin limit clear <player> <id[:data]>", "Clear a players limits for a specific item.");
 			send.msg("/tr admin limit list <player> [id]", "List a players limits.");
+			send.msg("/tr admin test <class> <field>", "Get the value of a setting. (Debug feature)");
 		} else {
 			send.msg(ChatColor.RED + "Page " + page + " doesn't exist. ");
 		}

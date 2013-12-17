@@ -135,6 +135,7 @@ public class TRConfigCache {
 		Threads.GAOffensive = config.getBoolean2(ConfigFile.ModModifications, "AllowGemArmorOffensive", false);
 		
 		Threads.SSDisableEntities = config.getBoolean2(ConfigFile.SafeZones, "InSafeZones.DisableEntities", false);
+		Threads.SSDisableEntitiesRange = config.getInt2(ConfigFile.SafeZones, "InSafeZones.DisableEntitiesRange", 3);
 		Threads.SSDechargeEE = config.getBoolean2(ConfigFile.SafeZones, "InSafeZones.DechargeEE", true);
 		Threads.SSDisableArcane = config.getBoolean2(ConfigFile.SafeZones, "InSafeZones.DisableRingOfArcana", true);
 		List<String> exempt = config.getStringList(ConfigFile.SafeZones, "InSafeZones.ExemptEntityTypes");
@@ -239,6 +240,7 @@ public class TRConfigCache {
 		
 		@SuppressWarnings("rawtypes")
 		public static ArrayList<Class> SSClassBypasses = new ArrayList<Class>();
+		public static int SSDisableEntitiesRange;
 	}
 	
 	public static class LWC {

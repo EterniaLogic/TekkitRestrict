@@ -30,7 +30,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.ItemStack;
-import org.eclipse.jdt.annotation.NonNull;
 
 import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.TRConfigCache.Listeners;
@@ -155,6 +154,11 @@ class TRLimitFlyThread extends Thread {
 class TGemArmorDisabler extends Thread {
 	@Override
 	public void run() {
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Armor.Movement.Activate", true) && !Threads.GAMovement)
+			Threads.GAMovement = true;
+		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Armor.Offensive.Activate", true) && !Threads.GAOffensive)
+			Threads.GAOffensive = true;
+		
 		int errors = 0;
 		while (true) {
 			try {
@@ -177,7 +181,10 @@ class TGemArmorDisabler extends Thread {
 			}
 			
 			try {
-				Thread.sleep(Threads.gemArmorSpeed);
+				if (!Threads.GAMovement && !Threads.GAOffensive)
+					Thread.sleep(Threads.gemArmorSpeed*25);
+				else
+					Thread.sleep(Threads.gemArmorSpeed);
 			} catch (InterruptedException e) {
 				if (tekkitrestrict.disable) break; //If plugin is disabling, then stop the thread. The gemarmor thread shouldn't trigger again.
 			}
@@ -189,41 +196,39 @@ class TGemArmorDisabler extends Thread {
 		try {
 			if (!Threads.GAMovement) {
 				synchronized (EEBase.playerArmorMovementToggle) {
-					
 					Iterator<EntityHuman> it = EEBase.playerArmorMovementToggle.keySet().iterator();
-					ArrayList<EntityHuman> toremove = new ArrayList<EntityHuman>();
+					//ArrayList<EntityHuman> toremove = new ArrayList<EntityHuman>();
 					while (it.hasNext()){
 						EntityHuman human = it.next();
 						Player player = (Player) human.getBukkitEntity();
 						if (player.hasPermission("tekkitrestrict.bypass.gemarmor.defensive")) continue;
 						player.sendMessage(ChatColor.RED + "You are not allowed to use GemArmor Movement Powers!");
-						toremove.add(human);
+						it.remove();
+						//toremove.add(human);
 					}
 					
-					for (EntityHuman current : toremove){
-						EEBase.playerArmorMovementToggle.remove(current);
-					}
-					//EEBase.playerArmorMovementToggle.clear();
+					//for (EntityHuman current : toremove){
+					//	EEBase.playerArmorMovementToggle.remove(current);
+					//}
 				}
 			}
 			
 			if (!Threads.GAOffensive) {
 				synchronized (EEBase.playerArmorOffensiveToggle) {
 					Iterator<EntityHuman> it = EEBase.playerArmorOffensiveToggle.keySet().iterator();
-					ArrayList<EntityHuman> toremove = new ArrayList<EntityHuman>();
+					//ArrayList<EntityHuman> toremove = new ArrayList<EntityHuman>();
 					while (it.hasNext()){
 						EntityHuman human = it.next();
 						Player player = (Player) human.getBukkitEntity();
 						if (player.hasPermission("tekkitrestrict.bypass.gemarmor.offensive")) continue;
 						player.sendMessage(ChatColor.RED + "You are not allowed to use GemArmor Offensive Powers!");
-						toremove.add(human);
+						it.remove();
+						//toremove.add(human);
 					}
 					
-					for (EntityHuman current : toremove){
-						EEBase.playerArmorOffensiveToggle.remove(current);
-					}
-					
-					//EEBase.playerArmorOffensiveToggle.clear();
+					//for (EntityHuman current : toremove){
+					//	EEBase.playerArmorOffensiveToggle.remove(current);
+					//}
 				}
 			}
 		} catch (Exception ex) {
@@ -264,34 +269,52 @@ class TEntityRemover extends Thread {
 
 		List<World> worlds = tekkitrestrict.getInstance().getServer().getWorlds();
 		
-		
+		int range = Threads.SSDisableEntitiesRange;
+		if (range > 15) range = 15;
 		for (World world : worlds) {
 			try {
 				Chunk[] chunks = world.getLoadedChunks();
 				for (Chunk c : chunks){
 					ArrayList<Entity> tbr = new ArrayList<Entity>();
 					Entity[] entities = c.getEntities();
-					for (Entity e : entities){
-						if (e instanceof org.bukkit.entity.Item || e instanceof Player || e instanceof ExperienceOrb || e instanceof FallingSand || e instanceof Painting) continue;
-						if (e instanceof Vehicle && !(e instanceof Pig)) continue;
-						boolean blocked = false;
-						for (Class cl : TRConfigCache.Threads.SSClassBypasses){
-							if (cl.isInstance(e)){
-								blocked = true;
-								break;
+					try {
+						loop2: 
+							for (Entity e : entities){
+								if (e instanceof org.bukkit.entity.Item || e instanceof Player || e instanceof ExperienceOrb || e instanceof FallingSand || e instanceof Painting) continue;
+								if (e instanceof Vehicle && !(e instanceof Pig)) continue;
+
+								for (Class cl : TRConfigCache.Threads.SSClassBypasses){
+									if (cl.isInstance(e)){
+										continue loop2;
+									}
+								}
+								tbr.add(e);
+							}
+					} catch (Exception ex){}
+					
+					int lastx = 9999999, lastz = 9999999;
+					
+					try {
+						Iterator<Entity> it = tbr.iterator();
+						while (it.hasNext()){
+							Entity e = it.next();
+							if (e == null) continue;
+							
+							int x = e.getLocation().getBlockX();
+							int z = e.getLocation().getBlockZ();
+							if (Math.abs(x-lastx)<=range && Math.abs(z-lastz)<=range){
+								e.remove();
+								it.remove();
+							} else {
+								if (!"".equals(TRSafeZone.getSafeZoneByLocation(e.getLocation(), true))){
+									lastx = x;
+									lastz = z;
+									e.remove();
+									it.remove();
+								}
 							}
 						}
-						if (blocked) continue;
-						tbr.add(e);
-					}
-					
-					for (Entity e : tbr){
-						if (e == null) continue;
-						if (!TRSafeZone.getSafeZoneByLocation(e.getLocation(), true).equals("")) {
-							e.remove();
-						}
-						
-					}
+					} catch (Exception ex){}
 				}
 				/*
 				List<Entity> entities = world.getEntities();
@@ -406,7 +429,7 @@ class DisableItemThread extends Thread {
 					if (TRItemStack.getMCItem(st1[i]) instanceof ItemEECharged){
 						if (inSafeZone==0) inSafeZone = TRSafeZone.isSafeZoneFor(player, true, false)?1:2;
 						if (inSafeZone==1) {
-							if (checkEEArcanaSafeZone(st1[i]) || checkEEChargeSafeZone(st1[i], id)){
+							if (checkSafeZone(st1[i], id)){
 								changedInv = true;
 								continue;
 							}
@@ -629,6 +652,7 @@ class DisableItemThread extends Thread {
 		return false;
 	}
 	
+	/*
 	private boolean checkEECharge(ItemStack is, int id){
 		if (!tekkitrestrict.EEEnabled) return false;
 		
@@ -664,16 +688,16 @@ class DisableItemThread extends Thread {
 		return false;
 	}
 	
-	private boolean checkEEChargeSafeZone(@NonNull ItemStack is, int id){
+	private boolean checkEEChargeSafeZone(ItemStack is, int id){
 		if (!Threads.SSDechargeEE) return false;
-		
-		TRItem g = ssDecharged.get(id);
-		if (g == null) return false;
-		
 		try {
 			net.minecraft.server.ItemStack mcItemStack = ((CraftItemStack) is).getHandle();
 			
 			if (!(mcItemStack.getItem() instanceof ItemEECharged)) return false;
+			
+			TRItem g = ssDecharged.get(id);
+			if (g == null) return false;
+			
 			if (getShort(is, "chargeGoal") > 0 || getShort(is, "chargeLevel") > 0) {
 				setShort(is, "chargeLevel", 0);
 				setShort(is, "chargeGoal", 0);
@@ -687,10 +711,9 @@ class DisableItemThread extends Thread {
 		return false;
 	}
 	
-	private boolean checkEEArcanaSafeZone(ItemStack is){
+	private boolean checkEEArcanaSafeZone(ItemStack is, int id){
 		if (!Threads.SSDisableArcane) return false;
 		
-		int id = is.getTypeId();
 		if (id != 27584) return false;
 		
 		try {
@@ -704,6 +727,35 @@ class DisableItemThread extends Thread {
 			Log.Debug("SSDisableArcane[2] Error! " + ex.getMessage());
 			Log.debugEx(ex);
 		}
+		return false;
+	}
+	
+	*/
+	private boolean checkSafeZone(ItemStack is, int id){
+		if (!Threads.SSDechargeEE && !Threads.SSDisableArcane) return false;
+		net.minecraft.server.ItemStack mcItemStack = ((CraftItemStack) is).getHandle();
+		if (!(mcItemStack.getItem() instanceof ItemEECharged)) return false;
+		
+		if (id == 27584){
+			if (!Threads.SSDisableArcane) return false;
+			if (mcItemStack.getData() != 6 || !getString(is, "mode").equalsIgnoreCase("earth")) {
+				setString(is, "mode", "earth");
+				mcItemStack.setData(6);
+				return true;
+			}
+			return false;
+		}
+		
+		TRItem g = ssDecharged.get(id);
+		if (g == null) return false;
+		
+		if (getShort(is, "chargeGoal") > 0 || getShort(is, "chargeLevel") > 0) {
+			setShort(is, "chargeLevel", 0);
+			setShort(is, "chargeGoal", 0);
+			mcItemStack.setData(200);
+			return true;
+		}
+		
 		return false;
 	}
 	
@@ -827,19 +879,18 @@ class DisableItemThread extends Thread {
 	 * If the item doesn't have a value for the specified key it will make it and set it to 0.
 	 */
 	public short getShort(ItemStack bukkitItemStack, String key) {
-		net.minecraft.server.ItemStack var1 = ((CraftItemStack) bukkitItemStack).getHandle();
-		if (var1.tag == null) var1.setTag(new NBTTagCompound());
+		NBTTagCompound tag = TRItemStack.getTagOrCreate(bukkitItemStack);
 		
-		if (!var1.tag.hasKey(key)) setShort(bukkitItemStack, key, 0);
+		//if (!tag.hasKey(key)) tag.setShort(key, (short) 0);
 		
-		return var1.tag.getShort(key);
+		return tag.getShort(key);
 	}
 	/**
 	 * Sets a short value from the given key.<br>
 	 * If the item doesn't have a tag it will add one.
 	 */
 
-	public void setShort(ItemStack bukkitItemStack, String key, int value) {
+	private void setShort(ItemStack bukkitItemStack, String key, int value) {
 		net.minecraft.server.ItemStack var1 = ((CraftItemStack) bukkitItemStack).getHandle();
 		if (var1.tag == null) var1.setTag(new NBTTagCompound());
 		
@@ -852,12 +903,11 @@ class DisableItemThread extends Thread {
 	 */
 
 	public String getString(ItemStack bukkitItemStack, String key) {
-		net.minecraft.server.ItemStack var1 = ((CraftItemStack) bukkitItemStack).getHandle();
-		if (var1.tag == null) var1.setTag(new NBTTagCompound());
+		NBTTagCompound tag = TRItemStack.getTagOrCreate(bukkitItemStack);
 		
-		if (!var1.tag.hasKey(key)) setString(bukkitItemStack, key, "");
+		//if (!tag.hasKey(key)) tag.setString(key, "");
 		
-		return var1.tag.getString(key);
+		return tag.getString(key);
 	}
 	/**
 	 * Sets the string value for the given key.<br>

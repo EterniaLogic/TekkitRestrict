@@ -475,7 +475,7 @@ public class TRSafeZone {
 	 * @return A string with information about the type of safezone and its name/owner.<br>
 	 * Returns "" if there is none.
 	 */
-	@NonNull public static String getSafeZoneByLocation(@NonNull Location loc, boolean doGP) {
+	@NonNull public static String getSafeZoneByLocation(Location loc, boolean doGP) {
 		if (!SafeZones.UseSafeZones) return "";
 		if (lastZone != null){
 			if (lastZone.mode == 1){

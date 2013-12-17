@@ -80,7 +80,7 @@ public class tekkitrestrict extends JavaPlugin {
 		instance = this; //Set the instance
 		log = getLogger(); //Set the logger
 		
-		version = new TRVersion(getDescription().getVersion().equals("1.2") ? "1.20" : getDescription().getVersion());
+		version = new TRVersion(getDescription().getVersion());//.equals("1.2") ? "1.20" : getDescription().getVersion());
 		Log.init();
 		
 		//#################### load Config ####################
@@ -90,7 +90,7 @@ public class tekkitrestrict extends JavaPlugin {
 		double configVer = config.getDouble(ConfigFile.General, "ConfigVersion", 0.9);
 		if (configVer < 1.1)
 			UpdateConfigFiles.v09();//0 --> newest
-		else if (configVer < 1.5) {//Upgrade to 1.9
+		else if (configVer < 1.5) {//Upgrade to 2.0
 			AdvancedConfig.upgradeFile();
 			DatabaseConfig.upgradeFile();
 			GeneralConfig.upgradeFile();
@@ -101,26 +101,30 @@ public class tekkitrestrict extends JavaPlugin {
 			LoggingConfig.upgradeFile();
 			if (linkEEPatch()) EEPatchConfig.upgradeFile();
 			reloadConfig();
-		} else if (configVer < 1.6){//Upgrade to 1.9
+		} else if (configVer < 1.6){//Upgrade to 2.0
 			GeneralConfig.upgradeFile();
 			DatabaseConfig.upgradeFile();
 			SafeZonesConfig.upgradeFile();
 			LoggingConfig.upgradeFile();
 			if (linkEEPatch()) EEPatchConfig.upgradeFile();
 			reloadConfig();
-		} else if (configVer < 1.7){//upgrade to 1.9
+		} else if (configVer < 1.7){//upgrade to 2.0
 			GeneralConfig.upgradeFile();
 			DatabaseConfig.upgradeFile();
 			SafeZonesConfig.upgradeFile();
 			LoggingConfig.upgradeFile();
 			if (linkEEPatch()) EEPatchConfig.upgradeFile();
 			reloadConfig();
-		} else if (configVer < 1.8){//upgrade to 1.9
+		} else if (configVer < 1.8){//upgrade to 2.0
 			GeneralConfig.upgradeFile();
 			SafeZonesConfig.upgradeFile();
 			DatabaseConfig.upgradeFile();
 			reloadConfig();
-		} else if (configVer < 1.9){//upgrade to 1.9
+		} else if (configVer < 1.9){//upgrade to 2.0
+			GeneralConfig.upgradeFile();
+			SafeZonesConfig.upgradeFile();
+			reloadConfig();
+		} else if (configVer < 2.0){//upgrade to 2.0
 			GeneralConfig.upgradeFile();
 			SafeZonesConfig.upgradeFile();
 			reloadConfig();
