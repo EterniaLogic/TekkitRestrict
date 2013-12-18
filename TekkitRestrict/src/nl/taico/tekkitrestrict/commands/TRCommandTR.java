@@ -711,7 +711,7 @@ public class TRCommandTR implements CommandExecutor {
 	}
 	
 	private void unloadChunks(String[] largs){
-		immibis.chunkloader.Main.instance.getWorld(((CraftWorld)Bukkit.getWorld("")).getHandle());
+		//immibis.chunkloader.Main.instance.getWorld(((CraftWorld)Bukkit.getWorld("")).getHandle());
 		//TRChunkUnloader.unloadSChunks();
 		//Chunk c = forge.DimensionManager.getWorld(0).getChunkAt(0, 0);
 		

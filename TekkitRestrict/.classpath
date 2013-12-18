@@ -1,16 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="com/github/dreadslicer/tekkitrestrict/TRNoHackForcefield.java|com/github/dreadslicer/tekkitrestrict/TRHandleFly.java|com/github/dreadslicer/tekkitrestrict/TRNoHackSpeed.java|lib/PatPeter/SQLibrary/|com/github/dreadslicer/tekkitrestrict/lib/TRChunkRunner.java|com/github/dreadslicer/tekkitrestrict/TRSafeZone_old.java|com/github/dreadslicer/tekkitrestrict/Metrics_old.java|com/github/dreadslicer/tekkitrestrict/TRBans.java|com/github/dreadslicer/tekkitrestrict/TRCacheItem2.java|com/github/dreadslicer/tekkitrestrict/TaeirMetrics.java|com/github/dreadslicer/tekkitrestrict/TRNoDupe_BagCache.java|com/github/dreadslicer/tekkitrestrict/Updater_Old.java" kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Tekkit Classic Mods Base for TekkitRestrict"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Other"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Permission Plugins for Tekkit Classic"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Protection Plugins for Tekkit Classic"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Tekkit Classic Bukkit"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Tekkit Classic Mods Base for TekkitRestrict"/>
 	<classpathentry kind="lib" path="org.eclipse.jdt.annotation_1.1.0.v20130513-1648.jar"/>
-<<<<<<< HEAD
-=======
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/EEPatch"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Other"/>
->>>>>>> refs/remotes/origin/master
 	<classpathentry kind="output" path="bin"/>
 </classpath>
