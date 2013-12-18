@@ -6,9 +6,8 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Permission Plugins for Tekkit Classic"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Protection Plugins for Tekkit Classic"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Tekkit Classic Bukkit"/>
-	<classpathentry kind="lib" path="C:/Program Files/eclipse_Kepler/lib/Tekkit_Classic/Essentials 2.9.2 for 1.2.5.jar"/>
-	<classpathentry kind="lib" path="C:/Program Files/eclipse_Kepler/lib/Tekkit_Classic/EEPatch.zip"/>
 	<classpathentry kind="lib" path="org.eclipse.jdt.annotation_1.1.0.v20130513-1648.jar"/>
-	<classpathentry kind="lib" path="C:/Program Files/eclipse_Kepler/lib/Swing/jSuggestField.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/EEPatch"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Other"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
