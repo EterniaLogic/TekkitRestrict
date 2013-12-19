@@ -32,6 +32,7 @@ public class TREMCSet {
 	 * WARNING: If that item is also used as fuel, unexpected behavior may occur.
 	 * */
 	public static void removeEMC(int id, int data){
+		@SuppressWarnings("cast")
 		HashMap<Integer, Integer> old = (HashMap<Integer, Integer>) ee.EEMaps.alchemicalValues.get(id);
 		if (old == null) return;
 		old.remove(data);

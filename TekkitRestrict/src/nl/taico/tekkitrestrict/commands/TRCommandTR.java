@@ -12,16 +12,13 @@ import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.eclipse.jdt.annotation.NonNull;
 
-import net.minecraft.server.Chunk;
 import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.NameProcessor;
 import nl.taico.tekkitrestrict.Send;
@@ -36,7 +33,6 @@ import nl.taico.tekkitrestrict.TRConfigCache.LogFilter;
 import nl.taico.tekkitrestrict.Updater.UpdateResult;
 import nl.taico.tekkitrestrict.api.SafeZones.SafeZoneCreate;
 import nl.taico.tekkitrestrict.eepatch.EEPSettings;
-import nl.taico.tekkitrestrict.functions.TRChunkUnloader;
 import nl.taico.tekkitrestrict.functions.TREMCSet;
 import nl.taico.tekkitrestrict.functions.TRLimiter;
 import nl.taico.tekkitrestrict.functions.TRNoClick;
@@ -334,6 +330,7 @@ public class TRCommandTR implements CommandExecutor {
 				if (emc > 0) ee.EEMaps.addEMC(isr.id, data, emc);
 				else {
 					//Remove EMC value.
+					@SuppressWarnings("cast")
 					HashMap<Integer, Integer> hm = (HashMap<Integer, Integer>) ee.EEMaps.alchemicalValues.get(isr.id);
 					if (hm != null){
 						hm.remove(data);
@@ -372,6 +369,7 @@ public class TRCommandTR implements CommandExecutor {
 				return;
 			}
 			for (TRItem isr : iss) {
+				@SuppressWarnings("cast")
 				HashMap<Integer, Integer> hm = (HashMap<Integer, Integer>) ee.EEMaps.alchemicalValues.get(isr.id);
 				if (hm == null) continue;
 				
@@ -708,13 +706,6 @@ public class TRCommandTR implements CommandExecutor {
 		} else {
 			send.msg(ChatColor.RED + "Page " + page + " doesn't exist. ");
 		}
-	}
-	
-	private void unloadChunks(String[] largs){
-		//immibis.chunkloader.Main.instance.getWorld(((CraftWorld)Bukkit.getWorld("")).getHandle());
-		//TRChunkUnloader.unloadSChunks();
-		//Chunk c = forge.DimensionManager.getWorld(0).getChunkAt(0, 0);
-		
 	}
 	
 	private void ssMain(String[] args, String[] largs){
