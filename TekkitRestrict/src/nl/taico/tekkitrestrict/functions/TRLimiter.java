@@ -10,10 +10,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.Future;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -37,6 +35,7 @@ import nl.taico.tekkitrestrict.annotations.Safe;
 import nl.taico.tekkitrestrict.objects.TRConfigLimit;
 import nl.taico.tekkitrestrict.objects.TRItem;
 import nl.taico.tekkitrestrict.objects.TRLimit;
+import nl.taico.tekkitrestrict.objects.TRLocation;
 import nl.taico.tekkitrestrict.objects.TRPermLimit;
 import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 
@@ -179,11 +178,10 @@ public class TRLimiter {
 		int thisid = block.getTypeId();
 		int thisdata = block.getData();
 		
-		Location bloc = block.getLocation();
-		
 		int TLimit = getMax(event.getPlayer(), thisid, thisdata);//Get the max for this player for id:data
 		
 		if (TLimit != -1) {
+			TRLocation bloc2 = new TRLocation(block.getLocation());
 			for (TRLimit limit : itemlimits) {
 				if (limit.id != thisid || limit.data != thisdata) continue;
 				
@@ -197,20 +195,17 @@ public class TRLimiter {
 					// loop through the placedblocks to make sure that we
 					// aren't placing the same one down twice.
 					boolean place2 = false;
-					for (Location j : limit.placedBlock) {
-						if (j.equals(bloc)) {
+					for (TRLocation j : limit.placedBlock) {
+						if (j.equals(bloc2)) {
 							place2 = true;
 							break;
 						}
 					}
 					
 					if (!place2) {
-						limit.placedBlock.add(block.getLocation());
+						limit.placedBlock.add(bloc2);
 
-						int x = bloc.getBlockX();
-						int y = bloc.getBlockY();
-						int z = bloc.getBlockZ();
-						allBlockOwners.put(bloc.getWorld().getName() + ":" + x + ":" + y + ":" + z, event.getPlayer().getName());
+						allBlockOwners.put(bloc2.world + ":" + bloc2.x + ":" + bloc2.y + ":" + bloc2.z, event.getPlayer().getName());
 						isModified = true;
 						return null;//true
 					} else {
@@ -225,13 +220,10 @@ public class TRLimiter {
 			TRLimit g = new TRLimit();
 			g.id = thisid;
 			g.data = thisdata;
-			g.placedBlock.add(bloc);
+			g.placedBlock.add(bloc2);
 			itemlimits.add(g);
 			
-			int x = bloc.getBlockX();
-			int y = bloc.getBlockY();
-			int z = bloc.getBlockZ();
-			allBlockOwners.put(bloc.getWorld().getName() + ":" + x + ":" + y + ":" + z, event.getPlayer().getName());
+			allBlockOwners.put(bloc2.world + ":" + bloc2.x + ":" + bloc2.y + ":" + bloc2.z, event.getPlayer().getName());
 			isModified = true;
 			// Making new
 			return null;//true
@@ -255,13 +247,10 @@ public class TRLimiter {
 				return;
 			} else {
 				// add to it!
-				Location bloc = event.getBlock().getLocation();
+				TRLocation bloc = new TRLocation(event.getBlock().getLocation());
 				limit.placedBlock.remove(bloc);
 				
-				int x = bloc.getBlockX();
-				int y = bloc.getBlockY();
-				int z = bloc.getBlockZ();
-				allBlockOwners.remove(bloc.getWorld().getName() + ":" + x + ":" + y + ":" + z);
+				allBlockOwners.remove(bloc.world + ":" + bloc.x + ":" + bloc.y + ":" + bloc.z);
 				isModified = true;
 				return;
 			}
@@ -283,10 +272,7 @@ public class TRLimiter {
 				// add to it!
 				limit.placedBlock.remove(bloc);
 				
-				int x = bloc.getBlockX();
-				int y = bloc.getBlockY();
-				int z = bloc.getBlockZ();
-				allBlockOwners.remove(bloc.getWorld().getName() + ":" + x + ":" + y + ":" + z);
+				allBlockOwners.remove(bloc.getWorld().getName() + ":" + bloc.getBlockX() + ":" + bloc.getBlockY() + ":" + bloc.getBlockZ());
 				isModified = true;
 				return;
 			}
@@ -350,8 +336,8 @@ public class TRLimiter {
 				}
 
 				for (TRLimit l : r.itemlimits) {
-					for (Location l1 : l.placedBlock) {
-						allBlockOwners.put(l1.getWorld().getName() + ":" + l1.getBlockX() + ":" + l1.getBlockY() + ":" + l1.getBlockZ(), r.player);
+					for (TRLocation l1 : l.placedBlock) {
+						allBlockOwners.put(l1.world + ":" + l1.x + ":" + l1.y + ":" + l1.z, r.player);
 					}
 				}
 
@@ -416,8 +402,8 @@ public class TRLimiter {
 				}
 
 				for (TRLimit l : r.itemlimits) {
-					for (Location l1 : l.placedBlock) {
-						allBlockOwners.put(l1.getWorld().getName() + ":" + l1.getBlockX() + ":" + l1.getBlockY() + ":" + l1.getBlockZ(), r.player);
+					for (TRLocation l1 : l.placedBlock) {
+						allBlockOwners.put(l1.world + ":" + l1.x + ":" + l1.y + ":" + l1.z, r.player);
 					}
 				}
 
@@ -473,11 +459,11 @@ public class TRLimiter {
 					if (locStr.contains("_")) {
 						String[] datas = locStr.split("_");
 						for (int j = 0; j < datas.length; j++) {
-							Location loc = locParse(datas[j]);
+							TRLocation loc = locParse(datas[j]);
 							if (loc != null) l.placedBlock.add(loc);
 						}
 					} else {
-						Location loc = locParse(locStr);
+						TRLocation loc = locParse(locStr);
 						if (loc != null) l.placedBlock.add(loc);
 					}
 				}
@@ -572,13 +558,14 @@ public class TRLimiter {
 				int size2 = limit1.placedBlock.size();
 				int j = 0;
 				
-				Iterator<Location> pblockIt = limit1.placedBlock.iterator();
+				Iterator<TRLocation> pblockIt = limit1.placedBlock.iterator();
 				while (pblockIt.hasNext()){
-					Location l = pblockIt.next();
+					
 					String suf1;
 					if (j == size2 - 1) suf1 = "";
 					else suf1 = "_";
-					DATA += l.getWorld().getName() + "," + l.getBlockX() + "," + l.getBlockY() + "," + l.getBlockZ() + suf1;
+					TRLocation l = pblockIt.next();
+					DATA += l.world + "," + l.x + "," + l.y + "," + l.z + suf1;
 					j++;
 				}
 				
@@ -614,24 +601,23 @@ public class TRLimiter {
 			}
 		}
 	}
-
+	
 	/** Parses a String formatted like <code>"world,x,y,z"</code> to a location. */
-	@Nullable private static Location locParse(String ins) {
-		Location l = null;
+	@Nullable private static TRLocation locParse(String ins) {
 		try {
 			if (ins.contains(",")) {
 				// determine if the world for this exists...
 				String[] lac = ins.split(",");
 				World cw = Bukkit.getWorld(lac[0]);
 				if (cw != null) {
-					l = new Location(cw, Integer.parseInt(lac[1]), Integer.parseInt(lac[2]), Integer.parseInt(lac[3]));
+					return new TRLocation(cw.getName(), Integer.parseInt(lac[1]), Integer.parseInt(lac[2]), Integer.parseInt(lac[3]));
 				}
 			}
 		} catch (Exception ex){
 			Warning.other("Error while loading a limiter: malformed limiter location in the database!", false);
 		}
 
-		return l;
+		return null;
 	}
 
 	/** load all of the block:player pairs from db. */
@@ -659,23 +645,23 @@ public class TRLimiter {
 						for (int i = 0; i < prelimits.length; i++) {
 							String g = prelimits[i];
 							TRLimit l = loadLimitFromString(g);
-							List<Location> blks = l.placedBlock;
-							for (Location loc : blks) {
+							List<TRLocation> blks = l.placedBlock;
+							for (TRLocation loc : blks) {
 								allBlockOwners.put(
-										loc.getWorld().getName() + ":"
-												+ loc.getBlockX() + ":"
-												+ loc.getBlockY() + ":"
-												+ loc.getBlockZ(), player);
+										loc.world + ":"
+												+ loc.x + ":"
+												+ loc.y + ":"
+												+ loc.z, player);
 							}
 						}
 					} else {
 						String g = blockdata;
 						TRLimit l = loadLimitFromString(g);
-						List<Location> blks = l.placedBlock;
-						for (Location loc : blks) {
-							allBlockOwners.put(loc.getWorld().getName() + ":"
-									+ loc.getBlockX() + ":" + loc.getBlockY()
-									+ ":" + loc.getBlockZ(), player);
+						List<TRLocation> blks = l.placedBlock;
+						for (TRLocation loc : blks) {
+							allBlockOwners.put(loc.world + ":"
+									+ loc.x + ":" + loc.y
+									+ ":" + loc.z, player);
 						}
 					}
 				}
@@ -691,8 +677,8 @@ public class TRLimiter {
 		}
 	}
 
-	/** Used by {@link #manageData()} for the Future call. */
-	private static Location tempLoc;
+//	/** Used by {@link #manageData()} for the Future call. */
+//	private static Location tempLoc;
 	/**
 	 * Manages and removes bad data.
 	 * Determines if the limit exists at a location. If not, remove it.
@@ -703,12 +689,16 @@ public class TRLimiter {
 			boolean changed = false;
 			for (TRLimit l : lb.itemlimits) {
 				try {
-					Iterator<Location> it = l.placedBlock.iterator();
+					Iterator<TRLocation> it = l.placedBlock.iterator();
 					while (it.hasNext()){
-						Location loc = it.next();
-						tempLoc = loc;
-						Chunk chunk = tempLoc.getChunk();
+						TRLocation loc = it.next();
+						//tempLoc = loc;
+						Chunk chunk = loc.getChunk();//tempLoc.getChunk();
+						
 						if (!chunk.isLoaded()){
+							chunk.load(false);
+							
+							/*
 							try {
 								Future<Chunk> returnFuture = Bukkit.getScheduler().callSyncMethod(tekkitrestrict.getInstance(), new Callable<Chunk>() {
 								   public Chunk call() {
@@ -720,10 +710,10 @@ public class TRLimiter {
 								chunk = returnFuture.get();
 							} catch (Exception ex){
 								continue;
-							}
+							}*/
 						}
 						
-						if(chunk != null){
+						if(chunk.isLoaded()){
 							Block b = loc.getBlock();
 							if (b.getTypeId() != l.id){
 								it.remove();
@@ -732,6 +722,8 @@ public class TRLimiter {
 								it.remove();
 								changed = true;
 							}
+						} else {
+							tekkitrestrict.log.info("[DEBUG] Chunk is not loaded at: "+chunk.getX() + ", " + chunk.getZ());
 						}
 					}
 				} catch (ConcurrentModificationException ex){
@@ -774,7 +766,7 @@ public class TRLimiter {
 	public static void removeExpire(@NonNull String playerName) {
 		playerName = playerName.toLowerCase();
 		for (TRLimiter il : limiters){
-			if (il.player.toLowerCase().equals(playerName))
+			if (il.player.equalsIgnoreCase(playerName))
 				il.expire = -1;
 		}
 	}
@@ -783,10 +775,7 @@ public class TRLimiter {
 	@Nullable public static String getPlayerAt(@NonNull Block block) {
 		// Cache block:owners, so this goes really fast.
 		Location bloc = block.getLocation();
-		int x = bloc.getBlockX();
-		int y = bloc.getBlockY();
-		int z = bloc.getBlockZ();
-		String pl = allBlockOwners.get(bloc.getWorld().getName() + ":" + x + ":" + y + ":" + z);
+		String pl = allBlockOwners.get(bloc.getWorld().getName() + ":" + bloc.getBlockX() + ":" + bloc.getBlockY() + ":" + bloc.getBlockZ());
 		return pl;
 	}
 

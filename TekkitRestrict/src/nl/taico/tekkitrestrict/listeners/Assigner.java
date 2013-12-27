@@ -33,18 +33,19 @@ public class Assigner {
 				PM.registerEvents(new InteractListener(), plugin);
 		}
 		
-		if (Dupes.alcBags.prevent ||
-			Dupes.pedestals.prevent ||
-			Dupes.rmFurnaces.prevent ||
-			Dupes.tankcarts.prevent ||
-			Dupes.tankcartGlitchs.prevent ||
-			Dupes.transmutes.prevent)
+		if (Dupes.alcBag.prevent ||
+			Dupes.pedestal.prevent ||
+			Dupes.rmFurnace.prevent ||
+			Dupes.tankcart.prevent ||
+			Dupes.tankcartGlitch.prevent ||
+			Dupes.transmute.prevent ||
+			Dupes.diskdrive.prevent)
 			InventoryClickListener.doDupeCheck = true;
 
 		if (Listeners.UseLimitedCreative)
 			PM.registerEvents(new DropListener(), plugin);
 		
-		if (Dupes.teleports.prevent)
+		if (Dupes.teleport.prevent)
 			PM.registerEvents(new TeleportListener(), plugin);
 		
 		if (Listeners.UseBlockLimit){

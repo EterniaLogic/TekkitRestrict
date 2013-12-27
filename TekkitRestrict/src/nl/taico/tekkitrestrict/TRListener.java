@@ -142,12 +142,6 @@ public class TRListener implements Listener {
 			return;
 		}
 
-		if (TRNoDupeProjectTable.tableUseNotAllowed(event.getClickedBlock(), player)){
-			player.sendMessage(ChatColor.RED + "Someone else is already using this project table!");
-			event.setCancelled(true);
-			return;
-		}
-
 		if (player.getGameMode() == GameMode.CREATIVE) {
 			ItemStack str = player.getItemInHand();
 			if (str != null) {
@@ -172,9 +166,18 @@ public class TRListener implements Listener {
 			}
 		}
 	}
+	
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	public void onPlayerInteract2(PlayerInteractEvent event){
+		if (TRNoDupeProjectTable.tableUseNotAllowed(event.getClickedBlock(), event.getPlayer())){
+			event.getPlayer().sendMessage(ChatColor.RED + "Someone else is already using this project table!");
+			event.setCancelled(true);
+			return;
+		}
+	}
 	// /////////// END INTERACT /////////////
 
-	@EventHandler
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void onInventoryCloseEvent(InventoryCloseEvent e) {
 		Player player = (Player) e.getPlayer();
 		if (player == null) return;

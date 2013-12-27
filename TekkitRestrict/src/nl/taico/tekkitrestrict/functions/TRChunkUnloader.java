@@ -268,14 +268,22 @@ public class TRChunkUnloader {
 	private static boolean isChunkInUse(World world, int x, int z, int dist) {
 		Player[] players = Bukkit.getOnlinePlayers();
 
-		for(Player player : players){
-			Location loc = player.getLocation();
-			
-			if (loc.getWorld() != world) continue;
-			
-			if (Math.abs(loc.getBlockX() - (x << 4)) <= dist && Math.abs(loc.getBlockZ() - (z << 4)) <= dist) {
-				return true;
+		try {
+			for(Player player : players){
+				try {
+					Location loc = player.getLocation();
+					
+					if (loc.getWorld() != world) continue;
+					
+					if (Math.abs(loc.getBlockX() - (x << 4)) <= dist && Math.abs(loc.getBlockZ() - (z << 4)) <= dist) {
+						return true;
+					}
+				} catch (Exception ex){
+					return true;
+				}
 			}
+		} catch (Exception ex){
+			return true;
 		}
 
 		return false;

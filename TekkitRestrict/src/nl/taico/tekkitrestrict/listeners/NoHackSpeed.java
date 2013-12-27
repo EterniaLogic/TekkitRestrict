@@ -2,8 +2,10 @@ package nl.taico.tekkitrestrict.listeners;
 
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
@@ -16,14 +18,14 @@ public class NoHackSpeed implements Listener{
 	private static ConcurrentHashMap<String, Integer> tickTolerance = new ConcurrentHashMap<String, Integer>();
 	private static int maxmove = 15 + 1; // above this value, players will be kicked anyways.
 	
-	@EventHandler
+	@EventHandler(priority = EventPriority.MONITOR)
 	void handleMove(PlayerMoveEvent e) {
 		Player player = e.getPlayer();
 		if (player.hasPermission("tekkitrestrict.bypass.hack.speed")) return;
 		String name = player.getName();
 		// determine position of player to get velocity.
-		
-		double xNew = player.getLocation().getX(), zNew = player.getLocation().getZ();
+		Location loc = player.getLocation();
+		double xNew = loc.getX(), zNew = loc.getZ();
 		
 		// determine XZ velocity
 		

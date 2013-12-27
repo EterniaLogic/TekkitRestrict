@@ -2,8 +2,9 @@ name: tekkitrestrict
 main: nl.taico.tekkitrestrict.tekkitrestrict
 authors: [Taeir, DreadSlicer]
 prefix: TekkitRestrict
-version: 1.21 Beta 1
+version: 1.21 Beta 3
 description: TekkitRestrict gives server owners alot of features to prevent and block unwanted tekkit features.
+softdepend: [mod_EE, GriefPrevention, PreciousStones, WorldGuard]
 
 permissions:
     tekkitrestrict.bypass.*:

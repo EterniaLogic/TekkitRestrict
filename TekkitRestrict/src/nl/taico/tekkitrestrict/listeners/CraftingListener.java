@@ -3,6 +3,7 @@ package nl.taico.tekkitrestrict.listeners;
 import java.util.HashMap;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import nl.taico.tekkitrestrict.TRConfigCache;
@@ -38,8 +39,9 @@ public class CraftingListener {
 						if (item == null) continue;
 						HashMap<Integer, org.bukkit.inventory.ItemStack> failed = player.getInventory().addItem(new org.bukkit.inventory.ItemStack(item.id, 1, (short) item.getData()));
 						if (!failed.isEmpty()){
+							Location loc = player.getLocation();
 							for (org.bukkit.inventory.ItemStack t : failed.values()){
-								player.getWorld().dropItem(player.getLocation(), t);
+								player.getWorld().dropItem(loc, t);
 							}
 						}
 					}

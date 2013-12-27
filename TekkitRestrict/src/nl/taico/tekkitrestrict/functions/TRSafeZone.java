@@ -84,11 +84,10 @@ public class TRSafeZone {
 		return data;
 	}
 	
-	public static void init() {
-		if (SafeZones.UseWG) worldGuard = PM().getPlugin("WorldGuard");
-		if (SafeZones.UseGP) griefPrevention = PM().getPlugin("GriefPrevention");
-		if (SafeZones.UsePS) preciousStones = PM().getPlugin("PreciousStones");
-		
+	public static void init(Plugin wg, Plugin gp, Plugin ps) {
+		if (SafeZones.UseWG) worldGuard = wg;
+		if (SafeZones.UseGP) griefPrevention = gp;
+		if (SafeZones.UsePS) preciousStones = ps;
 		
 		ResultSet rs = null;
 		try {

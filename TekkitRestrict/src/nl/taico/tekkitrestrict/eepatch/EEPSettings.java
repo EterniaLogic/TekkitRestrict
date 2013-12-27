@@ -10,6 +10,7 @@ import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 
 import ee.events.EEEnums.EEAction2;
 import ee.events.EEEnums.EEAmuletAction;
+import ee.events.EEEnums.EEPedestalAction;
 import ee.events.EEEnums.EERingAction;
 import ee.events.EEEnums.EEArmorAction;
 import ee.events.EEEnums.EETransmuteAction;
@@ -513,6 +514,7 @@ public class EEPSettings {
 	
 	public static ArrayList<EETransmuteAction> phil = new ArrayList<EETransmuteAction>();
 	public static ArrayList<EETransmuteAction> trans = new ArrayList<EETransmuteAction>();
+	public static ArrayList<EEPedestalAction> pedestal = new ArrayList<EEPedestalAction>();
 	public static void loadOtherActions(){
 		phil.clear();
 		trans.clear();
@@ -527,5 +529,30 @@ public class EEPSettings {
 			trans.add(EETransmuteAction.ChangeMob);
 		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Other.TransmutionTablet.PortableTable", true))
 			trans.add(EETransmuteAction.PortableTable);
+		
+		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Other.Pedestal.Activate", true))
+			pedestal.add(EEPedestalAction.Activate);
+		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Other.Pedestal.Attract", true))
+			pedestal.add(EEPedestalAction.Attract);
+		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Other.Pedestal.Harvest", true))
+			pedestal.add(EEPedestalAction.Harvest);
+		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Other.Pedestal.Heal", true))
+			pedestal.add(EEPedestalAction.Heal);
+		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Other.Pedestal.Ignition", true))
+			pedestal.add(EEPedestalAction.Ignition);
+		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Other.Pedestal.Interdict", true))
+			pedestal.add(EEPedestalAction.Interdict);
+		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Other.Pedestal.Repair", true))
+			pedestal.add(EEPedestalAction.Repair);
+		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Other.Pedestal.ShootArrow", true))
+			pedestal.add(EEPedestalAction.ShootArrow);
+		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Other.Pedestal.StopStorm", true))
+			pedestal.add(EEPedestalAction.StopStorm);
+		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Other.Pedestal.Storm", true))
+			pedestal.add(EEPedestalAction.Storm);
+		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Other.Pedestal.StrikeLightning", true))
+			pedestal.add(EEPedestalAction.StrikeLightning);
+		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Other.Pedestal.Time", true))
+			pedestal.add(EEPedestalAction.Time);
 	}
 }

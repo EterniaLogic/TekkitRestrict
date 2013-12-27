@@ -11,7 +11,6 @@ import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -38,8 +37,10 @@ import nl.taico.tekkitrestrict.functions.TRLimiter;
 import nl.taico.tekkitrestrict.functions.TRNoClick;
 import nl.taico.tekkitrestrict.functions.TRNoItem;
 import nl.taico.tekkitrestrict.functions.TRSafeZone;
+import nl.taico.tekkitrestrict.objects.TREnums.DBType;
 import nl.taico.tekkitrestrict.objects.TRItem;
 import nl.taico.tekkitrestrict.objects.TRLimit;
+import nl.taico.tekkitrestrict.objects.TRLocation;
 import nl.taico.tekkitrestrict.objects.TRPos;
 import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 import nl.taico.tekkitrestrict.objects.TREnums.SafeZone;
@@ -73,7 +74,7 @@ public class TRCommandTR implements CommandExecutor {
 			return true;
 		}
 		
-		if (largs[0].equals("about")){
+		if (largs[0].equals("about") || largs[0].equals("info") || largs[0].equals("status")){
 			about();
 			return true;
 		}
@@ -224,24 +225,41 @@ public class TRCommandTR implements CommandExecutor {
 		return;
 	}
 	private void about(){
-		send.msg("[TekkitRestrict About]");
-		send.msg("Former author and creator: DreadSlicer/EterniaLogic");
-		send.msg("Current author: Taeir");
-		if (!send.sender.hasPermission("tekkitrestrict.admin")) return;
+		send.msg(ChatColor.YELLOW + "[TekkitRestrict About]");
+		send.msg(ChatColor.BLUE + "Former author and creator: " + ChatColor.GREEN + "DreadSlicer/EterniaLogic");
+		send.msg(ChatColor.BLUE + "Current author: " + ChatColor.GREEN + "Taeir");
 		send.msg("");
-		send.msg("Version: " + tekkitrestrict.getFullVersion());
-		
-		double eepver = tekkitrestrict.getEEPatchVersion();
-		send.msg("EEPatch version: " + (eepver==-1d?"<1.4":eepver));
-		send.msg("Database version: " + tekkitrestrict.dbversion);
-
-		switch (tekkitrestrict.dbworking){
-			case 0: send.msg("DB working: " + ChatColor.GREEN + "yes"); break;
-			case 2:	send.msg("DB working: " + ChatColor.RED + "partially; Safezones will not be saved."); break;
-			case 4:	send.msg("DB working: " + ChatColor.RED + "partially; Limits will not be saved."); break;
-			case 20: send.msg("DB working: " + ChatColor.RED + "no; Unable to read database file.");
-			default: send.msg("DB working: " + ChatColor.RED + "no; Database will reset upon next startup."); break;
+		send.msg(ChatColor.BLUE + "Version: " + ChatColor.GREEN + tekkitrestrict.version.toMetricsVersion());
+		if (tekkitrestrict.useTMetrics){
+			send.msg(ChatColor.BLUE+"Server UID: " + ChatColor.GREEN + tekkitrestrict.tmetrics.uid);
 		}
+		
+		if (!send.sender.hasPermission("tekkitrestrict.admin")) return;
+		
+		if (tekkitrestrict.linkEEPatch()){
+			double eepver = tekkitrestrict.getEEPatchVersion();
+			send.msg(ChatColor.BLUE+"EEPatch version: " + ChatColor.GREEN+(eepver==-1d?"< 1.4":eepver));
+		} else {
+			send.msg(ChatColor.BLUE+"EEPatch: "+ChatColor.RED+"not installed");
+		}
+		
+		send.msg(ChatColor.BLUE + "Database version: " + ChatColor.GREEN + tekkitrestrict.dbversion);
+		
+		if (tekkitrestrict.dbtype == DBType.MySQL)
+			send.msg(ChatColor.BLUE + "Database type: "+ChatColor.GREEN+"MySQL");
+		else if (tekkitrestrict.dbtype == DBType.SQLite)
+			send.msg(ChatColor.BLUE + "Database type: "+ChatColor.GREEN+"SQLite");
+		
+		switch (tekkitrestrict.dbworking){
+			case 0: send.msg(ChatColor.BLUE+"DB working: " + ChatColor.GREEN + "yes"); break;
+			case 2:	send.msg(ChatColor.BLUE+"DB working: " + ChatColor.RED + "partially; Safezones will not be saved."); break;
+			case 4:	send.msg(ChatColor.BLUE+"DB working: " + ChatColor.RED + "partially; Limits will not be saved."); break;
+			case 20: send.msg(ChatColor.BLUE+"DB working: " + ChatColor.RED + "no; Unable to read database file.");
+			default: send.msg(ChatColor.BLUE+"DB working: " + ChatColor.RED + "no; Database will reset upon next startup."); break;
+		}
+		
+		if (!tekkitrestrict.useTMetrics)
+			send.msg(ChatColor.BLUE + "TMetrics: "+ChatColor.RED+"false");
 	}
 	private void debugInfo(){
 		if (send.sender instanceof Player){
@@ -330,7 +348,6 @@ public class TRCommandTR implements CommandExecutor {
 				if (emc > 0) ee.EEMaps.addEMC(isr.id, data, emc);
 				else {
 					//Remove EMC value.
-					@SuppressWarnings("cast")
 					HashMap<Integer, Integer> hm = (HashMap<Integer, Integer>) ee.EEMaps.alchemicalValues.get(isr.id);
 					if (hm != null){
 						hm.remove(data);
@@ -369,7 +386,6 @@ public class TRCommandTR implements CommandExecutor {
 				return;
 			}
 			for (TRItem isr : iss) {
-				@SuppressWarnings("cast")
 				HashMap<Integer, Integer> hm = (HashMap<Integer, Integer>) ee.EEMaps.alchemicalValues.get(isr.id);
 				if (hm == null) continue;
 				
@@ -1091,7 +1107,7 @@ public class TRCommandTR implements CommandExecutor {
 						if(trl.placedBlock != null)
 							trl.placedBlock.clear();
 						else
-							trl.placedBlock = new LinkedList<Location>();
+							trl.placedBlock = new LinkedList<TRLocation>();
 					}
 					int ci = cc.itemlimits.indexOf(trl);
 					if(ci != -1) cc.itemlimits.set(ci, trl);
@@ -1174,23 +1190,24 @@ public class TRCommandTR implements CommandExecutor {
 			send.msg(ChatColor.RED + largs[1] + " is not a valid number!");
 			return;
 		}
-		int lastpage = Math.round(TRNoItem.DisabledItems.size()/8);
+		List<TRItem> banned = TRNoItem.getBannedItems();
+		int lastpage = (int) Math.ceil(banned.size()/8);
 		int start = (page-1) * 8; //8
 		int end = page * 8; //15
-		if (start > TRNoItem.DisabledItems.size()){
+		if (page <= 0 || start > banned.size()){
 			send.msg(ChatColor.RED + "Page " + page + " does not exist!");
 			send.msg(ChatColor.RED + "Last page: " + lastpage+".");
 			return;
 		}
 		send.msg(ChatColor.BLUE + "Banned Items - Page " + page + " of "+lastpage);
 		send.msg(ChatColor.RED +""+ChatColor.BOLD + "Banned Item - " + ChatColor.RED +"Reason");
-		for (int i=start;i<TRNoItem.DisabledItems.size() && i < end;i++){
-			TRItem it = TRNoItem.DisabledItems.get(i);
+		for (int i=start;i<banned.size() && i < end;i++){
+			TRItem it = banned.get(i);
 			String reason = it.msg;
 			String name = NameProcessor.getName(it);
 			if (reason == null || reason.equals("")) reason = "None";
-			if (reason.contains("Reason:")){
-				reason = reason.split("Reason:")[1].trim();
+			if (reason.toLowerCase().contains("reason:")){
+				reason = reason.split("(?i)Reason:")[1].trim();
 			}
 			
 			if (name == null) continue;

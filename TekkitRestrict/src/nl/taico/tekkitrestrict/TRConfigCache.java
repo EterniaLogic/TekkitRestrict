@@ -48,66 +48,75 @@ public class TRConfigCache {
 		
 		Hacks.broadcastFormat = config.getString2(ConfigFile.HackDupe, "Anti-Hacks.BroadcastString", "&9{PLAYER} &ctried to &a{TYPE}&c-hack!");
 		
-		Dupes.alcBags = new TRDupeSettings();
-		Dupes.alcBags.prevent = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.AlchemyBagDupe.Prevent", true);
-		Dupes.alcBags.broadcast = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.AlchemyBagDupe.Broadcast", true);
-		Dupes.alcBags.kick = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.AlchemyBagDupe.Kick", false);
-		Dupes.alcBags.useCommand = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.AlchemyBagDupe.ExecuteCommand.Enabled", false);
-		Dupes.alcBags.command = config.getString2(ConfigFile.HackDupe, "Anti-Dupes.AlchemyBagDupe.ExecuteCommand.Command", "");
-		Dupes.alcBags.triggerAfter = config.getInt2(ConfigFile.HackDupe, "Anti-Dupes.AlchemyBagDupe.ExecuteCommand.TriggerAfter", 1);
+		Dupes.alcBag = new TRDupeSettings();
+		Dupes.alcBag.prevent = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.AlchemyBagDupe.Prevent", true);
+		Dupes.alcBag.broadcast = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.AlchemyBagDupe.Broadcast", true);
+		Dupes.alcBag.kick = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.AlchemyBagDupe.Kick", false);
+		Dupes.alcBag.useCommand = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.AlchemyBagDupe.ExecuteCommand.Enabled", false);
+		Dupes.alcBag.command = config.getString2(ConfigFile.HackDupe, "Anti-Dupes.AlchemyBagDupe.ExecuteCommand.Command", "");
+		Dupes.alcBag.triggerAfter = config.getInt2(ConfigFile.HackDupe, "Anti-Dupes.AlchemyBagDupe.ExecuteCommand.TriggerAfter", 1);
 		
-		Dupes.rmFurnaces = new TRDupeSettings();
-		Dupes.rmFurnaces.prevent = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.RMFurnaceDupe.Prevent", true);
-		Dupes.rmFurnaces.broadcast = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.RMFurnaceDupe.Broadcast", true);
-		Dupes.rmFurnaces.kick = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.RMFurnaceDupe.Kick", false);
-		Dupes.rmFurnaces.useCommand = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.RMFurnaceDupe.ExecuteCommand.Enabled", false);
-		Dupes.rmFurnaces.command = config.getString2(ConfigFile.HackDupe, "Anti-Dupes.RMFurnaceDupe.ExecuteCommand.Command", "");
-		Dupes.rmFurnaces.triggerAfter = config.getInt2(ConfigFile.HackDupe, "Anti-Dupes.RMFurnaceDupe.ExecuteCommand.TriggerAfter", 1);
+		Dupes.rmFurnace = new TRDupeSettings();
+		Dupes.rmFurnace.prevent = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.RMFurnaceDupe.Prevent", true);
+		Dupes.rmFurnace.broadcast = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.RMFurnaceDupe.Broadcast", true);
+		Dupes.rmFurnace.kick = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.RMFurnaceDupe.Kick", false);
+		Dupes.rmFurnace.useCommand = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.RMFurnaceDupe.ExecuteCommand.Enabled", false);
+		Dupes.rmFurnace.command = config.getString2(ConfigFile.HackDupe, "Anti-Dupes.RMFurnaceDupe.ExecuteCommand.Command", "");
+		Dupes.rmFurnace.triggerAfter = config.getInt2(ConfigFile.HackDupe, "Anti-Dupes.RMFurnaceDupe.ExecuteCommand.TriggerAfter", 1);
 		
-		Dupes.transmutes = new TRDupeSettings();
-		Dupes.transmutes.prevent = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.TransmuteDupe.Prevent", true);
-		Dupes.transmutes.broadcast = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.TransmuteDupe.Broadcast", true);
-		Dupes.transmutes.kick = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.TransmuteDupe.Kick", false);
-		Dupes.transmutes.useCommand = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.TransmuteDupe.ExecuteCommand.Enabled", false);
-		Dupes.transmutes.command = config.getString2(ConfigFile.HackDupe, "Anti-Dupes.TransmuteDupe.ExecuteCommand.Command", "");
-		Dupes.transmutes.triggerAfter = config.getInt2(ConfigFile.HackDupe, "Anti-Dupes.TransmuteDupe.ExecuteCommand.TriggerAfter", 1);
+		Dupes.transmute = new TRDupeSettings();
+		Dupes.transmute.prevent = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.TransmuteDupe.Prevent", true);
+		Dupes.transmute.broadcast = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.TransmuteDupe.Broadcast", true);
+		Dupes.transmute.kick = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.TransmuteDupe.Kick", false);
+		Dupes.transmute.useCommand = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.TransmuteDupe.ExecuteCommand.Enabled", false);
+		Dupes.transmute.command = config.getString2(ConfigFile.HackDupe, "Anti-Dupes.TransmuteDupe.ExecuteCommand.Command", "");
+		Dupes.transmute.triggerAfter = config.getInt2(ConfigFile.HackDupe, "Anti-Dupes.TransmuteDupe.ExecuteCommand.TriggerAfter", 1);
 		
-		Dupes.tankcarts = new TRDupeSettings();
-		Dupes.tankcarts.prevent = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.TankCartDupe.Prevent", true);
-		Dupes.tankcarts.broadcast = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.TankCartDupe.Broadcast", true);
-		Dupes.tankcarts.kick = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.TankCartDupe.Kick", false);
-		Dupes.tankcarts.useCommand = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.TankCartDupe.ExecuteCommand.Enabled", false);
-		Dupes.tankcarts.command = config.getString2(ConfigFile.HackDupe, "Anti-Dupes.TankCartDupe.ExecuteCommand.Command", "");
-		Dupes.tankcarts.triggerAfter = config.getInt2(ConfigFile.HackDupe, "Anti-Dupes.TankCartDupe.ExecuteCommand.TriggerAfter", 1);
+		Dupes.tankcart = new TRDupeSettings();
+		Dupes.tankcart.prevent = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.TankCartDupe.Prevent", true);
+		Dupes.tankcart.broadcast = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.TankCartDupe.Broadcast", true);
+		Dupes.tankcart.kick = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.TankCartDupe.Kick", false);
+		Dupes.tankcart.useCommand = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.TankCartDupe.ExecuteCommand.Enabled", false);
+		Dupes.tankcart.command = config.getString2(ConfigFile.HackDupe, "Anti-Dupes.TankCartDupe.ExecuteCommand.Command", "");
+		Dupes.tankcart.triggerAfter = config.getInt2(ConfigFile.HackDupe, "Anti-Dupes.TankCartDupe.ExecuteCommand.TriggerAfter", 1);
 		
-		Dupes.tankcartGlitchs = new TRDupeSettings();
-		Dupes.tankcartGlitchs.prevent = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.TankCartGlitch.Prevent", true);
-		Dupes.tankcartGlitchs.broadcast = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.TankCartGlitch.Broadcast", true);
-		Dupes.tankcartGlitchs.kick = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.TankCartGlitch.Kick", false);
-		Dupes.tankcartGlitchs.useCommand = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.TankCartGlitch.ExecuteCommand.Enabled", false);
-		Dupes.tankcartGlitchs.command = config.getString2(ConfigFile.HackDupe, "Anti-Dupes.TankCartGlitch.ExecuteCommand.Command", "");
-		Dupes.tankcartGlitchs.triggerAfter = config.getInt2(ConfigFile.HackDupe, "Anti-Dupes.TankCartGlitch.ExecuteCommand.TriggerAfter", 1);
+		Dupes.tankcartGlitch = new TRDupeSettings();
+		Dupes.tankcartGlitch.prevent = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.TankCartGlitch.Prevent", true);
+		Dupes.tankcartGlitch.broadcast = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.TankCartGlitch.Broadcast", true);
+		Dupes.tankcartGlitch.kick = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.TankCartGlitch.Kick", false);
+		Dupes.tankcartGlitch.useCommand = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.TankCartGlitch.ExecuteCommand.Enabled", false);
+		Dupes.tankcartGlitch.command = config.getString2(ConfigFile.HackDupe, "Anti-Dupes.TankCartGlitch.ExecuteCommand.Command", "");
+		Dupes.tankcartGlitch.triggerAfter = config.getInt2(ConfigFile.HackDupe, "Anti-Dupes.TankCartGlitch.ExecuteCommand.TriggerAfter", 1);
 		
-		Dupes.teleports = new TRDupeSettings();
-		Dupes.teleports.prevent = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.TeleportDupe.Prevent", true);
-		Dupes.teleports.broadcast = false;
-		Dupes.teleports.kick = false;
-		Dupes.teleports.useCommand = false;
-		Dupes.teleports.command = "";
-		Dupes.teleports.triggerAfter = 1;
+		Dupes.teleport = new TRDupeSettings();
+		Dupes.teleport.prevent = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.TeleportDupe.Prevent", true);
+		Dupes.teleport.broadcast = false;
+		Dupes.teleport.kick = false;
+		Dupes.teleport.useCommand = false;
+		Dupes.teleport.command = "";
+		Dupes.teleport.triggerAfter = 1;
 		
-		Dupes.pedestals = new TRDupeSettings();
-		Dupes.pedestals.prevent = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.PedestalEmcGen.Prevent", true);
-		Dupes.pedestals.broadcast = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.PedestalEmcGen.Broadcast", true);
-		Dupes.pedestals.kick = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.PedestalEmcGen.Kick", false);
-		Dupes.pedestals.useCommand = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.PedestalEmcGen.ExecuteCommand.Enabled", false);
-		Dupes.pedestals.command = config.getString2(ConfigFile.HackDupe, "Anti-Dupes.PedestalEmcGen.ExecuteCommand.Command", "");
-		Dupes.pedestals.triggerAfter = config.getInt2(ConfigFile.HackDupe, "Anti-Dupes.PedestalEmcGen.ExecuteCommand.TriggerAfter", 1);
+		Dupes.pedestal = new TRDupeSettings();
+		Dupes.pedestal.prevent = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.PedestalEmcGen.Prevent", true);
+		Dupes.pedestal.broadcast = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.PedestalEmcGen.Broadcast", true);
+		Dupes.pedestal.kick = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.PedestalEmcGen.Kick", false);
+		Dupes.pedestal.useCommand = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.PedestalEmcGen.ExecuteCommand.Enabled", false);
+		Dupes.pedestal.command = config.getString2(ConfigFile.HackDupe, "Anti-Dupes.PedestalEmcGen.ExecuteCommand.Command", "");
+		Dupes.pedestal.triggerAfter = config.getInt2(ConfigFile.HackDupe, "Anti-Dupes.PedestalEmcGen.ExecuteCommand.TriggerAfter", 1);
+		
+		Dupes.diskdrive = new TRDupeSettings();
+		Dupes.diskdrive.prevent = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.DiskDriveDupe.Prevent", true);
+		Dupes.diskdrive.broadcast = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.DiskDriveDupe.Broadcast", true);
+		Dupes.diskdrive.kick = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.DiskDriveDupe.Kick", false);
+		Dupes.diskdrive.useCommand = config.getBoolean2(ConfigFile.HackDupe, "Anti-Dupes.DiskDriveDupe.ExecuteCommand.Enabled", false);
+		Dupes.diskdrive.command = config.getString2(ConfigFile.HackDupe, "Anti-Dupes.DiskDriveDupe.ExecuteCommand.Command", "");
+		Dupes.diskdrive.triggerAfter = config.getInt2(ConfigFile.HackDupe, "Anti-Dupes.DiskDriveDupe.ExecuteCommand.TriggerAfter", 1);
 		
 		Dupes.broadcastFormat = config.getString2(ConfigFile.HackDupe, "Anti-Dupes.BroadcastString", "&9{PLAYER} &ctried to dupe&6 {ITEM} &cusing &a{TYPE}&c!");
 		
 		Global.debug = config.getBoolean(ConfigFile.General, "ShowDebugMessages", false) ||
 					   config.getBoolean(ConfigFile.Logging, "LogDebug", false);
+		Global.favorPerformanceOverMemory = config.getBoolean(ConfigFile.General, "FavorPerformanceOverMemory", false);
 		
 		Global.kickFromConsole = config.getBoolean2(ConfigFile.General, "KickFromConsole", false);
 		//Global.useNewBanSystem = config.getBoolean("UseNewBannedItemsSystem", false);
@@ -194,6 +203,7 @@ public class TRConfigCache {
 
 	public static class Global {
 		public static boolean kickFromConsole, debug;
+		public static boolean favorPerformanceOverMemory;
 	}
 	
 	public static class Logger {
@@ -206,7 +216,7 @@ public class TRConfigCache {
 	}
 	
 	public static class Dupes {
-		public static TRDupeSettings alcBags, rmFurnaces, tankcarts, tankcartGlitchs, transmutes, pedestals, teleports;
+		public static TRDupeSettings alcBag, rmFurnace, tankcart, tankcartGlitch, transmute, pedestal, teleport, diskdrive;
 		public static String broadcastFormat;
 	}
 	

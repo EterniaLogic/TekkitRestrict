@@ -12,8 +12,6 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -25,6 +23,7 @@ import net.minecraft.server.RedPowerMachine;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.eclipse.jdt.annotation.NonNull;
@@ -53,7 +52,7 @@ public class tekkitrestrict extends JavaPlugin {
 	public static Logger log;
 	public static TRFileConfiguration config;
 	public static boolean EEEnabled = false;
-	public static Boolean EEPatch = null;
+	public static Boolean EEPatch = null, FixPack = null;
 	
 	/** Indicates if tekkitrestrict is disabling. Threads use this to check if they should stop. */
 	public static boolean disable = false;
@@ -66,14 +65,12 @@ public class tekkitrestrict extends JavaPlugin {
 	public static Database db;
 	public static Updater updater2 = null;
 	
-	public static ExecutorService basfo = Executors.newCachedThreadPool();
-	
 	private static TRThread ttt = null;
 	private static TRLogFilter filter = null;
 	public static ArrayList<YamlConfiguration> configList = new ArrayList<YamlConfiguration>();
 	
 	public static boolean useTMetrics = true;
-	private static TMetrics tmetrics;
+	public static TMetrics tmetrics;
 	
 	@Override
 	public void onLoad() {
@@ -199,18 +196,20 @@ public class tekkitrestrict extends JavaPlugin {
 		}
 		
 		try {
+			//.add(dmg << 15 | id)
 			RedPowerMachine.breakerBlacklist.add(Integer.valueOf(-1 << 15 | 194));
 			
-			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(0 << 15 | 6362));//REP
-			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(0 << 15 | 6359));//Wireless sniffer
-			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(0 << 15 | 6363));//Private sniffer
-			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(0 << 15 | 27562));//Alcbag
-			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(0 << 15 | 27585));//Divining ROd
-			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(0 << 15 | 30122));//Cropnalyser
-			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(0 << 15 | 30104));//Debug item
+			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(6362));//REP
+			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(6359));//Wireless sniffer
+			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(6363));//Private sniffer
+			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(27562));//Alcbag
+			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(27585));//Divining ROd
+			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(30122));//Cropnalyser
+			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(30104));//Debug item
 			
-			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(0 << 15 | 27592));//transtablet
-			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(0 << 15 | 7493));//Ender pouch
+			
+			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(27592));//transtablet
+			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(7493));//Ender pouch
 			log.fine("Patched BlockBreaker + Auto Crafting Table MK II dupe.");
 			log.fine("Patched most Deployer Crash Bugs.");
 		} catch (Exception ex){
@@ -236,20 +235,25 @@ public class tekkitrestrict extends JavaPlugin {
 			Log.Exception(ex, true);
 		}
 		
-		TRSafeZone.init();
+		PluginManager pm = this.getServer().getPluginManager();
+		final Plugin wg = pm.getPlugin("WorldGuard"), gp = pm.getPlugin("GriefPrevention"), ps = pm.getPlugin("PreciousStones");
 		
-		TRLimiter.init();
+		if (Bukkit.getScheduler().scheduleAsyncDelayedTask(this, new Runnable(){
+			public void run(){
+				TRSafeZone.init(wg, gp, ps);
+				TRLimiter.init();
+			}
+		})==-1){
+			log.warning("Unable to schedule Limiter and SafeZones. Using non-scheduled methods.");
+			TRSafeZone.init(wg, gp, ps);
+			TRLimiter.init();
+		}
 
 		getCommand("tekkitrestrict").setExecutor(new TRCommandTR());
 		getCommand("openalc").setExecutor(new TRCommandAlc());
 		getCommand("tpic").setExecutor(new TRCommandTPIC());
 		getCommand("checklimits").setExecutor(new TRCommandCheck());
-
-		// determine if EE2 is enabled by using pluginmanager
-		PluginManager pm = this.getServer().getPluginManager();
 		
-		tekkitrestrict.EEEnabled = pm.isPluginEnabled("mod_EE");
-
 		try {
 			if (pm.isPluginEnabled("PermissionsEx")) {
 				TRPermHandler.permEx = ru.tehkode.permissions.bukkit.PermissionsEx.getPermissionManager();
@@ -259,6 +263,9 @@ public class tekkitrestrict extends JavaPlugin {
 			log.info("Linking with Pex Failed!");
 			// Was not able to load permissionsEx
 		}
+		
+		// determine if EE2 is enabled by using pluginmanager
+		tekkitrestrict.EEEnabled = pm.isPluginEnabled("mod_EE");
 		
 		try {
 			ttt.init();
@@ -291,7 +298,6 @@ public class tekkitrestrict extends JavaPlugin {
 			log.info("EEPatch is not available. Extended EE integration disabled.");
 		}
 		
-		
 		Bukkit.getScheduler().scheduleAsyncDelayedTask(this, new Runnable() {
 			public void run(){
 				if (config.getBoolean2(ConfigFile.General, "Auto-Update", true)){
@@ -308,13 +314,22 @@ public class tekkitrestrict extends JavaPlugin {
 		
 		
 		//##################### Log Filter ####################
-		if (config.getBoolean2(ConfigFile.Logging, "FilterLogs", true) || config.getBoolean2(ConfigFile.Logging, "SplitLogs", true)){
-			Enumeration<String> cc = LogManager.getLogManager().getLoggerNames();
-			filter = new TRLogFilter();
-			while (cc.hasMoreElements()){
-				Logger.getLogger(cc.nextElement()).setFilter(filter);
+		if (Bukkit.getScheduler().scheduleAsyncDelayedTask(this, new Runnable(){
+			public void run() {
+				if (config.getBoolean2(ConfigFile.Logging, "FilterLogs", true) || config.getBoolean2(ConfigFile.Logging, "SplitLogs", true)){
+					Enumeration<String> cc = LogManager.getLogManager().getLoggerNames();
+					filter = new TRLogFilter();
+					while (cc.hasMoreElements()){
+						Logger.getLogger(cc.nextElement()).setFilter(filter);
+					}
+				}
+			}
+		})==-1){
+			if (config.getBoolean2(ConfigFile.Logging, "FilterLogs", true) || config.getBoolean2(ConfigFile.Logging, "SplitLogs", true)){
+				log.severe("Unable to register logfilters! Error: Cannot schedule!");
 			}
 		}
+		
 		//#####################################################
 		
 		initMetrics();
@@ -349,9 +364,21 @@ public class tekkitrestrict extends JavaPlugin {
 		ttt.gemArmorThread.interrupt();
 		ttt.worldScrubThread.interrupt();
 		ttt.saveThread.interrupt();
+		
 		//ttt.limitFlyThread.interrupt();
 		
-		try { Thread.sleep(1500); } catch (InterruptedException e) {} //Sleep for 1.5 seconds to allow the savethread to save.
+		try {
+			int i = 1;
+			Thread.sleep(100);
+			do {
+				Thread.sleep(100);
+				i++;
+				if (i >= 50){
+					log.severe("The save thread was unable to fully save!");
+					break;
+				}
+			} while (ttt.saveThread.isSaving());
+		} catch (InterruptedException e) {} //Sleep for 0.1 or more seconds to allow the savethread to save.
 
 		TRLogger.saveLogs();
 		TRLogFilter.disable();
@@ -423,7 +450,7 @@ public class tekkitrestrict extends JavaPlugin {
 		}
 	}
 	
-	public boolean linkEEPatch(){
+	public static boolean linkEEPatch(){
 		if (EEPatch != null) return EEPatch.booleanValue();
 		try {
 			Class.forName("ee.events.EEEvent");
@@ -472,25 +499,36 @@ public class tekkitrestrict extends JavaPlugin {
 	 * @param listeners Reload Listeners as well?
 	 * @param silent If silent is true, no notice of the reload will appear in the console.
 	 */
-	public void reload(boolean listeners, boolean silent) {
+	public void reload(final boolean listeners, final boolean silent) {
 		if (listeners) Assigner.unregisterAll();
 		
-		this.reloadConfig();
-		config = this.getConfigx();
-		load();
-		TRThread.reload();
-		
-		//Stop TMetrics if the user disabled it in the config and reloaded.
-		if (!config.getBoolean(ConfigFile.General, "UseTMetrics", true)){
-			tmetrics.stop();
+		int id = Bukkit.getScheduler().scheduleAsyncDelayedTask(this, new Runnable(){
+			public void run(){
+				reloadConfig();
+				
+				load();
+				TRThread.reload();
+				
+				//Stop TMetrics if the user disabled it in the config and reloaded.
+				if (!config.getBoolean(ConfigFile.General, "UseTMetrics", true)){
+					tmetrics.stop();
+				}
+				if (listeners){
+					Bukkit.getScheduler().scheduleSyncDelayedTask(tekkitrestrict.this, new Runnable(){
+						public void run(){
+							Assigner.assign();
+							if (linkEEPatch()) Assigner.assignEEPatch();
+							if (!silent) log.info("TekkitRestrict Reloaded!");
+						}
+					});
+				} else {
+					if (!silent) log.info("TekkitRestrict Reloaded!");
+				}
+			}
+		});
+		if (id == -1){
+			log.severe("Unable to reload tekkitrestrict! Error: cannot schedule reload.");
 		}
-		
-		if (listeners){
-			Assigner.assign();
-			if (linkEEPatch()) Assigner.assignEEPatch();
-		}
-		
-		if (!silent) log.info("TekkitRestrict Reloaded!");
 	}
 
 	@NonNull private TRFileConfiguration getConfigx() {
@@ -690,40 +728,4 @@ public class tekkitrestrict extends JavaPlugin {
 
 	}
 
-	@NonNull public static String getFullVersion(){
-		return getMajorVersion() + "." + getMinorVersion() + getExtraVersion();
-	}
-	@NonNull public static String getMajorVersion(){
-		return instance.getDescription().getVersion().split("\\D+")[0];
-	}
-	@NonNull public static String getMinorVersion(){
-		return instance.getDescription().getVersion().split("\\D+")[1];
-	}
-	@NonNull public static String getExtraVersion(){
-		String ver = instance.getDescription().getVersion().toLowerCase();
-		if (ver.contains("beta")){
-			String temp[] = ver.split(" ");
-			if (temp.length >= 3 && temp[2].matches("\\d+")){//1.18 beta 2
-				return "b" + temp[2];
-			} else {
-				return "b1";
-			}
-		} else if (ver.contains("dev")){
-			String temp[] = ver.split(" ");
-			if (temp.length >= 3 && temp[2].matches("\\d+")){
-				return "d" + temp[2];
-			} else {
-				return "d1";
-			}
-		} else {
-			return "";
-		}
-	}
-	
-	public static boolean isBeta(){
-		return getExtraVersion().contains("b");
-	}
-	public static boolean isDev(){
-		return getExtraVersion().contains("d");
-	}
 }

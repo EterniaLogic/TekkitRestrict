@@ -14,9 +14,9 @@ public class TRVersion {
 	public int extra = -1;
 	
 	public TRVersion(@NonNull String str){
-		str = str.toLowerCase();
-		if (str.contains("tekkitrestrict")){
-			str = str.replace("tekkitrestrict", "");
+		//str = str.toLowerCase();
+		if (str.toLowerCase().contains("tekkitrestrict")){
+			str = str.replaceAll("(?i)tekkitrestrict", "");
 		}
 		str = str.trim();
 		fullVer = str;
@@ -30,7 +30,7 @@ public class TRVersion {
 			beta = false;
 			dev = false;
 			extra = -1;
-		} else if (fullVer.contains("beta")){
+		} else if (fullVer.toLowerCase().contains("beta")){
 			beta = true;
 			dev = false;
 			
@@ -39,7 +39,7 @@ public class TRVersion {
 				extra = 1;
 			else if (temp.length >= 3)
 				extra = Integer.parseInt(temp[2]);
-		} else if (fullVer.contains("dev")){
+		} else if (fullVer.toLowerCase().contains("dev")){
 			beta = false;
 			dev = true;
 			

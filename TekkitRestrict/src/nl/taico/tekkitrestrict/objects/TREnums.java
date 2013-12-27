@@ -6,7 +6,7 @@ public class TREnums {
 	}
 	
 	public enum DupeType {
-		rmFurnace, alcBag, tankCart, tankCartGlitch, teleport, transmution, pedestal
+		rmFurnace, alcBag, tankCart, tankCartGlitch, teleport, transmution, pedestal, diskdrive
 	}
 	
 	public enum TRClickType{

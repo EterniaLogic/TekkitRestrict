@@ -13,7 +13,7 @@ import nl.taico.tekkitrestrict.Log.Warning;
 
 public class HackDupeConfig extends TRConfig {
 	public static ArrayList<String> defaultContents(boolean extra){
-		ArrayList<String> tbr = new ArrayList<String>(250);
+		ArrayList<String> tbr = new ArrayList<String>(260);
 		
 		tbr.add("##############################################################################################");
 		tbr.add("## Configuration file for TekkitRestrict                                                    ##");
@@ -224,6 +224,20 @@ public class HackDupeConfig extends TRConfig {
 		if (extra) tbr.add("#:-;-:# Anti-Dupes.TransmuteDupe.ExecuteCommand.Command");
 		tbr.add("            TriggerAfter: 1");
 		if (extra) tbr.add("#:-;-:# Anti-Dupes.TransmuteDupe.ExecuteCommand.TriggerAfter");
+		tbr.add("DiskDriveDupe:");
+		tbr.add("    Prevent: true");
+		if (extra) tbr.add("#:-;-:# Anti-Dupes.DiskDriveDupe.Prevent");
+		tbr.add("    Broadcast: false");
+		if (extra) tbr.add("#:-;-:# Anti-Dupes.DiskDriveDupe.Broadcast");
+		tbr.add("    Kick: false");
+		if (extra) tbr.add("#:-;-:# Anti-Dupes.DiskDriveDupe.Kick");
+		tbr.add("    ExecuteCommand:");
+		tbr.add("        Enabled: false");
+		if (extra) tbr.add("#:-;-:# Anti-Dupes.DiskDriveDupe.ExecuteCommand.Enabled");
+		tbr.add("        Command: \"\"");
+		if (extra) tbr.add("#:-;-:# Anti-Dupes.DiskDriveDupe.ExecuteCommand.Command");
+		tbr.add("        TriggerAfter: 1");
+		if (extra) tbr.add("#:-;-:# Anti-Dupes.DiskDriveDupe.ExecuteCommand.TriggerAfter");
 		tbr.add("    TankCartDupe:");
 		tbr.add("        Prevent: true");
 		if (extra) tbr.add("#:-;-:# Anti-Dupes.PreventTankCartDupe PreventTankCartDupe");

@@ -141,7 +141,7 @@ public class NoHackFly implements Listener {
 
 					// they are constant 0 or are going upwards
 					if (velo >= 0) {
-						Block cb = player.getLocation().getBlock();
+						Block cb = loc.getBlock();
 						for (BlockFace bf : BlockFace.values()) {
 							if (!nearBlocks.contains(cb.getRelative(bf).getTypeId())) continue;
 							lowerScore(name, 1);

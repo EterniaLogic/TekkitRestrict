@@ -13,6 +13,10 @@ import nl.taico.tekkitrestrict.TRConfigCache.Logger;
 
 import ee.events.EEEvent;
 import ee.events.amulet.EEAmuletEvent;
+import ee.events.destruction.EEDestructionToolEvent;
+import ee.events.dm.EEDMToolEvent;
+import ee.events.ring.EERingEvent;
+import ee.events.rm.EERMToolEvent;
 
 public class EEListener implements Listener {
 	//IMPORTANT TODO WIP
@@ -21,17 +25,28 @@ public class EEListener implements Listener {
 		if (e instanceof EEAmuletEvent){
 			EEAmuletEvent j = (EEAmuletEvent) e;
 			logUse("EEAmulet", j.getPlayer(), j.getAmulet().id);
+		} else if (e instanceof EERMToolEvent){
+			EERMToolEvent j = (EERMToolEvent) e;
+			logUse("EERmTool", j.getPlayer(), j.getTool().id);
+		} else if (e instanceof EEDMToolEvent){
+			EEDMToolEvent j = (EEDMToolEvent) e;
+			logUse("EEDmTool", j.getPlayer(), j.getTool().id);
+		} else if (e instanceof EEDestructionToolEvent){
+			EEDestructionToolEvent j = (EEDestructionToolEvent) e;
+			logUse("EEDmTool", j.getPlayer(), j.getTool().id);
+		} else if (e instanceof EERingEvent){
+			EERingEvent j = (EERingEvent) e;
+			logUse("EERing", j.getPlayer(), j.getRing().id);
+		} else {
+			//IMPORTANT TODO
 		}
 	}
 	
 	private void logUse(String logname, Player player, int id){
 		if (!isLoggable(logname)) return;
 		Location loc = player.getLocation();
-		int x = loc.getBlockX();
-		int y = loc.getBlockY();
-		int z = loc.getBlockZ();
 		TRLogger.Log(logname, "[" + player.getName() + "][" + player.getWorld().getName() +
-				" - " + x + "," + y + "," + z + "] used (" + id + ") `" + NameProcessor.getEEName(id) + "`");
+				" - " + loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ() + "] used (" + id + ") `" + NameProcessor.getEEName(id) + "`");
 	}
 	
 	private boolean isLoggable(@NonNull String type) {

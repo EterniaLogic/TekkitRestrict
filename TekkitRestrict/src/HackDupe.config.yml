@@ -164,6 +164,14 @@ Anti-Dupes:
             Enabled: false
             Command: ""
             TriggerAfter: 1
+    DiskDriveDupe:
+        Prevent: true
+        Broadcast: false
+        Kick: false
+        ExecuteCommand:
+            Enabled: false
+            Command: ""
+            TriggerAfter: 1
     TankCartDupe:
         Prevent: true
         Broadcast: true

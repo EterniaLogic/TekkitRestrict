@@ -3,6 +3,7 @@ package nl.taico.tekkitrestrict.functions;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.eclipse.jdt.annotation.NonNull;
@@ -116,21 +117,21 @@ public class TRNoHack {
 	}
 	
 	@NonNull private static String convert(@NonNull String str, @NonNull String type, @NonNull Player player){
-		str = Log.replaceColors(str);
-		str = str.replaceAll("(?i)\\{PLAYER\\}", player.getName());
-		str = str.replaceAll("(?i)\\{TYPE\\}", type);
-		str = str.replaceAll("(?i)\\{ID\\}","");
-		str = str.replaceAll("(?i)\\{DATA\\}", "");
-		str = str.replaceAll("(?i)\\{ITEM\\}", "");
-		str = str.replace("  ", " ");
-		return str;
+		return Log.replaceColors(str)
+				.replaceAll("(?i)\\{PLAYER\\}", player.getName())
+				.replaceAll("(?i)\\{TYPE\\}", type)
+				.replaceAll("(?i)\\{ID\\}","")
+				.replaceAll("(?i)\\{DATA\\}", "")
+				.replaceAll("(?i)\\{ITEM\\}", "")
+				.replace("  ", " ");
 	}
 	
 	/** Teleport the player to the highest block at his position. Will not teleport players above their current position. */
 	public static void groundPlayer(@NonNull Player player) {
-		Block highest = player.getWorld().getHighestBlockAt(player.getLocation());
-		int yblock = highest.getLocation().getBlockY();
-		int yplayer = player.getLocation().getBlockY();
+		Location ploc = player.getLocation();
+		Block highest = player.getWorld().getHighestBlockAt(ploc);
+		int yblock = highest.getY();
+		int yplayer = ploc.getBlockY();
 		if (yplayer < yblock) player.teleport(highest.getLocation());
 	}
 
@@ -142,12 +143,13 @@ public class TRNoHack {
 
 	public static void playerLogout(@NonNull Player player) {
 		// clears ALL lists for said player
-		NoHackSpeed.playerLogout(player.getName());
-		NoHackFly.playerLogout(player.getName());
-		NoHackForcefield.playerLogout(player.getName());
-		cmdFly.remove(player.getName());
-		cmdForcefield.remove(player.getName());
-		cmdSpeed.remove(player.getName());
+		String n = player.getName();
+		NoHackSpeed.playerLogout(n);
+		NoHackFly.playerLogout(n);
+		NoHackForcefield.playerLogout(n);
+		cmdFly.remove(n);
+		cmdForcefield.remove(n);
+		cmdSpeed.remove(n);
 		//TRLimitFlyThread.setGrounded(player);
 	}
 }

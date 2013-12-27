@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -24,9 +25,11 @@ import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
  */
 public class TRNoItem {
 	/** A list of all the (by config) banned items. */
-	public static LinkedList<TRItem> DisabledItems = new LinkedList<TRItem>();
+	private static LinkedList<TRItem> DisabledItems = new LinkedList<TRItem>();
 	/** A list of all the (by config) banned creative items. */
 	private static LinkedList<TRItem> DisabledCreativeItems = new LinkedList<TRItem>();
+	
+	public static ArrayList<String> DisabledItemGroups = new ArrayList<String>();
 	
 	/**
 	 * Uses allocateDisabledItems() and allocateDisabledCreativeItems()<br>
@@ -155,12 +158,11 @@ public class TRNoItem {
 		if (player.hasPermission(idStr+"."+data)) return "";
 		else if (player.hasPermission(idStr)) return "";
 		else {
-			Iterator<String> keys = TRItemProcessor.groups.keySet().iterator();
-			while (keys.hasNext()) {
-				String key = keys.next();
-				if (player.hasPermission("tekkitrestrict.creative."+key)) {
-					List<TRItem> mi = TRItemProcessor.groups.get(key);
-					for(TRItem c:mi){
+			Iterator<Entry<String, List<TRItem>>> it = TRItemProcessor.groups.entrySet().iterator();
+			while (it.hasNext()){
+				Entry<String, List<TRItem>> e = it.next();
+				if (player.hasPermission("tekkitrestrict.creative."+e.getKey())) {
+					for(TRItem c : e.getValue()){
 						if (c == null) continue;
 						if (c.compare(id, data)) return "";
 					}
@@ -191,12 +193,11 @@ public class TRNoItem {
 		if (player.hasPermission(idStr+"."+data)) return "";
 		else if (player.hasPermission(idStr)) return "";
 		else {
-			Iterator<String> keys = TRItemProcessor.groups.keySet().iterator();
-			while (keys.hasNext()) {
-				String key = keys.next();
-				if (player.hasPermission("tekkitrestrict.noitem."+key)) {
-					List<TRItem> mi = TRItemProcessor.groups.get(key);
-					for(TRItem c:mi){
+			Iterator<Entry<String, List<TRItem>>> it = TRItemProcessor.groups.entrySet().iterator();
+			while (it.hasNext()){
+				Entry<String, List<TRItem>> e = it.next();
+				if (player.hasPermission("tekkitrestrict.noitem."+e.getKey())) {
+					for(TRItem c : e.getValue()){
 						if (c == null) continue;
 						if (c.compare(id, data)) return "";
 					}
@@ -286,6 +287,10 @@ public class TRNoItem {
 		return DisabledItems.size();
 	}
 
+	public static List<TRItem> getBannedItems(){
+		return (List<TRItem>) DisabledItems.clone();
+	}
+	
 	/** @return True if: id1 == id2 and (data1 = 0 or data1 == data2 or (data1 = -10 and data2 = 0)) */
 	public static boolean equalSet(int id1, int data1, int id2, int data2) {
 		if (id1 != id2) return false;

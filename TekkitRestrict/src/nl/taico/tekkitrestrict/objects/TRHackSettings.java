@@ -19,4 +19,10 @@ public class TRHackSettings {
 		this.triggerAfter = triggerAfter;
 		this.command = command;
 	}
+
+	@Override
+	public String toString() {
+		return "TRHackSettings [enable=" + enable + ", tolerance=" + tolerance + ", broadcast=" + broadcast + ", kick=" + kick + ", useCommand=" + useCommand
+				+ ", command=" + command + ", triggerAfter=" + triggerAfter + ", value=" + value + "]";
+	}
 }

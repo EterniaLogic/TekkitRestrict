@@ -21,11 +21,9 @@ public class InteractListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
 	public void onInteract_Logger(PlayerInteractEvent event){
 		if (!tekkitrestrict.EEEnabled) return;
-		
-		Player player = event.getPlayer();
-		if (player == null) return;
+		if (event.getPlayer() == null) return;
 
-		itemLogUse(player, event.getItem(), event.getAction(), event.isCancelled());
+		itemLogUse(event.getPlayer(), event.getItem(), event.getAction(), event.isCancelled());
 	}
 
 	/** Log EE tools. */
@@ -56,12 +54,9 @@ public class InteractListener implements Listener {
 	private void logUse(String logname, Player player, int id, boolean cancelled){
 		if (!isLoggable(logname)) return;
 		Location loc = player.getLocation();
-		int x = loc.getBlockX();
-		int y = loc.getBlockY();
-		int z = loc.getBlockZ();
 		FileLog filelog = FileLog.getLogOrMake(logname, true, false);
 		filelog.log("[" + player.getName() + "][" + player.getWorld().getName() +
-				" - " + x + "," + y + "," + z + "] used (" + id + ") `" + NameProcessor.getEEName(id) + "`" + (cancelled ? " (Action was cancelled)":""));
+				" - " + loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ() + "] used (" + id + ") `" + NameProcessor.getEEName(id) + "`" + (cancelled ? " (Action was cancelled)":""));
 	}
 	
 	private boolean isLoggable(@NonNull String type) {
