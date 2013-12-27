@@ -38,7 +38,7 @@ public class EEListener implements Listener {
 			EERingEvent j = (EERingEvent) e;
 			logUse("EERing", j.getPlayer(), j.getRing().id);
 		} else {
-			//IMPORTANT TODO
+			//IMPORTANT TODO continue this
 		}
 	}
 	

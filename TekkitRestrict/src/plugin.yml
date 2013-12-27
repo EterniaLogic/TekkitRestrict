@@ -40,6 +40,8 @@ permissions:
     tekkitrestrict.checklimits:
         description: Allows the user to use /checklimits
         default: true
+    tekkitrestrict.openalc.deny.all:
+        default: false
     tekkitrestrict.bypass.creative:
         description: Enables the use of any block in creative.
     tekkitrestrict.bypass.safezone:

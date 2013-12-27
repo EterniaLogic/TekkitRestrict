@@ -196,9 +196,9 @@ public class TMetrics {
 				} else if (s.contains("OK:")){
 					continue;
 				/*
-				} else if (s.contains("IMPORTANT: ")) {
-					if (showWarnings) scheduleRepeatingMSG(s.replace("IMPORTANT: ", ""));
-					Bukkit.getLogger().warning("[TekkitRestrict] Important Message: "+s.replace("IMPORTANT: ", ""));
+				} else if (s.contains("IMPO/RTANT: ")) {
+					if (showWarnings) scheduleRepeatingMSG(s.replace("IMPOR/TANT: ", ""));
+					Bukkit.getLogger().warning("[TekkitRestrict] Important Message: "+s.replace("IMPOR/TANT: ", ""));
 				} else if (s.contains("MSG: ")){
 					if (showWarnings) Bukkit.getLogger().info("[TMetrics] Message from server: "+s.replace("MSG: ", ""));
 				*/

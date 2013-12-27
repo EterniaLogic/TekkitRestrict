@@ -530,6 +530,7 @@ public class EEPSettings {
 		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Other.TransmutionTablet.PortableTable", true))
 			trans.add(EETransmuteAction.PortableTable);
 		
+		//TODO IMPORTANT Add pedestal listener
 		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Other.Pedestal.Activate", true))
 			pedestal.add(EEPedestalAction.Activate);
 		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Other.Pedestal.Attract", true))

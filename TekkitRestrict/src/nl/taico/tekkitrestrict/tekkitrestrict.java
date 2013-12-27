@@ -128,7 +128,7 @@ public class tekkitrestrict extends JavaPlugin {
 		}
 		
 		try {//Load all settings
-			load();//TODO loading eepatch
+			load();
 		} catch (Exception ex) {
 			Warning.load("An error occurred: Unable to load settings!", true);
 			Log.Exception(ex, true);

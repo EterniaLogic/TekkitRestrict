@@ -82,7 +82,8 @@ public class TRCommandAlc implements CommandExecutor {
 		}
 		
 		String OName = OPlayer.getName();
-		if (player.hasPermission("tekkitrestrict.openalc.deny."+OName) && !player.isOp()){
+		
+		if (player.hasPermission("tekkitrestrict.openalc.deny."+OName) && !player.isOp() && !player.hasPermission("tekkitrestrict.openalc.deny.all")){
 			sender.sendMessage(ChatColor.RED + "You are not allowed to open " + OName + "'s alchemy bags!");
 			return true;
 		}
