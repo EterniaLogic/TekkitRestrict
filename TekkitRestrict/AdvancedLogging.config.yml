@@ -1,0 +1,122 @@
+FilterMessages:
+    Group1:
+        Level: "ALL"
+        CaseSensitive: true
+        Messages: []
+    Group2:
+        Level: "INFO"
+        CaseSensitive: true
+        Messages:
+        - "Reached end of stream"
+        - "Connection reset"
+        - " joined with: ["
+        - "Sending serverside check to: "
+        - "Creating empty config: "
+        - "Read timed out"
+        - "Sending Triang: "
+        - "slotchanging("
+    Regexes:
+        Level: "INFO"
+        Regex: true
+        Messages:
+        - "//(\\d+)\\.(\\d+)\\.(\\d+)\\.(\\d+):(\\d+) lost connection"
+        
+# Should TekkitRestrict use a listener to log for commands? This is garanteed
+# to pick up every command.
+LogCommandsExtended: true
+SplitCommands:
+    SpawnItem:
+        Level: "PLAYER_COMMAND"
+        CaseSensitive: false
+        Messages:
+        - "/i "
+        - "/item "
+        - "/give "
+        - "/more "
+        - "/unlimited "
+        - "/ul "
+        - "/unl "
+        - "/eitem "
+        - "/egive "
+        - "/emore "
+        - "/eunlimited "
+        - "/eul "
+        - "/eunl "
+    PrivateChat:
+        Level: "PLAYER_COMMAND"
+        CaseSensitive: false
+        Messages:
+        - "/msg "
+        - "/m "
+        - "/tell "
+        - "/whisper "
+        - "/r "
+        - "/reply "
+        - "/mail "
+        - "/emsg "
+        - "/er "
+        - "/ereply "
+        - "/ewhisper "
+        - "/etell "
+        - "/email "
+    BansKicks:
+        Level: "PLAYER_COMMAND"
+        CaseSensitive: false
+        Messages:
+        - "/kick "
+        - "/ban "
+        - "/tempban "
+        - "/banip "
+        - "/unban "
+        - "/pardon "
+        - "/mute "
+        - "/unbanip "
+        - "/pardonip "
+        - "/tempmute "
+        - "/jail "
+        - "/togglejail "
+        - "/unjail "
+        - "/ekick "
+        - "/bmkick "
+        - "/eban "
+        - "/bmban "
+        - "/etempban "
+        - "/bmtempban "
+        - "/ebanip "
+        - "/bmbanip "
+        - "/eunban "
+        - "/bmunban "
+        - "/epardon "
+        - "/emute "
+        - "/eunbanip "
+        - "/bmunbanip "
+        - "/epardonip "
+        - "/etempmute "
+        - "/tjail "
+        - "/ejail "
+        - "/eunjail "
+    Teleportation:
+        Level: "PLAYER_COMMAND"
+        CaseSensitive: false
+        Messages:
+        - "/tp"
+        - "/tele"
+        - "/back "
+        - "/home "
+        - "/mvtp "
+        - "/spawn "
+        - "/top "
+        - "/warp"
+
+# Should the items spawned by NEI be logged? (Requires FixPack)
+LogSpawnItemNEI: true
+SplitLogs:
+    Errors:
+        Level: "ERRORLEVELS"
+    Login:
+        Level: "INFO"
+        CaseSensitive: true
+        Messages:
+        - " lost connection: disconnect."
+        - " logged in with entity id "
+        - " lost connection: user was kicked."

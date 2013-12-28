@@ -21,6 +21,8 @@ import org.eclipse.jdt.annotation.NonNull;
 import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.NameProcessor;
 import nl.taico.tekkitrestrict.Send;
+import nl.taico.tekkitrestrict.TR;
+import nl.taico.tekkitrestrict.TR.FixPack;
 import nl.taico.tekkitrestrict.TRConfigCache;
 import nl.taico.tekkitrestrict.TRDB;
 import nl.taico.tekkitrestrict.TRException;
@@ -231,7 +233,7 @@ public class TRCommandTR implements CommandExecutor {
 		send.msg("");
 		send.msg(ChatColor.BLUE + "Version: " + ChatColor.GREEN + tekkitrestrict.version.toMetricsVersion());
 		if (tekkitrestrict.useTMetrics){
-			send.msg(ChatColor.BLUE+"Server UID: " + ChatColor.GREEN + tekkitrestrict.tmetrics.uid);
+			send.msg(ChatColor.BLUE + "Server UID: " + ChatColor.GREEN + tekkitrestrict.tmetrics.uid);
 		}
 		
 		if (!send.sender.hasPermission("tekkitrestrict.admin")) return;
@@ -243,6 +245,17 @@ public class TRCommandTR implements CommandExecutor {
 			send.msg(ChatColor.BLUE+"EEPatch: "+ChatColor.RED+"not installed");
 		}
 		
+		if (FixPack.getNEIVer() != -1d) send.msg(ChatColor.BLUE + "FixPack NEI: " + ChatColor.GREEN + (FixPack.getNEIVer()==0d?"<1.7":FixPack.getNEIVer()));
+		else send.msg(ChatColor.BLUE + "FixPack NEI: " + ChatColor.RED + "No");
+		if (FixPack.getRailcraftVer() != -1d) send.msg(ChatColor.BLUE + "FixPack RailCraft: " + ChatColor.GREEN + FixPack.getRailcraftVer());
+		if (FixPack.getRedPowerVer() != -1d) send.msg(ChatColor.BLUE + "FixPack RedPower: " + ChatColor.GREEN + FixPack.getRedPowerVer());
+		if (FixPack.getWRVer() != -1d) send.msg(ChatColor.BLUE + "FixPack WirelessRedstone: " + ChatColor.GREEN + FixPack.getWRVer());
+		if (FixPack.getMFFSVer() != -1d) send.msg(ChatColor.BLUE + "FixPack MFFS: " + ChatColor.GREEN + (FixPack.getMFFSVer()==0d?"<1.4":FixPack.getMFFSVer()));
+		else send.msg(ChatColor.BLUE + "FixPack MFFS: " + ChatColor.RED + "No");
+		if (FixPack.getWMVer() != -1d) send.msg(ChatColor.BLUE + "FixPack WeaponsMod: " + ChatColor.GREEN + (FixPack.getWMVer()==0d?"<1.9":FixPack.getWMVer()));
+		else send.msg(ChatColor.BLUE + "FixPack WeaponsMod: " + ChatColor.RED + "No");
+		
+		
 		send.msg(ChatColor.BLUE + "Database version: " + ChatColor.GREEN + tekkitrestrict.dbversion);
 		
 		if (tekkitrestrict.dbtype == DBType.MySQL)
@@ -251,11 +264,11 @@ public class TRCommandTR implements CommandExecutor {
 			send.msg(ChatColor.BLUE + "Database type: "+ChatColor.GREEN+"SQLite");
 		
 		switch (tekkitrestrict.dbworking){
-			case 0: send.msg(ChatColor.BLUE+"DB working: " + ChatColor.GREEN + "yes"); break;
-			case 2:	send.msg(ChatColor.BLUE+"DB working: " + ChatColor.RED + "partially; Safezones will not be saved."); break;
-			case 4:	send.msg(ChatColor.BLUE+"DB working: " + ChatColor.RED + "partially; Limits will not be saved."); break;
-			case 20: send.msg(ChatColor.BLUE+"DB working: " + ChatColor.RED + "no; Unable to read database file.");
-			default: send.msg(ChatColor.BLUE+"DB working: " + ChatColor.RED + "no; Database will reset upon next startup."); break;
+			case 0: send.msg(ChatColor.BLUE+"DB working: " + ChatColor.GREEN + "Yes"); break;
+			case 2:	send.msg(ChatColor.BLUE+"DB working: " + ChatColor.RED + "Partially; Safezones will not be saved."); break;
+			case 4:	send.msg(ChatColor.BLUE+"DB working: " + ChatColor.RED + "Partially; Limits will not be saved."); break;
+			case 20: send.msg(ChatColor.BLUE+"DB working: " + ChatColor.RED + "No; Unable to read database file.");
+			default: send.msg(ChatColor.BLUE+"DB working: " + ChatColor.RED + "No; Database will reset upon next startup."); break;
 		}
 		
 		if (!tekkitrestrict.useTMetrics)

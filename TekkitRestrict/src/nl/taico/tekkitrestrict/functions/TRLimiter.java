@@ -693,6 +693,7 @@ public class TRLimiter {
 					while (it.hasNext()){
 						TRLocation loc = it.next();
 						//tempLoc = loc;
+						
 						Chunk chunk = loc.getChunk();//tempLoc.getChunk();
 						
 						if (!chunk.isLoaded()){

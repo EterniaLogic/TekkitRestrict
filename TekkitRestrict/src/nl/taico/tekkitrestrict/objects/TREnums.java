@@ -1,6 +1,36 @@
 package nl.taico.tekkitrestrict.objects;
 
+import java.util.logging.Level;
+
 public class TREnums {
+	public enum TRLogLevel {
+		FINEST, FINER, FINE, INFO, WARNING, SEVERE, PLAYER_COMMAND, FINELEVELS, ERRORLEVELS, ALL;
+		
+		public boolean doesApply(Level level){
+			if (this == TRLogLevel.ALL) return true;
+			
+			if (level == Level.INFO){
+				return this == TRLogLevel.INFO;
+			} else if (level == Level.WARNING){
+				return this == TRLogLevel.WARNING || this == TRLogLevel.ERRORLEVELS;
+			} else if (level == Level.SEVERE){
+				return this == TRLogLevel.SEVERE || this == TRLogLevel.ERRORLEVELS;
+			} else if (level == Level.FINE){
+				return this == TRLogLevel.FINE || this == TRLogLevel.FINELEVELS;
+			} else if (level == Level.FINER){
+				return this == TRLogLevel.FINER || this == TRLogLevel.FINELEVELS;
+			} else if (level == Level.FINEST){
+				return this == TRLogLevel.FINEST || this == TRLogLevel.FINELEVELS;
+			}
+			
+			return false;
+		}
+		
+		public boolean forCommands(){
+			return this == TRLogLevel.PLAYER_COMMAND || this == TRLogLevel.ALL;
+		}
+	}
+	
 	public enum HackType {
 		fly, forcefield, speed
 	}

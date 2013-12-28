@@ -46,6 +46,8 @@ FilterLogs: true
 
 # If a String contains any of the items listed here, it will not be
 # logged. Does not work if FilterLogs is false.
+# To add loglevels, do the following:
+# - "loglevel: fine"
 LogFilter:
 - "joined with"
 - "overloaded?"

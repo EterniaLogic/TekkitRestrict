@@ -69,17 +69,19 @@ private static boolean disabled = false;
 			if (record.getMessage() == null) return true;
 			if (disabled || tekkitrestrict.disable) return true;
 			
-			String a = record.getMessage();
 			String b = record.getMessage().toLowerCase();
 			
-			if (TRConfigCache.LogFilter.splitLogs) SplitLog(record, a, b);
+			if (TRConfigCache.LogFilter.splitLogs) SplitLog(record, record.getMessage(), b);
 			
 			if (TRConfigCache.LogFilter.filterLogs){
 				String levelname = record.getLevel().getName().toLowerCase();
 				for (String filtera : TRConfigCache.LogFilter.replaceList) {
 					filtera = filtera.toLowerCase();
-					if (levelname.equals(filtera)) return false;
-					else if (b.contains(filtera)) return false;
+					if (filtera.startsWith("loglevel: ")){
+						if (levelname.equals(filtera.replace("loglevel: ", ""))) return false;
+						continue;
+					}
+					if (b.contains(filtera)) return false;
 				}
 			}
 			
@@ -103,7 +105,7 @@ private static boolean disabled = false;
 		if (c(b, " disconnected: ") || c(b, "logged in with") || c(b, "joined with: [") || c(b, "sending serverside check to")){
 			if (login == null) login = FileLog.getLogOrMake("Login", true);
 			login.log(a);
-		} else if (c(b, "player_command") || record.getLevel() == Level.parse("Command")) {
+		} else if (c(a, "PLAYER_COMMAND") || record.getLevel() == Level.parse("Command") || record.getLevel() == Level.parse("PLAYER_COMMAND")) {
 			if (command == null) command = FileLog.getLogOrMake("Command", true);
 			command.log(a);
 			

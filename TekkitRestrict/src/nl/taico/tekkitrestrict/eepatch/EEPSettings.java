@@ -14,6 +14,7 @@ import ee.events.EEEnums.EEPedestalAction;
 import ee.events.EEEnums.EERingAction;
 import ee.events.EEEnums.EEArmorAction;
 import ee.events.EEEnums.EETransmuteAction;
+import ee.events.EEEnums.EEWatchAction;
 
 public class EEPSettings {
 	public static HashMap<Integer, Integer> MaxCharge = new HashMap<Integer, Integer>();
@@ -515,9 +516,12 @@ public class EEPSettings {
 	public static ArrayList<EETransmuteAction> phil = new ArrayList<EETransmuteAction>();
 	public static ArrayList<EETransmuteAction> trans = new ArrayList<EETransmuteAction>();
 	public static ArrayList<EEPedestalAction> pedestal = new ArrayList<EEPedestalAction>();
+	public static ArrayList<EEWatchAction> watch = new ArrayList<EEWatchAction>();
 	public static void loadOtherActions(){
 		phil.clear();
 		trans.clear();
+		pedestal.clear();
+		watch.clear();
 		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Other.PhilosopherStone.ChangeMob", true))
 			phil.add(EETransmuteAction.ChangeMob);
 		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Other.PhilosopherStone.PortableCrafting", true))
@@ -555,5 +559,10 @@ public class EEPSettings {
 			pedestal.add(EEPedestalAction.StrikeLightning);
 		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Other.Pedestal.Time", true))
 			pedestal.add(EEPedestalAction.Time);
+		
+		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Other.WatchOfFlowingTime.ScrollTimeForwards", true))
+			watch.add(EEWatchAction.TimeForward);
+		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Other.WatchOfFlowingTime.ScrollTimeBackwards", true))
+			watch.add(EEWatchAction.TimeBackward);
 	}
 }

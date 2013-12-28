@@ -9,6 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.inventory.ItemStack;
 
 import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.tekkitrestrict;
@@ -58,6 +59,23 @@ public class BlockBreakListener implements Listener{
 			
 			block.getWorld().dropItemNaturally(block.getLocation(), new org.bukkit.inventory.ItemStack(128, 1, (short) 0));
 			*/
+		} else if (id == 194){
+			if (event.getPlayer() == null){
+				event.setCancelled(true);
+				return;
+			}
+			if (Bukkit.getPlayerExact(event.getPlayer().getName()) == null){
+				event.setCancelled(true);
+				return;
+			}
+			ItemStack used = event.getPlayer().getItemInHand();
+			if (used != null){
+				int uid = used.getTypeId();
+				if (uid == 1){
+					event.setCancelled(true);
+					return;
+				}
+			}
 		}
 		
 		Player player = event.getPlayer();

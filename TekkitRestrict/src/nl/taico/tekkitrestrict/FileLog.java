@@ -112,15 +112,15 @@ public class FileLog {
 		return tbr;
 	}
 	
-	public void log(@Nullable String msg){
+	public void log(@Nullable String msg, long time){
 		try {
 			if (consoleLog){
 				if (type.equals("Chat"))
-					out.write(replacecolors(formatMsg(msg)));
+					out.write(replacecolors(formatMsg(msg, time)));
 				else
-					out.write(replaceshort(formatMsg(msg)));
+					out.write(replaceshort(formatMsg(msg, time)));
 			} else {
-				out.write(Util.replaceColors(formatMsg(msg)));
+				out.write(Util.replaceColors(formatMsg(msg, time)));
 			}
 			out.newLine();
 		} catch (IOException ex) {}
@@ -136,6 +136,10 @@ public class FileLog {
 			}
 			changeDate();
 		}
+	}
+	
+	public void log(@Nullable String msg){
+		log(msg, System.currentTimeMillis());
 	}
 	
 	public boolean close(){
@@ -306,9 +310,13 @@ public class FileLog {
 	}
 
 	@NonNull protected String formatMsg(@Nullable String msg){
+		return formatMsg(msg, System.currentTimeMillis());
+	}
+	
+	@NonNull protected String formatMsg(@Nullable String msg, long time){
 		if (msg == null) msg = "null";
 		DateFormat formatter = new SimpleDateFormat("kk:mm:ss");
-		String times = formatter.format(new Date(System.currentTimeMillis()));
+		String times = formatter.format(new Date(time));
 		
 		String format = TRConfigCache.LogFilter.logFormat;
 		if (format == null || format.equals("")){
@@ -319,10 +327,10 @@ public class FileLog {
 			
 			format = new StringBuilder("[").append(times).append("] ").append(msg).toString();
 		} else {
-			String time[] = times.split(":");
-			format = format.replace("{HOUR}", time[0])
-							.replace("{MINUTE}", time[1])
-							.replace("{SECOND}", time[2])
+			String timestr[] = times.split(":");
+			format = format.replace("{HOUR}", timestr[0])
+							.replace("{MINUTE}", timestr[1])
+							.replace("{SECOND}", timestr[2])
 							.replace("{INFO}", msg);
 		}
 		return format;

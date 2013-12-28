@@ -60,6 +60,8 @@ public class LoggingConfig extends TRConfig {
 		tbr.add("");
 		tbr.add("# If a String contains any of the items listed here, it will not be");
 		tbr.add("# logged. Does not work if FilterLogs is false.");
+		tbr.add("# To add loglevels, do the following:");
+		tbr.add("# - \"loglevel: fine\"");
 		tbr.add("LogFilter:");
 		if (extra) tbr.add("#:-;-:# LogFilter 12");
 		tbr.add("- \"joined with\"");

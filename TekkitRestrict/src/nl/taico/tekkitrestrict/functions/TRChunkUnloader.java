@@ -102,8 +102,11 @@ public class TRChunkUnloader {
 				int x = chunk.getX(), z = chunk.getZ();
 				try {
 					net.minecraft.server.WorldServer mcWorld = ((CraftWorld) chunk.getWorld()).getHandle();
-					net.minecraft.server.Chunk mcChunk = mcWorld.chunkProviderServer.getOrCreateChunk(x, z);
-
+					net.minecraft.server.Chunk mcChunk = mcWorld.chunkProviderServer.chunks.get(x, z);
+					if (mcChunk == null){
+						amount++;
+						continue;
+					}
 					if (!(mcChunk instanceof EmptyChunk)) {
 						if (!force) mcWorld.chunkProviderServer.queueUnload(x, z);
 						else mcWorld.chunkProviderServer.unloadQueue.add(x, z);
