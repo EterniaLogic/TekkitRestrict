@@ -11,6 +11,8 @@ public class TRPos {
 	
 	public TRPos(){}
 	public TRPos(@NonNull Location loc1, @NonNull Location loc2){
+		this(loc1.getBlockX(), loc1.getBlockY(), loc1.getBlockZ(), loc2.getBlockX(), loc2.getBlockY(), loc2.getBlockZ());
+		/*
 		x1 = loc1.getBlockX();
 		x2 = loc2.getBlockX();
 		y1 = loc1.getBlockY();
@@ -32,7 +34,18 @@ public class TRPos {
 			z1 = z2;
 			z2 = t;
 		}
+		*/
 	}
+	
+	public TRPos(BlockVector loc1, BlockVector loc2){
+		this(loc1.getBlockX(), loc1.getBlockY(), loc1.getBlockZ(), loc2.getBlockX(), loc2.getBlockY(), loc2.getBlockZ());
+	}
+	/**
+	 * @param loc1
+	 * @param loc2
+	 * @return
+	 * @deprecated Use new {@link #TRPos(BlockVector, BlockVector)} instead
+	 */
 	public static TRPos parse(@NonNull BlockVector loc1, @NonNull BlockVector loc2){
 		TRPos p = new TRPos();
 		p.x1 = loc1.getBlockX();
@@ -82,6 +95,8 @@ public class TRPos {
 		}
 	}
 	public TRPos(@NonNull String[] temp){
+		this(Integer.parseInt(temp[0]), Integer.parseInt(temp[1]), Integer.parseInt(temp[2]), Integer.parseInt(temp[3]), Integer.parseInt(temp[4]), Integer.parseInt(temp[5]));
+		/*
 		x1 = Integer.parseInt(temp[0]);
 		y1 = Integer.parseInt(temp[1]);
 		z1 = Integer.parseInt(temp[2]);
@@ -103,6 +118,7 @@ public class TRPos {
 			z1 = z2;
 			z2 = t;
 		}
+		*/
 	}
 	
 	public boolean contains(@NonNull Location loc){
@@ -115,6 +131,13 @@ public class TRPos {
 		return true;
 	}
 	
+	public boolean contains(int x, int y, int z) {
+		if (x < x1 || x > x2) return false;
+		if (z < z1 || z > z2) return false;
+		if (y < y1 || y > y2) return false;
+		return true;
+	}
+	
 	public boolean containsIgnoreY(@NonNull Location loc){
 		int x = loc.getBlockX();
 		if (x < x1 || x > x2) return false;
@@ -123,7 +146,25 @@ public class TRPos {
 		return true;
 	}
 	
-	@NonNull public Location toLoc(@NonNull World world){
+	public boolean containsIgnoreY(int x, int z){
+		if (x < x1 || x > x2) return false;
+		if (z < z1 || z > z2) return false;
+		return true;
+	}
+	
+	public Location getLesserCorner(World world){
+		return new Location(world, x1, y1, z1);
+	}
+	
+	public Location getCenter(World world){
+		return new Location(world, (x1+x2)/2, (y1+y2)/2, (z1+z2)/2);
+	}
+	
+	public Location getGreaterCorner(World world){
+		return new Location(world, x2, y2, z2);
+	}
+	
+	@NonNull public Location toLoc(World world){
 		return new Location(world, (x1+x2)/2, (y1+y2)/2, (z1+z2)/2);
 	}
 	
@@ -131,4 +172,5 @@ public class TRPos {
 	public String toString(){
 		return ""+x1+","+y1+","+z1+","+x2+","+y2+","+z2;
 	}
+	
 }
