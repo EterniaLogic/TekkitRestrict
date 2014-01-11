@@ -118,4 +118,116 @@ public class TREnums {
 			}
 		}
 	}
+
+	public enum ChunkUnloadMethod {//TODO make an index of chunks.
+		/**
+		 * Forced: only unloads when forced; goes to limit, not below it<br>
+		 * Low: only chunks not kept loaded by chunkloaders, players (radius x2), spawn
+		 */
+		UnloadLowWhenForced(1, 2),
+		/**
+		 * Forced: only unloads when forced; goes to limit, not below it<br>
+		 * Normal: only chunks not kept loaded by chunkloaders, players, spawn
+		 */
+		UnloadNormalWhenForced(2, 2),
+		/**
+		 * Forced: only unloads when forced; goes to limit, not below it<br>
+		 * High: only chunks not kept loaded by players.
+		 */
+		UnloadHighWhenForced(3, 2),
+		/**
+		 * Forced: only unloads when forced; goes to limit, not below it<br>
+		 * Extreme: unloads all chunks, does no checks.
+		 * @deprecated No one should use this, it makes no sense.
+		 */
+		UnloadExtremeWhenForced(4, 2),
+		/**
+		 * Forced_Plus: only unloads when forced; goes to limit and x % below it<br>
+		 * Low: only chunks not kept loaded by chunkloaders, players (radius x2), spawn
+		 */
+		UnloadLowWhenForced_Plus(1, 1),
+		/**
+		 * Forced_Plus: only unloads when forced; goes to limit and x % below it<br>
+		 * Normal: only chunks not kept loaded by chunkloaders, players, spawn
+		 */
+		UnloadNormalWhenForced_Plus(2, 1),
+		/**
+		 * Forced_Plus: only unloads when forced; goes to limit and x % below it<br>
+		 * High: only chunks not kept loaded by players.
+		 */
+		UnloadHighWhenForced_Plus(3, 1),
+		/**
+		 * Forced_Plus: only unloads when forced; goes to limit and x % below it<br>
+		 * Extreme: unloads all chunks, does no checks.
+		 * @deprecated No one should use this, it makes no sense.
+		 */
+		UnloadExtremeWhenForced_Plus(4, 1),
+		/**
+		 * Always: always unloads chunks; unloads as many as possible<br>
+		 * Low: only chunks not kept loaded by chunkloaders, players (radius x2), spawn
+		 */
+		UnloadLowAlways(1, 0),
+		/**
+		 * Always: always unloads chunks; unloads as many as possible<br>
+		 * Normal: only chunks not kept loaded by chunkloaders, players, spawn
+		 */
+		UnloadNormalAlways(2, 0),
+		/**
+		 * Always: always unloads chunks; unloads as many as possible<br>
+		 * High: only chunks not kept loaded by players.
+		 */
+		UnloadHighAlways(3, 0),
+		/**
+		 * Always: always unloads chunks; unloads as many as possible<br>
+		 * Extreme: unloads all chunks, does no checks.
+		 */
+		UnloadExtremeAlways(4, 0),
+		/**
+		 * Unload all the chunks in a world that are not kept loaded by players or worldanchors.
+		 */
+		UnloadAllChunksUnforced(9, -1),
+		/**
+		 * Unload chunks until the total chunk amount is good again.<br>
+		 * Equal to unloading unforced first, and then AllChunkUnforced if it cannot lower enough.<br>
+		 * If this can still not get by the limit, it will also unload worldanchor chunks.
+		 */
+		UnloadUnforced(2, -1),
+		/**
+		 * Unload ALL chunks in a world with force, keeping only ones loaded by players.
+		 */
+		UnloadAllChunksForced(3, -1),
+		/**
+		 * Unload ALL CHUNKS IN A WORLD no matter what.
+		 */
+		UnloadWorldForced(4, -1);
+		public final byte nr;
+		public final byte forced;
+		ChunkUnloadMethod(int nr, int forced){
+			this.nr = (byte) nr;
+			this.forced = (byte) forced;
+		}
+		
+		public boolean isForced(){
+			return this.forced==2;
+		}
+		public boolean isForced_Plus(){
+			return this.forced==1;
+		}
+		public boolean isAlways(){
+			return this.forced==0;
+		}
+		
+		public boolean isLow(){
+			return this.nr==1;
+		}
+		public boolean isNormal(){
+			return this.nr==2;
+		}
+		public boolean isHigh(){
+			return this.nr==3;
+		}
+		public boolean isExtreme(){
+			return this.nr==4;
+		}
+	}
 }

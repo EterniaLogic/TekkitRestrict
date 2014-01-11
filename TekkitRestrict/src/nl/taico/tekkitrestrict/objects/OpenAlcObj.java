@@ -16,7 +16,7 @@ public class OpenAlcObj {
 	private String bagOwnerName;
 	private static ArrayList<OpenAlcObj> allOpenAlcs = new ArrayList<OpenAlcObj>();
 	
-	public OpenAlcObj(@NonNull AlchemyBagData bag, @NonNull Player bagOwner, @NonNull Player viewer){
+	public OpenAlcObj(@NonNull final AlchemyBagData bag, @NonNull final Player bagOwner, @NonNull final Player viewer){
 		this.bag = bag;
 		this.bagOwner = bagOwner;
 		this.bagOwnerName = bagOwner.getName();
@@ -42,26 +42,26 @@ public class OpenAlcObj {
 		return bag;
 	}
 	
-	@Nullable public static OpenAlcObj getOpenAlcByOwner(@NonNull String owner){
-		for (OpenAlcObj current : allOpenAlcs){
+	@Nullable public static OpenAlcObj getOpenAlcByOwner(@NonNull final String owner){
+		for (final OpenAlcObj current : allOpenAlcs){
 			if (current.bagOwnerName.equalsIgnoreCase(owner)) return current;
 		}
 		return null;
 	}
 	
-	@Nullable public static OpenAlcObj getOpenAlcByViewer(@NonNull String viewer){
-		for (OpenAlcObj current : allOpenAlcs){
+	@Nullable public static OpenAlcObj getOpenAlcByViewer(@NonNull final String viewer){
+		for (final OpenAlcObj current : allOpenAlcs){
 			if (current.viewerName.equalsIgnoreCase(viewer)) return current;
 		}
 		return null;
 	}
 	
-	public static boolean isViewing(@NonNull String player){
+	public static boolean isViewing(@NonNull final String player){
 		if (getOpenAlcByViewer(player) != null) return true;
 		return false;
 	}
 	
-	public static boolean isViewed(@NonNull String player){
+	public static boolean isViewed(@NonNull final String player){
 		if (getOpenAlcByOwner(player) != null) return true;
 		return false;
 	}

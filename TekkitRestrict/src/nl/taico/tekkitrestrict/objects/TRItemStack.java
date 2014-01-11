@@ -11,57 +11,57 @@ public class TRItemStack{
 	/**
 	 * An itemStack of id:0 with an amount of 1.
 	 */
-	public TRItemStack(int id) {
+	public TRItemStack(final int id) {
 		this(id, 1, (short) 0, null);
 	}
 
 	/**
 	 * An ItemStack of id:0 with an amount of 1.
 	 */
-	public TRItemStack(int id, int amount) {
+	public TRItemStack(final int id, final int amount) {
 		this(id, amount, (short) 0, null);
 	}
 	
 	/**
 	 * An ItemStack of id:damage with an amount of amount.
 	 */
-	public TRItemStack(int id, int amount, short damage) {
+	public TRItemStack(final int id, final int amount, final short damage) {
 		this(id, amount, damage, null);
 	}
 	
-	public TRItemStack(int type, int amount, short damage, Byte data) {
+	public TRItemStack(final int type, final int amount, final short damage, final Byte data) {
 		bukkitStack = new ItemStack(type, amount, damage, data);
 	}
 
-	public TRItemStack(ItemStack stack) {
+	public TRItemStack(final ItemStack stack) {
 		this.bukkitStack = stack;
 	}
 	
 	public int getId(){
 		return bukkitStack.getTypeId();
 	}
-	public void setId(int id){
+	public void setId(final int id){
 		bukkitStack.setTypeId(id);
 	}
 	
 	public byte getByteData(){
 		return bukkitStack.getData().getData();
 	}
-	public void setByteData(byte data){
+	public void setByteData(final byte data){
 		bukkitStack.getData().setData(data);
 	}
 	
 	public short getShortData(){
 		return bukkitStack.getDurability();
 	}
-	public void setShortData(short data){
+	public void setShortData(final short data){
 		bukkitStack.setDurability(data);
 	}
 	
 	public int getAmount(){
 		return bukkitStack.getAmount();
 	}
-	public void setAmount(int amount){
+	public void setAmount(final int amount){
 		bukkitStack.setAmount(amount);
 	}
 	
@@ -85,48 +85,48 @@ public class TRItemStack{
 		return getMCStack().getItem();
 	}
 
-	public static int getId(ItemStack itemStack){
+	public static int getId(final ItemStack itemStack){
 		return itemStack.getTypeId();
 	}
-	public static void setId(ItemStack itemStack, int id){
+	public static void setId(final ItemStack itemStack, final int id){
 		itemStack.setTypeId(id);
 	}
 	
-	public static byte getByteData(ItemStack itemStack){
+	public static byte getByteData(final ItemStack itemStack){
 		return itemStack.getData().getData();
 	}
-	public static void setByteData(ItemStack itemStack, byte data){
+	public static void setByteData(final ItemStack itemStack, final byte data){
 		itemStack.getData().setData(data);
 	}
 	
-	public static short getShortData(ItemStack itemStack){
+	public static short getShortData(final ItemStack itemStack){
 		return itemStack.getDurability();
 	}
-	public static void setShortData(ItemStack itemStack, short data){
+	public static void setShortData(final ItemStack itemStack, final short data){
 		itemStack.setDurability(data);
 	}
 	
-	public static int getAmount(ItemStack itemStack){
+	public static int getAmount(final ItemStack itemStack){
 		return itemStack.getAmount();
 	}
-	public static void setAmount(ItemStack itemStack, int amount){
+	public static void setAmount(final ItemStack itemStack, final int amount){
 		itemStack.setAmount(amount);
 	}
 	
-	public static net.minecraft.server.ItemStack getMCStack(ItemStack itemStack){
+	public static net.minecraft.server.ItemStack getMCStack(final ItemStack itemStack){
 		return ((CraftItemStack) itemStack).getHandle();
 	}
-	public static CraftItemStack getCraftStack(ItemStack itemStack){
+	public static CraftItemStack getCraftStack(final ItemStack itemStack){
 		return (CraftItemStack) itemStack;
 	}
-	public static Item getMCItem(ItemStack itemStack){
+	public static Item getMCItem(final ItemStack itemStack){
 		return ((CraftItemStack) itemStack).getHandle().getItem();
 	}
 	
-	public static NBTTagCompound getTag(ItemStack itemStack){
+	public static NBTTagCompound getTag(final ItemStack itemStack){
 		return ((CraftItemStack) itemStack).getHandle().getTag();
 	}
-	public static NBTTagCompound getTagOrCreate(ItemStack itemStack){
+	public static NBTTagCompound getTagOrCreate(final ItemStack itemStack){
 		NBTTagCompound tag = ((CraftItemStack) itemStack).getHandle().getTag();
 		if (tag == null){
 			tag = new NBTTagCompound();
@@ -134,7 +134,15 @@ public class TRItemStack{
 		}
 		return tag;
 	}
-	public static void setTag(ItemStack itemStack, NBTTagCompound tag){
+	public static NBTTagCompound getTagOrCreate(final net.minecraft.server.ItemStack mcItemStack){
+		NBTTagCompound tag = mcItemStack.getTag();
+		if (tag == null){
+			tag = new NBTTagCompound();
+			mcItemStack.setTag(tag);
+		}
+		return tag;
+	}
+	public static void setTag(final ItemStack itemStack, final NBTTagCompound tag){
 		((CraftItemStack) itemStack).getHandle().setTag(tag);
 	}
 }

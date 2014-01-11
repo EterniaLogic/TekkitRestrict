@@ -7,7 +7,7 @@ public class TRDupeSettings {
 	
 	public TRDupeSettings(){}
 	
-	public TRDupeSettings(boolean prevent, boolean broadcast, boolean kick, boolean useCommand, int triggerAfter, String command){
+	public TRDupeSettings(final boolean prevent, final boolean broadcast, final boolean kick, final boolean useCommand, final int triggerAfter, final String command){
 		this.prevent = prevent;
 		this.broadcast = broadcast;
 		this.kick = kick;

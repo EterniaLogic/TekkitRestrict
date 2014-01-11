@@ -12,7 +12,7 @@ public class TRItem {
 	public int data;
 	public String msg = "";
 	
-	@NonNull public static TRItem parseItem(int id, int data, @Nullable String msg) {
+	@NonNull public static TRItem parseItem(final int id, final int data, @Nullable final String msg) {
 		TRItem item = new TRItem();
 		item.id = id;
 		item.data = data;
@@ -20,7 +20,7 @@ public class TRItem {
 		return item;
 	}
 	
-	@NonNull public static TRItem parseItem(int id, int data) {
+	@NonNull public static TRItem parseItem(final int id, final int data) {
 		TRItem item = new TRItem();
 		item.id = id;
 		item.data = data;
@@ -31,7 +31,7 @@ public class TRItem {
 	public boolean equals(Object obj){
 		if (obj == null) return false;
 		if (!(obj instanceof TRItem)) return false;
-		TRItem tri = (TRItem) obj;
+		final TRItem tri = (TRItem) obj;
 		if (tri.id == id && tri.data == data) return true;
 		return false;
 	}
@@ -44,14 +44,14 @@ public class TRItem {
 	
 	@Override
 	public Object clone(){
-		TRItem ti = new TRItem();
+		final TRItem ti = new TRItem();
 		ti.id = this.id;
 		ti.data = this.data;
 		ti.msg = this.msg;
 		return ti;
 	}
 	
-	public static boolean compareNP(@NonNull TRItem item, @NonNull TRItem np){
+	public static boolean compareNP(@NonNull final TRItem item, @NonNull final TRItem np){
 		if (item.id != np.id) return false;
 		
 		if (item.data == np.data || (item.data == -10 && np.data == 0)) return true;//:0 = :0, :-1 = :-1.
@@ -70,15 +70,15 @@ public class TRItem {
 	 * </ul>
 	 */
 	@Safe
-	public boolean compare(int id, int data) {
+	public boolean compare(final int id, final int data) {
 		return this.id == id && (this.data == data || this.data == -1 || (data == 0 && this.data == -10));
 	}
 	//IMPORTANT does not check messages!
-	public static boolean compare(int id, int data, @NonNull TRItem mainItem){
+	public static boolean compare(final int id, final int data, @NonNull final TRItem mainItem){
 		return id == mainItem.id && (data == mainItem.data || mainItem.data == -1 || (data == 0 && mainItem.data == -10));
 	}
 	//IMPORTANT does not check messages!
-	public static boolean compare(int id, int data, int mainId, int mainData){
+	public static boolean compare(final int id, final int data, final int mainId, final int mainData){
 		return id == mainId && (data == mainData || mainData == -1 || (data == 0 && mainData == -10));
 	}
 	
@@ -86,9 +86,9 @@ public class TRItem {
 		return ChatColor.RED + "You are not allowed to modify/obtain this item!";
 	}
 	
-	public static void sendBannedMessage(@NonNull Player player, @NonNull String message){
+	public static void sendBannedMessage(@NonNull final Player player, @NonNull final String message){
 		if (message.contains("\n")){
-			String temp[] = message.split("\n");
+			final String temp[] = message.split("\n");
 			for (String msg : temp) player.sendMessage(msg);
 		} else {
 			player.sendMessage(message);

@@ -20,14 +20,14 @@ public class TRCharge extends TRItem {
 	public boolean equals(Object obj){
 		if (obj == null) return false;
 		if (!(obj instanceof TRCharge)) return false;
-		TRCharge tri = (TRCharge) obj;
+		final TRCharge tri = (TRCharge) obj;
 		if (tri.id == id && tri.data == data && tri.maxcharge == maxcharge && tri.chargerate == chargerate) return true;
 		return false;
 	}
 	
 	@Override
 	@NonNull public Object clone(){
-		TRCharge tc = new TRCharge();
+		final TRCharge tc = new TRCharge();
 		tc.id = this.id;
 		tc.data = this.data;
 		tc.maxcharge = this.maxcharge;

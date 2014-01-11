@@ -9,7 +9,7 @@ public class TRHackSettings {
 	
 	public TRHackSettings(){}
 	
-	public TRHackSettings(boolean enable, boolean broadcast, boolean kick, int tolerance, double value, boolean useCommand, int triggerAfter, String command){
+	public TRHackSettings(final boolean enable, final boolean broadcast, final boolean kick, final int tolerance, final double value, final boolean useCommand, final int triggerAfter, final String command){
 		this.enable = enable;
 		this.broadcast = broadcast;
 		this.kick = kick;

@@ -186,7 +186,7 @@ public class TMetrics {
 			}
 
 			for (String s : response){
-				if (s == null || s.equals("")) continue;
+				if (s == null || s.isEmpty()) continue;
 				if (s.contains("id=")){
 					try {
 						uid = Integer.parseInt(s.replace("id=", ""));

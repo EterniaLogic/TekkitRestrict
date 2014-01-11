@@ -227,6 +227,7 @@ public class TRConfigCache {
 		public static boolean UseGP, UseTowny, UsePS, UseFactions, UseWG, useNative;
 		public static SSMode GPMode = SSMode.Admin;
 		public static SSMode WGMode = SSMode.Specific;
+		public static SSMode FMode = SSMode.All;
 	}
 	
 	public static class Listeners {

@@ -149,6 +149,21 @@ public class TR {
 			}
 		}
 	}
+	private static Double eep = null;
+ 	public static double getEEPatchVersion(){
+ 		if (eep != null) return eep;
+		try {
+			Class.forName("ee.EEPatch");
+			return eep = ee.EEPatch.version;
+		} catch (ClassNotFoundException ex){
+			try {
+				Class.forName("ee.events.EEEvent");
+			} catch (ClassNotFoundException e) {
+				return eep = -1d;
+			}
+			return eep = 0d;
+		}
+	}
 	
 	public static boolean hasEEPatch(){
 		if (tekkitrestrict.EEPatch != null) return tekkitrestrict.EEPatch.booleanValue();

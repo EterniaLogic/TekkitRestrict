@@ -1,14 +1,22 @@
 package nl.taico.tekkitrestrict;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Map.Entry;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
 import nl.taico.tekkitrestrict.objects.TRItem;
+
+import com.earth2me.essentials.Essentials;
+import com.earth2me.essentials.ItemDb;
 
 public class NameProcessor {
 	private static final LinkedHashMap<Integer, String> EEItems = new LinkedHashMap<Integer, String>(73);
@@ -87,8 +95,8 @@ public class NameProcessor {
 		EEItems.put(27593,"Void Ring");
 		EEItems.put(27594,"Alchemy Tome");
 	}
-	@NonNull public static String getEEName(int id){
-		String s = EEItems.get(id);
+	@NonNull public static String getEEName(final int id){
+		final String s = EEItems.get(id);
 		return (s == null ? "x"+id : s);
 	}
 	
@@ -3371,9 +3379,9 @@ public class NameProcessor {
 	
 	private static final LinkedHashMap<String, TRItem> AllNames = new LinkedHashMap<String, TRItem>();
 	static {
-		Iterator<Entry<TRItem, String>> all = All.entrySet().iterator();
+		final Iterator<Entry<TRItem, String>> all = All.entrySet().iterator();
 		while (all.hasNext()){
-			Entry<TRItem, String> entry = all.next(); 
+			final Entry<TRItem, String> entry = all.next(); 
 			AllNames.put(entry.getValue().replace(" ", "").toLowerCase(), entry.getKey());
 		}
 	}
@@ -3403,20 +3411,20 @@ public class NameProcessor {
 		mods.add("Chunk Loaders");
 	}
 	public static LinkedHashMap<String, TRItem> getAllItems(){
-		LinkedHashMap<String, TRItem> items = new LinkedHashMap<String, TRItem>();
-		Iterator<Entry<TRItem, String>> all = All.entrySet().iterator();
+		final LinkedHashMap<String, TRItem> items = new LinkedHashMap<String, TRItem>();
+		final Iterator<Entry<TRItem, String>> all = All.entrySet().iterator();
 		while (all.hasNext()){
-			Entry<TRItem, String> entry = all.next(); 
+			final Entry<TRItem, String> entry = all.next(); 
 			items.put(entry.getValue(), entry.getKey());
 		}
 		return items;
 	}
 	
 	public static LinkedHashMap<String, TRItem> getAllItemsAndMods(){
-		LinkedHashMap<String, TRItem> items = new LinkedHashMap<String, TRItem>();
-		Iterator<Entry<TRItem, String>> all = All.entrySet().iterator();
+		final LinkedHashMap<String, TRItem> items = new LinkedHashMap<String, TRItem>();
+		final Iterator<Entry<TRItem, String>> all = All.entrySet().iterator();
 		while (all.hasNext()){
-			Entry<TRItem, String> entry = all.next(); 
+			final Entry<TRItem, String> entry = all.next(); 
 			items.put(entry.getValue(), entry.getKey());
 		}
 		
@@ -3426,10 +3434,10 @@ public class NameProcessor {
 	/** 
 	 * @return The name of the given item, or null if not found.
 	 */
-	@Nullable public static String getName(@NonNull TRItem item){
-		Iterator<Entry<TRItem, String>> it = All.entrySet().iterator();
+	@Nullable public static String getName(@NonNull final TRItem item){
+		final Iterator<Entry<TRItem, String>> it = All.entrySet().iterator();
 		while (it.hasNext()){
-			Entry<TRItem, String> entry = it.next();
+			final Entry<TRItem, String> entry = it.next();
 			if (!TRItem.compareNP(item, entry.getKey())) continue;
 			return entry.getValue();
 		}
@@ -3440,18 +3448,16 @@ public class NameProcessor {
 	/**
 	 * @return An item representing the given String, or null if not found.
 	 */
-	@Nullable public static TRItem getItem(@NonNull String string){
-		string = string.replace(" ", "").toLowerCase();
-		TRItem it = AllNames.get(string);
-		if (it == null) return null;
-		return (TRItem) it.clone();
+	@Nullable public static TRItem getItem(@NonNull final String string){
+		final TRItem it = AllNames.get(string.replace(" ", "").toLowerCase());
+		return it == null ? null : (TRItem) it.clone();
 	}
 	
 	@NonNull public static LinkedHashMap<TRItem, String> getDefaultBlocks(@Nullable LinkedHashMap<TRItem, String> map){
 		if (map == null) map = new LinkedHashMap<TRItem, String>();
-		Iterator<Entry<TRItem, String>> all = All.entrySet().iterator();
+		final Iterator<Entry<TRItem, String>> all = All.entrySet().iterator();
 		while (all.hasNext()){
-			Entry<TRItem, String> entry = all.next(); 
+			final Entry<TRItem, String> entry = all.next(); 
 			map.put((TRItem) entry.getKey().clone(), entry.getValue());
 			if (entry.getKey().id == 124) break;
 		}
@@ -3461,14 +3467,266 @@ public class NameProcessor {
 	@NonNull public static LinkedHashMap<TRItem, String> getEEBlocks(@Nullable LinkedHashMap<TRItem, String> map){
 		if (map == null) map = new LinkedHashMap<TRItem, String>();
 		
-		Iterator<Entry<TRItem, String>> all = All.entrySet().iterator();
+		final Iterator<Entry<TRItem, String>> all = All.entrySet().iterator();
 		while (all.hasNext()){
-			Entry<TRItem, String> entry = all.next(); 
-			TRItem item = entry.getKey();
+			final Entry<TRItem, String> entry = all.next(); 
+			final TRItem item = entry.getKey();
 			if (item.id < 126) continue;
 			map.put((TRItem) item.clone(), entry.getValue());
 			if (item.id == 130) break;
 		}
 		return map;
+	}
+
+	public static void addTekkitMaterials(){
+		for (int i = 126; i < 255; i++){
+			final String name = getName(TRItem.parseItem(i, -1));
+			if (name == null) continue;
+			Material.setMaterialName(i, name.replace("Mk. ", "MK"));
+		}
+		for (int i = 1256; i < 31265; i++){
+			if (i > 2255 && i < 2267) continue;
+			final String name = getName(TRItem.parseItem(i, -1));
+			if (name == null) continue;
+			Material.setMaterialName(i, name);
+		}
+	}
+	
+	public static boolean addEEItemsToEssentials(){
+		try {
+			if (!Bukkit.getPluginManager().isPluginEnabled("Essentials")) return false;
+			
+			Map<String, Integer> items = null;
+			Map<String, Short> durabilities = null;
+			try {
+				final ItemDb db = ((Essentials) Bukkit.getPluginManager().getPlugin("Essentials")).getItemDb();
+				final Field field1 = ItemDb.class.getField("items");
+				field1.setAccessible(true);
+				items = (Map<String, Integer>) field1.get(db);
+				final Field field2 = ItemDb.class.getField("durabilities");
+				field2.setAccessible(true);
+				durabilities = (Map<String, Short>) field2.get(db);
+			} catch (Exception ex) {
+				// TODO Auto-generated catch block
+				return false;
+			}
+			
+			if (items == null || durabilities == null) return false;
+			final ArrayList<String> it = new ArrayList<String>();
+	
+			it.add("energycollectormk1,126,0");
+			it.add("energycollector,126,0");
+			it.add("collectormk1,126,0");
+			it.add("collector,126,0");
+			it.add("collectormk2,126,1");
+			it.add("energycollectormk2,126,1");
+			it.add("collectormk3,126,2");
+			it.add("energycollectormk3,126,2");
+			it.add("darkmatterfurnace,126,3");
+			it.add("dmfurnace,126,3");
+			it.add("redmatterfurnace,126,4");
+			it.add("rmfurnace,126,4");
+			it.add("antimatterrelay,126,5");
+			it.add("antimatterrelaymk1,126,5");
+			it.add("relaymk1,126,5");
+			it.add("relay,126,5");
+			it.add("antimatterrelaymk2,126,6");
+			it.add("relaymk2,126,6");
+			it.add("antimatterrelaymk3,126,7");
+			it.add("relaymk3,126,7");
+			it.add("darkmatterblock,126,8");
+			it.add("dmblock,126,8");
+			it.add("redmatterblock,126,9");
+			it.add("rmblock,126,9");
+			it.add("darkmatterpedestal,127,0");
+			it.add("dmpedestal,127,0");
+			it.add("alchemicalchest,128,0");
+			it.add("energycondenser,128,1");
+			it.add("condenser,128,1");
+			it.add("interdictiontorch,129,0");
+			it.add("transmutiontablet,130,0");
+			it.add("transmutetablet,130,0");
+			it.add("transtablet,130,0");
+			it.add("transmutiontable,130,0");
+			it.add("transmutetable,130,0");
+			
+			it.add("philosopherstone,27526,0");
+			it.add("philosopher,27526,0");
+			it.add("philostone,27526,0");
+			it.add("philo,27526,0");
+			it.add("destructioncatalyst,27527,0");
+			it.add("destcatalyst,27527,0");
+			it.add("ironband,27528,0");
+			it.add("soulstone,27529,0");
+			it.add("evertideamulet,27530,0");
+			it.add("evertide,27530,0");
+			it.add("volcaniteamulet,27531,0");
+			it.add("volcanite,27531,0");
+			it.add("blackholeband,27532,0");
+			it.add("bhb,27532,0");
+			it.add("ringofignition,27533,0");
+			it.add("ringignition,27533,0");
+			it.add("ignitionring,27533,0");
+			it.add("ignitering,27533,0");
+			it.add("archangelssmite,27534,0");
+			it.add("archangelsmite,27534,0");
+			it.add("archangels,27534,0");
+			it.add("archangel,27534,0");
+			it.add("hyperkineticlens,27535,0");
+			it.add("hyperkinetic,27535,0");
+			it.add("swiftwolfsrendinggale,27536,0");
+			it.add("swiftwolfrendinggale,27536,0");
+			it.add("swiftwolf,27536,0");
+			it.add("flyring,27536,0");
+			it.add("harvestring,27537,0");
+			it.add("watchofflowingtime,27538,0");
+			it.add("alchemicalcoal,27539,0");
+			it.add("mobiusfuel,27540,0");
+			it.add("darkmatter,27541,0");
+			it.add("dm,27541,0");
+			it.add("covalencedustlow,27542,0");
+			it.add("covalencelow,27542,0");
+			it.add("covalencedustmedium,27542,1");
+			it.add("covalencemedium,27542,1");
+			it.add("covalencedusthigh,27542,2");
+			it.add("covalencehigh,27542,2");
+			it.add("darkmatterpickaxe,27543,0");
+			it.add("darkmatterpick,27543,0");
+			it.add("dmpickaxe,27543,0");
+			it.add("dmpick,27543,0");
+			it.add("darkmatterspade,27544,0");
+			it.add("darkmattershovel,27544,0");
+			it.add("dmspade,27544,0");
+			it.add("dmshovel,27544,0");
+			it.add("darkmatterhoe,27545,0");
+			it.add("dmhoe,27545,0");
+			it.add("darkmattersword,27546,0");
+			it.add("dmsword,27546,0");
+			it.add("darkmatteraxe,27547,0");
+			it.add("dmaxe,27547,0");
+			it.add("darkmattershears,27548,0");
+			it.add("dmshears,27548,0");
+			it.add("darkmatterarmor,27549,0");
+			it.add("darkmatterchestplate,27549,0");
+			it.add("dmarmor,27549,0");
+			it.add("dmchestplate,27549,0");
+			it.add("darkmatterhelmet,27550,0");
+			it.add("dmhelmet,27550,0");
+			it.add("darkmattergreaves,27551,0");
+			it.add("darkmatterleggings,27551,0");
+			it.add("dmgreaves,27551,0");
+			it.add("dmleggings,27551,0");
+			it.add("darkmatterboots,27552,0");
+			it.add("dmboots,27552,0");
+			it.add("gemofeternaldensity,27553,0");
+			it.add("gemeternaldensity,27553,0");
+			it.add("repairtalisman,27554,0");
+			it.add("talismanofrepair,27554,0");
+			it.add("talismanrepair,27554,0");
+			it.add("darkmatterhammer,27555,0");
+			it.add("dmhammer,27555,0");
+			it.add("cataclycticlens,27556,0");
+			it.add("klienstarein,27557,0");
+			it.add("klienstar1,27557,0");
+			it.add("ksein,27557,0");
+			it.add("ks1,27557,0");
+			it.add("klienstarzwei,27558,0");
+			it.add("klienstar2,27558,0");
+			it.add("kszwei,27558,0");
+			it.add("ks2,27558,0");
+			it.add("klienstardrei,27559,0");
+			it.add("klienstar3,27559,0");
+			it.add("ksdrei,27559,0");
+			it.add("ks3,27559,0");
+			it.add("klienstarvier,27560,0");
+			it.add("klienstar4,27560,0");
+			it.add("ksvier,27560,0");
+			it.add("ks4,27560,0");
+			it.add("klienstarsphere,27561,0");
+			it.add("klienstar5,27561,0");
+			it.add("kssphere,27561,0");
+			it.add("ks5,27561,0");
+			it.add("klienstaromega,27591,0");
+			it.add("klienstar6,27591,0");
+			it.add("ksomega,27591,0");
+			it.add("ks6,27591,0");
+			it.add("alchemybag,27562,0");
+			it.add("alcbag,27562,0");
+			it.add("redmatter,27563,0");
+			it.add("rm,27563,0");
+			it.add("redmatterpickaxe,27564,0");
+			it.add("redmatterpick,27564,0");
+			it.add("rmpickaxe,27564,0");
+			it.add("rmpick,27564,0");
+			it.add("redmatterspade,27565,0");
+			it.add("redmattershovel,27565,0");
+			it.add("rmspade,27565,0");
+			it.add("rmshovel,27565,0");
+			it.add("redmatterhoe,27566,0");
+			it.add("rmhoe,27566,0");
+			it.add("redmattersword,27567,0");
+			it.add("rmsword,27567,0");
+			it.add("redmatteraxe,27568,0");
+			it.add("rmaxe,27568,0");
+			it.add("redmattershears,27569,0");
+			it.add("rmshears,27569,0");
+			it.add("redmatterhammer,27570,0");
+			it.add("rmhammer,27570,0");
+			it.add("aeternalisfuel,27571,0");
+			it.add("aeternalis,27571,0");
+			it.add("redmatterkatar,27572,0");
+			it.add("rmkatar,27572,0");
+			it.add("redkatar,27572,0");
+			it.add("redmattermorningstar,27573,0");
+			it.add("rmmorningstar,27573,0");
+			it.add("redmorningstar,27573,0");
+			it.add("zeroring,27574,0");
+			it.add("redmatterarmor,27575,0");
+			it.add("redmatterchestplate,27575,0");
+			it.add("rmarmor,27575,0");
+			it.add("rmchestplate,27575,0");
+			it.add("redmatterhelmet,27576,0");
+			it.add("rmhelmet,27576,0");
+			it.add("redmattergreaves,27577,0");
+			it.add("redmatterleggings,27577,0");
+			it.add("rmgreaves,27577,0");
+			it.add("rmleggings,27577,0");
+			it.add("redmatterboots,27578,0");
+			it.add("rmboots,27578,0");
+			it.add("infernalarmor,27579,0");
+			it.add("gemarmor,27579,0");
+			it.add("gemchestplate,27579,0");
+			it.add("abysshelmet,27580,0");
+			it.add("gemhelmet,27580,0");
+			it.add("gravitygreaves,27581,0");
+			it.add("gemgreaves,27581,0");
+			it.add("gemleggins,27581,0");
+			it.add("hurricaneboots,27582,0");
+			it.add("gemboots,27582,0");
+			it.add("mercurialeye,27583,0");
+			it.add("ringofarcana,27584,0");
+			it.add("ringarcana,27584,0");
+			it.add("arcanaring,27584,0");
+			it.add("diviningrod,27585,0");
+			it.add("bodystone,27588,0");
+			it.add("lifestone,27589,0");
+			it.add("mindstone,27590,0");
+			it.add("transmutationtablet,27592,0");
+			it.add("transtablet,27592,0");
+			it.add("voidring,27593,0");
+			it.add("alchemytome,27594,0");
+			for (final String line : it) {
+				final String[] parts = line.trim().toLowerCase(Locale.ENGLISH).split("[^a-z0-9]");
+				if (parts.length < 2) continue;
+	
+				final int numeric = Integer.parseInt(parts[1]);
+	
+				durabilities.put(parts[0], Short.valueOf(parts.length > 2 && !parts[2].equals("0") ? Short.parseShort(parts[2]) : 0));
+				items.put(parts[0], numeric);
+			}
+			return true;
+		} catch (final Exception ex){
+			return false;
+		}
 	}
 }

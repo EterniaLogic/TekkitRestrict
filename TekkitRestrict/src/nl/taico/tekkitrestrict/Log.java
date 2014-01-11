@@ -13,6 +13,8 @@ import org.eclipse.jdt.annotation.Nullable;
 import nl.taico.tekkitrestrict.TRConfigCache.Global;
 
 public class Log {
+	public static Level dupe;
+	public static Level hack;
 	/**
 	 * Creates 2 custom levels and assigns the loggers.
 	 */
@@ -20,8 +22,8 @@ public class Log {
 		McLogger = Logger.getLogger("Minecraft");
 		new CustomLevel("Notice", 801);
 		new CustomLevel("Command", 802);
-		new CustomLevel("TRDupe", 803);
-		new CustomLevel("TRHack", 804);
+		dupe = new CustomLevel("TRDupe", 803);
+		hack = new CustomLevel("TRHack", 804);
 	}
 	public static void deinit(){
 		McLogger = null;
@@ -36,71 +38,65 @@ public class Log {
 	}
 	
 	public static class Load {
-		public static void Blocked(String type, int count){
-			String extra = (count==1) ? "" : "s"; 
-			tekkitrestrict.log.info("Blocked " + count + " " + type + extra + ".");
+		public static void Blocked(final String type, final int count){
+			tekkitrestrict.log.info("Blocked " + count + " " + type + (count==1 ? "." : "s."));
 		}
-		public static void EMC(int count, int count2){
-			String extra = (count==1) ? "" : "s";
-			tekkitrestrict.log.info("Set " + count + " EMC value" + extra + " (" + count2 + " if you count all data values)");
+		public static void EMC(final int count, final int count2){
+			tekkitrestrict.log.info("Set " + count + " EMC value" + ((count==1) ? " (" : "s (")+ count2 + " if you count all data values)");
 		}
 	}
 	public static class Cache {
-		public static void Loaded(String type, int count){
-			String extra = (count==1) ? "" : "s"; 
-			tekkitrestrict.log.info("[Cache] Cached " + count + " " + type + extra + ".");
+		public static void Loaded(final String type, final int count){
+			tekkitrestrict.log.info("[Cache] Cached " + count + " " + type + ((count==1) ? "." : "s."));
 		}
-		public static void Warning(String message){
-			tekkitrestrict.log.log(Level.WARNING, "[Cache] " + message);
+		public static void Warning(final String message){
+			tekkitrestrict.log.warning("[Cache] " + message);
 		}
 	}
 	public static class Config {
 		@Deprecated
-		public static void Warning(String message){
+		public static void Warning(final String message){
 			tekkitrestrict.log.warning("[Config] " + message);
 			Warning.configWarnings.add(message);
 		}
-		public static void Notice(String message){
+		public static void Notice(final String message){
 			tekkitrestrict.log.log(Level.parse("Notice"), "[Config] " + message);
 		}
-		public static void Loaded(String type, int count){
-			String extra = (count==1) ? "" : "s"; 
-			tekkitrestrict.log.info("[Config] Loaded " + count + " " + type + extra + ".");
+		public static void Loaded(final String type, final int count){
+			tekkitrestrict.log.info("[Config] Loaded " + count + " " + type + ((count==1) ? "." : "s."));
 		}
 	}
 	
-	public static void Debug(@NonNull String msg){
+	public static void Debug(@NonNull final String msg){
 		if (!Global.debug) return;
-		FileLog log = FileLog.getLogOrMake("Debug", true, false);
-		log.log(msg);
+		FileLog.getLogOrMake("Debug", true, false).log(msg);
 	}
-	public static void Dupe(String message){
+	public static void Dupe(final String message){
 		McLogger.log(Level.parse("TRDupe"), message);
 	}
-	public static void Hack(String message){
-		McLogger.log(Level.parse("TRHack"), message);
+	public static void Hack(final String message){
+		McLogger.log(hack, message);
 	}
 	public static void Glitch(String type, String playername) {
-		String message = playername + " tried to glitch using a " + type + ".";
-		McLogger.log(Level.parse("TRDupe"), message);
+		McLogger.log(dupe, playername + " tried to glitch using a " + type + ".");
 	}
 	/** For each stackTrace element, it will write it to the debug log. */
-	public static void debugEx(@NonNull Exception ex){
+	public static void debugEx(@NonNull final Exception ex){
 		if (!Global.debug) return;
-		FileLog log = FileLog.getLogOrMake("Debug", true, false);
-		for (StackTraceElement element : ex.getStackTrace()) {
+		final FileLog log = FileLog.getLogOrMake("Debug", true, false);
+		for (final StackTraceElement element : ex.getStackTrace()) {
 			log.log("     " + element.toString());
 		}
 	}
 	/** For each stackTrace element, log to console and to debug log*/
-	public static void Exception(@NonNull Exception ex, boolean severe){
+	public static void Exception(@NonNull final Exception ex, final boolean severe){
 		if (severe){
-			for (StackTraceElement element : ex.getStackTrace()){
+			for (final StackTraceElement element : ex.getStackTrace()){
 				tekkitrestrict.log.severe(element.toString());
 				Debug("[SEVERE]     "+element.toString());
 			}
 		} else {
-			for (StackTraceElement element : ex.getStackTrace()){
+			for (final StackTraceElement element : ex.getStackTrace()){
 				tekkitrestrict.log.warning(element.toString());
 				Debug("[WARNING]     "+element.toString());
 			}
@@ -108,7 +104,7 @@ public class Log {
 		
 	}
 	
-	@NonNull public static String replaceColors(@Nullable String str){
+	@NonNull public static String replaceColors(@Nullable final String str){
 		if (str == null) return "null";
 		return str.replace("&0", ChatColor.BLACK + "")
 					.replace("&1", ChatColor.DARK_BLUE + "")
@@ -140,32 +136,32 @@ public class Log {
 		public static LinkedList<String> otherWarnings = new LinkedList<String>();
 		public static LinkedList<String> dbWarnings = new LinkedList<String>();
 		
-		public static void config(String message, boolean severe){
+		public static void config(final String message, final boolean severe){
 			if (severe) tekkitrestrict.log.severe("[Config] " + message);
 			else tekkitrestrict.log.warning("[Config] " + message);
 			configWarnings.add(message);
 			Debug("[Config] " + message);
 		}
-		public static void load(String message, boolean severe){
+		public static void load(final String message, final boolean severe){
 			if (severe) tekkitrestrict.log.severe(message);
 			else tekkitrestrict.log.warning(message);
 			loadWarnings.add(message);
 			Debug(message);
 		}
-		public static void other(String message, boolean severe){
+		public static void other(final String message, boolean severe){
 			if (severe) tekkitrestrict.log.severe(message);
 			else tekkitrestrict.log.warning(message);
 			otherWarnings.add(message);
 			Debug(message);
 		}
-		public static void dbAndLoad(String message, boolean severe) {
+		public static void dbAndLoad(final String message, boolean severe) {
 			if (severe) tekkitrestrict.log.severe(message);
 			else tekkitrestrict.log.warning(message);
 			dbWarnings.add(message);
 			loadWarnings.add(message);
 			Debug(message);
 		}
-		public static void db(String message, boolean severe){
+		public static void db(final String message, final boolean severe){
 			if (severe) tekkitrestrict.log.severe(message);
 			else tekkitrestrict.log.warning(message);
 			dbWarnings.add(message);

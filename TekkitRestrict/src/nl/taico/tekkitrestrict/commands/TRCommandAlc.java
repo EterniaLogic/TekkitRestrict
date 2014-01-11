@@ -22,6 +22,7 @@ import org.bukkit.craftbukkit.event.CraftEventFactory;
 import org.bukkit.entity.Player;
 
 import nl.taico.tekkitrestrict.Log;
+import nl.taico.tekkitrestrict.Send;
 import nl.taico.tekkitrestrict.tekkitrestrict;
 import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.objects.OpenAlcObj;
@@ -34,12 +35,17 @@ import forge.NetworkMod;
 import forge.packets.PacketOpenGUI;
 
 public class TRCommandAlc implements CommandExecutor {
+	private final Send send;
+	public TRCommandAlc(){
+		send = new Send();
+	}
+	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		if (!(sender instanceof Player)){
-			sender.sendMessage(ChatColor.RED + "The console cannot use this command!");
-			return true;
-		}
+		send.sender = sender;
+		
+		if (send.noConsole()) return true;
+		
 
 		if (!sender.hasPermission("tekkitrestrict.openalc")){
 			sender.sendMessage(ChatColor.RED + "You are not allowed to use this command!");

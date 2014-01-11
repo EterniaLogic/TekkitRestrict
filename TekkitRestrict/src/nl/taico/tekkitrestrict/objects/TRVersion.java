@@ -21,7 +21,7 @@ public class TRVersion {
 		str = str.trim();
 		fullVer = str;
 		{
-			String[] temp = fullVer.split(" ")[0].split("\\.");
+			final String[] temp = fullVer.split(" ")[0].split("\\.");
 			major = Integer.parseInt(temp[0]);
 			minor = Integer.parseInt(temp[1]);
 		}
@@ -34,7 +34,7 @@ public class TRVersion {
 			beta = true;
 			dev = false;
 			
-			String[] temp = fullVer.split(" ");//1.18,beta,1
+			final String[] temp = fullVer.split(" ");//1.18,beta,1
 			if (temp.length == 2)
 				extra = 1;
 			else if (temp.length >= 3)
@@ -43,7 +43,7 @@ public class TRVersion {
 			beta = false;
 			dev = true;
 			
-			String[] temp = fullVer.split(" ");//1.18,dev
+			final String[] temp = fullVer.split(" ");//1.18,dev
 			if (temp.length == 2)
 				extra = 1;
 			else if (temp.length >= 3)
@@ -51,7 +51,7 @@ public class TRVersion {
 		}
 	}
 	
-	public boolean isNewer(@NonNull TRVersion ver2){
+	public boolean isNewer(@NonNull final TRVersion ver2){
 		if (this.major > ver2.major) return false;
 		if (this.minor > ver2.minor) return false;
 		
@@ -86,7 +86,7 @@ public class TRVersion {
 		}
 	}
 	
-	public boolean shouldUpdate(@NonNull TRVersion ver2){
+	public boolean shouldUpdate(@NonNull final TRVersion ver2){
 		if (this.major > ver2.major) return false;
 		if (this.minor > ver2.minor) return false;
 		

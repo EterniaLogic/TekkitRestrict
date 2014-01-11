@@ -15,6 +15,14 @@
 ## Have fun, Play safe. Good luck.                                  ##
 ## * DreadEnd * out.                                                ##
 ######################################################################
+# Add Tekkit Material names (to get the name of the block/item, used
+# by logging plugins, Essentials, LWC, etc.) to Bukkit.
+AddTekkitMaterialNames: true
+
+# Add Equivalent Exchange items names to the Essentials Item Database
+# (used for /i, /give, /itemdb)
+AddEEItemsToEssentials: true
+
 # Patch ComputerCraft once to prevent some server crashes with
 # ComputerCraft computers.
 # Default: true

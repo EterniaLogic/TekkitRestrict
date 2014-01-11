@@ -13,6 +13,7 @@ public class TRLocation {
 	private World worldObj;
 	public TRLocation(Location loc){
 		world = loc.getWorld().getName();
+		worldObj = loc.getWorld();
 		x = loc.getBlockX();
 		y = loc.getBlockY();
 		z = loc.getBlockZ();
@@ -26,7 +27,7 @@ public class TRLocation {
 	}
 	
 	public boolean equals(TRLocation loc){
-		return (this.world.equals(loc.world)&& this.x == loc.x && this.y == loc.y && this.z == loc.z);
+		return (this.world.equals(loc.world) && this.x == loc.x && this.y == loc.y && this.z == loc.z);
 	}
 	
 	/**
@@ -36,20 +37,33 @@ public class TRLocation {
 	public Chunk getChunk(){
 		if (worldObj == null){
 			for (World w : Bukkit.getWorlds()){
-				if (w.getName().equalsIgnoreCase("world")){
+				if (w.getName().equalsIgnoreCase(world)){
 					worldObj = w;
 					break;
 				}
 			}
 		}
-		net.minecraft.server.Chunk c = ((CraftWorld) worldObj).getHandle().chunkProviderServer.chunks.get(x >> 4, z >> 4);
+
 		return worldObj.getChunkAt(x >> 4, z >> 4);
+	}
+	
+	public Chunk getChunkNoLoad(){
+		if (worldObj == null){
+			for (World w : Bukkit.getWorlds()){
+				if (w.getName().equalsIgnoreCase(world)){
+					worldObj = w;
+					break;
+				}
+			}
+		}
+		
+		return ((CraftWorld) worldObj).getHandle().chunkProviderServer.chunks.get(x >> 4, z >> 4).bukkitChunk;
 	}
 
 	public Block getBlock() {
 		if (worldObj == null){
 			for (World w : Bukkit.getWorlds()){
-				if (w.getName().equalsIgnoreCase("world")){
+				if (w.getName().equalsIgnoreCase(world)){
 					worldObj = w;
 					break;
 				}

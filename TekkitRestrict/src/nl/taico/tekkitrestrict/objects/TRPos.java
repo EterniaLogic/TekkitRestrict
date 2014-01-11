@@ -8,9 +8,11 @@ import com.sk89q.worldedit.BlockVector;
 
 public class TRPos {
 	public int x1, y1, z1, x2, y2, z2;
-	
-	public TRPos(){}
-	public TRPos(@NonNull Location loc1, @NonNull Location loc2){
+	public boolean isEmpty;
+	public TRPos(){
+		isEmpty = true;
+	}
+	public TRPos(@NonNull final Location loc1, @NonNull final Location loc2){
 		this(loc1.getBlockX(), loc1.getBlockY(), loc1.getBlockZ(), loc2.getBlockX(), loc2.getBlockY(), loc2.getBlockZ());
 		/*
 		x1 = loc1.getBlockX();
@@ -37,7 +39,7 @@ public class TRPos {
 		*/
 	}
 	
-	public TRPos(BlockVector loc1, BlockVector loc2){
+	public TRPos(final BlockVector loc1, final BlockVector loc2){
 		this(loc1.getBlockX(), loc1.getBlockY(), loc1.getBlockZ(), loc2.getBlockX(), loc2.getBlockY(), loc2.getBlockZ());
 	}
 	/**
@@ -46,7 +48,7 @@ public class TRPos {
 	 * @return
 	 * @deprecated Use new {@link #TRPos(BlockVector, BlockVector)} instead
 	 */
-	public static TRPos parse(@NonNull BlockVector loc1, @NonNull BlockVector loc2){
+	public static TRPos parse(@NonNull final BlockVector loc1, @NonNull final BlockVector loc2){
 		TRPos p = new TRPos();
 		p.x1 = loc1.getBlockX();
 		p.x2 = loc2.getBlockX();
@@ -69,9 +71,10 @@ public class TRPos {
 			p.z1 = p.z2;
 			p.z2 = t;
 		}
+		p.isEmpty = false;
 		return p;
 	}
-	public TRPos(int x1, int y1, int z1, int x2, int y2, int z2){
+	public TRPos(final int x1, final int y1, final int z1, final int x2, final int y2, final int z2){
 		if (x1 > x2){
 			this.x1 = x2;
 			this.x2 = x1;
@@ -93,8 +96,9 @@ public class TRPos {
 			this.z1 = z1;
 			this.z2 = z2;
 		}
+		isEmpty = false;
 	}
-	public TRPos(@NonNull String[] temp){
+	public TRPos(@NonNull final String[] temp){
 		this(Integer.parseInt(temp[0]), Integer.parseInt(temp[1]), Integer.parseInt(temp[2]), Integer.parseInt(temp[3]), Integer.parseInt(temp[4]), Integer.parseInt(temp[5]));
 		/*
 		x1 = Integer.parseInt(temp[0]);
@@ -121,50 +125,50 @@ public class TRPos {
 		*/
 	}
 	
-	public boolean contains(@NonNull Location loc){
-		int x = loc.getBlockX();
+	public boolean contains(@NonNull final Location loc){
+		final int x = loc.getBlockX();
 		if (x < x1 || x > x2) return false;
-		int z = loc.getBlockZ();
+		final int z = loc.getBlockZ();
 		if (z < z1 || z > z2) return false;
-		int y = loc.getBlockY();
+		final int y = loc.getBlockY();
 		if (y < y1 || y > y2) return false;
 		return true;
 	}
 	
-	public boolean contains(int x, int y, int z) {
+	public boolean contains(final int x, final int y, final int z) {
 		if (x < x1 || x > x2) return false;
 		if (z < z1 || z > z2) return false;
 		if (y < y1 || y > y2) return false;
 		return true;
 	}
 	
-	public boolean containsIgnoreY(@NonNull Location loc){
-		int x = loc.getBlockX();
+	public boolean containsIgnoreY(@NonNull final Location loc){
+		final int x = loc.getBlockX();
 		if (x < x1 || x > x2) return false;
-		int z = loc.getBlockZ();
+		final int z = loc.getBlockZ();
 		if (z < z1 || z > z2) return false;
 		return true;
 	}
 	
-	public boolean containsIgnoreY(int x, int z){
+	public boolean containsIgnoreY(final int x, final int z){
 		if (x < x1 || x > x2) return false;
 		if (z < z1 || z > z2) return false;
 		return true;
 	}
 	
-	public Location getLesserCorner(World world){
+	public Location getLesserCorner(final World world){
 		return new Location(world, x1, y1, z1);
 	}
 	
-	public Location getCenter(World world){
+	public Location getCenter(final World world){
 		return new Location(world, (x1+x2)/2, (y1+y2)/2, (z1+z2)/2);
 	}
 	
-	public Location getGreaterCorner(World world){
+	public Location getGreaterCorner(final World world){
 		return new Location(world, x2, y2, z2);
 	}
 	
-	@NonNull public Location toLoc(World world){
+	@NonNull public Location toLoc(final World world){
 		return new Location(world, (x1+x2)/2, (y1+y2)/2, (z1+z2)/2);
 	}
 	
@@ -172,5 +176,6 @@ public class TRPos {
 	public String toString(){
 		return ""+x1+","+y1+","+z1+","+x2+","+y2+","+z2;
 	}
+	
 	
 }

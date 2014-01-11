@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -46,6 +47,7 @@ import nl.taico.tekkitrestrict.listeners.Assigner;
 import nl.taico.tekkitrestrict.objects.TRVersion;
 import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 import nl.taico.tekkitrestrict.objects.TREnums.DBType;
+import nl.taico.tekkitrestrict.threads.TRThreadManager;
 
 public class tekkitrestrict extends JavaPlugin {
 	private static tekkitrestrict instance;
@@ -65,7 +67,6 @@ public class tekkitrestrict extends JavaPlugin {
 	public static Database db;
 	public static Updater updater2 = null;
 	
-	private static TRThread ttt = null;
 	private static TRLogFilter filter = null;
 	public static ArrayList<YamlConfiguration> configList = new ArrayList<YamlConfiguration>();
 	
@@ -75,6 +76,7 @@ public class tekkitrestrict extends JavaPlugin {
 	@Override
 	public void onLoad() {
 		instance = this; //Set the instance
+		
 		log = getLogger(); //Set the logger
 		
 		version = new TRVersion(getDescription().getVersion());//.equals("1.2") ? "1.20" : getDescription().getVersion());
@@ -84,7 +86,7 @@ public class tekkitrestrict extends JavaPlugin {
 		saveDefaultConfig(false); //Copy config files
 
 		config = this.getConfigx(); //Load the configuration files
-		double configVer = config.getDouble(ConfigFile.General, "ConfigVersion", 0.9);
+		final double configVer = config.getDouble(ConfigFile.General, "ConfigVersion", 0.9);
 		if (configVer < 1.1)
 			UpdateConfigFiles.v09();//0 --> newest
 		else if (configVer < 1.5) {//Upgrade to 2.0
@@ -129,7 +131,7 @@ public class tekkitrestrict extends JavaPlugin {
 		
 		try {//Load all settings
 			load();
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			Warning.load("An error occurred: Unable to load settings!", true);
 			Log.Exception(ex, true);
 		}
@@ -142,20 +144,24 @@ public class tekkitrestrict extends JavaPlugin {
 		if (!TRDB.loadDB()){
 			Warning.dbAndLoad("[DB] Failed to load Database!", true);
 		} else {
-			if (dbtype == DBType.SQLite) {
-				if (TRDB.initSQLite())
-					log.info("[SQLite] SQLite Database loaded!");
-				else {
-					Warning.dbAndLoad("[SQLite] Failed to load SQLite Database!", true);
-				}
-			} else if (dbtype == DBType.MySQL) {
-				if (TRDB.initMySQL()){
-					log.info("[MySQL] Database connection established!");
-				} else {
-					Warning.dbAndLoad("[MySQL] Failed to connect to MySQL Database!", true);
-				}
-			} else {
-				Warning.dbAndLoad("[DB] Unknown Database type set!", true);
+			switch (dbtype){
+				case SQLite:
+					if (TRDB.initSQLite()) {
+						log.info("[SQLite] SQLite Database loaded!");
+					} else {
+						Warning.dbAndLoad("[SQLite] Failed to load SQLite Database!", true);
+					}
+					break;
+				case MySQL:
+					if (TRDB.initMySQL()){
+						log.info("[MySQL] Database connection established!");
+					} else {
+						Warning.dbAndLoad("[MySQL] Failed to connect to MySQL Database!", true);
+					}
+					break;
+				default:
+					Warning.dbAndLoad("[DB] Unknown Database type set!", true);
+					break;
 			}
 		}
 		//#####################################################
@@ -164,12 +170,12 @@ public class tekkitrestrict extends JavaPlugin {
 		//###################### RPTimer ######################
 		if (config.getBoolean2(ConfigFile.General, "UseAutoRPTimer", false)){
 			try {
-				double value = config.getDouble(ConfigFile.ModModifications, "RPTimerMin", 0.2d);
-				int ticks = (int) Math.round((value-0.1d) * 20d);
-				RedPowerLogic.minInterval = ticks; // set minimum interval for logic timers...
+				final double value = config.getDouble(ConfigFile.ModModifications, "RPTimerMin", 0.2d);
+				RedPowerLogic.minInterval = (int) Math.round((value-0.1d) * 20d); // set minimum interval for logic timers...
 				log.info("Set the RedPower Timer Min interval to " + value + " seconds.");
-			} catch (Exception e) {
+			} catch (final Exception ex) {
 				Warning.load("Setting the RedPower Timer failed!", false);
+				Log.debugEx(ex);
 			}
 		}
 		//#####################################################
@@ -181,18 +187,33 @@ public class tekkitrestrict extends JavaPlugin {
 		}
 		//#####################################################
 		
+		
+		if (config.getBoolean2(ConfigFile.General, "AddTekkitMaterialNames", true)){
+			NameProcessor.addTekkitMaterials();
+			log.fine("Added Tekkit Material Names");
+		}
+		
+		if (config.getBoolean2(ConfigFile.Logging, "FilterLogs", true) || config.getBoolean2(ConfigFile.Logging, "SplitLogs", true)){
+			final Enumeration<String> cc = LogManager.getLogManager().getLoggerNames();
+			if (filter == null) filter = new TRLogFilter();
+			while (cc.hasMoreElements()){
+				Logger.getLogger(cc.nextElement()).setFilter(filter);
+			}
+		}
+	}
+	@Override
+	public void onEnable() {
 		//BlockBreaker anti-dupe
 		try {
-			ArrayList<Block> miningLaser = new ArrayList<Block>();
+			final ArrayList<Block> miningLaser = new ArrayList<Block>();
+			for (final Block block : EntityMiningLaser.unmineableBlocks) miningLaser.add(block);
 			
-			for (Block block : EntityMiningLaser.unmineableBlocks){
-				miningLaser.add(block);
-			}
 			miningLaser.add(Block.byId[194]);
 			EntityMiningLaser.unmineableBlocks = miningLaser.toArray(new Block[miningLaser.size()]);
 			log.fine("Patched Mining Laser + Auto Crafting Table MK II dupe.");
 		} catch (Exception ex){
 			Warning.load("Unable to patch Mining Laser + Auto Crafting Table MK II dupe!", false);
+			Log.debugEx(ex);
 		}
 		
 		try {
@@ -212,22 +233,26 @@ public class tekkitrestrict extends JavaPlugin {
 			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(7493));//Ender pouch
 			log.fine("Patched BlockBreaker + Auto Crafting Table MK II dupe.");
 			log.fine("Patched most Deployer Crash Bugs.");
-		} catch (Exception ex){
+		} catch (final Exception ex){
 			Warning.load("Unable to patch BlockBreaker + Auto Crafting Table MK II dupe!", false);
 			Warning.load("Unable to patch Deployer Crash Bugs!", false);
+			Log.debugEx(ex);
 		}
 		
 		try {
 			Ic2Recipes.addMaceratorRecipe(new ItemStack(135, 1, 2), new ItemStack(30254, 4, 0));
 			Ic2Recipes.addMaceratorRecipe(new ItemStack(135, 1, 3), new ItemStack(30255, 4, 0));
 			log.fine("Added Missing Nether Ores recipes.");
-		} catch (Exception ex){
+		} catch (final Exception ex){
 			Warning.load("Unable to add missing Nether Ore recipes.", false);
+			Log.debugEx(ex);
 		}
-	}
-	@Override
-	public void onEnable() {
-		ttt = new TRThread();
+		
+		final PluginManager pm = this.getServer().getPluginManager();
+		// determine if EE2 is enabled by using pluginmanager
+		tekkitrestrict.EEEnabled = pm.isPluginEnabled("mod_EE");
+		
+		final TRThreadManager ttt = new TRThreadManager();
 		try {
 			Assigner.assign(); //Register the required listeners
 		} catch (Exception ex){
@@ -235,7 +260,6 @@ public class tekkitrestrict extends JavaPlugin {
 			Log.Exception(ex, true);
 		}
 		
-		PluginManager pm = this.getServer().getPluginManager();
 		final Plugin wg = pm.getPlugin("WorldGuard"), gp = pm.getPlugin("GriefPrevention"), ps = pm.getPlugin("PreciousStones");
 		
 		if (Bukkit.getScheduler().scheduleAsyncDelayedTask(this, new Runnable(){
@@ -259,24 +283,22 @@ public class tekkitrestrict extends JavaPlugin {
 				TRPermHandler.permEx = ru.tehkode.permissions.bukkit.PermissionsEx.getPermissionManager();
 				log.info("PEX is enabled!");
 			}
-		} catch (Exception ex) {
-			log.info("Linking with Pex Failed!");
+		} catch (final Exception ex) {
+			Warning.load("Linking with Pex Failed!", false);
+			Log.debugEx(ex);
 			// Was not able to load permissionsEx
 		}
 		
-		// determine if EE2 is enabled by using pluginmanager
-		tekkitrestrict.EEEnabled = pm.isPluginEnabled("mod_EE");
-		
 		try {
 			ttt.init();
-		} catch (Exception ex) {
-			Warning.loadWarnings.add("An error occurred: Unable to start threads!");
+		} catch (final Exception ex) {
+			Warning.load("An error occurred: Unable to start threads!", true);
 			Log.Exception(ex, true);
 		}
 		
 		try {
 			initHeartBeat();
-		} catch (Exception ex){
+		} catch (final Exception ex){
 			Warning.load("An error occurred: Unable to initiate Limiter Manager correctly!", false);
 			Log.Exception(ex, false);
 		}
@@ -292,8 +314,7 @@ public class tekkitrestrict extends JavaPlugin {
 			if (success)
 				log.info("Linked with EEPatch for extended functionality!");
 			else
-				Warning.other("Linking with EEPatch Failed!", true);
-			
+				Warning.load("Linking with EEPatch Failed!", true);
 		} else {
 			log.info("EEPatch is not available. Extended EE integration disabled.");
 		}
@@ -317,8 +338,8 @@ public class tekkitrestrict extends JavaPlugin {
 		if (Bukkit.getScheduler().scheduleAsyncDelayedTask(this, new Runnable(){
 			public void run() {
 				if (config.getBoolean2(ConfigFile.Logging, "FilterLogs", true) || config.getBoolean2(ConfigFile.Logging, "SplitLogs", true)){
-					Enumeration<String> cc = LogManager.getLogManager().getLoggerNames();
-					filter = new TRLogFilter();
+					final Enumeration<String> cc = LogManager.getLogManager().getLoggerNames();
+					if (filter == null) filter = new TRLogFilter();
 					while (cc.hasMoreElements()){
 						Logger.getLogger(cc.nextElement()).setFilter(filter);
 					}
@@ -326,7 +347,7 @@ public class tekkitrestrict extends JavaPlugin {
 			}
 		})==-1){
 			if (config.getBoolean2(ConfigFile.Logging, "FilterLogs", true) || config.getBoolean2(ConfigFile.Logging, "SplitLogs", true)){
-				log.severe("Unable to register logfilters! Error: Cannot schedule!");
+				Warning.load("Unable to register logfilters! Error: Cannot schedule!", false);
 			}
 		}
 		
@@ -337,6 +358,18 @@ public class tekkitrestrict extends JavaPlugin {
 		
 		if (config.getBoolean2(ConfigFile.General, "UseTMetrics", true)){
 			tmetrics.start();
+		}
+		
+		if (pm.isPluginEnabled("Essentials") && config.getBoolean2(ConfigFile.General, "AddEEItemsToEssentials", true)){
+			Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable(){
+				public void run(){
+					if (NameProcessor.addEEItemsToEssentials()){
+						log.fine("Added EE Items to Essentials");
+					} else {
+						Warning.load("Failed to add EE Items to Essentials ItemDB!", false);
+					}
+				}
+			}, 10);
 		}
 		
 		Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
@@ -358,34 +391,26 @@ public class tekkitrestrict extends JavaPlugin {
 	public void onDisable() {
 		disable = true;
 		tmetrics.stop();
+		//metrics.stop();
+		TRThreadManager.stop();
 		
-		ttt.disableItemThread.interrupt();
-		ttt.entityRemoveThread.interrupt();
-		ttt.gemArmorThread.interrupt();
-		ttt.worldScrubThread.interrupt();
-		ttt.saveThread.interrupt();
-		
-		//ttt.limitFlyThread.interrupt();
-		
-		try {
-			int i = 1;
-			Thread.sleep(100);
-			do {
-				Thread.sleep(100);
-				i++;
-				if (i >= 50){
-					log.severe("The save thread was unable to fully save!");
-					break;
-				}
-			} while (ttt.saveThread.isSaving());
-		} catch (InterruptedException e) {} //Sleep for 0.1 or more seconds to allow the savethread to save.
-
 		TRLogger.saveLogs();
 		TRLogFilter.disable();
 		Log.deinit();
-		FileLog.closeAll();
-		
+		FileLog.closeAll();//Save all logs
+		db.close();//close db connection
+		getServer().getScheduler().cancelTasks(this);
 		log.info("TekkitRestrict v " + version.fullVer + " disabled!");
+		version = null;
+		dbtype = null;
+		updater2 = null;
+		db = null;
+		tmetrics = null;
+		config = null;
+		configList = null;
+		filter = null;
+		log = null;
+		instance = null;
 	}
 	
 	@NonNull public static tekkitrestrict getInstance() {
@@ -394,8 +419,8 @@ public class tekkitrestrict extends JavaPlugin {
 
 	private void initMetrics(){
 		try {
-			Metrics metrics = new Metrics(this);
-			Metrics.Graph g = metrics.createGraph("TekkitRestrict Stats");
+			final Metrics metrics = new Metrics(this);
+			final Metrics.Graph g = metrics.createGraph("TekkitRestrict Stats");
 			
 			g.addPlotter(new Metrics.Plotter("Total Safezones") {
 				@Override
@@ -445,7 +470,7 @@ public class tekkitrestrict extends JavaPlugin {
 				}
 			});
 			metrics.start();
-		} catch (IOException e) {
+		} catch (IOException ex) {
 			Warning.load("Metrics failed to start.", false);
 		}
 	}
@@ -459,15 +484,6 @@ public class tekkitrestrict extends JavaPlugin {
 		} catch (ClassNotFoundException ex) {
 			EEPatch = false;
 			return false;
-		}
-	}
-	
-	public static double getEEPatchVersion(){
-		try {
-			Class.forName("ee.EEPatch");
-			return ee.EEPatch.version;
-		} catch (ClassNotFoundException ex){
-			return -1d;
 		}
 	}
 	
@@ -502,12 +518,12 @@ public class tekkitrestrict extends JavaPlugin {
 	public void reload(final boolean listeners, final boolean silent) {
 		if (listeners) Assigner.unregisterAll();
 		
-		int id = Bukkit.getScheduler().scheduleAsyncDelayedTask(this, new Runnable(){
+		final int id = Bukkit.getScheduler().scheduleAsyncDelayedTask(this, new Runnable(){
 			public void run(){
 				reloadConfig();
 				
 				load();
-				TRThread.reload();
+				TRThreadManager.reload();
 				
 				//Stop TMetrics if the user disabled it in the config and reloaded.
 				if (!config.getBoolean(ConfigFile.General, "UseTMetrics", true)){
@@ -579,19 +595,19 @@ public class tekkitrestrict extends JavaPlugin {
 	}
 
 	@NonNull private YamlConfiguration reloadc(@NonNull String loc) {
-		File cf = new File("plugins"+File.separator+"tekkitrestrict"+File.separator + loc);
+		final File cf = new File("plugins"+File.separator+"tekkitrestrict"+File.separator + loc);
 		// tekkitrestrict.log.info(cf.getAbsolutePath());
-		YamlConfiguration conf = YamlConfiguration.loadConfiguration(cf);
+		final YamlConfiguration conf = YamlConfiguration.loadConfiguration(cf);
 		// newConfig.loadFromString(s)
-		InputStream defConfigStream = getResource(loc);
+		final InputStream defConfigStream = getResource(loc);
 		if (defConfigStream != null) {
-			YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(defConfigStream);
+			final YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(defConfigStream);
 			conf.setDefaults(defConfig);
 			try {
 				defConfigStream.close();
-			} catch (IOException ex) {
+			} catch (final IOException ex) {
 				Warning.load("Exception while trying to reload the config!", false);
-				ex.printStackTrace();
+				Log.Exception(ex, true);
 			}
 		}
 		return conf;
@@ -600,8 +616,8 @@ public class tekkitrestrict extends JavaPlugin {
 	@Deprecated
 	@Override
 	public void saveDefaultConfig() {
-		Level ll = log.getLevel();
-		log.setLevel(Level.SEVERE);
+		//Level ll = log.getLevel();
+		//log.setLevel(Level.SEVERE);
 		try {
 			saveResource("General.config.yml", false);
 		} catch (Exception e) {}
@@ -643,11 +659,11 @@ public class tekkitrestrict extends JavaPlugin {
 				saveResource("EEPatch.config.yml", false);
 			}
 		} catch (Exception e) {}
-		log.setLevel(ll);
+		//log.setLevel(ll);
 	}
 	public void saveDefaultConfig(boolean force) {
-		Level ll = log.getLevel();
-		log.setLevel(Level.SEVERE);
+		//Level ll = log.getLevel();
+		//log.setLevel(Level.SEVERE);
 		try {
 			saveResource("General.config.yml", force);
 		} catch (Exception e) {}
@@ -689,7 +705,45 @@ public class tekkitrestrict extends JavaPlugin {
 				saveResource("EEPatch.config.yml", force);
 			}
 		} catch (Exception e) {}
-		log.setLevel(ll);
+		//log.setLevel(ll);
+	}
+	
+	public void saveResource(String resourcePath, boolean replace){
+		if (resourcePath == null || resourcePath.equals("")) {
+            throw new IllegalArgumentException("ResourcePath cannot be null or empty");
+        }
+
+        resourcePath = resourcePath.replace('\\', '/');
+        @SuppressWarnings("resource")
+		final InputStream in = getResource(resourcePath);
+        if (in == null) {
+        	throw new IllegalArgumentException("The embedded resource '" + resourcePath + "' cannot be found in " + getFile());
+        }
+
+        final File outFile = new File(getDataFolder(), resourcePath);
+        final int lastIndex = resourcePath.lastIndexOf('/');
+        final File outDir = new File(getDataFolder(), resourcePath.substring(0, lastIndex >= 0 ? lastIndex : 0));
+
+        if (!outDir.exists()) {
+            outDir.mkdirs();
+        }
+
+        try {
+            if (!outFile.exists() || replace) {
+            	final OutputStream out = new FileOutputStream(outFile);
+            	final byte[] buf = new byte[1024];
+                int len;
+                while ((len = in.read(buf)) > 0) {
+                    out.write(buf, 0, len);
+                }
+                out.close();
+                in.close();
+            } else {
+                getLogger().log(Level.FINEST, "Could not save " + outFile.getName() + " to " + outFile + " because " + outFile.getName() + " already exists.");
+            }
+        } catch (final IOException ex) {
+        	getLogger().log(Level.SEVERE, "Could not save " + outFile.getName() + " to " + outFile, ex);
+        }
 	}
 	
 	public void Update(){
@@ -697,10 +751,10 @@ public class tekkitrestrict extends JavaPlugin {
 		updater2 = new Updater(this, 44061, this.getFile(), Updater.UpdateType.DEFAULT, true);
 	}
 	
-	public boolean backupConfig(@NonNull String sourceString, @NonNull String destString){
+	public boolean backupConfig(@NonNull final String sourceString, @NonNull final String destString){
 		try {
-			File sourceFile = new File(sourceString);
-			File destFile = new File(destString);
+			final File sourceFile = new File(sourceString);
+			final File destFile = new File(destString);
 			if (!sourceFile.exists()) return false;
 			
 			if(!destFile.exists()) destFile.createNewFile();
@@ -720,7 +774,7 @@ public class tekkitrestrict extends JavaPlugin {
 			if(source != null) source.close();
 			if(destination != null) destination.close();
 
-		} catch (IOException ex){
+		} catch (final IOException ex){
 			Warning.load("Cannot backup config: " + sourceString, false);
 			return false;
 		}
