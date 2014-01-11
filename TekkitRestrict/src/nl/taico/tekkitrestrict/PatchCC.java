@@ -10,18 +10,17 @@ import java.io.IOException;
 import java.util.LinkedList;
 
 import nl.taico.tekkitrestrict.Log.Warning;
-import nl.taico.tekkitrestrict.lib.BrokenRandomString;
 import nl.taico.tekkitrestrict.lib.RandomString;
 
 public class PatchCC {
-	static final String s = File.separator;
-	static Character nul = '\000';
+	private static final String s = File.separator;
+	private static Character nul = '\000';
 	public static void start(){
-		File patched = new File("mods"+s+"ComputerCraft"+s+"lua"+s+"rom"+s+"patched2"+s);
+		final File patched = new File("mods"+s+"ComputerCraft"+s+"lua"+s+"rom"+s+"patched3"+s);
 		if (patched.exists()) return;
 		
 		BufferedReader input = null;
-		File file = new File("mods"+s+"ComputerCraft"+s+"lua"+s+"rom"+s+"startup"+s);
+		final File file = new File("mods"+s+"ComputerCraft"+s+"lua"+s+"rom"+s+"startup"+s);
 		if (!file.exists()){
 			Warning.load("[CCPatch] ComputerCraft file cannot be found! (" + file.getAbsolutePath() + ")", false);
 			return;
@@ -35,7 +34,7 @@ public class PatchCC {
 		}
 		
 		
-		LinkedList<String> lines = new LinkedList<String>();
+		final LinkedList<String> lines = new LinkedList<String>();
 		try {
 			String line;
 			while ((line = input.readLine()) != null){
@@ -50,7 +49,7 @@ public class PatchCC {
 			return;
 		}
 		boolean rebootPatch = true, rsCrashPatch = true, nulPatch = true;
-		for (String curline : lines){
+		for (final String curline : lines){
 			if (curline == null) continue;
 			if (curline.contains("os.reboot = nil") || curline.contains("os.reboot=nil")) rebootPatch = false;
 			else if (curline.contains("bypassAntiRedstoneCrashBug = rs.setOutput") || curline.contains("rs.setOutput = function(side, bool)")) rsCrashPatch = false;
@@ -77,8 +76,7 @@ public class PatchCC {
 		}
 		
 		if (rsCrashPatch) {
-			RandomString ran = new RandomString(10);
-			String extra = ran.nextString();
+			final String extra = new RandomString(10).nextString();
 			tekkitrestrict.log.info("[CCPatch] Adding redstone crash patch...");
 			lines.add(extra+"bypassAntiRedstoneCrashBug = rs.setOutput");
 			lines.add("rs.setOutput = function(side, bool)");
@@ -91,20 +89,36 @@ public class PatchCC {
 		}
 		
 		if (nulPatch){
-			tekkitrestrict.log.info("[CCPatch] Your Computers startupfile is corrupt! Repairing...");
+			
+			boolean corrupt = false;
+			final char d = RandomString.randomChar();
+			for (int i = 0;i<lines.size();i++){
+				final String l = lines.get(i);
+				final String l2 = l.replace(nul, d);
+				if (!l.equals(l2)){
+					corrupt = true;
+					lines.set(i, l2);
+				}
+			}
+			
+			if (corrupt){
+				tekkitrestrict.log.info("[CCPatch] Your Computers startupfile was corrupt and has been repaired!");
+			}
+			
+			/*
 			char d = RandomString.randomChar();
 			for (char c : BrokenRandomString.symbols){
 				for (String line : lines){
 					line.replace(c, d);
 				}
-			}
-			tekkitrestrict.log.info("[CCPatch] Repair complete!");
+			}*/
+			
 		}
 		
 		BufferedWriter output = null;
 		try {
 			output = new BufferedWriter(new FileWriter(file));
-			for (String line2 : lines){
+			for (final String line2 : lines){
 				output.append(line2);
 				output.newLine();
 			}
