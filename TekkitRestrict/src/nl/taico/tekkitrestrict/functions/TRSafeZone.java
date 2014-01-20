@@ -335,7 +335,7 @@ public class TRSafeZone {
 		if (zone.mode == 4){
 			//IMPORTANT Potential problem when a claim gets resized.
 			if (griefPrevention == null) return false;
-			if (zone.getData().equals("")) return false;
+			if (zone.getData().isEmpty()) return false;
 			World world = Bukkit.getWorld(zone.world);
 			if (world == null) return false;
 			Location loc;
@@ -487,7 +487,7 @@ public class TRSafeZone {
 					if (lastZone.pluginRegion != null){
 						Claim c = (Claim) lastZone.pluginRegion;
 						String r = c.ownerName;
-						if (r == null || r.equals("")) r = "Admin";
+						if (r == null || r.isEmpty()) r = "Admin";
 						return "GriefPrevention Safezone Claim owned by: " + r;
 					} else {
 						return "GriefPrevention Safezone Claim: " + lastZone.name;
@@ -535,7 +535,7 @@ public class TRSafeZone {
 					if (a.pluginRegion != null){
 						Claim c = (Claim) a.pluginRegion;
 						r = c.ownerName;
-						if (r == null || r.equals("")) r = "Admin";
+						if (r == null || r.isEmpty()) r = "Admin";
 						return "GriefPrevention Safezone Claim owned by: " + r;
 					} else {
 						return "GriefPrevention Safezone Claim: " + a.name;
@@ -551,7 +551,7 @@ public class TRSafeZone {
 						if (a.pluginRegion != null){
 							Claim c = (Claim) a.pluginRegion;
 							r = c.ownerName;
-							if (r == null || r.equals("")) r = "Admin";
+							if (r == null || r.isEmpty()) r = "Admin";
 							return "GriefPrevention Safezone Claim owned by: " + r;
 						} else {
 							return "GriefPrevention Safezone Claim: " + a.name;

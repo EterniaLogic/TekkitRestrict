@@ -29,7 +29,7 @@ public class GPSafezone extends TRSafezone {
 		this.claim = getClaimAtPos(location);
 		if (this.claim == null){
 			this.valid = false;
-			this.location = new TRWorldPos(location, location);
+			this.location = new TRWorldPos(location, location);//save stored location.
 		} else {
 			this.location = new TRWorldPos(this.claim.getLesserBoundaryCorner(), this.claim.getGreaterBoundaryCorner());
 			switch (SafeZones.GPMode){
@@ -39,10 +39,36 @@ public class GPSafezone extends TRSafezone {
 					break;
 				default:
 					break;
-				
 			}
 		}
-		gpzones.add(this);
+		synchronized (gpzones){
+			gpzones.add(this);
+		}
+	}
+	
+	protected GPSafezone(final String name, final TRWorldPos loc) {
+		super(4, name);
+		this.world = loc.getWorld().getName().toLowerCase();
+		this.claim = getClaimAtPos(loc.getCenter());
+		if (this.claim == null) this.claim = getClaimAtPos(loc.getLesserCorner());
+		if (this.claim == null) this.claim = getClaimAtPos(loc.getGreaterCorner());
+		if (this.claim == null){
+			this.valid = false;
+			this.location = loc;//save stored location.
+		} else {
+			this.location = new TRWorldPos(this.claim.getLesserBoundaryCorner(), this.claim.getGreaterBoundaryCorner());
+			switch (SafeZones.GPMode){
+				case Admin:
+				case SpecificAdmin:
+					if (!claim.isAdminClaim()) this.valid = false;
+					break;
+				default:
+					break;
+			}
+		}
+		synchronized (gpzones){
+			gpzones.add(this);
+		}
 	}
 	
 	private static Claim getClaimAtPos(final Location loc){
@@ -82,10 +108,13 @@ public class GPSafezone extends TRSafezone {
 		return true;
 	}
 	
-	private boolean fastCheck(final Player player, final Location loc){
-		final Boolean b = cache.get(player.getName());
-		if (b != null) return b.booleanValue();
+	/**
+	 * Does not check validness or location.
+	 */
+	private boolean shortCheck(final Player player, final Location loc){
 		final String name = player.getName();
+		final Boolean b = cache.get(name);
+		if (b != null) return b.booleanValue();
 		if (claim.ownerName.equalsIgnoreCase(name)){
 			cache.put(name, false);
 			return false;
@@ -112,16 +141,22 @@ public class GPSafezone extends TRSafezone {
 		return true;
 	}
 	
+	public static ArrayList<GPSafezone> getZones(){
+		synchronized (gpzones){
+			return new ArrayList<GPSafezone>(gpzones);
+		}
+	}
+	
 	public static boolean isInSafezone(final Player player){
 		final Location loc = player.getLocation();
 		switch (SafeZones.GPMode){
 			case SpecificAdmin:
 				if (player.hasPermission("griefprevention.adminclaims")) return false;
 			case Specific:
-				for (final GPSafezone zone : gpzones){
+				for (final GPSafezone zone : getZones()){
 					if (!zone.valid || zone.claim == null) continue;
 					if (!zone.location.containsIgnoreY(loc)) continue;
-					return zone.fastCheck(player, loc);
+					return zone.shortCheck(player, loc);
 				}
 				return false;
 			case Admin:
@@ -145,7 +180,11 @@ public class GPSafezone extends TRSafezone {
 		
 		cache.clear();
 	}
-	
+	protected void remove() {
+		synchronized (gpzones){
+			gpzones.remove(this);
+		}
+	}
 	
 
 }

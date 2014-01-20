@@ -5,8 +5,6 @@ import org.bukkit.entity.Player;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
-import nl.taico.tekkitrestrict.annotations.Safe;
-
 public class TRItem {
 	public int id;
 	public int data;
@@ -69,7 +67,6 @@ public class TRItem {
 	 * <li>this.id == id AND data == 0 AND this.data == -10</li>
 	 * </ul>
 	 */
-	@Safe
 	public boolean compare(final int id, final int data) {
 		return this.id == id && (this.data == data || this.data == -1 || (data == 0 && this.data == -10));
 	}
