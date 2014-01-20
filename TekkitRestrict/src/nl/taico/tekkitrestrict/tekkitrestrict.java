@@ -1,3 +1,7 @@
+/* IMPORTANT TODO'S:
+ * - Add check to disable Anti pedestal EMC gen if EEPatch of the right version is installed (it fixes it)
+ * 
+ */
 package nl.taico.tekkitrestrict;
 
 import ic2.api.Ic2Recipes;
@@ -127,6 +131,9 @@ public class tekkitrestrict extends JavaPlugin {
 			GeneralConfig.upgradeFile();
 			SafeZonesConfig.upgradeFile();
 			reloadConfig();
+		} else if (configVer < 2.1){
+			if (linkEEPatch()) EEPatchConfig.upgradeFile();
+			GeneralConfig.upgradeFile();
 		}
 		
 		try {//Load all settings
@@ -273,10 +280,11 @@ public class tekkitrestrict extends JavaPlugin {
 			TRLimiter.init();
 		}
 
-		getCommand("tekkitrestrict").setExecutor(new TRCommandTR());
-		getCommand("openalc").setExecutor(new TRCommandAlc());
-		getCommand("tpic").setExecutor(new TRCommandTPIC());
-		getCommand("checklimits").setExecutor(new TRCommandCheck());
+		getCommand("tekkitrestrict").setExecutor(new TRCmdTr());
+		getCommand("openalc").setExecutor(new TRCmdOpenAlc());
+		getCommand("clearalc").setExecutor(new TRCmdClearAlc());
+		getCommand("tpic").setExecutor(new TRCmdTpic());
+		getCommand("checklimits").setExecutor(new TRCmdCheck());
 		
 		try {
 			if (pm.isPluginEnabled("PermissionsEx")) {

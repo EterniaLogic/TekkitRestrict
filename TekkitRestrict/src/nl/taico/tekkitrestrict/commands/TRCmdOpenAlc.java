@@ -7,7 +7,6 @@ import net.minecraft.server.Container;
 import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.ItemInWorldManager;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.World;
 import net.minecraft.server.mod_EE;
 
 import org.bukkit.Bukkit;
@@ -16,7 +15,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.CraftServer;
-import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.event.CraftEventFactory;
 import org.bukkit.entity.Player;
@@ -34,9 +32,9 @@ import forge.MinecraftForge;
 import forge.NetworkMod;
 import forge.packets.PacketOpenGUI;
 
-public class TRCommandAlc implements CommandExecutor {
+public class TRCmdOpenAlc implements CommandExecutor {
 	private final Send send;
-	public TRCommandAlc(){
+	public TRCmdOpenAlc(){
 		send = new Send();
 	}
 	
@@ -109,8 +107,8 @@ public class TRCommandAlc implements CommandExecutor {
 		}
 		
 		try {
-			World world = ((CraftWorld) player.getWorld()).getHandle();
-			AlchemyBagData alcdata = openGui(looker, holder, mod_EE.getInstance(), 56, world, color, (int) looker.locY, (int) looker.locZ);
+			//World world = ((CraftWorld) player.getWorld()).getHandle();
+			AlchemyBagData alcdata = openGui(looker, holder, color);
 			if (alcdata == null){
 				Warning.other("An error occurred. " + OName + "'s bag will not save properly if he is offline.", false);
 				sender.sendMessage(ChatColor.RED + "An error occured: Unable to find the specified bag!");
@@ -250,16 +248,17 @@ public class TRCommandAlc implements CommandExecutor {
 	
 	/**
 	 * @param player The player that needs to see the inventory.
-	 * @param TargetPlayer The player that owns the inventory.
+	 * @param targetPlayer The player that owns the inventory.
 	 * @return 
 	 */
-	public static AlchemyBagData openGui(EntityPlayer player, EntityPlayer TargetPlayer, BaseMod mod, int ID, World world, int x, int y, int z) {
+	public static AlchemyBagData openGui(EntityPlayer player, EntityPlayer targetPlayer, int color) {
+		BaseMod mod = mod_EE.getInstance();
 		if (!(mod instanceof NetworkMod)) return null;
 		
 		IGuiHandler handler = MinecraftForge.getGuiHandler(mod);
 		if (handler == null) return null;
 		
-		Container container = (Container) handler.getGuiElement(ID, TargetPlayer, world, x, y, z);
+		Container container = (Container) handler.getGuiElement(56, targetPlayer, player.world, color, 0, 0);
 		if (container == null) return null;
 		
 		container = CraftEventFactory.callInventoryOpenEvent(player, container);
@@ -268,7 +267,7 @@ public class TRCommandAlc implements CommandExecutor {
 		player.H();
 
 		PacketOpenGUI pkt = new PacketOpenGUI(player.getCurrentWindowIdField(),
-				MinecraftForge.getModID((NetworkMod) mod), ID, x, y, z);
+				MinecraftForge.getModID((NetworkMod) mod), 56, color, 0, 0);
 		player.netServerHandler.sendPacket(pkt.getPacket());
 		player.activeContainer = container;
 		player.activeContainer.windowId = player.getCurrentWindowIdField();
@@ -284,7 +283,7 @@ public class TRCommandAlc implements CommandExecutor {
 		return test;
 	}
 
-	private static int getColor(String color) {
+	public static int getColor(String color) {
 		color = color.toLowerCase();
 		switch (color){
 		case "white": return 0;
@@ -333,11 +332,12 @@ public class TRCommandAlc implements CommandExecutor {
 			case 13: return "green";
 			case 14: return "red";
 			case 15: return "black";
+			//case -2: return "all";
 			default: return "unknown";
 		}
 	}
 
-	private static Player Playerz(Player sender, String name) {
+	static Player Playerz(Player sender, String name) {
 		//Check if the targetplayer is online
 		Player target = Bukkit.getPlayer(name);
 		if (target != null) return target;
@@ -359,6 +359,36 @@ public class TRCommandAlc implements CommandExecutor {
 			}
 			sender.sendMessage(ChatColor.RED + "Player " + name + " can not be found!");
 		} catch (Exception ex) {
+			sender.sendMessage("Error while retrieving offline player data!");
+			Warning.other("An error occured in OpenAlc ('-TRCommandAlc.Playerz(...):Player')!", false);
+			Log.Exception(ex, false);
+			return null;
+		}
+		return target;
+	}
+	
+	static Player Playerz(CommandSender sender, String name) {
+		//Check if the targetplayer is online
+		Player target = Bukkit.getPlayer(name);
+		if (target != null) return target;
+		
+		//Otherwise search in the players folder fore the player.
+		final File playerfolder = new File(Bukkit.getWorlds().get(0).getWorldFolder(), "players");
+
+		final String playername = matchUser(playerfolder.listFiles(), name);
+		if (playername == null) return null;
+		
+		try {
+			final MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
+			final EntityPlayer entity = new EntityPlayer(server, server.getWorldServer(0), playername, new ItemInWorldManager(server.getWorldServer(0)));
+			target = entity.getBukkitEntity();
+			if (target != null) {
+				//Do as if the player logs on.
+				target.loadData();
+				return target;
+			}
+			sender.sendMessage(ChatColor.RED + "Player " + name + " can not be found!");
+		} catch (final Exception ex) {
 			sender.sendMessage("Error while retrieving offline player data!");
 			Warning.other("An error occured in OpenAlc ('-TRCommandAlc.Playerz(...):Player')!", false);
 			Log.Exception(ex, false);

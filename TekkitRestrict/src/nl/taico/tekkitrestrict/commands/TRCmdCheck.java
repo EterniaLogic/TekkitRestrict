@@ -16,10 +16,10 @@ import nl.taico.tekkitrestrict.functions.TRLimiter;
 import nl.taico.tekkitrestrict.objects.TRLimit;
 import nl.taico.tekkitrestrict.objects.TRPermLimit;
 
-public class TRCommandCheck implements CommandExecutor {
+public class TRCmdCheck implements CommandExecutor {
 	private Send send;
 	
-	public TRCommandCheck(){
+	public TRCmdCheck(){
 		send = new Send();
 	}
 	

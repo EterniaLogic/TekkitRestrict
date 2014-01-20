@@ -15,9 +15,9 @@ import org.bukkit.util.Vector;
 
 import nl.taico.tekkitrestrict.Send;
 
-public class TRCommandTPIC implements CommandExecutor {
+public class TRCmdTpic implements CommandExecutor {
 	private Send send;
-	public TRCommandTPIC(){
+	public TRCmdTpic(){
 		send = new Send();
 	}
 	

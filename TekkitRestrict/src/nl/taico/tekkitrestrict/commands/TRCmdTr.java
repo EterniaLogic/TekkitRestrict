@@ -50,16 +50,15 @@ import nl.taico.tekkitrestrict.objects.TREnums.SafeZone;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
-public class TRCommandTR implements CommandExecutor {
+public class TRCmdTr implements CommandExecutor {
 	private Send send;
-	public TRCommandTR(){
+	public TRCmdTr(){
 		send = new Send();
 	}
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		send.sender = sender;
-		
 		@NonNull String[] largs = args.clone();
 		
 		for (int i = 0; i < largs.length; i++){
@@ -238,12 +237,8 @@ public class TRCommandTR implements CommandExecutor {
 		
 		if (!send.sender.hasPermission("tekkitrestrict.admin")) return;
 		
-		if (tekkitrestrict.linkEEPatch()){
-			double eepver = tekkitrestrict.getEEPatchVersion();
-			send.msg(ChatColor.BLUE+"EEPatch version: " + ChatColor.GREEN+(eepver==-1d?"< 1.4":eepver));
-		} else {
-			send.msg(ChatColor.BLUE+"EEPatch: "+ChatColor.RED+"not installed");
-		}
+		if (TR.getEEPatchVersion() != -1d) send.msg(ChatColor.BLUE+"EEPatch version: " + ChatColor.GREEN+(TR.getEEPatchVersion()==0d?"< 1.4":TR.getEEPatchVersion()));
+		else send.msg(ChatColor.BLUE+"EEPatch: "+ChatColor.RED+"not installed");
 		
 		if (FixPack.getNEIVer() != -1d) send.msg(ChatColor.BLUE + "FixPack NEI: " + ChatColor.GREEN + (FixPack.getNEIVer()==0d?"<1.7":FixPack.getNEIVer()));
 		else send.msg(ChatColor.BLUE + "FixPack NEI: " + ChatColor.RED + "No");
@@ -736,6 +731,11 @@ public class TRCommandTR implements CommandExecutor {
 			send.msg(ChatColor.RED + "Page " + page + " doesn't exist. ");
 		}
 	}
+	private void adminForceUnloadChunks(String largs[]){
+		if (send.noPerm("admin.forceunload")) return;
+		
+		
+	}
 	
 	private void ssMain(String[] args, String[] largs){
 		if (send.noPerm("admin.safezone")) return;
@@ -849,7 +849,7 @@ public class TRCommandTR implements CommandExecutor {
 		String plugin = (String) temp[0];
 		String zone = (String) temp[1];
 		
-		if (zone.equals("")) zone = "NO_NAME";
+		if (zone.isEmpty()) zone = "NO_NAME";
 		if (status == SafeZone.isAllowedStrict) {
 			send.msg(ChatColor.YELLOW + target.getName() + " is currently in the "+plugin+" safezone " + zone + ", but it doesn't apply to him/her.");
 			return;
@@ -942,7 +942,7 @@ public class TRCommandTR implements CommandExecutor {
 				zone.mode = 1;
 				zone.name = name;
 				zone.world = player.getWorld().getName();
-				zone.location = TRPos.parse(pr.getMinimumPoint(), pr.getMaximumPoint());
+				zone.location = new TRPos(pr.getMinimumPoint(), pr.getMaximumPoint());
 				zone.pluginRegion = pr;
 				zone.locSet = true;
 				TRSafeZone.zones.add(zone);
@@ -1218,7 +1218,7 @@ public class TRCommandTR implements CommandExecutor {
 			TRItem it = banned.get(i);
 			String reason = it.msg;
 			String name = NameProcessor.getName(it);
-			if (reason == null || reason.equals("")) reason = "None";
+			if (reason == null || reason.isEmpty()) reason = "None";
 			if (reason.toLowerCase().contains("reason:")){
 				reason = reason.split("(?i)Reason:")[1].trim();
 			}

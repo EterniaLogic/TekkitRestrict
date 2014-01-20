@@ -6,7 +6,7 @@ import java.util.ArrayList;
 public class GeneralConfig extends TRConfig {
 	public static String s = File.separator;
 	public static ArrayList<String> defaultContents(boolean extra){
-		ArrayList<String> tbr = new ArrayList<String>(130);
+		final ArrayList<String> tbr = new ArrayList<String>(extra ? 140 : 130);
 		tbr.add("######################################################################");
 		tbr.add("## Configuration file for TekkitRestrict                            ##");
 		tbr.add("## Authors: Taeir, DreadEnd (aka DreadSlicer)                       ##");
@@ -139,7 +139,7 @@ public class GeneralConfig extends TRConfig {
 		tbr.add("######################################################################");
 		tbr.add("######################################################################");
 		tbr.add("# Do NOT change this. It will reset the config files if you do.");
-		tbr.add("ConfigVersion: 2.0");
+		tbr.add("ConfigVersion: 2.1");
 		tbr.add("");
 		tbr.add("######################################################################");
 		return tbr;
