@@ -5,11 +5,11 @@ import org.eclipse.jdt.annotation.Nullable;
 
 public class TRFileLog extends FileLog {
 	
-	public TRFileLog(String type, boolean consoleLog) {
+	private TRFileLog(String type, boolean consoleLog) {
 		super(type, consoleLog);
 	}
 	
-	public TRFileLog(String type, boolean alternate, boolean consoleLog) {
+	private TRFileLog(String type, boolean alternate, boolean consoleLog) {
 		super(type, alternate, consoleLog);
 	}
 	

@@ -176,7 +176,7 @@ public class TREnums {
 		 * Always: always unloads chunks; unloads as many as possible<br>
 		 * High: only chunks not kept loaded by players.
 		 */
-		UnloadHighAlways(3, 0),
+		UnloadHighAlways(3, 0),//kinda impossible, wont unload chunkloader chunks if not forced.
 		/**
 		 * Always: always unloads chunks; unloads as many as possible<br>
 		 * Extreme: unloads all chunks, does no checks.
