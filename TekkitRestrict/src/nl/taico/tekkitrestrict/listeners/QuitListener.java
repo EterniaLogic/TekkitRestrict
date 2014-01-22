@@ -9,7 +9,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import nl.taico.tekkitrestrict.TRConfigCache;
 import nl.taico.tekkitrestrict.TRConfigCache.Listeners;
-import nl.taico.tekkitrestrict.commands.TRCommandAlc;
+import nl.taico.tekkitrestrict.commands.TRCmdOpenAlc;
+import nl.taico.tekkitrestrict.commands.TRCmdOpenInv;
 import nl.taico.tekkitrestrict.functions.TRLimiter;
 import nl.taico.tekkitrestrict.functions.TRNoDupe;
 import nl.taico.tekkitrestrict.functions.TRNoDupeProjectTable;
@@ -29,7 +30,8 @@ public class QuitListener implements Listener{
 	public void quit(Player player){
 		if (player == null) return;
 		
-		TRCommandAlc.restoreViewerInventory(player, false);
+		TRCmdOpenAlc.setOnDisconnect(player);
+		TRCmdOpenInv.closeInv(player);
 		TRNoDupeProjectTable.playerUnuse(player.getName());
 		
 		if (Listeners.UseBlockLimit) {

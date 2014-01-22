@@ -127,11 +127,11 @@ public class TRDisableItemsThread extends Thread {
 					}
 					
 					switch (inSafeZone){
-						case -1: break;
+						case -1: continue;
 						case 0:
 							if (TRItemStack.getMCItem(item) instanceof ItemEECharged){
 								inSafeZone = (TRSafeZone.isSafeZoneFor(player, true, false)?1:-1);
-								if (inSafeZone == -1) break;
+								if (inSafeZone == -1) continue;
 								if (checkSafeZone(item, id)){
 									changedInv = true;
 									continue;

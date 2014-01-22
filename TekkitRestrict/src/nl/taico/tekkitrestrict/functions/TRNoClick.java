@@ -226,7 +226,7 @@ public class TRNoClick {
 		try {
 			for (TRNoClick cia : disableClickItemActions) {
 				if (cia.compare(player, event.getClickedBlock(), event.getItem(), event.getAction())) {
-					if (!cia.msg.equals("")) {
+					if (!cia.msg.isEmpty()) {
 						TRItem.sendBannedMessage(player, cia.msg);
 					} else {
 						String t = (cia.type.both() || cia.type.all()) ? "" : " " + cia.type.name();

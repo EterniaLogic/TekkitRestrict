@@ -11,7 +11,6 @@ import org.bukkit.inventory.ItemStack;
 
 import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.Log.Warning;
-import nl.taico.tekkitrestrict.TR;
 import nl.taico.tekkitrestrict.TRConfigCache.Dupes;
 import nl.taico.tekkitrestrict.TRConfigCache.Listeners;
 import nl.taico.tekkitrestrict.functions.TRNoDupe;
@@ -24,7 +23,7 @@ public class InventoryClickListener implements Listener {
 	boolean logged = false;
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	private void onInventoryClick(InventoryClickEvent event){
-		TR.getLogger().info("[DEBUG] RawSlot: "+event.getRawSlot());
+		//TR.getLogger().info("[DEBUG] RawSlot: "+event.getRawSlot());
 		try {
 			Player player = (Player) event.getWhoClicked();
 			
@@ -66,7 +65,7 @@ public class InventoryClickListener implements Listener {
 				}
 				
 				if (banned != null){
-					String msg = ChatColor.RED + "[TRItemDisabler] This item is banned!" + (banned.equals("") ? "" : " Reason: "+ChatColor.RESET+banned);
+					String msg = ChatColor.RED + "[TRItemDisabler] This item is banned!" + (banned.isEmpty() ? "" : " Reason: "+ChatColor.RESET+banned);
 					TRItem.sendBannedMessage(player, msg);
 					event.setCancelled(true);
 					return;

@@ -29,7 +29,7 @@ public class CraftingListener {
 				String banned = TRNoItem.isItemBanned(player, var2.id, var2.getData(), true);
 
 				if (banned != null){
-					if (banned.equals("")) banned = ChatColor.RED + "[TRItemDisabler] This item is banned!";
+					if (banned.isEmpty()) banned = ChatColor.RED + "[TRItemDisabler] This item is banned!";
 					TRItem.sendBannedMessage(player, banned);
 					var2.id = TRConfigCache.Threads.ChangeDisabledItemsIntoId;
 					var2.setData(0);

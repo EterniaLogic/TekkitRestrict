@@ -28,10 +28,18 @@ public class TRCmdClearAlc implements CommandExecutor {
 		if (send.noPerm("clearalc")) return false;
 		switch (args.length){
 			case 2:
-				final Player OPlayer = TRCmdOpenAlc.Playerz(sender, args[0]);
+				final Player OPlayer = TRCmdOpenInv.Playerz(sender, args[0]);
 				if (OPlayer == null){
 					sender.sendMessage(ChatColor.RED + "Player " + args[0] + " cannot be found!");
 					return true;
+				}
+				
+				if (sender instanceof Player){
+					final String OName = OPlayer.getName();
+					if (sender.hasPermission("tekkitrestrict.openalc.deny."+OName.toLowerCase()) && !sender.isOp() && !sender.hasPermission("tekkitrestrict.openalc.deny.all")){
+						sender.sendMessage(ChatColor.RED + "You are not allowed to clear " + OName + "'s alchemy bags!");
+						return true;
+					}
 				}
 				
 				final EntityPlayer holder = ((CraftPlayer) OPlayer).getHandle();
@@ -47,9 +55,9 @@ public class TRCmdClearAlc implements CommandExecutor {
 					}
 				}
 				if (color == -2){
-					for (int j = 0;j<6;j++){
+					for (int j = 0;j<16;j++){
 						try {
-							final AlchemyBagData alcdata = getBag(holder, ((CraftWorld) OPlayer.getWorld()).getHandle(), color);
+							final AlchemyBagData alcdata = getBag(holder, ((CraftWorld) OPlayer.getWorld()).getHandle(), j);
 							for (int i = 0;i<alcdata.getSize();i++){
 								alcdata.getContents()[i] = null;
 							}
@@ -84,17 +92,5 @@ public class TRCmdClearAlc implements CommandExecutor {
 	
 	public AlchemyBagData getBag(EntityPlayer targetPlayer, World world, int color){
 		return ItemAlchemyBag.getBagData(color, targetPlayer, world);
-		/*
-		final BaseMod mod = mod_EE.getInstance();
-		if (mod == null) return null;
-		IGuiHandler handler = MinecraftForge.getGuiHandler(mod);
-		if (handler == null) return null;
-		
-		Container container = (Container) handler.getGuiElement(56, targetPlayer, world, color, 0, 0);
-		if (container == null) return null;
-		
-		return (AlchemyBagData) container.getInventory();
-		*/
 	}
-
 }

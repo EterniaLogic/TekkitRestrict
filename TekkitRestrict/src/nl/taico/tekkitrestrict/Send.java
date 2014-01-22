@@ -8,12 +8,12 @@ import org.eclipse.jdt.annotation.NonNull;
 public class Send {
 	public CommandSender sender;
 	
-	public void msg(@NonNull String msg){
+	public void msg(@NonNull final String msg){
 		sender.sendMessage(msg);
 	}
 
-	public void msg(@NonNull String command, @NonNull String explanation, ChatColor color, ChatColor color2){
-		int msglength = command.length() + 3 + explanation.length();
+	public void msg(@NonNull final String command, @NonNull final String explanation, final ChatColor color, final ChatColor color2){
+		final int msglength = command.length() + 3 + explanation.length();
 		if (msglength<=55 || !(sender instanceof Player))
 			sender.sendMessage(color + command + " - " + ChatColor.RESET + color2 + explanation);
 		else {
@@ -21,8 +21,8 @@ public class Send {
 			sender.sendMessage(color2 + " - " + explanation);
 		}
 	}
-	public void msg(@NonNull String command, @NonNull String explanation){
-		int msglength = command.length() + 3 + explanation.length();
+	public void msg(@NonNull final String command, @NonNull final String explanation){
+		final int msglength = command.length() + 3 + explanation.length();
 		if (msglength<=55 || !(sender instanceof Player)) sender.sendMessage(ChatColor.BLUE + command + " - " + ChatColor.GREEN + explanation);
 		else {
 			sender.sendMessage(ChatColor.BLUE + command);
@@ -30,7 +30,7 @@ public class Send {
 		}
 	}
 	
-	public boolean noPerm(@NonNull String perm){
+	public boolean noPerm(@NonNull final String perm){
 		if (sender.hasPermission("tekkitrestrict." + perm)) return false;
 		sender.sendMessage(ChatColor.RED + "You don't have permission to use this command!");
 		return true;

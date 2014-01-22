@@ -14,15 +14,16 @@ public class OpenAlcObj {
 	private Player viewer;
 	private String viewerName;
 	private String bagOwnerName;
+	private int color;
 	private static ArrayList<OpenAlcObj> allOpenAlcs = new ArrayList<OpenAlcObj>();
 	
-	public OpenAlcObj(@NonNull final AlchemyBagData bag, @NonNull final Player bagOwner, @NonNull final Player viewer){
+	public OpenAlcObj(@NonNull final AlchemyBagData bag, @NonNull final Player bagOwner, @NonNull final Player viewer, final int color){
 		this.bag = bag;
 		this.bagOwner = bagOwner;
 		this.bagOwnerName = bagOwner.getName();
 		this.viewer = viewer;
 		this.viewerName = viewer.getName();
-		
+		this.color = color;
 		allOpenAlcs.add(this);
 	}
 	
@@ -41,13 +42,17 @@ public class OpenAlcObj {
 	@NonNull public AlchemyBagData getBag(){
 		return bag;
 	}
+	public int getColor(){
+		return this.color;
+	}
 	
+	/*
 	@Nullable public static OpenAlcObj getOpenAlcByOwner(@NonNull final String owner){
 		for (final OpenAlcObj current : allOpenAlcs){
 			if (current.bagOwnerName.equalsIgnoreCase(owner)) return current;
 		}
 		return null;
-	}
+	}*/
 	
 	@Nullable public static OpenAlcObj getOpenAlcByViewer(@NonNull final String viewer){
 		for (final OpenAlcObj current : allOpenAlcs){
@@ -61,8 +66,10 @@ public class OpenAlcObj {
 		return false;
 	}
 	
-	public static boolean isViewed(@NonNull final String player){
-		if (getOpenAlcByOwner(player) != null) return true;
+	public static boolean isViewed(@NonNull final String player, final int color){
+		for (final OpenAlcObj current : allOpenAlcs){
+			if (current.bagOwnerName.equalsIgnoreCase(player) && current.color == color) return true;
+		}
 		return false;
 	}
 

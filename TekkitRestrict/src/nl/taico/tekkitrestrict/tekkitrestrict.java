@@ -39,6 +39,7 @@ import nl.taico.tekkitrestrict.config.*;
 import nl.taico.tekkitrestrict.database.Database;
 import nl.taico.tekkitrestrict.eepatch.EEPSettings;
 import nl.taico.tekkitrestrict.functions.TREMCSet;
+import nl.taico.tekkitrestrict.functions.TRLWCProtect;
 import nl.taico.tekkitrestrict.functions.TRLimiter;
 import nl.taico.tekkitrestrict.functions.TRLogFilter;
 import nl.taico.tekkitrestrict.functions.TRNoClick;
@@ -91,49 +92,24 @@ public class tekkitrestrict extends JavaPlugin {
 
 		config = this.getConfigx(); //Load the configuration files
 		final double configVer = config.getDouble(ConfigFile.General, "ConfigVersion", 0.9);
-		if (configVer < 1.1)
-			UpdateConfigFiles.v09();//0 --> newest
-		else if (configVer < 1.5) {//Upgrade to 2.0
-			AdvancedConfig.upgradeFile();
-			DatabaseConfig.upgradeFile();
+		if (configVer < 1.1) UpdateConfigFiles.v09();
+		else if (configVer != 2.1){
+			if (configVer < 2.1 && linkEEPatch()) EEPatchConfig.upgradeFile();
+			if (configVer < 2.0) SafeZonesConfig.upgradeFile();
+			if (configVer < 1.8) DatabaseConfig.upgradeFile();
+			if (configVer < 1.7) LoggingConfig.upgradeFile();
+			if (configVer < 1.5){
+				AdvancedConfig.upgradeFile();
+				HackDupeConfig.upgradeOldHackFile();
+				ModModificationsConfig.upgradeFile();
+				TPerformanceConfig.upgradeFile();
+			}
 			GeneralConfig.upgradeFile();
-			HackDupeConfig.upgradeOldHackFile();
-			ModModificationsConfig.upgradeFile();
-			SafeZonesConfig.upgradeFile();
-			TPerformanceConfig.upgradeFile();
-			LoggingConfig.upgradeFile();
-			if (linkEEPatch()) EEPatchConfig.upgradeFile();
 			reloadConfig();
-		} else if (configVer < 1.6){//Upgrade to 2.0
-			GeneralConfig.upgradeFile();
-			DatabaseConfig.upgradeFile();
-			SafeZonesConfig.upgradeFile();
-			LoggingConfig.upgradeFile();
-			if (linkEEPatch()) EEPatchConfig.upgradeFile();
-			reloadConfig();
-		} else if (configVer < 1.7){//upgrade to 2.0
-			GeneralConfig.upgradeFile();
-			DatabaseConfig.upgradeFile();
-			SafeZonesConfig.upgradeFile();
-			LoggingConfig.upgradeFile();
-			if (linkEEPatch()) EEPatchConfig.upgradeFile();
-			reloadConfig();
-		} else if (configVer < 1.8){//upgrade to 2.0
-			GeneralConfig.upgradeFile();
-			SafeZonesConfig.upgradeFile();
-			DatabaseConfig.upgradeFile();
-			reloadConfig();
-		} else if (configVer < 1.9){//upgrade to 2.0
-			GeneralConfig.upgradeFile();
-			SafeZonesConfig.upgradeFile();
-			reloadConfig();
-		} else if (configVer < 2.0){//upgrade to 2.0
-			GeneralConfig.upgradeFile();
-			SafeZonesConfig.upgradeFile();
-			reloadConfig();
-		} else if (configVer < 2.1){
-			if (linkEEPatch()) EEPatchConfig.upgradeFile();
-			GeneralConfig.upgradeFile();
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {}
+			
 		}
 		
 		try {//Load all settings
@@ -282,6 +258,7 @@ public class tekkitrestrict extends JavaPlugin {
 
 		getCommand("tekkitrestrict").setExecutor(new TRCmdTr());
 		getCommand("openalc").setExecutor(new TRCmdOpenAlc());
+		getCommand("openinv").setExecutor(new TRCmdOpenInv());
 		getCommand("clearalc").setExecutor(new TRCmdClearAlc());
 		getCommand("tpic").setExecutor(new TRCmdTpic());
 		getCommand("checklimits").setExecutor(new TRCmdCheck());
@@ -513,6 +490,7 @@ public class tekkitrestrict extends JavaPlugin {
 		TRLimiter.reload();
 		TRRecipeBlock.reload();
 		TREMCSet.reload();
+		TRLWCProtect.reload();
 		if (linkEEPatch()){
 			EEPSettings.loadAllDisabledActions();
 			EEPSettings.loadMaxCharge();

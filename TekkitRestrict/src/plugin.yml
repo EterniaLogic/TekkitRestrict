@@ -2,8 +2,8 @@ name: tekkitrestrict
 main: nl.taico.tekkitrestrict.tekkitrestrict
 authors: [Taeir, DreadSlicer]
 prefix: TekkitRestrict
-version: 1.21 Beta 5
-description: TekkitRestrict gives server owners alot of features to prevent and block unwanted tekkit features.
+version: 1.21 Beta 6
+description: TekkitRestrict gives server owners a lot of features to prevent and block unwanted Tekkit features.
 softdepend: [mod_EE, GriefPrevention, PreciousStones, WorldGuard, Essentials]
 
 permissions:
@@ -23,15 +23,15 @@ permissions:
             tekkitrestrict.bypass.gemarmor.offensive: true
             tekkitrestrict.bypass.blockactions: true
     tekkitrestrict.noitem.*:
-        description: removes the ability to GET "*" by item ID. (Valid 111, datavalue 1111.11, range 111-222, MOD (ic2, ee, redpower))
+        description: Having this permission makes all items banned.
         default: false
         children:
             tekkitrestrict.noitem.blockall: true
     tekkitrestrict.limiter.*:
-        description: removes the ability to craft or GET "*" by item ID. (Valid 111, datavalue 1111.11, range 111-222, MOD (ic2, ee, redpower))
+        description: Having this permission makes all blocks limited
         default: false
     tekkitrestrict.creative.*:
-        description: Disables the use of certain defined items
+        description: Having this permission makes all items banned in creative.
         default: false
         children:
             tekkitrestrict.creative.blockall: true
@@ -39,7 +39,10 @@ permissions:
         description: Disables the left/rightclicking with certain items. See the bukkitdev for more info.
         default: false
     tekkitrestrict.openalc:
-        description: adds the ability to use /alc [player] [bagcolor].
+        description: Allows the use of /openalc
+        default: op
+    tekkitrestrict.openinv:
+        description: Allows the use of /openinv
         default: op
     tekkitrestrict.checklimits:
         description: Allows the user to use /checklimits
@@ -270,6 +273,9 @@ commands:
     openalc:
         description: View a player's Alchemy bag.
         usage: /<command> <player> <color>
+    openinv:
+        description: View a player's inventory.
+        usage: /<command> <player>
     tpic:
         description: Teleports you to an area where a cluster of items is sitting on the ground.
         usage: /<command> [Min Items Threshhold] [Thorough]

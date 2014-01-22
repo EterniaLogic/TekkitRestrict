@@ -26,11 +26,16 @@ import nl.taico.tekkitrestrict.tekkitrestrict;
 public class YamlConfiguration extends FileConfiguration {
 	protected static final String COMMENT_PREFIX = "# ";
 	protected static final String BLANK_CONFIG = "{}\n";
-	private final DumperOptions yamlOptions = new DumperOptions();
-	private final Representer yamlRepresenter = new YamlRepresenter();
-	private final Yaml yaml = new Yaml(new YamlConstructor(), yamlRepresenter,
-			yamlOptions);
+	private final DumperOptions yamlOptions;
+	private final Representer yamlRepresenter;
+	private final Yaml yaml;
 
+	public YamlConfiguration(){
+		yamlOptions = new DumperOptions();
+		yamlRepresenter = new YamlRepresenter();
+		yaml = new Yaml(new YamlConstructor(), yamlRepresenter, yamlOptions);
+	}
+	
 	@Override
 	public String saveToString() {
 		yamlOptions.setIndent(options().indent());

@@ -1,15 +1,13 @@
 package nl.taico.tekkitrestrict.functions;
 
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.plugin.PluginManager;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.eclipse.jdt.annotation.NonNull;
 
 import nl.taico.tekkitrestrict.TRConfigCache;
@@ -21,16 +19,18 @@ import nl.taico.tekkitrestrict.objects.TRItem;
 import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 
 import com.griefcraft.lwc.LWC;
-import com.griefcraft.lwc.LWCPlugin;
 import com.griefcraft.model.Permission;
 import com.griefcraft.model.Protection;
 
 public class TRLWCProtect {
-	public static List<TRItem> lwcBlocked = Collections.synchronizedList(new LinkedList<TRItem>());
+	public static CopyOnWriteArrayList<TRItem> lwcBlocked = new CopyOnWriteArrayList<TRItem>();
 	
+	public static boolean init = false;
 	public static void reload(){
-		List<String> blockedList = tekkitrestrict.config.getStringList(ConfigFile.Advanced, "LWCPreventNearLocked");
-		for (String str : blockedList){
+		init = false;
+		final List<String> blockedList = tekkitrestrict.config.getStringList(ConfigFile.Advanced, "LWCPreventNearLocked");
+		lwcBlocked.clear();
+		for (final String str : blockedList){
 			try {
 				lwcBlocked.addAll(TRItemProcessor.processItemString(str));
 			} catch (TRException ex) {
@@ -41,54 +41,108 @@ public class TRLWCProtect {
 		}
 	}
 	
+	private static void init(){
+		if (init) return;
+		
+		if (tekkitrestrict.getInstance().getServer().getPluginManager().getPlugin("LWC") != null){
+			TRConfigCache.LWC.lwc = true;
+		} else {
+			TRConfigCache.LWC.lwc = false;
+		}
+		init = true;
+	}
+	
 	/**
 	 * Checks tekkitrestrict.bypass.lwc permission.
 	 * @return False if the event was cancelled.
 	 */
 	public static boolean checkLWCAllowed(@NonNull BlockPlaceEvent event) {
-		if (TRConfigCache.LWC.lwcPlugin == null){
-			PluginManager PM = tekkitrestrict.getInstance().getServer().getPluginManager();
-			if (PM.isPluginEnabled("LWC")) TRConfigCache.LWC.lwcPlugin = (LWCPlugin) PM.getPlugin("LWC");
-			
-			if (TRConfigCache.LWC.lwcPlugin == null) return true;
-		}
+		init();
+		if (!TRConfigCache.LWC.lwc || LWC.getInstance() == null) return true;
 		
-		Player player = event.getPlayer();
+		final Player player = event.getPlayer();
 
 		if (player.hasPermission("tekkitrestrict.bypass.lwc")) return true;
 		
-		Block block = event.getBlock();
-		int id = block.getTypeId();
-		byte data = block.getData();
+		final Block block = event.getBlock();
+		final int id = block.getTypeId();
+		final byte data = block.getData();
 
 		String blocked = null;
-		for (TRItem tci : lwcBlocked){
+		for (final TRItem tci : lwcBlocked){
 			if (tci.compare(id, data)){
-				blocked = tci.msg == null ? "" : tci.msg;
+				blocked = (tci.msg == null || tci.msg.isEmpty() ? (ChatColor.RED + "You are not allowed to place this next to a locked block!") : tci.msg);
 				break;
 			}
 		}
 		
 		if (blocked == null) return true;
 		
-		LWC LWC = TRConfigCache.LWC.lwcPlugin.getLWC();
-		String playername = player.getName().toLowerCase();
+		final String playername = player.getName().toLowerCase();
+
+		outerloop:
+			for (int i=-1;i<2;i++){
+				for (int j=-1;j<2;j++){
+					for (int k=-1;k<2;k++){
+						final Protection prot = LWC.getInstance().getProtectionCache().getProtection(block.getRelative(i, j, k));
+						if (prot == null) continue;
+						if (prot.isOwner(player)) continue;
+						
+						for (final Permission pe : prot.getPermissions()) {
+							if (pe.getName().equalsIgnoreCase(playername)) continue outerloop;
+						}
+						
+						TRItem.sendBannedMessage(player, blocked);
+						event.setCancelled(true);
+	
+						return false;
+					}
+				}
+			}
+		
+		return true;
+	}
+	
+	public static boolean isLWCAllowed(PlayerInteractEvent event){
+		init();
+		if (!TRConfigCache.LWC.lwc || LWC.getInstance() == null) return true;
+		
+		final Player player = event.getPlayer();
+		if (player.hasPermission("tekkitrestrict.bypass.lwc")) return true;
+		
+		final int data = player.getItemInHand().getDurability();
+	
+		String blocked = null;
+		for (final TRItem tci : lwcBlocked){
+			if (tci.compare(136, data)){
+				blocked = (tci.msg == null || tci.msg.isEmpty() ? (ChatColor.RED + "You are not allowed to place this next to a locked block!") : tci.msg);
+				break;
+			}
+		}
+		
+		if (blocked == null) return true;
+		
+		final String playername = player.getName().toLowerCase();
+		final Block block = event.getClickedBlock().getRelative(event.getBlockFace());
 		
 		outerloop:
-			for (BlockFace bf : BlockFace.values()) {
-				Protection prot = LWC.getProtectionCache().getProtection(block.getRelative(bf));
-				if (prot == null) continue;
-				if (prot.isOwner(player)) continue;
-				
-				for (Permission pe : prot.getPermissions()) {
-					if (pe.getName().toLowerCase().equals(playername)) continue outerloop;
-				}
+			for (int i=-1;i<2;i++){
+				for (int j=-1;j<2;j++){
+					for (int k=-1;k<2;k++){
+						final Protection prot = LWC.getInstance().getProtectionCache().getProtection(block.getRelative(i, j, k));
+						if (prot == null) continue;
+						if (prot.isOwner(player)) continue;
+						
+						for (final Permission pe : prot.getPermissions()) {
+							if (pe.getName().equalsIgnoreCase(playername)) continue outerloop;
+						}
+						
+						TRItem.sendBannedMessage(player, blocked);
+						event.setCancelled(true);
 	
-				if (blocked.equals("")) blocked = ChatColor.RED + "You are not allowed to place this here!";
-				TRItem.sendBannedMessage(player, blocked);
-				event.setCancelled(true);
-
-				return false;
+						return false;
+					}
+				}
 			}
 		return true;
 	}
