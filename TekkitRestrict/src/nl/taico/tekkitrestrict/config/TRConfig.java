@@ -51,7 +51,10 @@ public abstract class TRConfig {
 		if (configFile.exists()){
 			File backupfile = new File("plugins"+s+"tekkitrestrict"+s+name+".config_backup.yml");
 			if (backupfile.exists()) backupfile.delete();
-			configFile.renameTo(backupfile);
+			if (!configFile.renameTo(backupfile)){
+				configFile = new File("plugins"+s+"tekkitrestrict"+s+name+".config.yml");
+				configFile.delete();
+			}
 			configFile = new File("plugins"+s+"tekkitrestrict"+s+name+".config.yml");
 			try {
 				configFile.createNewFile();
@@ -89,7 +92,7 @@ public abstract class TRConfig {
 					nr = str.split(" ")[1];
 					str = str.split(" ")[0];
 				}
-				Object obj = tekkitrestrict.config.get(str, null);
+				final Object obj = tekkitrestrict.config.get(str, null);
 				if (obj == null){
 					defaults.remove(i);
 					i--; j--;
@@ -97,29 +100,29 @@ public abstract class TRConfig {
 				}
 				
 				if (obj instanceof String){
-					String str2 = defaults.get(i-1);//Method: "1"
+					final String str2 = defaults.get(i-1);//Method: "1"
 					defaults.set(i-1, str2.split(":")[0] + ": \""+obj.toString().replace("\\\"", "#;~;#").replace("\"", "\\\"").replace("#;~;#", "\\\"")+"\"");
 					defaults.remove(i);//Remove posString
 					i--; j--;
 				} else if (obj instanceof Integer){
-					String str2 = defaults.get(i-1);//Method: "1"
+					final String str2 = defaults.get(i-1);//Method: "1"
 					defaults.set(i-1, str2.split(":")[0] + ": "+toInt(obj));
 					defaults.remove(i);//Remove posString
 					i--; j--;
 				} else if (obj instanceof Double){
-					String str2 = defaults.get(i-1);//Method: "1"
+					final String str2 = defaults.get(i-1);//Method: "1"
 					defaults.set(i-1, str2.split(":")[0] + ": "+toDouble(obj));
 					defaults.remove(i);//Remove posString
 					i--; j--;
 				} else if (obj instanceof Boolean){
-					String str2 = defaults.get(i-1);//Method: "1"
+					final String str2 = defaults.get(i-1);//Method: "1"
 					defaults.set(i-1, str2.split(":")[0] + ": "+((Boolean) obj).toString());
 					defaults.remove(i);//Remove posString
 					i--; j--;
 				} else if (obj instanceof List){
-					List<Object> l = (List<Object>) obj;
+					final List<Object> l = (List<Object>) obj;
 					
-					String str2 = defaults.get(i-1);//Method: "1"
+					final String str2 = defaults.get(i-1);//Method: "1"
 					defaults.set(i-1, str2.split(":")[0] + ": " + (l.isEmpty() ? "[]" : ""));
 					defaults.remove(i);//Remove posString, cursor is at first element of list
 					if (nr != null){
@@ -161,7 +164,7 @@ public abstract class TRConfig {
 			if (str.contains("#:-;-:#")){
 				str = str.replace("#:-;-:# ", "");
 				
-				Object obj = tekkitrestrict.config.get(str, null);
+				final Object obj = tekkitrestrict.config.get(str, null);
 				if (obj == null){
 					defaults.remove(i);
 					i--; j--;
@@ -169,29 +172,29 @@ public abstract class TRConfig {
 				}
 				
 				if (obj instanceof String){
-					String str2 = defaults.get(i-1);//Method: "1"
+					final String str2 = defaults.get(i-1);//Method: "1"
 					defaults.set(i-1, str2.split(":")[0] + ": \""+obj.toString().replace("\\\"", "#;~;#").replace("\"", "\\\"").replace("#;~;#", "\\\"")+"\"");
 					defaults.remove(i);//Remove posString
 					i--; j--;
 				} else if (obj instanceof Integer){
-					String str2 = defaults.get(i-1);//Method: "1"
+					final String str2 = defaults.get(i-1);//Method: "1"
 					defaults.set(i-1, str2.split(":")[0] + ": "+toInt(obj));
 					defaults.remove(i);//Remove posString
 					i--; j--;
 				} else if (obj instanceof Double){
-					String str2 = defaults.get(i-1);//Method: "1"
+					final String str2 = defaults.get(i-1);//Method: "1"
 					defaults.set(i-1, str2.split(":")[0] + ": "+toDouble(obj));
 					defaults.remove(i);//Remove posString
 					i--; j--;
 				} else if (obj instanceof Boolean){
-					String str2 = defaults.get(i-1);//Method: "1"
+					final String str2 = defaults.get(i-1);//Method: "1"
 					defaults.set(i-1, str2.split(":")[0] + ": "+((Boolean) obj).toString());
 					defaults.remove(i);//Remove posString
 					i--; j--;
 				} else if (obj instanceof List){
-					List<Object> l = (List<Object>) obj;
+					final List<Object> l = (List<Object>) obj;
 					
-					String str2 = defaults.get(i-1);//Method: "1"
+					final String str2 = defaults.get(i-1);//Method: "1"
 					String toadd = "";
 					for (Object o : l){
 						if (isPrimitive(o) || o instanceof String){

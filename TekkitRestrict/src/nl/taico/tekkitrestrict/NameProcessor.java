@@ -3507,7 +3507,6 @@ public class NameProcessor {
 				field2.setAccessible(true);
 				durabilities = (Map<String, Short>) field2.get(db);
 			} catch (Exception ex) {
-				// TODO Auto-generated catch block
 				return false;
 			}
 			
@@ -3716,16 +3715,18 @@ public class NameProcessor {
 			it.add("voidring,27593,0");
 			it.add("alchemytome,27594,0");
 			for (final String line : it) {
-				final String[] parts = line.trim().toLowerCase(Locale.ENGLISH).split("[^a-z0-9]");
-				if (parts.length < 2) continue;
-	
-				final int numeric = Integer.parseInt(parts[1]);
-	
-				durabilities.put(parts[0], Short.valueOf(parts.length > 2 && !parts[2].equals("0") ? Short.parseShort(parts[2]) : 0));
-				items.put(parts[0], numeric);
+				try {
+					final String[] parts = line.trim().toLowerCase(Locale.ENGLISH).split("[^a-z0-9]");
+					if (parts.length < 2) continue;
+		
+					final int numeric = Integer.parseInt(parts[1]);
+		
+					durabilities.put(parts[0], Short.valueOf(parts.length > 2 && !parts[2].equals("0") ? Short.parseShort(parts[2]) : 0));
+					items.put(parts[0], numeric);
+				} catch (Exception ex){}
 			}
 			return true;
-		} catch (final Exception ex){
+		} catch (Exception ex){
 			return false;
 		}
 	}

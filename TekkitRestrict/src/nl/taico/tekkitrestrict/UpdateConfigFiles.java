@@ -15,13 +15,13 @@ public class UpdateConfigFiles {
 		Warning.load("The config file version differs from the current one.", false);
 		Warning.load("Backing up old config files and writing new ones.", false);
 		
-		String path = "plugins"+s+"tekkitrestrict"+s;
+		final String path = "plugins"+s+"tekkitrestrict"+s;
 		String bpath = path+"config_backup";
 		File temp = new File(bpath);
 		temp.mkdirs();
 		bpath += s;
 		
-		tekkitrestrict tr = tekkitrestrict.getInstance();
+		final tekkitrestrict tr = tekkitrestrict.getInstance();
 		
 		tr.backupConfig(path + "General.config.yml", bpath + "General.config.yml");
 		tr.backupConfig(path + "Advanced.config.yml", bpath + "Advanced.config.yml");

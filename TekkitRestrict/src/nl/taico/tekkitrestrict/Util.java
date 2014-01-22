@@ -9,18 +9,18 @@ import org.eclipse.jdt.annotation.Nullable;
 import nl.taico.tekkitrestrict.TRConfigCache.Global;
 
 public class Util {
-	public static void kick(@NonNull Player player, @NonNull String message){
+	public static void kick(@NonNull final Player player, @NonNull final String message){
 		if (Global.kickFromConsole)
 			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "kick " + player.getName() + " " + message);
 		else
 			player.kickPlayer(message);
 	}
 	
-	public static int broadcastNoConsole(@NonNull String message, @NonNull String permission){
+	public static int broadcastNoConsole(@NonNull final String message, @NonNull final String permission){
 		int count = 0;
-        Player[] players = Bukkit.getOnlinePlayers();
+		final Player[] players = Bukkit.getOnlinePlayers();
         
-        for (Player player : players){
+        for (final Player player : players){
         	if (player.hasPermission(permission)) player.sendMessage(message);
         	count++;
         }
@@ -28,7 +28,7 @@ public class Util {
         return count;
 	}
 	
-	@Nullable public static String inGroup(int id){
+	@Nullable public static String inGroup(final int id){
 		if (inRange(id, 27520, 27599) || inRange(id, 126, 130)) return "ee";
 		if (inRange(id, 153, 174) || inRange(id, 4056, 4066) || inRange(id, 4298, 4324)) return "buildcraft";
 		if (inRange(id, 4299, 4305) || id == 179) return "additionalpipes";
@@ -54,14 +54,14 @@ public class Util {
 		return null;
 	}
 	
-	public static boolean inRange(int id, int min, int max){
+	public static boolean inRange(final int id, final int min, final int max){
 		if (min > 10000) return (id > min && id < max);
 		return (id < max && id > min);
 	}
 
-	@NonNull public static String replaceColors(@Nullable String str){
+	@NonNull public static String replaceColors(@Nullable final String str){
 		if (str == null) return "null";
-		return str.replace("&0", ChatColor.BLACK + "")
+		return str.replace("&0", ChatColor.BLACK.toString() + "")
 					.replace("&1", ChatColor.DARK_BLUE + "")
 					.replace("&2", ChatColor.DARK_GREEN + "")
 					.replace("&3", ChatColor.DARK_AQUA + "")

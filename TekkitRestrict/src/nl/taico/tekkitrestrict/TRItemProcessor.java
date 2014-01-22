@@ -50,23 +50,23 @@ public class TRItemProcessor {
 
 	public static void reload() {
 		groups.clear();
-		for (String s : modItems) {
+		for (final String s : modItems) {
 			if (s.contains("=")) {
-				String[] gg = s.split("=");
-				String mod = gg[0];
+				final String[] gg = s.split("=");
+				final String mod = gg[0];
 				if (mod.contains("|")){
-					String[] gg2 = mod.split("\\|");
-					for (String mod2 : gg2){
+					final String[] gg2 = mod.split("\\|");
+					for (final String mod2 : gg2){
 						try {
 							groups.put(mod2, processMultiString(gg[1]));
-						} catch (TRException ex) {
+						} catch (final TRException ex) {
 							Warning.config(ex.toString(), false);
 						}
 					}
 				} else {
 					try {
 						groups.put(mod, processMultiString(gg[1]));
-					} catch (TRException ex) {
+					} catch (final TRException ex) {
 						Warning.config(ex.toString(), false);
 					}
 				}
@@ -74,16 +74,16 @@ public class TRItemProcessor {
 		}
 
 		// pre-load variables
-		ConfigurationSection cs = tekkitrestrict.config.getConfigurationSection(ConfigFile.GroupPermissions, "PermissionGroups");
+		final ConfigurationSection cs = tekkitrestrict.config.getConfigurationSection(ConfigFile.GroupPermissions, "PermissionGroups");
 		if (cs != null) {
-			Set<String> keys = cs.getKeys(true);
-			Iterator<String> keyIterator = keys.iterator();
+			final Set<String> keys = cs.getKeys(true);
+			final Iterator<String> keyIterator = keys.iterator();
 			while (keyIterator.hasNext()) {
 				try {
-					String groupName = keyIterator.next().toLowerCase();
-					String value = cs.getString(groupName);
+					final String groupName = keyIterator.next().toLowerCase();
+					final String value = cs.getString(groupName);
 
-					if (value == null || value.equals("")) continue;
+					if (value == null || value.isEmpty()) continue;
 					
 					if (value.contains(" ")) {
 						Log.Warning.config("Invalid value in PermissionGroups: Invalid value \""+value+"\"!", false);
@@ -91,7 +91,7 @@ public class TRItemProcessor {
 					}
 					groups.put(groupName, processMultiString(value));
 
-				} catch (Exception ex) {
+				} catch (final Exception ex) {
 					Warning.other("Error in PermissionGroups: " + ex.toString(), false);
 					Log.Exception(ex, false);
 				}
@@ -99,13 +99,13 @@ public class TRItemProcessor {
 		}
 	}
 	
-	public static boolean isInRange(@NonNull String range, int id, int data, @NonNull String perm){
+	public static boolean isInRange(@NonNull final String range, final int id, final int data, @NonNull final String perm){
 		String itemx = range.replace(":-", ":=");
 		if (itemx.contains("-")) {
 			// loop through this range and add each to the return stack.
 			int data2;
 			if (itemx.contains(":")) {
-				String dataString = itemx.split(":")[1];
+				final String dataString = itemx.split(":")[1];
 				if (dataString.equals("*")) data2 = -1;
 				else {
 					try {
@@ -125,8 +125,8 @@ public class TRItemProcessor {
 			
 			if (data2 != -1 && data2 != data && !(data2 == -10 && data == 0)) return false;
 			
-			String[] t = itemx.split("-");
-			int fromId = 0, toId = 0;
+			final String[] t = itemx.split("-");
+			final int fromId, toId;
 			try {
 				fromId = Integer.parseInt(t[0]);
 				toId = Integer.parseInt(t[1]);
@@ -141,7 +141,7 @@ public class TRItemProcessor {
 		}
 		//############################## SINGLE ID WITH DATA ###########################
 		else if (itemx.contains(":")) {
-			String[] t = itemx.split(":");
+			final String[] t = itemx.split(":");
 			int id2 = 0, data2 = 0;
 			
 			try {
@@ -160,7 +160,7 @@ public class TRItemProcessor {
 			if (t[0].matches("\\d+")){//ID
 				try {
 					id2 = Integer.parseInt(t[0]);
-				} catch (NumberFormatException ex){
+				} catch (final NumberFormatException ex){
 					Warning.other("You have set an invalid limiter permission \""+perm+"\":", false);
 					Warning.other("Invalid entry: \"" + itemx + "\"!", false);
 					return false;
@@ -172,7 +172,7 @@ public class TRItemProcessor {
 				boolean found = false;
 				List<TRItem> items = groups.get(t[0]);
 				if (items != null){
-					for (TRItem item : items){
+					for (final TRItem item : items){
 						if (item.compare(id, data)) return true;
 					}
 					found = true;
@@ -180,10 +180,10 @@ public class TRItemProcessor {
 				
 				try {
 					items = processItemName(t[0], data2);
-				} catch (TRException ex) {}
+				} catch (final TRException ex) {}
 				
 				if (items != null){
-					for (TRItem item : items){
+					for (final TRItem item : items){
 						if (item.compare(id, data)) return true;
 					}
 					found = true;
@@ -199,7 +199,7 @@ public class TRItemProcessor {
 		
 		//############################## SINGLE ID ###########################
 		else {
-			int id2 = 0;
+			final int id2;
 			try {
 				id2 = Integer.parseInt(itemx);
 				if (id2 == id) return true;
@@ -208,7 +208,7 @@ public class TRItemProcessor {
 				boolean found = false;
 				List<TRItem> items = groups.get(itemx);
 				if (items != null){
-					for (TRItem item : items){
+					for (final TRItem item : items){
 						if (item.compare(id, data)) return true;
 					}
 					found = true;
@@ -216,10 +216,10 @@ public class TRItemProcessor {
 				
 				try {
 				items = processItemName(itemx, -1);
-				} catch (TRException ex2) {}
+				} catch (final TRException ex2) {}
 				
 				if (items != null){
-					for (TRItem item : items){
+					for (final TRItem item : items){
 						if (item.compare(id, data)) return true;
 					}
 					found = true;
@@ -238,10 +238,10 @@ public class TRItemProcessor {
 	 * Processes an item string that contains ;'s.<br>
 	 * This uses {@link #processItemString(String, boolean)} to process each item string.
 	 */
-	@NonNull private static List<TRItem> processMultiString(@NonNull String ins) throws TRException {
+	@NonNull private static List<TRItem> processMultiString(@NonNull final String ins) throws TRException {
 		if (ins.contains(";")) {
-			String[] itemsStr = ins.split(";");
-			List<TRItem> l = new LinkedList<TRItem>();
+			final String[] itemsStr = ins.split(";");
+			final List<TRItem> l = new LinkedList<TRItem>();
 			for (String itemStr : itemsStr) {
 				l.addAll(processItemString(itemStr));
 			}
@@ -255,9 +255,9 @@ public class TRItemProcessor {
 	 * Processes an item string that contains ;'s.<br>
 	 * This uses {@link #processItemString(String, boolean, String)} to process each item string.
 	 */
-	@NonNull private static List<TRItem> processMultiString(@NonNull String ins, @Nullable String message) throws TRException {
-		String msg;
-		if (message == null || message.equals("")) msg = "";
+	@NonNull private static List<TRItem> processMultiString(@NonNull final String ins, @Nullable final String message) throws TRException {
+		final String msg;
+		if (message == null || message.isEmpty()) msg = "";
 		else msg = " {"+message+"}";
 		if (ins.contains(";")) {
 			String[] itemsStr = ins.split(";");
@@ -272,16 +272,15 @@ public class TRItemProcessor {
 		return new LinkedList<TRItem>();
 	}
 
-	@Nullable public static List<TRItem> processItemName(@NonNull String name, int data) throws TRException {
+	@Nullable public static List<TRItem> processItemName(@NonNull final String name, final int data) throws TRException {
 		List<TRItem> tbr = processIC2Item(name, data);
 		if (tbr == null) tbr = processEEItem(name, data);
 		
 		return tbr;
 	}
-	@Nullable public static List<TRItem> processIC2Item(@NonNull String name, int data) throws TRException {
-		name = name.toLowerCase();
-		List<TRItem> tbr = new LinkedList<TRItem>();
-		switch (name){
+	@Nullable public static List<TRItem> processIC2Item(@NonNull final String name, final int data) throws TRException {
+		final List<TRItem> tbr = new LinkedList<TRItem>();
+		switch (name.toLowerCase()){
 			case "quantumhelmet":
 				tbr.add(TRItem.parseItem(30171, data));
 				return tbr;
@@ -400,10 +399,9 @@ public class TRItemProcessor {
 				return null;
 		}
 	}
-	@Nullable public static List<TRItem> processEEItem(@NonNull String name, int data) throws TRException {
-		List<TRItem> tbr = new LinkedList<TRItem>();
-		name = name.toLowerCase();
-		switch (name){
+	@Nullable public static List<TRItem> processEEItem(@NonNull final String name, final int data) throws TRException {
+		final List<TRItem> tbr = new LinkedList<TRItem>();
+		switch (name.toLowerCase()){
 			case "dmpickaxe":
 				tbr.add(TRItem.parseItem(27543, data));
 				return tbr;
@@ -666,19 +664,18 @@ public class TRItemProcessor {
 				return null;
 		}
 	}
-	@Nullable private static List<TRItem> processItemName(@NonNull String name, int data, @Nullable String message) throws TRException {
+	@Nullable private static List<TRItem> processItemName(@NonNull final String name, final int data, @Nullable final String message) throws TRException {
 		List<TRItem> tbr = processIC2Item(name, data, message);
 		if (tbr == null) tbr = processEEItem(name, data, message);
 		
 		return tbr;
 	}
-	@Nullable private static List<TRItem> processIC2Item(@NonNull String name, int data, @Nullable String message) throws TRException {
-		name = name.toLowerCase();
-		String msg;
-		if (message == null || message.equals("")) msg = "";
+	@Nullable private static List<TRItem> processIC2Item(@NonNull final String name, final int data, @Nullable final String message) throws TRException {
+		final String msg;
+		if (message == null || message.isEmpty()) msg = "";
 		else msg = " {"+message+"}";
-		List<TRItem> tbr = new LinkedList<TRItem>();
-		switch (name){
+		final List<TRItem> tbr = new LinkedList<TRItem>();
+		switch (name.toLowerCase()){
 			case "quantumhelmet":
 				tbr.add(TRItem.parseItem(30171, data, msg));
 				return tbr;
@@ -797,13 +794,12 @@ public class TRItemProcessor {
 				return null;
 		}
 	}
-	@Nullable private static List<TRItem> processEEItem(@NonNull String name, int data, @Nullable String message) throws TRException {
-		List<TRItem> tbr = new LinkedList<TRItem>();
-		String msg;
-		if (message == null || message.equals("")) msg = "";
+	@Nullable private static List<TRItem> processEEItem(@NonNull final String name, final int data, @Nullable final String message) throws TRException {
+		final List<TRItem> tbr = new LinkedList<TRItem>();
+		final String msg;
+		if (message == null || message.isEmpty()) msg = "";
 		else msg = " {"+message+"}";
-		name = name.toLowerCase();
-		switch (name){
+		switch (name.toLowerCase()){
 			case "dmpickaxe":
 				tbr.add(TRItem.parseItem(27543, data, msg));
 				return tbr;
@@ -1067,9 +1063,8 @@ public class TRItemProcessor {
 		}
 	}
 	
-	public static int getIdFromIC2Name(@NonNull String name){
-		name = name.toLowerCase();
-		switch (name){
+	public static int getIdFromIC2Name(@NonNull final String name){
+		switch (name.toLowerCase()){
 			case "quantumhelmet":
 				return 30171;
 			case "quantumchestplate":
@@ -1166,7 +1161,7 @@ public class TRItemProcessor {
 	 * - EE2 and IC2 item names + 1 Damage value (rmaxe:1)<br>
 	 * - EE2 and IC2 item names without damage value (quantumhelmet)<br>
 	 */
-	@NonNull public static List<TRItem> processItemString(@NonNull String item) throws TRException {
+	@NonNull public static List<TRItem> processItemString(@NonNull final String item) throws TRException {
 		String itemx;
 		String message = "";
 		if (item.contains("{")){
@@ -1179,7 +1174,7 @@ public class TRItemProcessor {
 			//message = ChatColor.RED + "You are not allowed to modify/obtain this item!";
 		}
 		itemx = itemx.toLowerCase().replace(":-", ":=");
-		LinkedList<TRItem> tci = new LinkedList<TRItem>();
+		final LinkedList<TRItem> tci = new LinkedList<TRItem>();
 		if (itemx.contains(";")){
 			throw new TRException("You cannot use ; to separate items in a single item string. You can only use ranges, single items, itemnames or groups.");
 		}
@@ -1190,13 +1185,13 @@ public class TRItemProcessor {
 			// loop through this range and add each to the return stack.
 			int data = 0;
 			if (itemx.contains(":")) {
-				String dataString = itemx.split(":")[1];
+				final String dataString = itemx.split(":")[1];
 				if (dataString.equals("*")) data = -1;
 				else {
 					try {
 						data = Integer.parseInt(dataString.replace("=", "-"));
 						if (data == 0) data = -10;
-					} catch (NumberFormatException ex){
+					} catch (final NumberFormatException ex){
 						throw new TRException("Invalid data value: \"" + dataString + "\" in \"" + itemx + "\"!");//Throw exception
 					}
 				}
@@ -1206,12 +1201,12 @@ public class TRItemProcessor {
 				data = -1;
 			}
 			
-			String[] t = itemx.split("-");
-			int fromId = 0, toId = 0;
+			final String[] t = itemx.split("-");
+			final int fromId, toId;
 			try {
 				fromId = Integer.parseInt(t[0]);
 				toId = Integer.parseInt(t[1]);
-			} catch (NumberFormatException ex){
+			} catch (final NumberFormatException ex){
 				throw new TRException("Invalid range: \"" + t[0]+"-"+t[1] + "\"");
 			}
 
@@ -1223,7 +1218,7 @@ public class TRItemProcessor {
 		
 		//############################## SINGLE ID WITH DATA ###########################
 		else if (itemx.contains(":")) {
-			String[] t = itemx.split(":");
+			final String[] t = itemx.split(":");
 			int id = 0, data = 0;
 			
 			try {
@@ -1232,7 +1227,7 @@ public class TRItemProcessor {
 				else
 					data = Integer.parseInt(t[1].replace('=', '-'));
 				
-			} catch (NumberFormatException ex){
+			} catch (final NumberFormatException ex){
 				throw new TRException("Invalid data value in \""+itemx+"\"!");
 			}
 			
@@ -1243,7 +1238,7 @@ public class TRItemProcessor {
 			if (t[0].matches("\\d+")){//ID
 				try {
 					id = Integer.parseInt(t[0]);
-				} catch (NumberFormatException ex){
+				} catch (final NumberFormatException ex){
 					throw new TRException("Invalid entry: \"" + itemx + "\"!");
 				}
 				
@@ -1253,8 +1248,8 @@ public class TRItemProcessor {
 				List<TRItem> items = groups.get(t[0]);
 				
 				if (items != null){
-					for (TRItem it : items){
-						TRItem it2 = (TRItem) it.clone();
+					for (final TRItem it : items){
+						final TRItem it2 = (TRItem) it.clone();
 						it2.msg = message;
 						tci.add(it2);
 					}
@@ -1264,7 +1259,7 @@ public class TRItemProcessor {
 				items = processItemName(t[0], data, message);
 				if (items != null) return items;
 				
-				TRItem it = NameProcessor.getItem(t[0]);
+				final TRItem it = NameProcessor.getItem(t[0]);
 				if (it != null){
 					tci.add(it);
 					return tci;
@@ -1281,21 +1276,21 @@ public class TRItemProcessor {
 		
 		//############################## SINGLE ID ###########################
 		else {
-			int id = 0;
+			final int id;
 			try {
 				id = Integer.parseInt(itemx);
 			} catch (NumberFormatException ex){
 				List<TRItem> items = groups.get(itemx);
 				if (items != null){
-					for (TRItem it : items){
-						TRItem it2 = (TRItem) it.clone();
+					for (final TRItem it : items){
+						final TRItem it2 = (TRItem) it.clone();
 						it2.msg = message;
 						tci.add(it2);
 					}
 					return tci; //All :*
 				}
 				
-				TRItem it = NameProcessor.getItem(itemx);
+				final TRItem it = NameProcessor.getItem(itemx);
 				if (it != null){
 					tci.add(it);
 					return tci;
@@ -1312,7 +1307,7 @@ public class TRItemProcessor {
 		}
 	}
 
-	@NonNull public static List<TRItem> processNoItemString(@NonNull String item) throws TRException {
+	@NonNull public static List<TRItem> processNoItemString(@NonNull final String item) throws TRException {
 		String itemx;
 		String message = "";
 		if (item.contains("{")){
@@ -1325,7 +1320,7 @@ public class TRItemProcessor {
 			//message = ChatColor.RED + "You are not allowed to modify/obtain this item!";
 		}
 		itemx = itemx.toLowerCase().replace(":-", ":=");
-		LinkedList<TRItem> tci = new LinkedList<TRItem>();
+		final LinkedList<TRItem> tci = new LinkedList<TRItem>();
 		if (itemx.contains(";")){
 			throw new TRException("You cannot use ; to separate items in a single item string. You can only use ranges, single items, itemnames or groups.");
 		}
@@ -1336,13 +1331,13 @@ public class TRItemProcessor {
 			// loop through this range and add each to the return stack.
 			int data = 0;
 			if (itemx.contains(":")) {
-				String dataString = itemx.split(":")[1];
+				final String dataString = itemx.split(":")[1];
 				if (dataString.equals("*")) data = -1;
 				else {
 					try {
 						data = Integer.parseInt(dataString.replace("=", "-"));
 						if (data == 0) data = -10;
-					} catch (NumberFormatException ex){
+					} catch (final NumberFormatException ex){
 						throw new TRException("Invalid data value: \"" + dataString + "\" in \"" + itemx + "\"!");//Throw exception
 					}
 				}
@@ -1352,12 +1347,12 @@ public class TRItemProcessor {
 				data = -1;
 			}
 			
-			String[] t = itemx.split("-");
-			int fromId = 0, toId = 0;
+			final String[] t = itemx.split("-");
+			final int fromId, toId;
 			try {
 				fromId = Integer.parseInt(t[0]);
 				toId = Integer.parseInt(t[1]);
-			} catch (NumberFormatException ex){
+			} catch (final NumberFormatException ex){
 				throw new TRException("Invalid range: \"" + t[0]+"-"+t[1] + "\"");
 			}
 
@@ -1369,7 +1364,7 @@ public class TRItemProcessor {
 		
 		//############################## SINGLE ID WITH DATA ###########################
 		else if (itemx.contains(":")) {
-			String[] t = itemx.split(":");
+			final String[] t = itemx.split(":");
 			int id = 0, data = 0;
 			
 			try {
@@ -1378,7 +1373,7 @@ public class TRItemProcessor {
 				else
 					data = Integer.parseInt(t[1].replace('=', '-'));
 				
-			} catch (NumberFormatException ex){
+			} catch (final NumberFormatException ex){
 				throw new TRException("Invalid data value in \""+itemx+"\"!");
 			}
 			
@@ -1399,8 +1394,8 @@ public class TRItemProcessor {
 				List<TRItem> items = groups.get(t[0]);
 				
 				if (items != null){
-					for (TRItem it : items){
-						TRItem it2 = (TRItem) it.clone();
+					for (final TRItem it : items){
+						final TRItem it2 = (TRItem) it.clone();
 						it2.msg = message;
 						tci.add(it2);
 					}
@@ -1411,7 +1406,7 @@ public class TRItemProcessor {
 				items = processItemName(t[0], data, message);
 				if (items != null) return items;
 				
-				TRItem it = NameProcessor.getItem(t[0]);
+				final TRItem it = NameProcessor.getItem(t[0]);
 				if (it != null){
 					tci.add(it);
 					return tci;
@@ -1428,14 +1423,14 @@ public class TRItemProcessor {
 		
 		//############################## SINGLE ID ###########################
 		else {
-			int id = 0;
+			final int id;
 			try {
 				id = Integer.parseInt(itemx);
 			} catch (NumberFormatException ex){
 				List<TRItem> items = groups.get(itemx);
 				if (items != null){
-					for (TRItem it : items){
-						TRItem it2 = (TRItem) it.clone();
+					for (final TRItem it : items){
+						final TRItem it2 = (TRItem) it.clone();
 						it2.msg = message;
 						tci.add(it2);
 					}
@@ -1446,7 +1441,7 @@ public class TRItemProcessor {
 				items = processItemName(itemx, -1, message);
 				if (items != null) return items;
 				
-				TRItem it = NameProcessor.getItem(itemx);
+				final TRItem it = NameProcessor.getItem(itemx);
 				if (it != null){
 					tci.add(it);
 					return tci;
@@ -1472,7 +1467,7 @@ public class TRItemProcessor {
 	 * - EE2 and IC2 item names + 1 Damage value (rmaxe:1)<br>
 	 * - EE2 and IC2 item names without damage value (quantumhelmet)<br>
 	 */
-	@NonNull public static List<TRItem> processItemStringAndAddToLIst(@NonNull String item, @Nullable List<String> addedGroups) throws TRException {
+	@NonNull public static List<TRItem> processItemStringAndAddToLIst(@NonNull final String item, @Nullable final List<String> addedGroups) throws TRException {
 		String itemx;
 		String message = "";
 		if (item.contains("{")){
@@ -1485,7 +1480,7 @@ public class TRItemProcessor {
 			//message = ChatColor.RED + "You are not allowed to modify/obtain this item!";
 		}
 		itemx = itemx.toLowerCase().replace(":-", ":=");
-		LinkedList<TRItem> tci = new LinkedList<TRItem>();
+		final LinkedList<TRItem> tci = new LinkedList<TRItem>();
 		if (itemx.contains(";")){
 			throw new TRException("You cannot use ; to separate items in a single item string. You can only use ranges, single items, itemnames or groups.");
 		}
@@ -1496,7 +1491,7 @@ public class TRItemProcessor {
 			// loop through this range and add each to the return stack.
 			int data = 0;
 			if (itemx.contains(":")) {
-				String dataString = itemx.split(":")[1];
+				final String dataString = itemx.split(":")[1];
 				if (dataString.equals("*")) data = -1;
 				else {
 					try {
@@ -1512,8 +1507,8 @@ public class TRItemProcessor {
 				data = -1;
 			}
 			
-			String[] t = itemx.split("-");
-			int fromId = 0, toId = 0;
+			final String[] t = itemx.split("-");
+			final int fromId, toId;
 			try {
 				fromId = Integer.parseInt(t[0]);
 				toId = Integer.parseInt(t[1]);
@@ -1529,7 +1524,7 @@ public class TRItemProcessor {
 		
 		//############################## SINGLE ID WITH DATA ###########################
 		else if (itemx.contains(":")) {
-			String[] t = itemx.split(":");
+			final String[] t = itemx.split(":");
 			int id = 0, data = 0;
 			
 			try {
@@ -1538,7 +1533,7 @@ public class TRItemProcessor {
 				else
 					data = Integer.parseInt(t[1].replace('=', '-'));
 				
-			} catch (NumberFormatException ex){
+			} catch (final NumberFormatException ex){
 				throw new TRException("Invalid data value in \""+itemx+"\"!");
 			}
 			
@@ -1549,7 +1544,7 @@ public class TRItemProcessor {
 			if (t[0].matches("\\d+")){//ID
 				try {
 					id = Integer.parseInt(t[0]);
-				} catch (NumberFormatException ex){
+				} catch (final NumberFormatException ex){
 					throw new TRException("Invalid entry: \"" + itemx + "\"!");
 				}
 				
@@ -1559,8 +1554,8 @@ public class TRItemProcessor {
 				List<TRItem> items = groups.get(t[0]);
 				
 				if (items != null){
-					for (TRItem it : items){
-						TRItem it2 = (TRItem) it.clone();
+					for (final TRItem it : items){
+						final TRItem it2 = (TRItem) it.clone();
 						it2.msg = message;
 						tci.add(it2);
 					}
@@ -1588,8 +1583,8 @@ public class TRItemProcessor {
 			} catch (NumberFormatException ex){
 				List<TRItem> items = groups.get(itemx);
 				if (items != null){
-					for (TRItem it : items){
-						TRItem it2 = (TRItem) it.clone();
+					for (final TRItem it : items){
+						final TRItem it2 = (TRItem) it.clone();
 						it2.msg = message;
 						tci.add(it2);
 					}

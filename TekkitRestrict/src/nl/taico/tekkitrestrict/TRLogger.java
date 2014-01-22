@@ -9,15 +9,15 @@ import java.util.Map.Entry;
 import org.eclipse.jdt.annotation.NonNull;
 
 public class TRLogger {
-	private static HashMap<String, ArrayList<String>> logMessages = new HashMap<String, ArrayList<String>>();
+	private static final HashMap<String, ArrayList<String>> logMessages = new HashMap<String, ArrayList<String>>();
 
 	private static String convertTime(String input){
-		Calendar c = new GregorianCalendar();
-		int hour = c.get(Calendar.HOUR_OF_DAY);
-		int min = c.get(Calendar.MINUTE);
-		int sec = c.get(Calendar.SECOND);
+		final Calendar c = new GregorianCalendar();
+		final int hour = c.get(Calendar.HOUR_OF_DAY);
+		final int min = c.get(Calendar.MINUTE);
+		final int sec = c.get(Calendar.SECOND);
 		
-		String h, m, s;
+		final String h, m, s;
 		if (hour < 10) h = "0"+hour;
 		else h = ""+hour;
 		
@@ -32,13 +32,13 @@ public class TRLogger {
 				.replace("{SECOND}", s);
 	}
 	
-	public static void Log(@NonNull String type, @NonNull String info) {
-		String msg = convertTime(TRConfigCache.LogFilter.logFormat).replace("{INFO}", info);
+	public static void Log(@NonNull final String type, @NonNull final String info) {
+		final String msg = convertTime(TRConfigCache.LogFilter.logFormat).replace("{INFO}", info);
 
-		ArrayList<String> old = logMessages.get(type);
+		final ArrayList<String> old = logMessages.get(type);
 		
 		if (old == null){
-			ArrayList<String> msgs = new ArrayList<String>();
+			final ArrayList<String> msgs = new ArrayList<String>();
 			msgs.add(msg);
 			logMessages.put(type, msgs);
 		} else {
@@ -48,13 +48,13 @@ public class TRLogger {
 	}
 	
 	public static void saveLogs() {
-		Iterator<Entry<String, ArrayList<String>>> entries = logMessages.entrySet().iterator();
+		final Iterator<Entry<String, ArrayList<String>>> entries = logMessages.entrySet().iterator();
 		while (entries.hasNext()){
-			Entry<String, ArrayList<String>> e = entries.next();
-			TRFileLog filelog = TRFileLog.getLogOrMake(e.getKey(), true, false);
-			ArrayList<String> msgs = e.getValue();
+			final Entry<String, ArrayList<String>> e = entries.next();
+			final TRFileLog filelog = TRFileLog.getLogOrMake(e.getKey(), true, false);
+			final ArrayList<String> msgs = e.getValue();
 			if (msgs == null) continue;
-			for (String msg : msgs) filelog.log(msg);
+			for (final String msg : msgs) filelog.log(msg);
 			msgs.clear();
 		}
 		/*

@@ -10,8 +10,6 @@ import nl.taico.tekkitrestrict.objects.TRHackSettings;
 import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 import nl.taico.tekkitrestrict.objects.TREnums.SSMode;
 
-import com.griefcraft.lwc.LWCPlugin;
-
 public class TRConfigCache {
 	@SuppressWarnings("rawtypes")
 	public static void loadConfigCache(){
@@ -255,7 +253,7 @@ public class TRConfigCache {
 	}
 	
 	public static class LWC {
-		public static LWCPlugin lwcPlugin;
+		public static boolean lwc;
 	}
 	
 	public static class ChunkUnloader {

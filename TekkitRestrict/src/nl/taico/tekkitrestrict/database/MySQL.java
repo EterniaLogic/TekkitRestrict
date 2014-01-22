@@ -162,7 +162,7 @@ public class MySQL extends Database {
 	}
 	
 	protected void write(@Nullable String toWrite, @NonNull Level level) {
-		if (toWrite == null || toWrite.equals("")) return;
+		if (toWrite == null || toWrite.isEmpty()) return;
 		tekkitrestrict.log.log(level, "[MySQL] " + toWrite);
 	}
 }

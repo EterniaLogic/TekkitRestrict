@@ -184,7 +184,7 @@ public class Updater {
 		}
 
 		String key = this.config.getString("api-key");
-		if (key.equalsIgnoreCase("PUT_API_KEY_HERE") || key.equals("")) {
+		if (key.equalsIgnoreCase("PUT_API_KEY_HERE") || key.isEmpty()) {
 			key = null;
 		}
 

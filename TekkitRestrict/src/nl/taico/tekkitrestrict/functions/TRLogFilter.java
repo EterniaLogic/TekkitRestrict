@@ -105,7 +105,7 @@ private static boolean disabled = false;
 		if (c(b, " disconnected: ") || c(b, "logged in with") || c(b, "joined with: [") || c(b, "sending serverside check to")){
 			if (login == null) login = FileLog.getLogOrMake("Login", true);
 			login.log(a);
-		} else if (c(a, "PLAYER_COMMAND") || record.getLevel() == Level.parse("Command") || record.getLevel() == Level.parse("PLAYER_COMMAND")) {
+		} else if (c(a, "PLAYER_COMMAND") || record.getLevel() == Level.parse("Command")) {
 			if (command == null) command = FileLog.getLogOrMake("Command", true);
 			command.log(a);
 			
