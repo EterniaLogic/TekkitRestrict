@@ -14,6 +14,8 @@ import java.nio.charset.Charset;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
+import nl.taico.tekkitrestrict.TRException;
+
 public class SimpleConfigManager {
 
 	private JavaPlugin plugin;
@@ -29,20 +31,21 @@ public class SimpleConfigManager {
 	 * Get new configuration with header
 	 * @param filePath - Path to file
 	 * @return - New SimpleConfig
+	 * @throws TRException 
 	 */
-	public SimpleConfig getNewConfig(String filePath, String[] header) {
+	public SimpleConfig getNewConfig(String filePath, String[] header, int length) {
 		File file = this.getConfigFile(filePath);
 
 		if (!file.exists()) {
 			this.prepareFile(filePath);
 
 			if (header != null && header.length != 0) {
-				this.setHeader(file, header);
+				this.setHeader(file, header, length);
 			}
 
 		}
 
-		SimpleConfig config = new SimpleConfig(this.getConfigContent(filePath), file, this.getCommentsNum(file), plugin);
+		SimpleConfig config = new SimpleConfig(this.getConfigContent(filePath), file, this.getCommentsNum(file), plugin, length);
 		return config;
 	}
 
@@ -50,9 +53,10 @@ public class SimpleConfigManager {
 	 * Get new configuration
 	 * @param filePath - Path to file
 	 * @return - New SimpleConfig
+	 * @throws TRException 
 	 */
 	public SimpleConfig getNewConfig(String filePath) {
-		return this.getNewConfig(filePath, null);
+		return this.getNewConfig(filePath, null, 84);
 	}
 
 	/**
@@ -87,6 +91,9 @@ public class SimpleConfigManager {
 	 */
 	public void prepareFile(String filePath, String resource) {
 		File file = this.getConfigFile(filePath);
+		if (file == null){
+			return;
+		}
 		if (file.exists()) {
 			return;
 		}
@@ -115,11 +122,11 @@ public class SimpleConfigManager {
 	 * Adds header block to config
 	 * @param file - Config file
 	 * @param header - Header lines
+	 * @throws TRException if the length is lower than 10
 	 */
-	public void setHeader(File file, String[] header) {
-		if (!file.exists()) {
-			return;
-		}
+	public void setHeader(File file, String[] header, int length) {
+		if (!file.exists()) return;
+		if (length < 20) length = 20;
 
 		try {
 			String currentLine;
@@ -127,14 +134,48 @@ public class SimpleConfigManager {
 			BufferedReader reader = new BufferedReader(new FileReader(file));
 
 			while ((currentLine = reader.readLine()) != null) {
-				config.append(currentLine + "\n");
+				config.append(currentLine).append("\n");
 			}
 
 			reader.close();
-			//config.append("# +----------------------------------------------------+ #\n");
+
+			StringBuilder base = new StringBuilder(length+6);
+			for (int i = 0;i<(length+6);i++) base.append("#");
+			
+			config.append(base).append("\n");
 			
 			for (String line : header) {
-				config.append("##" + line);
+				if (line.length() <= length){//20 max
+					
+					StringBuilder ll = new StringBuilder(line);
+					while (ll.length() <= length) ll.append(" ");//make it full length
+					
+					config.append("## ").append(ll).append("##\n");
+				} else {
+					String[] temp = line.split(" ");
+					
+					StringBuilder l0 = new StringBuilder(length+1);
+					for (int i = 0; i < temp.length; i++){
+						if (temp[i].isEmpty()) continue;
+						if (l0.length()+temp[i].length() > length){//123_56_ + 89 > 8
+							
+							StringBuilder ll = new StringBuilder(l0);
+							while (ll.length() <= length) ll.append(" ");
+							
+							config.append("## ").append(ll).append("##\n");
+							l0 = new StringBuilder(length+1);
+						}
+						
+						if (temp[i].length()<length){
+							l0.append(temp[i]).append(" ");
+						} else {
+							config.append("## ").append(temp[i]).append(" ##\n");
+						}
+					}
+					StringBuilder ll = new StringBuilder(l0);
+					while (ll.length() <= length) ll.append(" ");
+					config.append("## ").append(ll).append("##\n");
+				}
 				/*
 				if (line.length() > 50) {
 					continue;
@@ -157,6 +198,8 @@ public class SimpleConfigManager {
 				*/
 				//config.append("# < " + finalLine.toString() + " > #\n");
 			}
+			
+			config.append(base);
 
 			//config.append("# +----------------------------------------------------+ #");
 
@@ -191,8 +234,9 @@ public class SimpleConfigManager {
 
 			while ((currentLine = reader.readLine()) != null) {
 
-				if (currentLine.startsWith("#")) {
-					addLine = currentLine.replaceFirst("#", pluginName + "_COMMENT_" + commentNum + ":");
+				if (currentLine.startsWith("#") && !currentLine.startsWith("##")) {
+					addLine = pluginName+"_COMMENT_"+commentNum+": \"" + currentLine.substring(1).replace("\\\"", "\"").replace("\"", "\\\"") + "\"";
+					//addLine = currentLine.replaceFirst("#", pluginName + "_COMMENT_" + commentNum + ":");
 					whole.append(addLine + "\n");
 					commentNum++;
 				} else {
@@ -251,38 +295,19 @@ public class SimpleConfigManager {
 
 	private String prepareConfigString(String configString) {
 		int lastLine = 0;
-		int headerLine = 0;
 
 		String[] lines = configString.split("\n");
 		StringBuilder config = new StringBuilder("");
 
 		for (String line : lines) {
-
+			System.out.println(line);
 			if (line.startsWith(this.getPluginName() + "_COMMENT")) {
 				String comment = "#" + line.trim().substring(line.indexOf(":") + 1);
 
-				if (comment.startsWith("##")) {
+				if (comment.startsWith("####") && comment.endsWith("####")) {
+					lastLine = 0;
 
-					/*
-					 * If header line = 0 then it is
-					 * header start, if it's equal
-					 * to 1 it's the end of header
-					 */
-
-					if (headerLine == 0) {
-						config.append(comment + "\n");
-
-						lastLine = 0;
-						headerLine = 1;
-
-					} else if (headerLine == 1) {
-						config.append(comment + "\n\n");
-
-						lastLine = 0;
-						headerLine = 0;
-
-					}
-
+					config.append(comment).append("\n");
 				} else {
 
 					/*
@@ -292,8 +317,8 @@ public class SimpleConfigManager {
 
 					String normalComment;
 
-					if (comment.startsWith("# ' ")) {
-						normalComment = comment.substring(0, comment.length() - 1).replaceFirst("# ' ", "# ");
+					if (comment.startsWith("# '")) {
+						normalComment = comment.substring(0, comment.length() - 1).replaceFirst("# '", "# ");
 					} else {
 						normalComment = comment;
 					}

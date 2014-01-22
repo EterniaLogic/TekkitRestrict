@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
+//import org.bukkit.configuration.file.FileConfiguration;
+//import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin; 
 
 public class SimpleConfig {
@@ -18,13 +18,15 @@ public class SimpleConfig {
 
 	private File file;
 	private FileConfiguration config;
+	private int linelength;
 
-	public SimpleConfig(InputStream configStream, File configFile, int comments, JavaPlugin plugin) {
+	public SimpleConfig(InputStream configStream, File configFile, int comments, JavaPlugin plugin, int linelength) {
 		this.comments = comments;
 		this.manager = new SimpleConfigManager(plugin);
 
 		this.file = configFile;
 		this.config = YamlConfiguration.loadConfiguration(configStream);
+		this.linelength = linelength+3;
 	}
 
 	public Object get(String path) {
@@ -325,19 +327,49 @@ public class SimpleConfig {
 
 	public void set(String path, Object value, String comment) {
 		if(!this.config.contains(path)) {
-			this.config.set(manager.getPluginName() + "_COMMENT_" + comments, " " + comment);
-			comments++;
+			for (String s : handleComment(comment)){
+				this.config.set(manager.getPluginName() + "_COMMENT_" + comments, s);
+				comments++;
+			}
 		}
 
 		this.config.set(path, value);
-
+	}
+	
+	private String[] handleComment(String line){
+		if (line.length() <= linelength){//20 max
+			return new String[] {line};
+		} else {
+			ArrayList<String> tbr = new ArrayList<String>();
+			String[] temp = line.split(" ");
+			
+			StringBuilder l0 = new StringBuilder(linelength);
+			for (int i = 0; i < temp.length; i++){
+				if (temp[i].isEmpty()) continue;
+				if (l0.length()+temp[i].length() > linelength){//123_56_ + 89 > 8
+					tbr.add(l0.toString().trim());
+					
+					l0 = new StringBuilder(linelength);
+				}
+				
+				if (temp[i].length()<linelength){
+					l0.append(temp[i]).append(" ");
+				} else {
+					tbr.add(temp[i]);//TODO Change it so it breaks up the word instead.
+				}
+			}
+			tbr.add(l0.toString().trim());
+			return tbr.toArray(new String[0]);
+		}
 	}
 
 	public void set(String path, Object value, String[] comment) {
 		for(String comm : comment) {
 			if(!this.config.contains(path)) {
-				this.config.set(manager.getPluginName() + "_COMMENT_" + comments, " " + comm);
-				comments++;
+				for (String s : handleComment(comm)){
+					this.config.set(manager.getPluginName() + "_COMMENT_" + comments, s);
+					comments++;
+				}
 			}
 		}
 
@@ -345,8 +377,14 @@ public class SimpleConfig {
 
 	}
 
+	public void setHeader(String[] header, int length) {
+		manager.setHeader(this.file, header, length);
+		this.comments = header.length + 2;
+		this.reloadConfig();
+	}
+	
 	public void setHeader(String[] header) {
-		manager.setHeader(this.file, header);
+		manager.setHeader(this.file, header, linelength);
 		this.comments = header.length + 2;
 		this.reloadConfig();
 	}
