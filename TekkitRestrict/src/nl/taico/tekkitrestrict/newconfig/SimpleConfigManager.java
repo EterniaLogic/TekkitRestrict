@@ -325,7 +325,7 @@ public class SimpleConfigManager {
 
 					if (lastLine == 0) {
 						config.append(normalComment + "\n");
-					} else if (lastLine == 1) {
+					} else if (lastLine == 1) {//start new comment
 						config.append("\n" + normalComment + "\n");
 					}
 

@@ -10,34 +10,26 @@ import org.bukkit.entity.Player;
 
 import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.World;
-
-import nl.taico.tekkitrestrict.Send;
-
+import static nl.taico.tekkitrestrict.commands.TRCmdHelper.*;
 import ee.AlchemyBagData;
 import ee.ItemAlchemyBag;
 
 public class TRCmdClearAlc implements CommandExecutor {
-	final private Send send;
-	
-	public TRCmdClearAlc(){
-		send = new Send();
-	}
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		send.sender = sender;
-		if (send.noPerm("clearalc")) return false;
+		if (noPerm(sender, "clearalc")) return false;
 		switch (args.length){
 			case 2:
-				final Player OPlayer = TRCmdOpenInv.Playerz(sender, args[0]);
+				final Player OPlayer = Playerz(sender, args[0]);
 				if (OPlayer == null){
-					sender.sendMessage(ChatColor.RED + "Player " + args[0] + " cannot be found!");
+					msgr(sender, "Player " + args[0] + " cannot be found!");
 					return true;
 				}
 				
 				if (sender instanceof Player){
 					final String OName = OPlayer.getName();
 					if (sender.hasPermission("tekkitrestrict.openalc.deny."+OName.toLowerCase()) && !sender.isOp() && !sender.hasPermission("tekkitrestrict.openalc.deny.all")){
-						sender.sendMessage(ChatColor.RED + "You are not allowed to clear " + OName + "'s alchemy bags!");
+						msgr(sender, "You are not allowed to clear " + OName + "'s alchemy bags!");
 						return true;
 					}
 				}
@@ -49,8 +41,8 @@ public class TRCmdClearAlc implements CommandExecutor {
 				} else {
 					color = TRCmdOpenAlc.getColor(args[1]);
 					if (color == -1){
-						sender.sendMessage(ChatColor.RED + "Unknown color!");
-						sender.sendMessage(ChatColor.RED + "Color can be white, lime, etc. OR a number from 0-15.");
+						msgr(sender, "Unknown color!");
+						msgr(sender, "Color can be white, lime, etc. OR a number from 0-15.");
 						return true;
 					}
 				}
@@ -63,11 +55,11 @@ public class TRCmdClearAlc implements CommandExecutor {
 							}
 							alcdata.update();
 						} catch (Exception ex){
-							send.msg(ChatColor.RED + "An error occured while clearing the bag. Please try again.");
+							msgr(sender, "An error occured while clearing the bag. Please try again.");
 							return true;
 						}
 					}
-					send.msg(ChatColor.GREEN + "Cleared all bags of "+OPlayer.getName());
+					msgg(sender, "Cleared all bags of "+OPlayer.getName());
 				} else {
 					try {
 						final AlchemyBagData alcdata = getBag(holder, ((CraftWorld) OPlayer.getWorld()).getHandle(), color);
@@ -76,15 +68,15 @@ public class TRCmdClearAlc implements CommandExecutor {
 						}
 						alcdata.update();
 					} catch (Exception ex){
-						send.msg(ChatColor.RED + "An error occured while clearing the bag. Please try again.");
+						msgr(sender, "An error occured while clearing the bag. Please try again.");
 						return true;
 					}
-					send.msg(ChatColor.GREEN + "Cleared the "+TRCmdOpenAlc.getColor(color) + " bag of "+OPlayer.getName());
+					msgg(sender, "Cleared the "+TRCmdOpenAlc.getColor2(color) + ChatColor.GREEN + " bag of "+OPlayer.getName());
 				}
 				break;
 			default:
-				send.msg(ChatColor.BLUE+"Clearalc help");
-				send.msg("/clearalc <player> <color|all> [world]", "Clear the alcbag(s) of the specified player.");
+				msgy(sender, "[TekkitRestrict Clearalc help]");
+				msg(sender, "/clearalc <player> <color|all> [world]", "Clear the alcbag(s) of the specified player.");
 				break;
 		}
 		return true;

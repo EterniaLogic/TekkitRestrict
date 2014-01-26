@@ -28,6 +28,7 @@ import net.minecraft.server.RedPowerMachine;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -38,6 +39,7 @@ import nl.taico.tekkitrestrict.commands.*;
 import nl.taico.tekkitrestrict.config.*;
 import nl.taico.tekkitrestrict.database.Database;
 import nl.taico.tekkitrestrict.eepatch.EEPSettings;
+import nl.taico.tekkitrestrict.functions.TRChunkUnloader2;
 import nl.taico.tekkitrestrict.functions.TREMCSet;
 import nl.taico.tekkitrestrict.functions.TRLWCProtect;
 import nl.taico.tekkitrestrict.functions.TRLimiter;
@@ -355,6 +357,10 @@ public class tekkitrestrict extends JavaPlugin {
 					}
 				}
 			}, 10);
+		}
+		
+		for (World world : Bukkit.getWorlds()){
+			new TRChunkUnloader2(world);
 		}
 		
 		Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {

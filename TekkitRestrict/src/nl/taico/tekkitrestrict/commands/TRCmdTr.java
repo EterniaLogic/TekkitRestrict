@@ -20,7 +20,6 @@ import org.eclipse.jdt.annotation.NonNull;
 
 import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.NameProcessor;
-import nl.taico.tekkitrestrict.Send;
 import nl.taico.tekkitrestrict.TR;
 import nl.taico.tekkitrestrict.TR.FixPack;
 import nl.taico.tekkitrestrict.TRConfigCache;
@@ -34,11 +33,13 @@ import nl.taico.tekkitrestrict.TRConfigCache.LogFilter;
 import nl.taico.tekkitrestrict.Updater.UpdateResult;
 import nl.taico.tekkitrestrict.api.SafeZones.SafeZoneCreate;
 import nl.taico.tekkitrestrict.eepatch.EEPSettings;
+import nl.taico.tekkitrestrict.functions.TRChunkUnloader2;
 import nl.taico.tekkitrestrict.functions.TREMCSet;
 import nl.taico.tekkitrestrict.functions.TRLimiter;
 import nl.taico.tekkitrestrict.functions.TRNoClick;
 import nl.taico.tekkitrestrict.functions.TRNoItem;
 import nl.taico.tekkitrestrict.functions.TRSafeZone;
+import nl.taico.tekkitrestrict.objects.TREnums.ChunkUnloadMethod;
 import nl.taico.tekkitrestrict.objects.TREnums.DBType;
 import nl.taico.tekkitrestrict.objects.TRItem;
 import nl.taico.tekkitrestrict.objects.TRLimit;
@@ -47,18 +48,14 @@ import nl.taico.tekkitrestrict.objects.TRPos;
 import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 import nl.taico.tekkitrestrict.objects.TREnums.SafeZone;
 
+import static nl.taico.tekkitrestrict.commands.TRCmdHelper.*;
+
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 public class TRCmdTr implements CommandExecutor {
-	private Send send;
-	public TRCmdTr(){
-		send = new Send();
-	}
-
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		send.sender = sender;
 		@NonNull String[] largs = args.clone();
 		
 		for (int i = 0; i < largs.length; i++){
@@ -66,112 +63,112 @@ public class TRCmdTr implements CommandExecutor {
 		}
 		
 		if (largs.length == 0 || largs[0].equals("help")) {
-			help();
+			help(sender);
 			return true;
 		}
 		
 		if (largs[0].equals("warnings")){
-			warnings(largs);
+			warnings(sender, largs);
 			return true;
 		}
 		
 		if (largs[0].equals("about") || largs[0].equals("info") || largs[0].equals("status")){
-			about();
+			about(sender);
 			return true;
 		}
 		
 		if (largs[0].equals("emc")) {
-			emcMain(largs);
+			emcMain(sender, largs);
 			return true;
 		}
 		
 		if (largs[0].equals("admin")) {
-			adminMain(args, largs);
+			adminMain(sender, args, largs);
 			return true;
 		}
 		
-		if (largs[0].equals("debug") && !(send.sender instanceof Player)){
-			debugInfo();
+		if (largs[0].equals("debug") && !(sender instanceof Player)){
+			debugInfo(sender);
 			return true;
 		}
 		
 		if (largs[0].equals("banned")){
-			banned(largs, true);
+			banned(sender, largs, true);
 			return true;
 		}
 		
-		send.msg(ChatColor.RED + "Unkown subcommand /tr " + largs[0] + "!");
-		help();
+		msgr(sender, "Unkown subcommand /tr " + largs[0] + "!");
+		help(sender);
 		return true;
 	}
 
-	private void help(){
-		send.msg(ChatColor.YELLOW + "[TekkitRestrict v" + tekkitrestrict.version.fullVer + " Commands]");
-		send.msg("Aliases: /tr, /tekkitrestrict");
-		if (send.sender.hasPermission("tekkitrestrict.emc")) send.msg("/tr EMC", "List EMC commands.");
-		if (send.sender.hasPermission("tekkitrestrict.admin")) send.msg("/tr admin", "list admin commands");
-		send.msg("/tr about", "List information about the version and authors of TekkitRestrict");
+	private void help(CommandSender sender){
+		msgy(sender, "[TekkitRestrict v" + tekkitrestrict.version.fullVer + " Commands]");
+		msg(sender, "Aliases: /tr, /tekkitrestrict");
+		if (sender.hasPermission("tekkitrestrict.emc")) msg(sender, "/tr EMC", "List EMC commands.");
+		if (sender.hasPermission("tekkitrestrict.admin")) msg(sender, "/tr admin", "list admin commands");
+		msg(sender, "/tr about", "List information about the version and authors of TekkitRestrict");
 	}
-	private void warnings(String largs[]){
-		if (send.noPerm("warnings")) return;
+	private void warnings(CommandSender sender, String largs[]){
+		if (noPerm(sender, "warnings")) return;
 		
 		if (largs.length == 1 || largs.length > 2){
-			send.msg("/tr warnings load", "display warnings during loading");
-			send.msg("/tr warnings db", "display database warnings");
-			send.msg("/tr warnings config", "display config warnings");
-			send.msg("/tr warnings other", "display other warnings");
-			send.msg("/tr warnings all", "display all warnings");
+			msg(sender, "/tr warnings load", "display warnings during loading");
+			msg(sender, "/tr warnings db", "display database warnings");
+			msg(sender, "/tr warnings config", "display config warnings");
+			msg(sender, "/tr warnings other", "display other warnings");
+			msg(sender, "/tr warnings all", "display all warnings");
 			return;
 		}
 		
 		if (largs[1].equals("load")){
 			LinkedList<String> msgs = Warning.loadWarnings;
 			if (msgs.isEmpty()){
-				send.msg("There were no warnings during load.");
+				msg(sender, "There were no warnings during load.");
 				return;
 			}
 			
-			for (String str : msgs){
-				send.msg(str);
+			for (final String str : msgs){
+				msg(sender, str);
 			}
 			return;
 		}
 		
 		if (largs[1].equals("db")){
-			LinkedList<String> msgs = Warning.dbWarnings;
+			final LinkedList<String> msgs = Warning.dbWarnings;
 			if (msgs.isEmpty()){
-				send.msg("There were no database warnings.");
+				msg(sender, "There were no database warnings.");
 				return;
 			}
 			
-			for (String str : msgs){
-				send.msg(str);
+			for (final String str : msgs){
+				msg(sender, str);
 			}
 			return;
 		}
 		
 		if (largs[1].equals("config")){
-			LinkedList<String> msgs = Warning.configWarnings;
+			final LinkedList<String> msgs = Warning.configWarnings;
 			if (msgs.isEmpty()){
-				send.msg("There were no config warnings.");
+				msg(sender, "There were no config warnings.");
 				return;
 			}
 			
-			for (String str : msgs){
-				send.msg(str);
+			for (final String str : msgs){
+				msg(sender, str);
 			}
 			return;
 		}
 		
 		if (largs[1].equals("other")){
-			LinkedList<String> msgs = Warning.otherWarnings;
+			final LinkedList<String> msgs = Warning.otherWarnings;
 			if (msgs.isEmpty()){
-				send.msg("There were no other warnings.");
+				msg(sender, "There were no other warnings.");
 				return;
 			}
 			
-			for (String str : msgs){
-				send.msg(str);
+			for (final String str : msgs){
+				msg(sender, str);
 			}
 			return;
 		}
@@ -179,154 +176,148 @@ public class TRCmdTr implements CommandExecutor {
 		if (largs[1].equals("all")){
 			LinkedList<String> msgs = Warning.loadWarnings;
 			if (msgs.isEmpty()){
-				send.msg("Load Warnings: None");
+				msg(sender, "Load Warnings: None");
 			} else {
-				send.msg("Load Warnings:");
-				for (String str : msgs){
-					send.msg(str);
+				msg(sender, "Load Warnings:");
+				for (final String str : msgs){
+					msg(sender, str);
 				}
 			}
 			
 			msgs = Warning.dbWarnings;
 			if (msgs.isEmpty()){
-				send.msg("DB Warnings: None");
+				msg(sender, "DB Warnings: None");
 			} else {
-				send.msg("DB Warnings:");
-				for (String str : msgs){
-					send.msg(str);
+				msg(sender, "DB Warnings:");
+				for (final String str : msgs){
+					msg(sender, str);
 				}
 			}
 			
 			msgs = Warning.configWarnings;
 			if (msgs.isEmpty()){
-				send.msg("Config Warnings: None");
+				msg(sender, "Config Warnings: None");
 			} else {
-				send.msg("Config Warnings:");
-				for (String str : msgs){
-					send.msg(str);
+				msg(sender, "Config Warnings:");
+				for (final String str : msgs){
+					msg(sender, str);
 				}
 			}
 			
 			msgs = Warning.otherWarnings;
 			if (msgs.isEmpty()){
-				send.msg("Other Warnings: None");
+				msg(sender, "Other Warnings: None");
 			} else {
-				send.msg("Other Warnings:");
-				for (String str : msgs){
-					send.msg(str);
+				msg(sender, "Other Warnings:");
+				for (final String str : msgs){
+					msg(sender, str);
 				}
 			}
 			return;
 		}
 		
-		send.msg("/tr warnings load", "display warnings during loading");
-		send.msg("/tr warnings config", "display config warnings");
-		send.msg("/tr warnings other", "display other warnings");
-		send.msg("/tr warnings all", "display all warnings");
+		msg(sender, "/tr warnings load", "display warnings during loading");
+		msg(sender, "/tr warnings config", "display config warnings");
+		msg(sender, "/tr warnings other", "display other warnings");
+		msg(sender, "/tr warnings all", "display all warnings");
 		return;
 	}
-	private void about(){
-		send.msg(ChatColor.YELLOW + "[TekkitRestrict About]");
-		send.msg(ChatColor.BLUE + "Former author and creator: " + ChatColor.GREEN + "DreadSlicer/EterniaLogic");
-		send.msg(ChatColor.BLUE + "Current author: " + ChatColor.GREEN + "Taeir");
-		send.msg("");
-		send.msg(ChatColor.BLUE + "Version: " + ChatColor.GREEN + tekkitrestrict.version.toMetricsVersion());
+	private void about(CommandSender sender){
+		msgy(sender, "[TekkitRestrict About]");
+		msgb(sender, "Former author and creator: " + ChatColor.GREEN + "DreadSlicer/EterniaLogic");
+		msgb(sender, "Current author: " + ChatColor.GREEN + "Taeir");
+		msg(sender, "");
+		msgb(sender, "Version: " + ChatColor.GREEN + tekkitrestrict.version.toMetricsVersion());
 		if (tekkitrestrict.useTMetrics){
-			send.msg(ChatColor.BLUE + "Server UID: " + ChatColor.GREEN + tekkitrestrict.tmetrics.uid);
+			msgb(sender, "Server UID: " + ChatColor.GREEN + tekkitrestrict.tmetrics.uid);
 		}
 		
-		if (!send.sender.hasPermission("tekkitrestrict.admin")) return;
+		if (!sender.hasPermission("tekkitrestrict.admin")) return;
 		
-		if (TR.getEEPatchVersion() != -1d) send.msg(ChatColor.BLUE+"EEPatch version: " + ChatColor.GREEN+(TR.getEEPatchVersion()==0d?"< 1.4":TR.getEEPatchVersion()));
-		else send.msg(ChatColor.BLUE+"EEPatch: "+ChatColor.RED+"not installed");
+		if (TR.getEEPatchVersion() != -1d) msgb(sender, "EEPatch version: " + ChatColor.GREEN+(TR.getEEPatchVersion()==0d?"< 1.4":TR.getEEPatchVersion()));
+		else msgb(sender, "EEPatch: "+ChatColor.RED+"not installed");
 		
-		if (FixPack.getNEIVer() != -1d) send.msg(ChatColor.BLUE + "FixPack NEI: " + ChatColor.GREEN + (FixPack.getNEIVer()==0d?"<1.7":FixPack.getNEIVer()));
-		else send.msg(ChatColor.BLUE + "FixPack NEI: " + ChatColor.RED + "No");
-		if (FixPack.getRailcraftVer() != -1d) send.msg(ChatColor.BLUE + "FixPack RailCraft: " + ChatColor.GREEN + FixPack.getRailcraftVer());
-		if (FixPack.getRedPowerVer() != -1d) send.msg(ChatColor.BLUE + "FixPack RedPower: " + ChatColor.GREEN + FixPack.getRedPowerVer());
-		if (FixPack.getWRVer() != -1d) send.msg(ChatColor.BLUE + "FixPack WirelessRedstone: " + ChatColor.GREEN + FixPack.getWRVer());
-		if (FixPack.getMFFSVer() != -1d) send.msg(ChatColor.BLUE + "FixPack MFFS: " + ChatColor.GREEN + (FixPack.getMFFSVer()==0d?"<1.4":FixPack.getMFFSVer()));
-		else send.msg(ChatColor.BLUE + "FixPack MFFS: " + ChatColor.RED + "No");
-		if (FixPack.getWMVer() != -1d) send.msg(ChatColor.BLUE + "FixPack WeaponsMod: " + ChatColor.GREEN + (FixPack.getWMVer()==0d?"<1.9":FixPack.getWMVer()));
-		else send.msg(ChatColor.BLUE + "FixPack WeaponsMod: " + ChatColor.RED + "No");
+		if (FixPack.getNEIVer() != -1d) msgb(sender, "FixPack NEI: " + ChatColor.GREEN + (FixPack.getNEIVer()==0d?"<1.7":FixPack.getNEIVer()));
+		else msgb(sender, "FixPack NEI: " + ChatColor.RED + "No");
+		if (FixPack.getRailcraftVer() != -1d) msgb(sender, "FixPack RailCraft: " + ChatColor.GREEN + FixPack.getRailcraftVer());
+		if (FixPack.getRedPowerVer() != -1d) msgb(sender, "FixPack RedPower: " + ChatColor.GREEN + FixPack.getRedPowerVer());
+		if (FixPack.getWRVer() != -1d) msgb(sender, "FixPack WirelessRedstone: " + ChatColor.GREEN + FixPack.getWRVer());
+		if (FixPack.getMFFSVer() != -1d) msgb(sender, "FixPack MFFS: " + ChatColor.GREEN + (FixPack.getMFFSVer()==0d?"<1.4":FixPack.getMFFSVer()));
+		else msgb(sender, "FixPack MFFS: " + ChatColor.RED + "No");
+		if (FixPack.getWMVer() != -1d) msgb(sender, "FixPack WeaponsMod: " + ChatColor.GREEN + (FixPack.getWMVer()==0d?"<1.9":FixPack.getWMVer()));
+		else msgb(sender, "FixPack WeaponsMod: " + ChatColor.RED + "No");
 		
 		
-		send.msg(ChatColor.BLUE + "Database version: " + ChatColor.GREEN + tekkitrestrict.dbversion);
+		msgb(sender, "Database version: " + ChatColor.GREEN + tekkitrestrict.dbversion);
 		
 		if (tekkitrestrict.dbtype == DBType.MySQL)
-			send.msg(ChatColor.BLUE + "Database type: "+ChatColor.GREEN+"MySQL");
+			msgb(sender, "Database type: "+ChatColor.GREEN+"MySQL");
 		else if (tekkitrestrict.dbtype == DBType.SQLite)
-			send.msg(ChatColor.BLUE + "Database type: "+ChatColor.GREEN+"SQLite");
+			msgb(sender, "Database type: "+ChatColor.GREEN+"SQLite");
 		
 		switch (tekkitrestrict.dbworking){
-			case 0: send.msg(ChatColor.BLUE+"DB working: " + ChatColor.GREEN + "Yes"); break;
-			case 2:	send.msg(ChatColor.BLUE+"DB working: " + ChatColor.RED + "Partially; Safezones will not be saved."); break;
-			case 4:	send.msg(ChatColor.BLUE+"DB working: " + ChatColor.RED + "Partially; Limits will not be saved."); break;
-			case 20: send.msg(ChatColor.BLUE+"DB working: " + ChatColor.RED + "No; Unable to read database file.");
-			default: send.msg(ChatColor.BLUE+"DB working: " + ChatColor.RED + "No; Database will reset upon next startup."); break;
+			case 0: msgb(sender, "DB working: " + ChatColor.GREEN + "Yes"); break;
+			case 2:	msgb(sender, "DB working: " + ChatColor.RED + "Partially; Safezones will not be saved."); break;
+			case 4:	msgb(sender, "DB working: " + ChatColor.RED + "Partially; Limits will not be saved."); break;
+			case 20: msgb(sender, "DB working: " + ChatColor.RED + "No; Unable to read database file.");
+			default: msgb(sender, "DB working: " + ChatColor.RED + "No; Database will reset upon next startup."); break;
 		}
 		
 		if (!tekkitrestrict.useTMetrics)
-			send.msg(ChatColor.BLUE + "TMetrics: "+ChatColor.RED+"false");
+			msgb(sender, "TMetrics: "+ChatColor.RED+"false");
 	}
-	private void debugInfo(){
-		if (send.sender instanceof Player){
-			send.msg(ChatColor.RED + "Only the console can execute this command!");
+	private void debugInfo(CommandSender sender){
+		if (sender instanceof Player){
+			msgr(sender, "Only the console can execute this command!");
 			return;
 		}
 		
 		String output = "";
 		
-		ArrayList<String> noitem = TRNoItem.getDebugInfo();
-		for (String s : noitem){
-			output += s+";";
-		}
-		ArrayList<String> limiter = TRLimiter.getDebugInfo();
-		for (String s : limiter){
-			output += s+";";
-		}
+		for (String s : TRNoItem.getDebugInfo()) output += s+";";
+		for (String s : TRLimiter.getDebugInfo()) output += s+";";
 		
-		send.msg(output);
+		msg(sender, output);
 	}
 	
-	private void emcMain(String largs[]){
-		if (send.noPerm("emc")) return;
+	private void emcMain(CommandSender sender, String largs[]){
+		if (noPerm(sender, "emc")) return;
 		
 		if (!tekkitrestrict.EEEnabled){
-			send.msg(ChatColor.RED + "EquivalentExchange is not enabled!");
+			msgr(sender, "EquivalentExchange is not enabled!");
 			return;
 		}
 		
 		if (largs.length == 1 || largs[1].equals("help")) {
-			emcHelp();
+			emcHelp(sender);
 			return;
 		}
 		
 		if (largs[1].equals("tempset")) {
-			emcTempSet(largs);
+			emcTempSet(sender, largs);
 			return;
 		}
 		
 		if (largs[1].equals("lookup")) {
-			emcLookup(largs);
+			emcLookup(sender, largs);
 			return;
 		}
 		
-		send.msg(ChatColor.RED + "Unknown subcommand /tr emc " + largs[1] + "!");
-		emcHelp();
+		msgr(sender, "Unknown subcommand /tr emc " + largs[1] + "!");
+		emcHelp(sender);
 		
 	}
-	private void emcHelp(){
-		send.msg(ChatColor.YELLOW + "[TekkitRestrict v" + tekkitrestrict.version.fullVer + " EMC Commands]");
-		send.msg("/tr emc tempset <id[:data]> <EMC>", "Set an emc value till the next restart.");
-		send.msg("/tr emc lookup <id[:data]>", "Check the emc value of an item.");
+	private void emcHelp(CommandSender sender){
+		msgy(sender, "[TekkitRestrict v" + tekkitrestrict.version.fullVer + " EMC Commands]");
+		msg(sender, "/tr emc tempset <id[:data]> <EMC>", "Set an emc value till the next restart.");
+		msg(sender, "/tr emc lookup <id[:data]>", "Check the emc value of an item.");
 	}
-	private void emcTempSet(String largs[]){
-		if (send.noPerm("emc.tempset")) return;
+	private void emcTempSet(CommandSender sender, String largs[]){
+		if (noPerm(sender, "emc.tempset")) return;
 		
 		if (largs.length != 4){
-			send.msg(ChatColor.RED + "Incorrect syntaxis!");
-			send.msg(ChatColor.RED + "Correct usage: /tr emc tempset <id:data> <EMC>");
+			msgr(sender, "Incorrect syntaxis!");
+			msgr(sender, "Correct usage: /tr emc tempset <id:data> <EMC>");
 			return;
 		}
 		
@@ -334,11 +325,11 @@ public class TRCmdTr implements CommandExecutor {
 		try {
 			emc = Integer.parseInt(largs[3]);
 			if (emc < 0){
-				send.msg(ChatColor.RED + "Negative values are not allowed!");
+				msgr(sender, "Negative values are not allowed!");
 				return;
 			}
 		} catch (NumberFormatException ex){
-			send.msg(ChatColor.RED + "This is not a valid number!");
+			msgr(sender, "This is not a valid number!");
 			return;
 		}
 		
@@ -347,38 +338,38 @@ public class TRCmdTr implements CommandExecutor {
 			try {
 				iss = TRItemProcessor.processItemString(largs[2]);
 			} catch (TRException ex) {
-				send.msg(ChatColor.RED + "Invalid item string:");
-				send.msg(ChatColor.RED + ex.getMessage());
+				msgr(sender, "Invalid item string:");
+				msgr(sender, ex.getMessage());
 				return;
 			}
 			for (TRItem isr : iss) {
-				int data = isr.data == -1 || isr.data == 0 ? 0 : isr.data;
+				final int data = isr.data == -1 || isr.data == 0 ? 0 : isr.data;
 				if (emc > 0) ee.EEMaps.addEMC(isr.id, data, emc);
 				else {
 					//Remove EMC value.
-					HashMap<Integer, Integer> hm = (HashMap<Integer, Integer>) ee.EEMaps.alchemicalValues.get(isr.id);
+					final HashMap<Integer, Integer> hm = (HashMap<Integer, Integer>) ee.EEMaps.alchemicalValues.get(isr.id);
 					if (hm != null){
 						hm.remove(data);
 						if (hm.isEmpty()) ee.EEMaps.alchemicalValues.remove(isr.id);
 						else ee.EEMaps.alchemicalValues.put(isr.id, hm);
 					}
 				}
-				send.msg(ChatColor.GREEN + "Temporary set " + isr.id + ":" + data + " to " + emc + " EMC.");
+				msgg(sender, "Temporary set " + isr.id + ":" + data + " to " + emc + " EMC.");
 			}
 		} catch (Exception ex){
 			Log.debugEx(ex);
-			send.msg(ChatColor.RED + "Incorrect syntaxis!");
-			send.msg(ChatColor.RED + "Correct usage:");
-			send.msg(ChatColor.RED + "/tr emc tempset <id[:data]> <EMC>");
-			send.msg(ChatColor.RED + "/tr emc tempset <id-id2> <EMC>");
+			msgr(sender, "Incorrect syntaxis!");
+			msgr(sender, "Correct usage:");
+			msgr(sender, "/tr emc tempset <id[:data]> <EMC>");
+			msgr(sender, "/tr emc tempset <id-id2> <EMC>");
 		}
 	}
-	private void emcLookup(String largs[]){
-		if (send.noPerm("emc.lookup")) return;
+	private void emcLookup(CommandSender sender, String largs[]){
+		if (noPerm(sender, "emc.lookup")) return;
 		
 		if (largs.length != 3){
-			send.msg(ChatColor.RED + "Incorrect syntaxis!");
-			send.msg(ChatColor.RED + "Correct usage: /tr emc lookup <id[:data]>");
+			msgr(sender, "Incorrect syntaxis!");
+			msgr(sender, "Correct usage: /tr emc lookup <id[:data]>");
 			return;
 		}
 		
@@ -389,8 +380,8 @@ public class TRCmdTr implements CommandExecutor {
 			try {
 				iss = TRItemProcessor.processItemString(largs[2]);
 			} catch (TRException ex) {
-				send.msg(ChatColor.RED + "Invalid item string:");
-				send.msg(ChatColor.RED + ex.getMessage());
+				msgr(sender, "Invalid item string:");
+				msgr(sender, ex.getMessage());
 				return;
 			}
 			for (TRItem isr : iss) {
@@ -400,43 +391,48 @@ public class TRCmdTr implements CommandExecutor {
 				if (isr.data == -1) { //Get all data values
 					Iterator<Integer> ks = hm.keySet().iterator();//Every data value
 					while (ks.hasNext()) {
-						Integer dat = ks.next();
-						Integer emc = hm.get(dat);
+						final Integer dat = ks.next();
+						final Integer emc = hm.get(dat);
 						if (emc == null) continue; //Should never happen.
 						found = true;
-						send.msg("[" + isr.id + ":" + dat + "] EMC: " + emc);
+						msg(sender, "[" + isr.id + ":" + dat + "] EMC: " + emc);
 					}
 				} else {
-					int datax = isr.data == -10 ? 0 : isr.data;
-					Integer emc = hm.get(datax);
+					final int datax = isr.data == -10 ? 0 : isr.data;
+					final Integer emc = hm.get(datax);
 					if (emc == null) continue;
 					found = true;
 					
-					send.msg("[" + isr.id + ":" + datax + "] EMC: " + emc);
+					msg(sender, "[" + isr.id + ":" + datax + "] EMC: " + emc);
 				}
 			}
 			
 			if (!found){
-				send.msg(ChatColor.RED + "No EMC values found for " + largs[2] + ".");
+				msgr(sender, "No EMC values found for " + largs[2] + ".");
 			}
 		} catch (Exception ex) {
 			Log.debugEx(ex);
-			send.msg(ChatColor.RED + "Sorry, EMC lookup unsuccessful...");
-			send.msg("/tr emc lookup <id[:data]>");
-			send.msg("/tr emc lookup <id-id2>");
+			msgr(sender, "Sorry, EMC lookup unsuccessful...");
+			msg(sender, "/tr emc lookup <id[:data]>");
+			msg(sender, "/tr emc lookup <id-id2>");
 		}
 	}
 	
-	private void adminMain(String[] args, String largs[]){
-		if (send.noPerm("admin")) return;
+	private void adminMain(CommandSender sender, String[] args, String largs[]){
+		if (noPerm(sender, "admin")) return;
 
 		if (largs.length == 1) {
-			adminHelp(1);
+			adminHelp(sender, 1);
 			return;
 		}
 		
 		if (largs[1].equals("2")) {
-			adminHelp(2);
+			adminHelp(sender, 2);
+			return;
+		}
+		
+		if (largs[1].equals("3")) {
+			adminHelp(sender, 3);
 			return;
 		}
 		
@@ -445,35 +441,35 @@ public class TRCmdTr implements CommandExecutor {
 			if (largs.length == 3){
 				try { page = Integer.parseInt(largs[2]); } catch (NumberFormatException ex) {}
 			}
-			adminHelp(page);
+			adminHelp(sender, page);
 			return;
 		}
 		
 		if (largs[1].equals("reload")) {
-			adminReload(largs);
+			adminReload(sender, largs);
 			return;
 		}
 		
 		if (largs[1].equals("update")) {
-			adminUpdate(largs);
+			adminUpdate(sender, largs);
 			return;
 		}
 		
 		if (largs[1].equals("threadlag")) {
-			adminThreadLag();
+			adminThreadLag(sender);
 			return;
 		}
 		
 		if (largs[1].equals("reinit")) {
-			adminReinit();
+			adminReinit(sender);
 			return;
 		}
 		
 		if (largs[1].equals("safezone")) {
 			try {
-				ssMain(args, largs);
+				ssMain(sender, args, largs);
 			} catch (Exception ex) {
-				send.msg(ChatColor.RED + "An error has occurred processing your command!");
+				msgr(sender, "An error has occurred processing your command!");
 				Warning.other("Error occurred in /tr admin safezone! Please inform the author.", false);
 				Log.Exception(ex, false);
 			}
@@ -482,9 +478,9 @@ public class TRCmdTr implements CommandExecutor {
 		
 		if (largs[1].equals("limit")) {
 			try {
-				limitMain(largs);
+				limitMain(sender, largs);
 			} catch (Exception ex) {
-				send.msg(ChatColor.RED + "An error has occurred processing your command!");
+				msgr(sender, "An error has occurred processing your command!");
 				Warning.other("Error occurred in /tr admin limit! Please inform the author.", false);
 				Log.Exception(ex, false);
 			}
@@ -492,31 +488,36 @@ public class TRCmdTr implements CommandExecutor {
 		}
 		
 		if (largs[1].equals("test")) {
-			adminTest(largs);
+			adminTest(sender, largs);
+			return;
+		}
+		
+		if (largs[1].equals("unloadchunks")){
+			adminUnloadChunks(sender, largs);
 			return;
 		}
 
-		send.msg(ChatColor.RED + "Unknown subcommand /tr admin " + largs[1] + "!");
-		send.msg("Use /tr admin help to see all subcommands.");
+		msgr(sender, "Unknown subcommand /tr admin " + largs[1] + "!");
+		msg(sender, "Use /tr admin help to see all subcommands.");
 	}
-	private void adminReload(String largs[]){
-		if (send.noPerm("admin.reload")) return;
+	private void adminReload(CommandSender sender, String largs[]){
+		if (noPerm(sender, "admin.reload")) return;
 		
 		if (largs.length == 3){
 			tekkitrestrict.getInstance().saveDefaultConfig(false);
 			tekkitrestrict.getInstance().reloadConfig();
 			if (largs[2].equals("limiter")){
 				TRLimiter.reload();
-				send.msg("Limiter Reloaded!");
+				msg(sender, "Limiter Reloaded!");
 			} else if (largs[2].equals("noitem")){
 				TRNoItem.reload();
-				send.msg("NoItem (Banned Items) Reloaded!");
+				msg(sender, "NoItem (Banned Items) Reloaded!");
 			} else if (largs[2].equals("creative") || largs[2].equals("limitedcreative")){
 				TRNoItem.reload();
-				send.msg("Limited Creative Banned Items Reloaded!");
+				msg(sender, "Limited Creative Banned Items Reloaded!");
 			} else if (largs[2].equals("noclick")){
 				TRNoClick.reload();
-				send.msg("NoClick (disabled interactions) Reloaded!");
+				msg(sender, "NoClick (disabled interactions) Reloaded!");
 			} else if (largs[2].equals("Logger") || largs[2].equals("logfilter") || largs[2].equals("logsplitter")){
 				LogFilter.replaceList = tekkitrestrict.config.getStringList(ConfigFile.Logging, "LogFilter");
 				LogFilter.splitLogs = tekkitrestrict.config.getBoolean(ConfigFile.Logging, "SplitLogs", true);
@@ -530,30 +531,30 @@ public class TRCmdTr implements CommandExecutor {
 				TRConfigCache.Logger.LogRMTools = tekkitrestrict.config.getBoolean(ConfigFile.Logging, "LogRMTools", false);
 				TRConfigCache.Logger.LogEEMisc = tekkitrestrict.config.getBoolean(ConfigFile.Logging, "LogEEMisc", false);
 				TRConfigCache.Logger.LogEEDestructive = tekkitrestrict.config.getBoolean(ConfigFile.Logging, "LogEEDestructive", false);
-				send.msg("Log Filter/Splitter Reloaded!");
+				msg(sender, "Log Filter/Splitter Reloaded!");
 			} else if (largs[2].equals("emcset")){
 				TREMCSet.reload();
-				send.msg("EMC setter Reloaded!");
+				msg(sender, "EMC setter Reloaded!");
 			} else {
 				if (largs[2].equals("help"))
-					send.msg(ChatColor.YELLOW + "Possible subcommands: ");
+					msgy(sender, "Possible subcommands: ");
 				else
-					send.msg(ChatColor.RED + "Unknown subcommand! Possible subcommands: ");
+					msgr(sender, "Unknown subcommand! Possible subcommands: ");
 				
-				send.msg(ChatColor.YELLOW + "Limiter, Noitem, LimitedCreative, NoClick, Logger and EMCSet");
+				msgy(sender, "Limiter, Noitem, LimitedCreative, NoClick, Logger and EMCSet");
 			}
 			return;
 		}
 
 		tekkitrestrict.getInstance().reload(true, false);
-		send.msg("Tekkit Restrict Reloaded!");
+		msg(sender, "Tekkit Restrict Reloaded!");
 		return;
 	}
-	private void adminUpdate(String largs[]){
-		if (send.noPerm("admin.update")) return;
+	private void adminUpdate(CommandSender sender, String largs[]){
+		if (noPerm(sender, "admin.update")) return;
 		
 		if (tekkitrestrict.updater2 == null){
-			send.msg(ChatColor.RED + "The update check is disabled in the config.");
+			msgr(sender, "The update check is disabled in the config.");
 			return;
 		}
 		
@@ -562,69 +563,69 @@ public class TRCmdTr implements CommandExecutor {
 			if (largs[2].equals("check")) check = true;
 			else if (largs[2].equals("download")) check = false;
 			else {
-				send.msg(ChatColor.RED + "Invalid argument: \""+largs[2]+"\"! Only \"check\" and \"download\" are allowed.");
+				msgr(sender, "Invalid argument: \""+largs[2]+"\"! Only \"check\" and \"download\" are allowed.");
 				return;
 			}
 		} else {
-			send.msg(ChatColor.RED + "Invalid syntaxis! Correct usage: /tr admin update <check|download>");
+			msgr(sender, "Invalid syntaxis! Correct usage: /tr admin update <check|download>");
 			return;
 		}
 		
-		UpdateResult result = tekkitrestrict.updater2.getResult();
+		final UpdateResult result = tekkitrestrict.updater2.getResult();
 		if (result == UpdateResult.DISABLED){
-			send.msg(ChatColor.RED + "The update check is disabled in the global Updater config.");
+			msgr(sender, "The update check is disabled in the global Updater config.");
 			return;
 		} else if (result == UpdateResult.SUCCESS){
-			send.msg(ChatColor.GREEN + "The update " + ChatColor.YELLOW + tekkitrestrict.updater2.getLatestName() + ChatColor.GREEN + " is available, and has already been downloaded.");
-			send.msg(ChatColor.GREEN + "This update will be installed on the next server start.");
+			msgg(sender, "The update " + ChatColor.YELLOW + tekkitrestrict.updater2.getLatestName() + ChatColor.GREEN + " is available, and has already been downloaded.");
+			msgg(sender, "This update will be installed on the next server start.");
 		} else if (result == UpdateResult.UPDATE_AVAILABLE){
 			if (check){
-				send.msg(ChatColor.GREEN + "The update " + ChatColor.YELLOW + tekkitrestrict.updater2.getLatestName() + ChatColor.GREEN + " is available.");
-				send.msg(ChatColor.YELLOW + "Use /tr admin update download to start downloading.");
+				msgg(sender, "The update " + ChatColor.YELLOW + tekkitrestrict.updater2.getLatestName() + ChatColor.GREEN + " is available.");
+				msgy(sender, "Use /tr admin update download to start downloading.");
 			} else {
-				send.msg(ChatColor.GREEN + "TekkitRestrict will now start downloading " + ChatColor.YELLOW + tekkitrestrict.updater2.getLatestName() + ChatColor.GREEN + ".");
+				msgg(sender, "TekkitRestrict will now start downloading " + ChatColor.YELLOW + tekkitrestrict.updater2.getLatestName() + ChatColor.GREEN + ".");
 				tekkitrestrict.getInstance().Update();
 			}
 		} else if (result == UpdateResult.NO_UPDATE){
-			send.msg(ChatColor.YELLOW + "There is no update available for TekkitRestrict.");
+			msgy(sender, "There is no update available for TekkitRestrict.");
 		} else {
-			send.msg(ChatColor.RED + "An error occurred when trying to check for a new version.");
+			msgr(sender, "An error occurred when trying to check for a new version.");
 		}
 		
 		/*
 		UpdateResult result = tekkitrestrict.updater.getResult();
 		if (result == UpdateResult.SUCCESS){
-			send.msg(ChatColor.GREEN + "The update TekkitRestrict " + ChatColor.YELLOW + tekkitrestrict.updater.shortVersion + ChatColor.GREEN + " is available, and has already been downloaded.");
-			send.msg(ChatColor.GREEN + "This update will be installed on the next server start.");
+			msgg(sender, "The update TekkitRestrict " + ChatColor.YELLOW + tekkitrestrict.updater.shortVersion + ChatColor.GREEN + " is available, and has already been downloaded.");
+			msgg(sender, "This update will be installed on the next server start.");
 		} else if (result == UpdateResult.UPDATE_AVAILABLE){
 			if (check){
-				send.msg(ChatColor.GREEN + "The update TekkitRestrict " + ChatColor.YELLOW + tekkitrestrict.updater.shortVersion + ChatColor.GREEN + " is available.");
-				send.msg(ChatColor.YELLOW + "Use /tr admin update download to start downloading.");
+				msgg(sender, "The update TekkitRestrict " + ChatColor.YELLOW + tekkitrestrict.updater.shortVersion + ChatColor.GREEN + " is available.");
+				msgy(sender, "Use /tr admin update download to start downloading.");
 			} else {
-				send.msg(ChatColor.GREEN + "TekkitRestrict will now start downloading version " + ChatColor.YELLOW + tekkitrestrict.updater.shortVersion + ChatColor.GREEN + ".");
+				msgg(sender, "TekkitRestrict will now start downloading version " + ChatColor.YELLOW + tekkitrestrict.updater.shortVersion + ChatColor.GREEN + ".");
 				tekkitrestrict.getInstance().Update();
 			}
 		} else if (result == UpdateResult.NO_UPDATE){
-			send.msg(ChatColor.YELLOW + "There is no update available for TekkitRestrict.");
+			msgy(sender, "There is no update available for TekkitRestrict.");
 		} else {
-			send.msg(ChatColor.RED + "An error occurred when trying to check for a new version.");
+			msgr(sender, "An error occurred when trying to check for a new version.");
 		}
 		*/
 	}
-	private void adminThreadLag(){
-		if (send.noPerm("admin.threadlag")) return;
+	private void adminThreadLag(CommandSender sender){
+		if (noPerm(sender, "admin.threadlag")) return;
 		
-		TRPerformance.getThreadLag(send.sender);
+		TRPerformance.getThreadLag(sender);
 	}
-	private void adminReinit(){
-		if ((send.sender instanceof Player) && send.noPerm("admin.reinit")) return;
+	private void adminReinit(CommandSender sender){
+		if ((sender instanceof Player) && noPerm(sender, "admin.reinit")) return;
 		//Console should always be able to use this, even though permission default is false in plugin.yml
 		
-		send.msg(ChatColor.RED + "Reinitializing server.");
+		msgr(sender, "Reinitializing server.");
 		tekkitrestrict.getInstance().getServer().reload();
 	}
-	private void adminTest(String largs[]){
-		if (send.noPerm("admin.testsettings")) return;
+	private void adminTest(CommandSender sender, String largs[]){
+		if (noPerm(sender, "admin.testsettings")) return;
 		
 		if (largs.length == 4){
 			if (largs[2].equals("eepatch")){
@@ -637,26 +638,26 @@ public class TRCmdTr implements CommandExecutor {
 						vals = f.get(null);
 						if (vals != null && vals instanceof ArrayList){
 							ArrayList<?> arr = (ArrayList<?>) vals;
-							send.msg(ChatColor.GOLD + "Blocked actions for " + f.getName() + ":");
+							msg(sender, ChatColor.GOLD + "Blocked actions for " + f.getName() + ":");
 							int i = 0;
 							for (Object val : arr){
-								send.msg("["+i+"] "+val.toString());
+								msg(sender, "["+i+"] "+val.toString());
 								i++;
 							}
 							return;
 						} else {
-							send.msg(ChatColor.RED + "There are no blocked actions for " + f.getName() + ".");
+							msgr(sender, "There are no blocked actions for " + f.getName() + ".");
 							return;
 						}
 					} catch (IllegalArgumentException | IllegalAccessException e){
-						send.msg(ChatColor.RED + "An error occurred!");
+						msgr(sender, "An error occurred!");
 						return;
 					}
 				}
 				String pFields = "";
 				for (Field f : fields) pFields += " " + f.getName();
 				pFields = pFields.trim().replace(" ", ", ");
-				send.msg(ChatColor.RED + "Unknown field! "+ChatColor.GOLD + "Available fields: " + pFields);
+				msgr(sender, "Unknown field! "+ChatColor.GOLD + "Available fields: " + pFields);
 				return;
 			}
 			
@@ -673,10 +674,10 @@ public class TRCmdTr implements CommandExecutor {
 						Object val;
 						try {
 							val = f.get(null);
-							send.msg(c.getSimpleName()+"."+f.getName() + ": " + val);
+							msg(sender, c.getSimpleName()+"."+f.getName() + ": " + val);
 							return;
 						} catch (IllegalArgumentException | IllegalAccessException e) {
-							send.msg(ChatColor.RED + "An error occurred!");
+							msgr(sender, "An error occurred!");
 							return;
 						}
 					}
@@ -686,7 +687,7 @@ public class TRCmdTr implements CommandExecutor {
 					for (Field f : fields) pFields += " " + f.getName();
 					pFields = pFields.trim().replace(" ", ", ");
 					
-					send.msg(ChatColor.RED + "Unknown field! "+ChatColor.GOLD+"Available fields: " + pFields);
+					msgr(sender, "Unknown field! "+ChatColor.GOLD+"Available fields: " + pFields);
 					return;
 				}
 			}
@@ -697,104 +698,136 @@ public class TRCmdTr implements CommandExecutor {
 			for (Class<?> c : classes) pClasses += " " + c.getSimpleName();
 			pClasses = pClasses.trim().replace(" ", ", ");
 			
-			send.msg(ChatColor.RED + "Unknown class! "+ChatColor.GOLD+"Available classes: " + pClasses + " and EEPatch");
+			msgr(sender, "Unknown class! "+ChatColor.GOLD+"Available classes: " + pClasses + " and EEPatch");
 			return;
 		} else {
-			send.msg(ChatColor.RED + "Invalid syntax! Usage: /tr admin test <class> <field>");
+			msgr(sender, "Invalid syntax! Usage: /tr admin test <class> <field>");
 			return;
 		}
 	}
-	private void adminHelp(int page) {
+	private void adminHelp(CommandSender sender, int page) {
 		if (page == 1) {
-			send.msg(ChatColor.YELLOW + "[TekkitRestrict " + tekkitrestrict.version.fullVer + " Admin Commands] Page 1 / 3");
-			send.msg("/tr admin help <page>", "Show this help.");
-			send.msg("/tr admin reload", "Reload TekkitRestrict");
-			send.msg("/tr admin reload help", "View Reload subcommands");
-			send.msg("/tr admin update check", "Check for updates.");
-			send.msg("/tr admin update download", "Download an update if it is available.");
-			send.msg("/tr admin threadlag", "Display threadlag information.");
+			msgy(sender, "[TekkitRestrict " + tekkitrestrict.version.fullVer + " Admin Commands] Page 1 / 3");
+			msg(sender, "/tr admin help <page>", "Show this help.");
+			msg(sender, "/tr admin safezone list [page]", "List safezones.");
+			msg(sender, "/tr admin safezone check [player]", "Check if a player is in a safezone.");
+			msg(sender, "/tr admin safezone addwg <region>", "Add a safezone using WorldGuard.");
+			msg(sender, "/tr admin safezone addgp <name>", "Add a safezone using GriefPrevention.");
+			msg(sender, "/tr admin safezone rem <name>", "Remove a safezone.");
 		} else if (page == 2) {
-			send.msg(ChatColor.YELLOW + "[TekkitRestrict " + tekkitrestrict.version.fullVer + " Admin Commands] Page 2 / 3");
-			send.msg("/tr admin safezone list [page]", "List safezones.");
-			send.msg("/tr admin safezone check [player]", "Check if a player is in a safezone.");
-			send.msg("/tr admin safezone addwg <region>", "Add a safezone using WorldGuard.");
-			send.msg("/tr admin safezone addgp <name>", "Add a safezone using GriefPrevention.");
-			send.msg("/tr admin safezone rem <name>", "Remove a safezone.");
-			send.msg(ChatColor.STRIKETHROUGH + "/tr admin reinit", ChatColor.STRIKETHROUGH + "Reload the server.");
+			msgy(sender, "[TekkitRestrict " + tekkitrestrict.version.fullVer + " Admin Commands] Page 2 / 3");
+			msg(sender, "/tr admin limit clear <player>", "Clear a players limits.");
+			msg(sender, "/tr admin limit clear <player> <id[:data]>", "Clear a players limits for a specific item.");
+			msg(sender, "/tr admin limit list <player> [id]", "List a players limits.");
+			msg(sender, "/tr admin unloadchunks low", "Only unload chunks not loaded for a reason, default radius.");
+			msg(sender, "/tr admin unloadchunks normal", "Unload normally and unload chunks that are kept loaded by ChunkLoaders.");
+			msg(sender, "/tr admin unloadchunks high", "Unload all chunks not loaded by players.");
+			msg(sender, "/tr admin unloadchunks extreme", "Unload all chunks no matter what. (WARNING: Can crash server)");
 		} else if (page >= 3){
-			send.msg(ChatColor.YELLOW + "[TekkitRestrict " + tekkitrestrict.version.fullVer + " Admin Commands] Page 3 / 3");
-			send.msg("/tr admin limit clear <player>", "Clear a players limits.");
-			send.msg("/tr admin limit clear <player> <id[:data]>", "Clear a players limits for a specific item.");
-			send.msg("/tr admin limit list <player> [id]", "List a players limits.");
-			send.msg("/tr admin test <class> <field>", "Get the value of a setting. (Debug feature)");
+			msgy(sender, "[TekkitRestrict " + tekkitrestrict.version.fullVer + " Admin Commands] Page 3 / 3");
+			msg(sender, "/tr admin reload", "Reload TekkitRestrict");
+			msg(sender, "/tr admin reload help", "View Reload subcommands");
+			msg(sender, "/tr admin update <check|download>", "Check for or download updates.");
+			msg(sender, "/tr admin threadlag", "Display threadlag information.");
+			msg(sender, ChatColor.STRIKETHROUGH + "/tr admin reinit", ChatColor.STRIKETHROUGH + "Reload the server.");
+			msg(sender, "/tr admin test <class> <field>", "Get the value of a setting. (Debug feature)");
 		} else {
-			send.msg(ChatColor.RED + "Page " + page + " doesn't exist. ");
+			msgr(sender, "Page " + page + " doesn't exist. ");
 		}
 	}
-	private void adminForceUnloadChunks(String largs[]){
-		if (send.noPerm("admin.forceunload")) return;
-		
-		
+	@SuppressWarnings("deprecation")
+	private void adminUnloadChunks(CommandSender sender, String largs[]){
+		if (noPerm(sender, "admin.forceunload")) return;
+		if (largs.length < 2){
+			msgy(sender, "[TekkitRestrict " + tekkitrestrict.version.fullVer + "UnloadChunks help]");
+			msg(sender, "/tr admin unloadchunks low", "Only unload chunks not loaded for a reason, default radius.");
+			msg(sender, "/tr admin unloadchunks normal", "Unload normally and unload chunks that are kept loaded by ChunkLoaders.");
+			msg(sender, "/tr admin unloadchunks high", "Unload all chunks not loaded by players.");
+			msg(sender, "/tr admin unloadchunks extreme", "Unload all chunks no matter what. (WARNING: Can crash server)");
+			return;
+		}
+		ChunkUnloadMethod method;
+		switch (largs[2]){
+			case "low":
+				method = ChunkUnloadMethod.UnloadLowWhenForced;
+				break;
+			case "normal":
+				method = ChunkUnloadMethod.UnloadNormalWhenForced;
+				break;
+			case "high":
+				method = ChunkUnloadMethod.UnloadHighWhenForced;
+				break;
+			case "extreme":
+				method = ChunkUnloadMethod.UnloadExtremeWhenForced;
+				break;
+			default:
+				msgr(sender, "Incorrect syntax! Correct usage: /tr admin unloadchunks <low|normal|high|extreme> [world]");
+				return;
+		}
+
+		for (TRChunkUnloader2 unloader : TRChunkUnloader2.getAll()){
+			unloader.forceUnload(sender, method);
+		}
 	}
 	
-	private void ssMain(String[] args, String[] largs){
-		if (send.noPerm("admin.safezone")) return;
+	private void ssMain(CommandSender sender, String[] args, String[] largs){
+		if (noPerm(sender, "admin.safezone")) return;
 		
 		if (largs.length == 2 || largs[2].equals("help")){
-			ssHelp();
+			ssHelp(sender);
 			return;
 		}
 		
 		if (largs[2].equals("list")){
-			ssList(largs);
+			ssList(sender, largs);
 			return;
 		}
 		
 		if (largs[2].equals("check")){
-			ssCheck(largs);
+			ssCheck(sender, largs);
 			return;
 		}
 		
 		if (largs[2].equals("rem") || largs[2].equals("del") || largs[2].equals("remove") || largs[2].equals("delete")){
-			ssDel(largs);
+			ssDel(sender, largs);
 			return;
 		}
 		
 		if (largs[2].equals("addwg")){
-			ssAddWG(largs);
+			ssAddWG(sender, largs);
 			return;
 		}
 		
 		if (largs[2].equals("addgp")){
-			ssAddGP(largs);
+			ssAddGP(sender, largs);
 			return;
 		}
 		
 		if (largs[2].equals("addnative")){
-			ssAddNative(args, largs);
+			ssAddNative(sender, args, largs);
 			return;
 		}
 		
-		send.msg(ChatColor.RED + "Unknown subcommand /tr admin safezone " + largs[2] + "!");
-		ssHelp();
+		msgr(sender, "Unknown subcommand /tr admin safezone " + largs[2] + "!");
+		ssHelp(sender);
 	}
-	private void ssHelp(){
-		send.msg(ChatColor.YELLOW + "[TekkitRestrict v" + tekkitrestrict.version.fullVer + " Safezone Commands]");
-		send.msg("/tr admin safezone check [player]", "Check if a player is in a safezone.");
-		send.msg("/tr admin safezone list [page]", "List safezones");
-		send.msg("/tr admin safezone addwg <name>", "Add a WorldGuard safezone");
-		send.msg("/tr admin safezone addgp <name>", "Add a GriefPrevention safezone");
-		send.msg("/tr admin safezone del <name>", "remove safezone");
+	private void ssHelp(CommandSender sender){
+		msgy(sender, "[TekkitRestrict v" + tekkitrestrict.version.fullVer + " Safezone Commands]");
+		msg(sender, "/tr admin safezone check [player]", "Check if a player is in a safezone.");
+		msg(sender, "/tr admin safezone list [page]", "List safezones");
+		msg(sender, "/tr admin safezone addwg <name>", "Add a WorldGuard safezone");
+		msg(sender, "/tr admin safezone addgp <name>", "Add a GriefPrevention safezone");
+		msg(sender, "/tr admin safezone del <name>", "remove safezone");
 	}
-	private void ssList(String[] largs){
-		if (send.noPerm("admin.safezone.list")) return;
+	private void ssList(CommandSender sender, String[] largs){
+		if (noPerm(sender, "admin.safezone.list")) return;
 		
 		int requestedPage = 1;
 		if (largs.length == 4){
 			try {
 				requestedPage = Integer.parseInt(largs[3]);
 			} catch (NumberFormatException ex){
-				send.msg(ChatColor.RED + "Page number incorrect!");
+				msgr(sender, "Page number incorrect!");
 				return;
 			}
 		}
@@ -802,80 +835,81 @@ public class TRCmdTr implements CommandExecutor {
 		if (totalPages == 0) totalPages = 1;
 		if (requestedPage > totalPages) requestedPage = totalPages;
 		
-		send.msg(ChatColor.YELLOW + "SafeZones - Page " + requestedPage + " of " + totalPages);
+		msgy(sender, "SafeZones - Page " + requestedPage + " of " + totalPages);
 		for (int i = ((requestedPage-1) * 5); i < (requestedPage * 5); i++){
 			if (TRSafeZone.zones.size() <= i) break;
 			
-			TRSafeZone z = TRSafeZone.zones.get(i);
+			final TRSafeZone z = TRSafeZone.zones.get(i);
 			if (z == null) continue;
 			
-			String pl = "";
+			final String pl;
 			if (z.mode == 1) pl = "[WG] ";
 			else if (z.mode == 4) pl = "[GP] ";
 			else if (z.mode == 0) pl = "[TR] ";
 			else if (z.mode == 2) pl = "[PS] ";
 			else if (z.mode == 3) pl = "[F] ";
+			else pl = "";
 			
-			send.msg("" + ChatColor.YELLOW + (i+1) + ": " + pl + z.name + " - Loc: [" + z.world + "] [" + z.location.x1 + " " + z.location.y1 + " " + z.location.z1 + "] - [" + z.location.x2 + " " + z.location.y2 + " " + z.location.z2 + "]");
+			msgy(sender, "" + (i+1) + ": " + pl + z.name + " - Loc: [" + z.world + "] [" + z.location.x1 + " " + z.location.y1 + " " + z.location.z1 + "] - [" + z.location.x2 + " " + z.location.y2 + " " + z.location.z2 + "]");
 		}
 	}
-	private void ssCheck(String[] largs){
-		Player target;
+	private void ssCheck(CommandSender sender, String[] largs){
+		final Player target;
 		if (largs.length == 4){
-			if (send.noPerm("admin.safezone.check.others")) return;
+			if (noPerm(sender, "admin.safezone.check.others")) return;
 			target = Bukkit.getPlayer(largs[3]);
 			if (target == null){
-				send.msg(ChatColor.RED + "Cannot find player " + largs[3] + "!");
+				msgr(sender, "Cannot find player " + largs[3] + "!");
 				return;
 			}
 		} else {
-			if (send.noPerm("admin.safezone.check")) return;
-			if (send.sender instanceof Player){
-				target = (Player) send.sender;
+			if (noPerm(sender, "admin.safezone.check")) return;
+			if (sender instanceof Player){
+				target = (Player) sender;
 			} else {
-				send.msg(ChatColor.RED + "The console can only use /tr admin safezone check <player>");
+				msgr(sender, "The console can only use /tr admin safezone check <player>");
 				return;
 			}
 		}
 		
-		Object[] temp = TRSafeZone.getSafeZoneStatusFor(target);
-		SafeZone status = (SafeZone) temp[2];
+		final Object[] temp = TRSafeZone.getSafeZoneStatusFor(target);
+		final SafeZone status = (SafeZone) temp[2];
 		
 		if (status == SafeZone.isNone || status == SafeZone.pluginDisabled){
-			send.msg(ChatColor.YELLOW + target.getName() + " is currently " + ChatColor.RED + "not" + ChatColor.YELLOW + " in a safezone.");
+			msgy(sender, target.getName() + " is currently " + ChatColor.RED + "not" + ChatColor.YELLOW + " in a safezone.");
 			return;
 		}
 		
-		String plugin = (String) temp[0];
+		final String plugin = (String) temp[0];
 		String zone = (String) temp[1];
 		
 		if (zone.isEmpty()) zone = "NO_NAME";
 		if (status == SafeZone.isAllowedStrict) {
-			send.msg(ChatColor.YELLOW + target.getName() + " is currently in the "+plugin+" safezone " + zone + ", but it doesn't apply to him/her.");
+			msgy(sender, target.getName() + " is currently in the "+plugin+" safezone " + zone + ", but it doesn't apply to him/her.");
 			return;
 		}
 		
 		if (status == SafeZone.isAllowedNonStrict) {
-			send.msg(ChatColor.YELLOW + target.getName() + " is currently in the "+plugin+" safezone " + zone + ".");
+			msgy(sender, target.getName() + " is currently in the "+plugin+" safezone " + zone + ".");
 			return;
 		}
 		
 		if (status == SafeZone.isDisallowed) {
-			send.msg(ChatColor.YELLOW + target.getName() + " is currently in the "+plugin+" safezone " + zone + ".");
+			msgy(sender, target.getName() + " is currently in the "+plugin+" safezone " + zone + ".");
 			return;
 		}
 		
 		if (status == SafeZone.hasBypass) {
-			send.msg(ChatColor.YELLOW + target.getName() + " is currently in the "+plugin+" safezone " + zone + ", but it doesn't apply to him/her.");
+			msgy(sender, target.getName() + " is currently in the "+plugin+" safezone " + zone + ", but it doesn't apply to him/her.");
 			return;
 		}
 	}
-	private void ssDel(String[] largs){
-		if (send.noPerm("admin.safezone.remove")) return;
+	private void ssDel(CommandSender sender, String[] largs){
+		if (noPerm(sender, "admin.safezone.remove")) return;
 		
 		if (largs.length != 4){
-			send.msg(ChatColor.RED + "Incorrect syntaxis!");
-			send.msg(ChatColor.RED + "Correct usage: /tr admin safezone rem <name>");
+			msgr(sender, "Incorrect syntaxis!");
+			msgr(sender, "Correct usage: /tr admin safezone rem <name>");
 			return;
 		}
 		
@@ -885,19 +919,19 @@ public class TRCmdTr implements CommandExecutor {
 		for (int i = 0; i < TRSafeZone.zones.size(); i++) {
 			zone = TRSafeZone.zones.get(i);
 			name = zone.name;
-			if (!name.toLowerCase().equals(largs[3])) continue;
+			if (!name.equalsIgnoreCase(largs[3])) continue;
 			found = true;
 		}
 		
 		if (found && zone != null){
 			if (!TRSafeZone.removeSafeZone(zone)){
-				send.msg(ChatColor.RED + "Unable to remove the safezone. Was the claim already removed?");
+				msgr(sender, "Unable to remove the safezone. Was the claim already removed?");
 				return;
 			}
 			
-			send.msg(ChatColor.GREEN + "Safezone " + name + " removed.");
+			msgg(sender, "Safezone " + name + " removed.");
 		} else {
-			send.msg(ChatColor.RED + "Cannot find safezone " + largs[3] + "!");
+			msgr(sender, "Cannot find safezone " + largs[3] + "!");
 			return;
 		}
 		
@@ -906,39 +940,39 @@ public class TRCmdTr implements CommandExecutor {
 							+ TRDB.antisqlinject((name == null ? largs[3] : name)) + "' COLLATE NOCASE");
 		} catch (SQLException ex) {}
 	}
-	private void ssAddWG(String[] largs){
-		if (send.noConsole()) return;
+	private void ssAddWG(CommandSender sender, String[] largs){
+		if (noConsole(sender)) return;
 		
-		if (send.noPerm("admin.safezone.addwg")) return;
+		if (noPerm(sender, "admin.safezone.addwg")) return;
 		if (largs.length != 4){
-			send.msg(ChatColor.RED + "Incorrect syntaxis!");
-			send.msg(ChatColor.RED + "Correct usage: /tr admin safezone addwg <name>");
+			msgr(sender, "Incorrect syntaxis!");
+			msgr(sender, "Correct usage: /tr admin safezone addwg <name>");
 			return;
 		}
 		
-		String name = largs[3];
-		Player player = (Player) send.sender;
+		final String name = largs[3];
+		final Player player = (Player) sender;
 
 		for (TRSafeZone current : TRSafeZone.zones){
 			if (current.world.equalsIgnoreCase(player.getWorld().getName())){
 				if (current.name.toLowerCase().equals(name)){
-					send.msg(ChatColor.RED + "There is already a safezone by this name!");
+					msgr(sender, "There is already a safezone by this name!");
 					return;
 				}
 			}
 		}
-		PluginManager pm = Bukkit.getPluginManager();
+		final PluginManager pm = Bukkit.getPluginManager();
 		if (!pm.isPluginEnabled("WorldGuard")){
-			send.msg(ChatColor.RED + "WorldGuard is not enabled!");
+			msgr(sender, "WorldGuard is not enabled!");
 			return;
 		}
 		
 		try {
-			WorldGuardPlugin wg = (WorldGuardPlugin) pm.getPlugin("WorldGuard");
-			Map<String, ProtectedRegion> rm = wg.getRegionManager(player.getWorld()).getRegions();
-			ProtectedRegion pr = rm.get(name);
+			final WorldGuardPlugin wg = (WorldGuardPlugin) pm.getPlugin("WorldGuard");
+			final Map<String, ProtectedRegion> rm = wg.getRegionManager(player.getWorld()).getRegions();
+			final ProtectedRegion pr = rm.get(name);
 			if (pr != null) {
-				TRSafeZone zone = new TRSafeZone();
+				final TRSafeZone zone = new TRSafeZone();
 				zone.mode = 1;
 				zone.name = name;
 				zone.world = player.getWorld().getName();
@@ -947,159 +981,158 @@ public class TRCmdTr implements CommandExecutor {
 				zone.locSet = true;
 				TRSafeZone.zones.add(zone);
 				TRSafeZone.save();
-				send.msg(ChatColor.GREEN + "Attached to region \"" + name + "\"!");
+				msgg(sender, "Attached to region \"" + name + "\"!");
 			} else {
-				send.msg(ChatColor.RED + "Region does not exist!");
+				msgr(sender, "Region does not exist!");
 				
 				String allregions = "";
-				for (String current : rm.keySet()) allregions += current + ", ";
+				for (final String current : rm.keySet()) allregions += current + ", ";
 				
 				if (allregions.length()==0) allregions = "There are no regions!";
 				else allregions = allregions.substring(0, allregions.length()-2);
 				
-				send.msg(ChatColor.YELLOW + "Possible regions: " + allregions);
+				msgy(sender, "Possible regions: " + allregions);
 				return;
 			}
 		} catch (Exception E) {
-			send.msg(ChatColor.RED + "Error! (does the region exist?)");
+			msgr(sender, "Error! (does the region exist?)");
 		}
 	}
-	private void ssAddGP(String[] largs){
-		if (send.noConsole()) return;
+	private void ssAddGP(CommandSender sender, String[] largs){
+		if (noConsole(sender)) return;
 		
-		if (send.noPerm("admin.safezone.addgp")) return;
+		if (noPerm(sender, "admin.safezone.addgp")) return;
 		
 		if (largs.length != 4){
-			send.msg(ChatColor.RED + "Incorrect syntaxis!");
-			send.msg(ChatColor.RED + "Correct usage: /tr admin safezone addgp <name>");
+			msgr(sender, "Incorrect syntaxis!");
+			msgr(sender, "Correct usage: /tr admin safezone addgp <name>");
 			return;
 		}
 		
-		Player player = (Player) send.sender;
-		String name = largs[3];
+		final Player player = (Player) sender;
+		final String name = largs[3];
 
 		for (TRSafeZone current : TRSafeZone.zones){
 			if (current.world.equalsIgnoreCase(player.getWorld().getName())){
 				if (current.name.toLowerCase().equals(name)){
-					send.msg(ChatColor.RED + "There is already a safezone by this name!");
+					msgr(sender, "There is already a safezone by this name!");
 					return;
 				}
 			}
 		}
-		PluginManager pm = Bukkit.getPluginManager();
-		if (!pm.isPluginEnabled("GriefPrevention")){
-			send.msg(ChatColor.RED + "GriefPrevention is not enabled!");
+		if (!Bukkit.getPluginManager().isPluginEnabled("GriefPrevention")){
+			msgr(sender, "GriefPrevention is not enabled!");
 			return;
 		}
 		
-		SafeZoneCreate response = TRSafeZone.addSafeZone(player, "griefprevention", name, null);
+		final SafeZoneCreate response = TRSafeZone.addSafeZone(player, "griefprevention", name, null);
 		if (response == SafeZoneCreate.AlreadyExists)
-			send.msg(ChatColor.RED + "This region is already a safezone!");
+			msgr(sender, "This region is already a safezone!");
 		else if (response == SafeZoneCreate.RegionNotFound)
-			send.msg(ChatColor.RED + "There is no region at your current position!");
+			msgr(sender, "There is no region at your current position!");
 		else if (response == SafeZoneCreate.PluginNotFound)
-			send.msg(ChatColor.RED + "Safezones are disabled for GriefPrevention claims.");
+			msgr(sender, "Safezones are disabled for GriefPrevention claims.");
 		else if (response == SafeZoneCreate.NoPermission)
-			send.msg(ChatColor.RED + "You either have no permission to modify this claim or you are not allowed to make safezones.");
+			msgr(sender, "You either have no permission to modify this claim or you are not allowed to make safezones.");
 		else if (response == SafeZoneCreate.Success)
-			send.msg(ChatColor.GREEN + "This claim is now a safezone!");
+			msgg(sender, "This claim is now a safezone!");
 		else 
-			send.msg(ChatColor.RED + "An undefined error occurred!");
+			msgr(sender, "An undefined error occurred!");
 
 	}
-	private void ssAddNative(String[] args, String[] largs){
-		if (send.noConsole()) return;
+	private void ssAddNative(CommandSender sender, String[] args, String[] largs){
+		if (noConsole(sender)) return;
 		
-		if (send.noPerm("admin.safezone.addnative")) return;
+		if (noPerm(sender, "admin.safezone.addnative")) return;
 		
 		if (largs.length != 8){
-			send.msg(ChatColor.RED + "Incorrect syntaxis!");
-			send.msg(ChatColor.RED + "Correct usage: /tr admin safezone addnative <x> <z> <x> <z> <name>");
+			msgr(sender, "Incorrect syntaxis!");
+			msgr(sender, "Correct usage: /tr admin safezone addnative <x> <z> <x> <z> <name>");
 			return;
 		}
 		
-		String name = largs[7];
+		final String name = largs[7];
 
 		for (TRSafeZone current : TRSafeZone.zones){
 			if (current.name.toLowerCase().equals(name)){
-				send.msg(ChatColor.RED + "There is already a safezone by this name!");
+				msgr(sender, "There is already a safezone by this name!");
 				return;
 			}
 		}
 		
-		int x1, x2, z1, z2;
+		final int x1, x2, z1, z2;
 		try {
 			x1 = Integer.parseInt(args[3]);
 			z1 = Integer.parseInt(args[4]);
 			x2 = Integer.parseInt(args[5]);
 			z2 = Integer.parseInt(args[6]);
 		} catch (NumberFormatException ex){
-			send.msg(ChatColor.RED + "Incorrect syntax!");
-			send.msg(ChatColor.RED + "Correct usage: /tr admin safezone addnative <x> <z> <x> <z> <name>");
+			msgr(sender, "Incorrect syntax!");
+			msgr(sender, "Correct usage: /tr admin safezone addnative <x> <z> <x> <z> <name>");
 			return;
 		}
 		
-		SafeZoneCreate response = TRSafeZone.addSafeZone((Player) send.sender, "griefprevention", name, new TRPos(x1, 0, z1, x2, 0, z2));
+		final SafeZoneCreate response = TRSafeZone.addSafeZone((Player) sender, "griefprevention", name, new TRPos(x1, 0, z1, x2, 0, z2));
 		if (response == SafeZoneCreate.AlreadyExists)
-			send.msg(ChatColor.RED + "This region is already a safezone!");
+			msgr(sender, "This region is already a safezone!");
 		else if (response == SafeZoneCreate.RegionNotFound)
-			send.msg(ChatColor.RED + "There is no region at your current position!");
+			msgr(sender, "There is no region at your current position!");
 		else if (response == SafeZoneCreate.PluginNotFound)
-			send.msg(ChatColor.RED + "Native TekkitRestrict safezones are disabled.");
+			msgr(sender, "Native TekkitRestrict safezones are disabled.");
 		else if (response == SafeZoneCreate.NoPermission)
-			send.msg(ChatColor.RED + "You are not allowed to make safezones.");
+			msgr(sender, "You are not allowed to make safezones.");
 		else if (response == SafeZoneCreate.Success)
-			send.msg(ChatColor.GREEN + "Successfully created safezone!");
+			msgg(sender, "Successfully created safezone!");
 		else 
-			send.msg(ChatColor.RED + "An undefined error occurred!");
+			msgr(sender, "An undefined error occurred!");
 	}
 	
-	private void limitMain(String[] largs){
-		if (send.noPerm("admin.limit")) return;
+	private void limitMain(CommandSender sender, String[] largs){
+		if (noPerm(sender, "admin.limit")) return;
 		
 		if (largs.length == 2 || largs[2].equals("help")) {
-			limitHelp();
+			limitHelp(sender);
 			return;
 		}
 		
 		if (largs[2].equals("clear")) {
-			limitClear(largs);
+			limitClear(sender, largs);
 			return;
 		}
 		
 		if (largs[2].equals("list")) {
-			limitList(largs);
+			limitList(sender, largs);
 			return;
 		}
 		
-		send.msg(ChatColor.RED + "Unknown subcommand /tr admin limit " + largs[2] + "!");
-		limitHelp();
+		msgr(sender, "Unknown subcommand /tr admin limit " + largs[2] + "!");
+		limitHelp(sender);
 	}
-	private void limitHelp(){
-		send.msg(ChatColor.YELLOW + "[TekkitRestrict v" + tekkitrestrict.version.fullVer + " Limit Commands]");
-		send.msg("/tr admin limit list <player>", "View a players limits");
-		send.msg("/tr admin limit list <player> <id>", "View a specific limit.");
-		send.msg("/tr admin limit clear <player>", "Clear a players limits.");
-		send.msg("/tr admin limit clear <player> <id>[:data]", "Clear a players limits for a specific itemid.");
+	private void limitHelp(CommandSender sender){
+		msgy(sender, "[TekkitRestrict v" + tekkitrestrict.version.fullVer + " Limit Commands]");
+		msg(sender, "/tr admin limit list <player>", "View a players limits");
+		msg(sender, "/tr admin limit list <player> <id>", "View a specific limit.");
+		msg(sender, "/tr admin limit clear <player>", "Clear a players limits.");
+		msg(sender, "/tr admin limit clear <player> <id>[:data]", "Clear a players limits for a specific itemid.");
 	}
-	private void limitClear(String[] largs){
-		if (send.noPerm("admin.limit.clear")) return;
+	private void limitClear(CommandSender sender, String[] largs){
+		if (noPerm(sender, "admin.limit.clear")) return;
 		
 		if (largs.length == 3 || largs.length > 5){
-			send.msg(ChatColor.RED + "Invalid syntaxis!");
-			send.msg(ChatColor.RED + "Correct usage: /tr admin limit clear <player> [id[:data]]");
+			msgr(sender, "Invalid syntaxis!");
+			msgr(sender, "Correct usage: /tr admin limit clear <player> [id[:data]]");
 			return;
 		}
 		
-		TRLimiter cc = TRLimiter.getLimiter(largs[3]);
+		final TRLimiter cc = TRLimiter.getLimiter(largs[3]);
 		//if (cc == null){
-		//	send.msg(ChatColor.RED + "This player doesn't exist!");
+		//	msgr(sender, "This player doesn't exist!");
 		//	return;
 		//}
 		
 		if (largs.length == 4){
 			cc.clearLimitsAndClearInDB();
-			send.msg(ChatColor.GREEN + "Cleared " + cc.player + "'s block limits!");
+			msgg(sender, "Cleared " + cc.player + "'s block limits!");
 			return;
 		}
 		
@@ -1108,8 +1141,8 @@ public class TRCmdTr implements CommandExecutor {
 			try {
 				iss = TRItemProcessor.processItemString(largs[4]);
 			} catch (TRException ex) {
-				send.msg(ChatColor.RED + "Invalid item string:");
-				send.msg(ChatColor.RED + ex.getMessage());
+				msgr(sender, "Invalid item string:");
+				msgr(sender, ex.getMessage());
 				return;
 			}
 			
@@ -1123,108 +1156,116 @@ public class TRCmdTr implements CommandExecutor {
 							trl.placedBlock = new LinkedList<TRLocation>();
 					}
 					int ci = cc.itemlimits.indexOf(trl);
-					if(ci != -1) cc.itemlimits.set(ci, trl);
+					if (ci != -1) cc.itemlimits.set(ci, trl);
 				}
 			}
-			send.msg(ChatColor.GREEN + "Cleared " + cc.player + "'s block limits for "+largs[4]);
+			msgg(sender, "Cleared " + cc.player + "'s block limits for "+largs[4]);
 		} catch (Exception E) {
-			send.msg(ChatColor.RED + "[Error!] Please use the formats:");
-			send.msg("/tr admin limit clear <player> [id[:data]]", "Clear a players limits.");
+			msgr(sender, "[Error!] Please use the formats:");
+			msg(sender, "/tr admin limit clear <player> [id[:data]]", "Clear a players limits.");
 		}
 	}
-	private void limitList(String[] largs){
-		if (send.noPerm("admin.limit.list")) return;
+	private void limitList(CommandSender sender, String[] largs){
+		if (noPerm(sender, "admin.limit.list")) return;
 		
 		if (largs.length < 4 || largs.length > 5){
-			send.msg(ChatColor.RED + "Incorrect syntaxis!");
-			send.msg(ChatColor.RED + "Correct usage: /tr admin limit list <player> [id]");
+			msgr(sender, "Incorrect syntaxis!");
+			msgr(sender, "Correct usage: /tr admin limit list <player> [id]");
 			return;
 		}
 		
-		TRLimiter cc = TRLimiter.getLimiter(largs[3]);
+		final TRLimiter cc = TRLimiter.getLimiter(largs[3]);
 		
 		if(cc.itemlimits.isEmpty()){
-			send.msg(ChatColor.RED + largs[3] + " doesn't have any limits!");
+			msgr(sender, largs[3] + " doesn't have any limits!");
 			return;
 		}
 		
-		Player target = Bukkit.getPlayer(cc.player);
+		final Player target = Bukkit.getPlayer(cc.player);
 		
 		if (largs.length == 5){
 			int id;
 			try {
 				id = Integer.parseInt(largs[4]);
 			} catch (NumberFormatException ex){
-				send.msg(ChatColor.RED + "You didn't specify a valid number!");
+				msgr(sender, "You didn't specify a valid number!");
 				return;
 			}
 			
 			if (target != null){
 				for (TRLimit l : cc.itemlimits) {
 					if (l.id != id) continue;
-					int cccl = cc.getMax(target, l.id, l.data);
-					cccl = cccl == -1 ? 0 : cccl;
-					send.msg("[" + l.id + ":" + l.data + "] - " + l.placedBlock.size() + "/" + cccl + " blocks");
+					final int cccl = cc.getMax(target, l.id, l.data);
+					msg(sender, "[" + l.id + ":" + l.data + "] - " + l.placedBlock.size() + "/" + (cccl == -1 ? 0 : cccl) + " blocks");
 				}
 			} else {
-				send.msg("As "+cc.player+" is offline, his/her max limits cannot be listed.");
+				msg(sender, "As "+cc.player+" is offline, his/her max limits cannot be listed.");
 				for (TRLimit l : cc.itemlimits) {
 					if (l.id != id) continue;
-					send.msg("[" + l.id + ":" + l.data + "] - " + l.placedBlock.size()+"/? blocks");
+					msg(sender, "[" + l.id + ":" + l.data + "] - " + l.placedBlock.size()+"/? blocks");
 				}
 			}
 			
 		} else {
 			if (target != null){
 				for (TRLimit l : cc.itemlimits) {
-					int cccl = cc.getMax(target, l.id, l.data);
-					cccl = cccl == -1 ? 0 : cccl;
-					send.msg("[" + l.id + ":" + l.data + "] - " + l.placedBlock.size()+"/"+cccl+" blocks");
+					final int cccl = cc.getMax(target, l.id, l.data);
+					msg(sender, "[" + l.id + ":" + l.data + "] - " + l.placedBlock.size()+"/"+(cccl == -1 ? 0 : cccl)+" blocks");
 				}
 			} else {
-				send.msg("As "+cc.player+" is offline, his/her max limits cannot be listed.");
+				msg(sender, "As "+cc.player+" is offline, his/her max limits cannot be listed.");
 				for (TRLimit l : cc.itemlimits) {
-					send.msg("[" + l.id + ":" + l.data + "] - " + l.placedBlock.size()+"/? blocks");
+					msg(sender, "[" + l.id + ":" + l.data + "] - " + l.placedBlock.size()+"/? blocks");
 				}
 			}
 		}
 	}
 
-	private void banned(String[] largs, boolean tr){
+	private void banned(CommandSender sender, String[] largs, boolean tr){
 		int page = 1;
 		if (largs.length > 2){
-			send.msg(ChatColor.RED + "Incorrect syntax! Correct usage: "+(tr?"/tr banned ":"/banned ")+"<page>");
+			msgr(sender, "Incorrect syntax! Correct usage: "+(tr?"/tr banned ":"/banned ")+"<page>");
 			return;
 		}
 		try {
 			if (largs.length == 2) page = Integer.parseInt(largs[1]);
 			else page = 1;
 		} catch (NumberFormatException ex){
-			send.msg(ChatColor.RED + largs[1] + " is not a valid number!");
+			msgr(sender, largs[1] + " is not a valid number!");
 			return;
 		}
-		List<TRItem> banned = TRNoItem.getBannedItems();
-		int lastpage = (int) Math.ceil(banned.size()/8);
-		int start = (page-1) * 8; //8
-		int end = page * 8; //15
+		final List<TRItem> banned = TRNoItem.getBannedItems();
+		final int lastpage = (int) Math.ceil(banned.size()/8);
+		final int start = (page-1) * 8; //8
+		final int end = page * 8; //15
 		if (page <= 0 || start > banned.size()){
-			send.msg(ChatColor.RED + "Page " + page + " does not exist!");
-			send.msg(ChatColor.RED + "Last page: " + lastpage+".");
+			msgr(sender, "Page " + page + " does not exist!");
+			msgr(sender, "Last page: " + lastpage + ".");
 			return;
 		}
-		send.msg(ChatColor.BLUE + "Banned Items - Page " + page + " of "+lastpage);
-		send.msg(ChatColor.RED +""+ChatColor.BOLD + "Banned Item - " + ChatColor.RED +"Reason");
-		for (int i=start;i<banned.size() && i < end;i++){
-			TRItem it = banned.get(i);
-			String reason = it.msg;
-			String name = NameProcessor.getName(it);
-			if (reason == null || reason.isEmpty()) reason = "None";
-			if (reason.toLowerCase().contains("reason:")){
-				reason = reason.split("(?i)Reason:")[1].trim();
+		//TRItemProcessor.
+		if (banned.size() > 0){
+			msgb(sender, "Banned Items - Page " + page + " of " + lastpage);
+			msgr(sender, "" + ChatColor.BOLD + "Banned Item - " + ChatColor.RED + "Reason");
+			for (int i = start; i<banned.size() && i < end; i++){
+				final TRItem it = banned.get(i);
+				
+				final String name = NameProcessor.getName(it);
+				if (name == null) continue;
+				
+				String reason = it.msg;
+				if (reason == null || reason.isEmpty()) reason = "None";
+				else if (reason.toLowerCase().contains("reason:")){
+					reason = reason.split("(?i)Reason:")[1].trim();
+					if (reason.isEmpty()) reason = it.msg;
+				}
+				
+				if (reason.isEmpty()) reason = "None";
+				
+				msgg(sender, NameProcessor.getName(it) + " - " + ChatColor.BLUE + it.msg);
 			}
-			
-			if (name == null) continue;
-			send.msg(ChatColor.GREEN + NameProcessor.getName(it) + " - " + ChatColor.BLUE + it.msg);
+		} else {
+			msgg(sender, "There are no banned items!");
 		}
 	}
 }

@@ -25,14 +25,16 @@ public class BlockBreakListener implements Listener{
 		return (id < 8 || id == 12 || id == 13 || id == 17 || id == 24 || id == 35 || id == 44 || id == 98 || id == 142);
 	}
 	
-	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onBlockBreak(BlockBreakEvent event) {
 		final int id = event.getBlock().getTypeId();
 		if (exempt(id)) return;
 		final Block block = event.getBlock();
 		final byte data = block.getData();
+		final Player player = event.getPlayer();
+		
 		if (id == 128 && data == 0){
-			TileEntity entity = ((CraftWorld) block.getWorld()).getTileEntityAt(block.getX(), block.getY(), block.getZ());
+			final TileEntity entity = ((CraftWorld) block.getWorld()).getTileEntityAt(block.getX(), block.getY(), block.getZ());
 			if (entity instanceof TileAlchChest){
 				for (HumanEntity h : ((TileAlchChest) entity).getViewers()){
 					h.closeInventory();
@@ -64,41 +66,45 @@ public class BlockBreakListener implements Listener{
 				event.setCancelled(true);
 				return;
 			}
-			if (Bukkit.getPlayerExact(event.getPlayer().getName()) == null){
+			if (player.getName().startsWith("[ComputerCraft] Turtle")){
 				event.setCancelled(true);
 				return;
 			}
-			ItemStack used = event.getPlayer().getItemInHand();
+			if (Bukkit.getPlayerExact(event.getPlayer().getName()) == null){//fakeplayers are blocked from breaking 194 (anti-dupe).
+				event.setCancelled(true);
+				return;
+			}
+			/*
+			 * TODO IMPORTANT WIP: add config for this and implement this.
+			final ItemStack used = event.getPlayer().getItemInHand();
 			if (used != null){
 				int uid = used.getTypeId();
 				if (uid == 1){
 					event.setCancelled(true);
 					return;
 				}
-			}
+			}*/
 		}
 		
-		Player player = event.getPlayer();
 		if (player == null) return;
 		
-		String pname = player.getName();
-		if (pname.startsWith("[ComputerCraft] Turtle") && id == 194 && event.getBlock().getData() == 1){
-			event.setCancelled(true);
-			return;
-		}
+		final ItemStack used = player.getItemInHand();
+		if (used != null && (used.getTypeId() == 30183 || used.getTypeId() == 30140)) return;
+
 		Bukkit.getScheduler().scheduleAsyncDelayedTask(tekkitrestrict.getInstance(), new Runnable(){
 			public void run(){
 				try {
-					String blockPlayerName = TRLimiter.getPlayerAt(block);
+					final String blockPlayerName = TRLimiter.getPlayerAt(block);
 					if (blockPlayerName != null) {
-						TRLimiter il = TRLimiter.getLimiter(blockPlayerName);
+						final TRLimiter il = TRLimiter.getLimiter(blockPlayerName);
 						il.checkBreakLimit(id, data, block.getLocation());
 					}
 				} catch(Exception ex){
-					Warning.other("Exception in '+BlockBreakListener.onBlockBreak(...)'!", false);
+					Warning.other("Exception in BlockBreakListener.onBlockBreak!", false);
 					Log.Exception(ex, false);
 				}
 			}
 		});
+		
 	}
 }

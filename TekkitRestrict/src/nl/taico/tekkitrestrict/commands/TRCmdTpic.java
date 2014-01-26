@@ -13,20 +13,13 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import nl.taico.tekkitrestrict.Send;
+import static nl.taico.tekkitrestrict.commands.TRCmdHelper.*;
 
-public class TRCmdTpic implements CommandExecutor {
-	private Send send;
-	public TRCmdTpic(){
-		send = new Send();
-	}
-	
+public class TRCmdTpic implements CommandExecutor {	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		send.sender = sender;
-		
-		if (send.noConsole()) return true;
-		if (send.noPerm("tpic")) return true;
+		if (noConsole(sender)) return true;
+		if (noPerm(sender, "tpic")) return true;
 		
 		int max = 0;
 		boolean thorough = false;
@@ -36,7 +29,7 @@ public class TRCmdTpic implements CommandExecutor {
 			try {
 				max = Integer.parseInt(args[0]);
 			} catch (NumberFormatException ex) {
-				send.msg(ChatColor.RED + "This is not a valid number!");
+				msgr(sender, "This is not a valid number!");
 				return true;
 			}
 		}
@@ -46,9 +39,9 @@ public class TRCmdTpic implements CommandExecutor {
 			
 			if (arg1.equals("true") || arg1.equals("yes")) thorough = true;
 			else if (!arg1.equals("false") && !arg1.equals("no")){
-				send.msg(ChatColor.RED + "Incorrect syntaxis! Correct usage:");
-				send.msg(ChatColor.RED + "/tpic [treshold] [include all entities]");
-				send.msg(ChatColor.RED + "[include all entities] can be true, false, yes or no.");
+				msgr(sender, "Incorrect syntaxis! Correct usage:");
+				msgr(sender, "/tpic [treshold] [include all entities]");
+				msgr(sender, "[include all entities] can be true, false, yes or no.");
 				return true;
 			}
 		}

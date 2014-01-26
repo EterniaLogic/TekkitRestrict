@@ -717,7 +717,7 @@ public class TRLimiter {
 								changed = true;
 							}
 						} else {
-							tekkitrestrict.log.info("[DEBUG] Chunk is not loaded at: "+chunk.getX() + ", " + chunk.getZ());
+							Log.Debug("Chunk is not loaded at: "+chunk.getX() + ", " + chunk.getZ());
 						}
 					}
 				} catch (final ConcurrentModificationException ex){

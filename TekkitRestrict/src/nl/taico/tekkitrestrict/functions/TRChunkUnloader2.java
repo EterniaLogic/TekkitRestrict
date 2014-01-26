@@ -1,11 +1,16 @@
 package nl.taico.tekkitrestrict.functions;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.World;
+import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.entity.Player;
 import org.bukkit.event.world.ChunkUnloadEvent;
 
 import net.minecraft.server.Chunk;
@@ -22,9 +27,11 @@ public class TRChunkUnloader2 {
 	private final World world;
 	private ChunkUnloadMethod method;
 	private TRChunkIndex index;
+	private static HashMap<String, TRChunkUnloader2> cus = new HashMap<String, TRChunkUnloader2>();
 	public TRChunkUnloader2(World world){
 		this.world = world;
 		this.method = ChunkUnloadMethod.UnloadLowWhenForced;
+		cus.put(world.getName().toLowerCase(), this);
 	}
 	
 	public ChunkUnloadMethod getMethod() {
@@ -116,16 +123,78 @@ public class TRChunkUnloader2 {
 		
 	}
 	
+	public void forceUnload(final CommandSender sender, final ChunkUnloadMethod method){
+		final TRChunkIndex index = new TRChunkIndex(world);
+		index.index();
+		final List<Chunk> toUnload;
+		switch (method.nr){
+			case 1: {
+				toUnload = index.getNormalChunks();
+				final Iterator<Chunk> it = toUnload.iterator();
+				while (it.hasNext()){
+					final Chunk chunk = it.next();
+					if (isChunkInUse(chunk.x, chunk.z, ChunkUnloader.maxRadii)) it.remove();
+				}
+				break;
+			} case 2: {
+				toUnload = index.getNormalChunks();
+				toUnload.addAll(index.getForceLoadedChunks());
+				final Iterator<Chunk> it = toUnload.iterator();
+				while (it.hasNext()) {
+					final Chunk chunk = it.next();
+					if (isChunkInUse(chunk.x, chunk.z, ChunkUnloader.maxRadii)) it.remove();
+				}
+				break;
+			} case 3: {
+				toUnload = index.getAllChunks();
+				final Iterator<Chunk> it = toUnload.iterator();
+				while (it.hasNext()){
+					final Chunk chunk = it.next();
+					if (isChunkInUse(chunk.x, chunk.z, ChunkUnloader.maxRadii)) it.remove();
+				}
+				break;
+			} case 4: {
+				toUnload = index.getAllChunks();
+				break;
+			} default: {
+				return;
+			}
+		}
+		
+		Bukkit.getScheduler().scheduleSyncDelayedTask(tekkitrestrict.getInstance(), new Runnable(){
+			public void run(){
+				int i = 0;
+				for (Chunk chunk : toUnload){
+					if (unloadChunk(chunk, true)) i++;
+				}
+				if (sender instanceof Player) sender.sendMessage(ChatColor.GREEN + "Unloaded " + i + " chunks.");
+				tekkitrestrict.log.info("Unloaded " + i + " chunks");
+			}
+		});
+	}
+	
 	/** @return If there are currently players near that chunk. */
 	private boolean isChunkInUse(final int x, final int z, final int dist) {
-		final List<EntityHuman> k = ((CraftWorld) world).getHandle().players;
-		for (EntityHuman h : k){
-			if (Math.abs(h.x - (x << 4)) <= dist && Math.abs(h.z - (z << 4)) <= dist) {
-				return true;
+		try {
+			final List<EntityHuman> k = ((CraftWorld) world).getHandle().players;
+			for (EntityHuman h : k){
+				if (Math.abs(h.x - (x << 4)) <= dist && Math.abs(h.z - (z << 4)) <= dist) {
+					return true;
+				}
 			}
+		} catch (Exception ex){
+			
 		}
 		
 		return false;
 	}
 	
+	
+	public static TRChunkUnloader2 getForWorld(String worldname){
+		return cus.get(worldname.toLowerCase());
+	}
+	
+	public static Collection<TRChunkUnloader2> getAll(){
+		return cus.values();
+	}
 }

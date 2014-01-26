@@ -51,20 +51,25 @@ public class TRChunkIndex {
 		final boolean keepspawn = ws.keepSpawnInMemory;
 		final ChunkCoordinates spawn = keepspawn ? ws.getSpawn() : null;
 		@SuppressWarnings("unchecked")
-		ArrayList<Chunk> all = new ArrayList<Chunk>(provider.chunkList);
+		final ArrayList<Chunk> all = new ArrayList<Chunk>(provider.chunkList);
 		total = all.size();
 		for (Chunk chunk : all){
 			if (chunk == null || chunk instanceof EmptyChunk || provider.isChunkLoaded(chunk.x, chunk.z)) continue;
-			if (hasChunkLoader(chunk)) forceloadedChunks.add(chunk);
 			
 			if (keepspawn){
 				int k = chunk.x * 16 + 8 - spawn.x;
 				int l = chunk.z * 16 + 8 - spawn.z;
 	
-				if (k >= -128 && k <= 128 && l >= -128 && l <= 128) spawnChunks.add(chunk);
-				else normalChunks.add(chunk);
+				if (k >= -128 && k <= 128 && l >= -128 && l <= 128){
+					spawnChunks.add(chunk);
+					if (hasChunkLoader(chunk)) forceloadedChunks.add(chunk);
+				} else {
+					if (hasChunkLoader(chunk)) forceloadedChunks.add(chunk);
+					else normalChunks.add(chunk);
+				}
 			} else {
-				normalChunks.add(chunk);
+				if (hasChunkLoader(chunk)) forceloadedChunks.add(chunk);
+				else normalChunks.add(chunk);
 			}
 		}
 	}

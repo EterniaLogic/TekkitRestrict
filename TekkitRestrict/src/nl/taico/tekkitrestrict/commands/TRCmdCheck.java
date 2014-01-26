@@ -10,41 +10,33 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import nl.taico.tekkitrestrict.Send;
 import nl.taico.tekkitrestrict.TRPermHandler;
 import nl.taico.tekkitrestrict.functions.TRLimiter;
 import nl.taico.tekkitrestrict.objects.TRLimit;
 import nl.taico.tekkitrestrict.objects.TRPermLimit;
+import static nl.taico.tekkitrestrict.commands.TRCmdHelper.*;
 
-public class TRCmdCheck implements CommandExecutor {
-	private Send send;
-	
-	public TRCmdCheck(){
-		send = new Send();
-	}
-	
+public class TRCmdCheck implements CommandExecutor {	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		send.sender = sender;
+		if (noConsole(sender)) return true;
 		
-		if (send.noConsole()) return true;
-		
-		if (send.noPerm("checklimits")) return true;
+		if (noPerm(sender, "checklimits")) return true;
 		
 		if (args.length > 1){
-			send.msg(ChatColor.RED + "Incorrect syntaxis!");
-			send.msg("/checklimits", "Check all your limits.");
-			send.msg("/checklimits id", "Check limits for the given id.");
-			send.msg("/checklimits hand", "Check limits about the block you are holding.");
+			msgr(sender, "Incorrect syntaxis!");
+			msg(sender, "/checklimits", "Check all your limits.");
+			msg(sender, "/checklimits id", "Check limits for the given id.");
+			msg(sender, "/checklimits hand", "Check limits about the block you are holding.");
 			return true;
 		}
-		Player player = (Player) sender;
+		final Player player = (Player) sender;
 		
-		TRLimiter cc = TRLimiter.getOnlineLimiter(player);
+		final TRLimiter cc = TRLimiter.getOnlineLimiter(player);
 		
 		if (args.length == 1){
 			if(cc.itemlimits.isEmpty()){
-				send.msg(ChatColor.RED + "You don't have any limits!");
+				msgr(sender, "You don't have any limits!");
 				return true;
 			}
 			
@@ -53,51 +45,49 @@ public class TRCmdCheck implements CommandExecutor {
 				id = Integer.parseInt(args[0]);
 			} catch (NumberFormatException ex){
 				if (args[0].equalsIgnoreCase("hand")){
-					ItemStack item = player.getItemInHand();
+					final ItemStack item = player.getItemInHand();
 					if (item == null){
-						send.msg(ChatColor.RED + "You don't have anything in your hand!");
+						msg(sender, ChatColor.RED + "You don't have anything in your hand!");
 						return true;
 					} else {
 						id = item.getTypeId();
 					}
 				} else if (args[0].equalsIgnoreCase("help")){
-					send.msg("/checklimits", "Check all your limits.");
-					send.msg("/checklimits id", "Check limits for the given id.");
-					send.msg("/checklimits hand", "Check limits about the block you are holding.");
+					msg(sender, "/checklimits", "Check all your limits.");
+					msg(sender, "/checklimits id", "Check limits for the given id.");
+					msg(sender, "/checklimits hand", "Check limits about the block you are holding.");
 					return true;
 				} else {
-					send.msg(ChatColor.RED + "You didn't specify a valid number!");
+					msgr(sender, "You didn't specify a valid number!");
 					return true;
 				}
 			}
 			
 			for (TRLimit l : cc.itemlimits) {
 				if (l.id != id) continue;
-				int cccl = cc.getMax(player, l.id, l.data);
-				cccl = cccl == -1 ? 0 : cccl;
-				send.msg("[" + l.id + ":" + l.data + "] - " + l.placedBlock.size() + "/" + cccl + " blocks");
+				final int cccl = cc.getMax(player, l.id, l.data);
+				msg(sender, "[" + l.id + ":" + l.data + "] - " + l.placedBlock.size() + "/" + (cccl == -1 ? 0 : cccl) + " blocks");
 			}
 		} else {
 			if(cc.itemlimits.isEmpty()){
-				send.msg(ChatColor.RED + "You don't have any limits!");
+				msgr(sender, "You don't have any limits!");
 				return true;
 			}
-			List<TRLimit> skip = new ArrayList<TRLimit>();
+			final List<TRLimit> skip = new ArrayList<TRLimit>();
 			for (TRLimit l : cc.itemlimits) {
-				int cccl = cc.getMax(player, l.id, l.data);
-				cccl = cccl == -1 ? 0 : cccl;
-				send.msg("[" + l.id + ":" + l.data + "] - " + l.placedBlock.size()+"/"+cccl+" blocks");
+				final int cccl = cc.getMax(player, l.id, l.data);
+				msg(sender, "[" + l.id + ":" + l.data + "] - " + l.placedBlock.size()+"/"+(cccl == -1 ? 0 : cccl)+" blocks");
 				skip.add(l);
 			}
-			List<String> permMsgs = getAllPerms(player, skip);
-			for (String msg : permMsgs) send.msg(msg);
+			final List<String> permMsgs = getAllPerms(player, skip);
+			for (String msg : permMsgs) msg(sender, msg);
 		}
 		return true;
 	}
 	
 	public static List<String> getAllPerms(Player player, List<TRLimit> skip){
-		List<TRPermLimit> perms = TRPermHandler.getAllLimiterPerms(player);
-		List<String> tbr = new ArrayList<String>();
+		final List<TRPermLimit> perms = TRPermHandler.getAllLimiterPerms(player);
+		final List<String> tbr = new ArrayList<String>();
 		outer:
 		for (TRPermLimit limit : perms){
 			for (TRLimit l : skip){

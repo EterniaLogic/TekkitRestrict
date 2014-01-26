@@ -42,6 +42,7 @@ public class TRNoItem {
 	public static void reload() {
 		DisabledItems.clear();
 		DisabledCreativeItems.clear();
+		DisabledItemGroups.clear();
 		allocateDisabledItems();
 		allocateDisabledCreativeItems();
 	}
@@ -53,7 +54,7 @@ public class TRNoItem {
 		List<String> di = tekkitrestrict.config.getStringList(ConfigFile.DisableItems, "DisableItems");
 		for (String str : di) {
 			try {
-				DisabledItems.addAll(TRItemProcessor.processItemString(str));
+				DisabledItems.addAll(TRItemProcessor.processNoItemString(str));
 			} catch (TRException ex) {
 				Warning.config("You have an error in your DisableItems.config.yml in DisableItems:", false);
 				Warning.config(ex.getMessage(), false);

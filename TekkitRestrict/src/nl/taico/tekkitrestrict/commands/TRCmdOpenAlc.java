@@ -16,53 +16,46 @@ import net.minecraft.server.mod_EE;
 
 import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.Log.Warning;
-import nl.taico.tekkitrestrict.Send;
 import nl.taico.tekkitrestrict.tekkitrestrict;
 import nl.taico.tekkitrestrict.objects.OpenAlcObj;
 import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 
+import static nl.taico.tekkitrestrict.commands.TRCmdHelper.*;
 import ee.AlchemyBagData;
 import forge.IGuiHandler;
 import forge.MinecraftForge;
 import forge.NetworkMod;
 import forge.packets.PacketOpenGUI;
 
-public class TRCmdOpenAlc implements CommandExecutor {
-	private final Send send;
-	public TRCmdOpenAlc(){
-		send = new Send();
-	}
-	
+public class TRCmdOpenAlc implements CommandExecutor {	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		send.sender = sender;
-		
-		if (send.noConsole()) return true;
+		if (noConsole(sender)) return true;
 
 		if (!sender.hasPermission("tekkitrestrict.openalc")){
-			sender.sendMessage(ChatColor.RED + "You are not allowed to use this command!");
+			msgr(sender, "You are not allowed to use this command!");
 			return false;
 		}
 		
 		if (!tekkitrestrict.config.getBoolean(ConfigFile.General, "UseOpenAlc", true)){
-			sender.sendMessage(ChatColor.RED + "Openalc is disabled!");
+			msgr(sender, "Openalc is disabled!");
 			return false;
 		}
 		
 		if (!tekkitrestrict.EEEnabled) {
-			sender.sendMessage(ChatColor.DARK_RED + "EE is not enabled!");
+			msgr(sender, "EE is not enabled!");
 			return true;
 		}
 		
 		if (args.length == 0) {
-			sender.sendMessage(ChatColor.GREEN + "/openalc <player> <color> - Open an alchemy bag.");
-			sender.sendMessage(ChatColor.GREEN + "Color can be white, lime, etc. OR a number from 0-15.");
+			msg(sender, "/openalc <player> <color>", "Open an alchemy bag.");
+			msgb(sender, "Color can be white, lime, etc. OR a number from 0-15.");
 			return true;
 		} else if (args.length == 1) {
-			sender.sendMessage(ChatColor.RED + "Not enough arguments! Usage: /openalc <player> <color>");
+			msgr(sender, "Not enough arguments! Usage: /openalc <player> <color>");
 			return true;
 		} else if (args.length != 2){
-			sender.sendMessage(ChatColor.RED + "Too many arguments! Usage: /openalc <player> <color>");
+			msgr(sender, "Too many arguments! Usage: /openalc <player> <color>");
 			return true;
 		}
 		
@@ -70,29 +63,29 @@ public class TRCmdOpenAlc implements CommandExecutor {
 		
 		if (OpenAlcObj.isViewing(player.getName())) setPlayerInv(player, false); //If player has an inventory open, close it.
 		
-		final Player OPlayer = TRCmdOpenInv.Playerz(sender, args[0]);
+		final Player OPlayer = Playerz(sender, args[0]);
 		
 		if (OPlayer == null){
-			sender.sendMessage(ChatColor.RED + "Player " + args[0] + " cannot be found!");
+			msgr(sender, "Player " + args[0] + " cannot be found!");
 			return true;
 		}
 		
 		final String OName = OPlayer.getName();
 		
 		if (player.hasPermission("tekkitrestrict.openalc.deny."+OName.toLowerCase()) && !player.isOp() && !player.hasPermission("tekkitrestrict.openalc.deny.all")){
-			sender.sendMessage(ChatColor.RED + "You are not allowed to open " + OName + "'s alchemy bags!");
+			msgr(sender, "You are not allowed to open " + OName + "'s alchemy bags!");
 			return true;
 		}
 
 		final int color = getColor(args[1]);
 		if (color == -1){
-			sender.sendMessage(ChatColor.RED + "Unknown color!");
-			sender.sendMessage(ChatColor.RED + "Color can be white, lime, etc. OR a number from 0-15.");
+			msgr(sender, "Unknown color!");
+			msgr(sender, "Color can be white, lime, etc. OR a number from 0-15.");
 			return true;
 		}
 		
 		if (OpenAlcObj.isViewed(OName, color)){
-			sender.sendMessage(ChatColor.RED + "Someone else is already viewing the "+getColor(color)+" bag of " + OName + "!");
+			msgr(sender, "Someone else is already viewing the "+getColor(color)+" bag of " + OName + "!");
 			return true;
 		}
 		
@@ -101,18 +94,17 @@ public class TRCmdOpenAlc implements CommandExecutor {
 			final AlchemyBagData alcdata = openGui(((CraftPlayer) player).getHandle(), ((CraftPlayer) OPlayer).getHandle(), color);
 			if (alcdata == null){
 				Warning.other("An error occurred. " + OName + "'s bag might not save properly if he is offline.", false);
-				sender.sendMessage(ChatColor.RED + "An error occured: Unable to find the specified bag!");
+				msgr(sender, "An error occured: Unable to find the specified bag!");
 				return true;
 			}
 			
 			new OpenAlcObj(alcdata, OPlayer, player, color); //Add new OpenAlcObject
 			
-			final String strcolor = getColor(color);
-			sender.sendMessage(ChatColor.GREEN + "Opened " + OName + "'s " + strcolor + " Alchemy Bag!");
+			msgg(sender, "Opened " + OName + "'s " + getColor2(color) + ChatColor.GREEN + " Alchemy Bag!");
 			
-			tekkitrestrict.log.info(player.getName() + " opened " + OName + "'s " + strcolor + " Alchemy Bag!");
+			tekkitrestrict.log.info(player.getName() + " opened " + OName + "'s " + getColor(color) + " Alchemy Bag!");
 		} catch (Exception ex) {
-			sender.sendMessage(ChatColor.RED + "An error has occurred processing your command.");
+			msgr(sender, "An error has occurred processing your command.");
 			Warning.other("Exception in OpenAlc (TRCommandAlc.onCommand)! Error: " + ex.toString(), false);
 		}
 
@@ -135,7 +127,7 @@ public class TRCmdOpenAlc implements CommandExecutor {
 			player.openInventory(player.getInventory());
 			player.closeInventory();
 			
-			if (inform) player.sendMessage(ChatColor.BLUE + "Your own inventory was restored.");
+			if (inform) msgb(player, "Your own inventory was restored.");
 			return;
 		}
 	}
@@ -246,6 +238,29 @@ public class TRCmdOpenAlc implements CommandExecutor {
 			case 13: return "green";
 			case 14: return "red";
 			case 15: return "black";
+			//case -2: return "all";
+			default: return "unknown";
+		}
+	}
+	
+	public static String getColor2(int color) {
+		switch (color){
+			case 0: return ChatColor.WHITE+"white";
+			case 1: return ChatColor.GOLD+"orange";
+			case 2: return ChatColor.LIGHT_PURPLE+"magenta";
+			case 3: return ChatColor.AQUA+"lightblue";
+			case 4: return ChatColor.YELLOW+"yellow";
+			case 5: return ChatColor.GREEN+"lime";
+			case 6: return ChatColor.LIGHT_PURPLE+"pink";
+			case 7: return ChatColor.DARK_GRAY+"gray";
+			case 8: return ChatColor.GRAY+"lightgray";
+			case 9: return ChatColor.AQUA+"cyan";
+			case 10: return ChatColor.DARK_PURPLE+"purple";
+			case 11: return ChatColor.BLUE+"blue";
+			case 12: return ChatColor.BLACK+"brown";
+			case 13: return ChatColor.DARK_GREEN+"green";
+			case 14: return ChatColor.RED+"red";
+			case 15: return ChatColor.BLACK+"black";
 			//case -2: return "all";
 			default: return "unknown";
 		}
