@@ -1,6 +1,7 @@
 package nl.taico.tekkitrestrict.functions;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -118,8 +119,8 @@ public class TRNoHack {
 	
 	@NonNull private static String convert(@NonNull String str, @NonNull String type, @NonNull Player player){
 		return Log.replaceColors(str)
-				.replaceAll("(?i)\\{PLAYER\\}", player.getName())
-				.replaceAll("(?i)\\{TYPE\\}", type)
+				.replaceAll("(?i)\\{PLAYER\\}", Matcher.quoteReplacement(player.getName()))
+				.replaceAll("(?i)\\{TYPE\\}", Matcher.quoteReplacement(type))
 				.replaceAll("(?i)\\{ID\\}","")
 				.replaceAll("(?i)\\{DATA\\}", "")
 				.replaceAll("(?i)\\{ITEM\\}", "")

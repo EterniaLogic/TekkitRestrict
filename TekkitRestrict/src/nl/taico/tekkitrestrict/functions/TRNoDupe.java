@@ -1,6 +1,7 @@
 package nl.taico.tekkitrestrict.functions;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -182,9 +183,9 @@ public class TRNoDupe {
 	}
 	
 	@NonNull private static String convert(@NonNull String str, @NonNull String type, @NonNull Player player, int id, int data){
-		str = Log.replaceColors(str);
-		str = str.replaceAll("(?i)\\{PLAYER\\}", player.getName());
-		str = str.replaceAll("(?i)\\{TYPE\\}", type);
+		str = Log.replaceColors(str)
+				.replaceAll("(?i)\\{PLAYER\\}", Matcher.quoteReplacement(player.getName()))
+				.replaceAll("(?i)\\{TYPE\\}", Matcher.quoteReplacement(type));
 		if (id == 0){
 			str = str.replaceAll("(?i)\\{ID\\}","");
 			str = str.replaceAll("(?i)\\{DATA\\}", "");

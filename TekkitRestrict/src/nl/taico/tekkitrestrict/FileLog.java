@@ -8,6 +8,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.regex.Matcher;
 
 import org.bukkit.ChatColor;
 import org.eclipse.jdt.annotation.NonNull;
@@ -293,10 +294,10 @@ public class FileLog {
 			name = type + "-" + data + ".log";
 		}
 		
-		return name.replaceAll("(?i)\\{DAY\\}", date[0])
-					.replaceAll("(?i)\\{MONTH\\}", date[1])
-					.replaceAll("(?i)\\{YEAR\\}", date[2])
-					.replaceAll("(?i)\\{TYPE\\}", type)
+		return name.replaceAll("(?i)\\{DAY\\}", Matcher.quoteReplacement(date[0]))
+					.replaceAll("(?i)\\{MONTH\\}", Matcher.quoteReplacement(date[1]))
+					.replaceAll("(?i)\\{YEAR\\}", Matcher.quoteReplacement(date[2]))
+					.replaceAll("(?i)\\{TYPE\\}", Matcher.quoteReplacement(type))
 					.replace("\\", "")
 					.replace("/", "");
 	}
@@ -320,10 +321,10 @@ public class FileLog {
 			return new StringBuilder("[").append(times).append("] ").append(msg).toString();
 		} else {
 			final String timestr[] = times.split(":");
-			return format.replaceAll("(?i)\\{HOUR\\}", timestr[0])
-						 .replaceAll("(?i)\\{MINUTE\\}", timestr[1])
-						 .replaceAll("(?i)\\{SECOND\\}", timestr[2])
-						 .replaceAll("(?i)\\{INFO\\}", msg);
+			return format.replaceAll("(?i)\\{HOUR\\}", Matcher.quoteReplacement(timestr[0]))
+						 .replaceAll("(?i)\\{MINUTE\\}", Matcher.quoteReplacement(timestr[1]))
+						 .replaceAll("(?i)\\{SECOND\\}", Matcher.quoteReplacement(timestr[2]))
+						 .replaceAll("(?i)\\{INFO\\}", Matcher.quoteReplacement(msg));
 		}
 	}
 }

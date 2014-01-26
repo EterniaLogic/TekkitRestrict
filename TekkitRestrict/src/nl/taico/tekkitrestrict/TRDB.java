@@ -784,9 +784,9 @@ public class TRDB {
 	}
 	
 	public static String antisqlinject(String ins) {
-		return ins.replaceAll("--", "")
-				  .replaceAll("`", "")
-				  .replaceAll("'", "")
-				  .replaceAll("\"", "");
+		return ins.replace("--", "")
+				  .replace("`", "")
+				  .replace("'", "")
+				  .replace("\"", "");
 	}
 }
