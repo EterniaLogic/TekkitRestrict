@@ -20,6 +20,7 @@ import net.minecraft.server.Item;
 import net.minecraft.server.NBTTagCompound;
 
 import nl.taico.tekkitrestrict.Log;
+import nl.taico.tekkitrestrict.NameProcessor;
 import nl.taico.tekkitrestrict.TRException;
 import nl.taico.tekkitrestrict.TRItemProcessor;
 import nl.taico.tekkitrestrict.tekkitrestrict;
@@ -105,16 +106,22 @@ public class TRDisableItemsThread extends Thread {
 				
 				try {
 					String banned = null;
-
+					boolean c = false;
 					if (isCreative){
 						if (!bypassn) banned = TRNoItem.isItemBanned(player, id, data, false);
-						if (!bypassc && banned == null) banned = TRNoItem.isItemBannedInCreative(player, id, data, false);
+						if (!bypassc && banned == null){
+							banned = TRNoItem.isItemBannedInCreative(player, id, data, false);
+							c = true;
+						}
 					} else {
 						if (!bypassn) banned = TRNoItem.isItemBanned(player, id, data, false);
 					}
 					
 					if (banned != null) {
-						if (banned.isEmpty()) banned = ChatColor.RED + "Removed a banned item from your inventory: "+id+":"+data+".";
+						if (banned.isEmpty()){
+							if (!c) banned = ChatColor.RED + "Removed "+NameProcessor.getName(TRItem.parseItem(id, data))+" ("+id+":"+data+") from your inventory. Reason: This item is banned!";
+							else banned = ChatColor.RED + "Removed "+NameProcessor.getName(TRItem.parseItem(id, data))+" ("+id+":"+data+") from your inventory. Reason: This item is banned in creative!";
+						}
 						TRItem.sendBannedMessage(player, banned);
 						changedInv = true;
 						st1[i] = new ItemStack(Threads.ChangeDisabledItemsIntoId, 1);
@@ -165,15 +172,22 @@ public class TRDisableItemsThread extends Thread {
 				
 				try {
 					String banned = null;
+					boolean c = false;
 					if (isCreative){
 						if (!bypassn) banned = TRNoItem.isItemBanned(player, id, data, false);
-						if (banned == null && !bypassc) banned = TRNoItem.isItemBannedInCreative(player, id, data, false);
+						if (banned == null && !bypassc){
+							banned = TRNoItem.isItemBannedInCreative(player, id, data, false);
+							c = true;
+						}
 					} else {
 						if (!bypassn) banned = TRNoItem.isItemBanned(player, id, data, false);
 					}
 					
 					if (banned != null) {
-						if (banned.isEmpty()) banned = ChatColor.RED + "Removed banned armor from your inventory: "+id+":"+data+".";
+						if (banned.isEmpty()){
+							if (!c) banned = ChatColor.RED + "Removed "+NameProcessor.getName(TRItem.parseItem(id, data))+" ("+id+":"+data+") from your inventory. Reason: This item is banned!";
+							else banned = ChatColor.RED + "Removed "+NameProcessor.getName(TRItem.parseItem(id, data))+" ("+id+":"+data+") from your inventory. Reason: This item is banned in creative!";
+						}
 						TRItem.sendBannedMessage(player, banned);
 						changedArmor = true;
 						st2[i] = new ItemStack(Threads.ChangeDisabledItemsIntoId, 1); //proceed to remove it.
