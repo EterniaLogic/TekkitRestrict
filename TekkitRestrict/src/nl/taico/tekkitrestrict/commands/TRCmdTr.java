@@ -3,11 +3,18 @@ package nl.taico.tekkitrestrict.commands;
 import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -15,6 +22,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.eclipse.jdt.annotation.NonNull;
 
@@ -87,7 +95,7 @@ public class TRCmdTr implements CommandExecutor {
 			return true;
 		}
 		
-		if (largs[0].equals("debug") && !(sender instanceof Player)){
+		if (largs[0].equals("debug")){
 			debugInfo(sender);
 			return true;
 		}
@@ -97,9 +105,56 @@ public class TRCmdTr implements CommandExecutor {
 			return true;
 		}
 		
+		if (largs[0].equals("debugtesting")){
+			debugTesting(sender, args);
+			return true;
+		}
+		
 		msgr(sender, "Unkown subcommand /tr " + largs[0] + "!");
 		help(sender);
 		return true;
+	}
+	private void debugTesting(CommandSender sender, String args[]){
+		final Enumeration<String> cc = LogManager.getLogManager().getLoggerNames();
+		HashMap<Logger, Handler[]> handlers = new HashMap<Logger, Handler[]>();
+		while (cc.hasMoreElements()){
+			final String s = cc.nextElement();
+			final Logger l = Logger.getLogger(s);
+			if (l == null) continue;
+			
+			sender.sendMessage("LoggerName: "+l.getName()+"; ManagerName: "+s);
+			
+			if (handlers.put(l, l.getHandlers()) != null) sender.sendMessage("Double logger found!");
+			
+			for (Handler h : l.getHandlers()){
+				sender.sendMessage("    Handler: "+h.toString()+"; Filter: "+h.getFilter()+"; Formatter: "+h.getFormatter());
+			}
+		}
+		
+		
+		HashSet<Handler> handlers2 = new HashSet<Handler>();
+		for (Handler[] val : handlers.values()){
+			for (Handler h : val){
+				if (!handlers2.add(h)) sender.sendMessage("    Duplicate Handler: "+h.toString());
+			}
+		}
+		
+		msg(sender, "-------------------------------------------");
+		Handler[] mchandlers = Logger.getLogger("Minecraft").getHandlers();
+		for (Handler h : mchandlers){
+			if (h instanceof org.bukkit.craftbukkit.util.TerminalConsoleHandler){
+				h.publish(new LogRecord(Level.INFO, "Console only message."));
+			} else {
+				h.publish(new LogRecord(Level.INFO, "Log file only message."));
+			}
+		}
+		
+		Handler forgehandler = Logger.getLogger("ForgeModLoader").getHandlers()[0];
+		forgehandler.publish(new LogRecord(Level.INFO, "Forge Log file only message."));
+		msg(sender, "-------------------------------------------");
+		for (Plugin plugin : Bukkit.getPluginManager().getPlugins()){
+			msg(sender, "Plugin name="+plugin.getName()+"; Logger="+plugin.getLogger().getName());
+		}
 	}
 
 	private void help(CommandSender sender){

@@ -16,6 +16,7 @@ import java.io.OutputStream;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -51,6 +52,7 @@ import nl.taico.tekkitrestrict.functions.TRSafeZone;
 import nl.taico.tekkitrestrict.lib.config.TRFileConfiguration;
 import nl.taico.tekkitrestrict.lib.config.YamlConfiguration;
 import nl.taico.tekkitrestrict.listeners.Assigner;
+import nl.taico.tekkitrestrict.logging.TRLogFilterPlus;
 import nl.taico.tekkitrestrict.objects.TRVersion;
 import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 import nl.taico.tekkitrestrict.objects.TREnums.DBType;
@@ -74,8 +76,10 @@ public class tekkitrestrict extends JavaPlugin {
 	public static Database db;
 	public static Updater updater2 = null;
 	
-	private static TRLogFilter filter = null;
+	public static TRLogFilter filter = null;
 	public static ArrayList<YamlConfiguration> configList = new ArrayList<YamlConfiguration>();
+	public static HashMap<ConfigFile, YamlConfiguration> configs = new HashMap<ConfigFile, YamlConfiguration>();
+	
 	
 	public static boolean useTMetrics = true;
 	public static TMetrics tmetrics;
@@ -122,6 +126,12 @@ public class tekkitrestrict extends JavaPlugin {
 		}
 		//#####################################################
 		
+		//################## Load New Logging #################
+		TRLogFilterPlus.loadFilters(config.getConfigurationSection(ConfigFile.Logging, "Filters"));
+		TRLogFilterPlus.assignFilters();
+		
+		
+		//#####################################################
 		
 		//##################### load SQL ######################
 		
@@ -328,7 +338,8 @@ public class tekkitrestrict extends JavaPlugin {
 					final Enumeration<String> cc = LogManager.getLogManager().getLoggerNames();
 					if (filter == null) filter = new TRLogFilter();
 					while (cc.hasMoreElements()){
-						Logger.getLogger(cc.nextElement()).setFilter(filter);
+						final Logger l = Logger.getLogger(cc.nextElement());
+						if (l != null) l.setFilter(filter);
 					}
 				}
 			}

@@ -50,14 +50,14 @@ public class TRNoHack {
 		String message = "";
 		
 		if (type == HackType.fly){
-			if (Hacks.flys.useCommand){
+			if (Hacks.fly.useCommand){
 				Integer cur = cmdFly.get(player.getName());
 				if (cur == null) cur = 0;
 				cur++;
 				
-				if (cur >= Hacks.flys.triggerAfter){
+				if (cur >= Hacks.fly.triggerAfter){
 					try {
-						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), Hacks.flys.command.replace("{PLAYER}", player.getName()).replace("{TYPE}", "fly"));
+						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), Hacks.fly.command.replace("{PLAYER}", player.getName()).replace("{TYPE}", "fly"));
 					} catch (Exception ex) {
 						Warning.config("The command set for Anti-Hacks.Fly returned an error!", false);
 					}
@@ -68,17 +68,17 @@ public class TRNoHack {
 			}
 			
 			message = convert(Hacks.broadcastFormat, "Fly", player);
-			if (Hacks.flys.kick) Util.kick(player, "[TRHack] Kicked for Fly-hacking!");
-			if (Hacks.flys.broadcast) Util.broadcastNoConsole("[TRHack] " + message, "tekkitrestrict.notify.hack");
+			if (Hacks.fly.kick) Util.kick(player, "[TRHack] Kicked for Fly-hacking!");
+			if (Hacks.fly.broadcast) Util.broadcastNoConsole("[TRHack] " + message, "tekkitrestrict.notify.hack");
 		} else if (type == HackType.forcefield){
-			if (Hacks.forcefields.useCommand){
+			if (Hacks.forcefield.useCommand){
 				Integer cur = cmdForcefield.get(player.getName());
 				if (cur == null) cur = 0;
 				cur++;
 				
-				if (cur >= Hacks.forcefields.triggerAfter){
+				if (cur >= Hacks.forcefield.triggerAfter){
 					try {
-						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), Hacks.forcefields.command.replace("{PLAYER}", player.getName()).replace("{TYPE}", "forcefield"));
+						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), Hacks.forcefield.command.replace("{PLAYER}", player.getName()).replace("{TYPE}", "forcefield"));
 					} catch (Exception ex) {
 						Warning.config("The command set for Anti-Hacks.Forcefield returned an error!", false);
 					}
@@ -89,17 +89,17 @@ public class TRNoHack {
 			}
 			
 			message = convert(Hacks.broadcastFormat, "Forcefield", player);
-			if (Hacks.forcefields.kick) Util.kick(player, "[TRHack] Kicked for Forcefield-hacking!");
-			if (Hacks.forcefields.broadcast) Util.broadcastNoConsole("[TRHack] " + message, "tekkitrestrict.notify.hack");
+			if (Hacks.forcefield.kick) Util.kick(player, "[TRHack] Kicked for Forcefield-hacking!");
+			if (Hacks.forcefield.broadcast) Util.broadcastNoConsole("[TRHack] " + message, "tekkitrestrict.notify.hack");
 		} else if (type == HackType.speed){
-			if (Hacks.speeds.useCommand){
+			if (Hacks.speed.useCommand){
 				Integer cur = cmdSpeed.get(player.getName());
 				if (cur == null) cur = 0;
 				cur++;
 				
-				if (cur >= Hacks.speeds.triggerAfter){
+				if (cur >= Hacks.speed.triggerAfter){
 					try {
-						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), Hacks.speeds.command.replace("{PLAYER}", player.getName()).replace("{TYPE}", "movespeed"));
+						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), Hacks.speed.command.replace("{PLAYER}", player.getName()).replace("{TYPE}", "movespeed"));
 					} catch (Exception ex) {
 						Warning.config("The command set for Anti-Hacks.MoveSpeed returned an error!", false);
 					}
@@ -110,8 +110,8 @@ public class TRNoHack {
 			}
 			
 			message = convert(Hacks.broadcastFormat, "Speed", player);
-			if (Hacks.speeds.kick) Util.kick(player, "[TRHack] Kicked for speed-hacking!");
-			if (Hacks.speeds.broadcast) Util.broadcastNoConsole("[TRHack] " + message, "tekkitrestrict.notify.hack");
+			if (Hacks.speed.kick) Util.kick(player, "[TRHack] Kicked for speed-hacking!");
+			if (Hacks.speed.broadcast) Util.broadcastNoConsole("[TRHack] " + message, "tekkitrestrict.notify.hack");
 		}
 		
 		Log.Hack(message);

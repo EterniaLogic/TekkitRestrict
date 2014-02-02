@@ -184,7 +184,7 @@ public class HackDupeConfig extends TRConfig {
 		tbr.add("Anti-Dupes:");
 		tbr.add("    AlchemyBagDupe:");
 		tbr.add("        Prevent: true");
-		if (extra) tbr.add("#:-;-:# Anti-Dupes.PreventAlchemyBagDupe PreventAlcDupe");
+		if (extra) tbr.add("#:-;-:# Anti-Dupes.AlchemyBagDupe.Prevent Dupes.PreventAlcDupe");
 		tbr.add("        Broadcast: true");
 		if (extra) tbr.add("#:-;-:# Anti-Dupes.AlchemyBagDupe.Broadcast");
 		tbr.add("        Kick: false");
@@ -198,7 +198,7 @@ public class HackDupeConfig extends TRConfig {
 		if (extra) tbr.add("#:-;-:# Anti-Dupes.AlchemyBagDupe.ExecuteCommand.TriggerAfter");
 		tbr.add("    RMFurnaceDupe:");
 		tbr.add("        Prevent: true");
-		if (extra) tbr.add("#:-;-:# Anti-Dupes.PreventRMFurnaceDupe PreventRMFurnaceDupe");
+		if (extra) tbr.add("#:-;-:# Anti-Dupes.RMFurnaceDupe.Prevent Dupes.PreventRMFurnaceDupe");
 		tbr.add("        Broadcast: true");
 		if (extra) tbr.add("#:-;-:# Anti-Dupes.RMFurnaceDupe.Broadcast");
 		tbr.add("        Kick: false");
@@ -212,7 +212,7 @@ public class HackDupeConfig extends TRConfig {
 		if (extra) tbr.add("#:-;-:# Anti-Dupes.RMFurnaceDupe.ExecuteCommand.TriggerAfter");
 		tbr.add("    TransmuteDupe:");
 		tbr.add("        Prevent: true");
-		if (extra) tbr.add("#:-;-:# Anti-Dupes.PreventTransmuteDupe PreventTransmuteDupe");
+		if (extra) tbr.add("#:-;-:# Anti-Dupes.TransmuteDupe.Prevent Dupes.PreventTransmuteDupe");
 		tbr.add("        Broadcast: true");
 		if (extra) tbr.add("#:-;-:# Anti-Dupes.TransmuteDupe.Broadcast");
 		tbr.add("        Kick: false");
@@ -240,7 +240,7 @@ public class HackDupeConfig extends TRConfig {
 		if (extra) tbr.add("#:-;-:# Anti-Dupes.DiskDriveDupe.ExecuteCommand.TriggerAfter");
 		tbr.add("    TankCartDupe:");
 		tbr.add("        Prevent: true");
-		if (extra) tbr.add("#:-;-:# Anti-Dupes.PreventTankCartDupe PreventTankCartDupe");
+		if (extra) tbr.add("#:-;-:# Anti-Dupes.TankCartDupe.Prevent Dupes.PreventTankCartDupe");
 		tbr.add("        Broadcast: true");
 		if (extra) tbr.add("#:-;-:# Anti-Dupes.TankCartDupe.Broadcast");
 		tbr.add("        Kick: false");
@@ -254,7 +254,7 @@ public class HackDupeConfig extends TRConfig {
 		if (extra) tbr.add("#:-;-:# Anti-Dupes.TankCartDupe.ExecuteCommand.TriggerAfter");
 		tbr.add("    TankCartGlitch:");
 		tbr.add("        Prevent: true");
-		if (extra) tbr.add("#:-;-:# Anti-Dupes.PreventTankCartGlitch PreventTankCartGlitch");
+		if (extra) tbr.add("#:-;-:# Anti-Dupes.TankCartGlitch.Prevent Dupes.PreventTankCartGlitch");
 		tbr.add("        Broadcast: true");
 		if (extra) tbr.add("#:-;-:# Anti-Dupes.TankCartGlitch.Broadcast");
 		tbr.add("        Kick: false");
@@ -268,7 +268,7 @@ public class HackDupeConfig extends TRConfig {
 		if (extra) tbr.add("#:-;-:# Anti-Dupes.TankCartGlitch.ExecuteCommand.TriggerAfter");
 		tbr.add("    PedestalEmcGen:");
 		tbr.add("        Prevent: true");
-		if (extra) tbr.add("#:-;-:# Anti-Dupes.PreventPedestalEmcGen PreventPedestalEmcGen");
+		if (extra) tbr.add("#:-;-:# Anti-Dupes.PedestalEmcGen.Prevent Dupes.PreventPedestalEmcGen");
 		tbr.add("        Broadcast: true");
 		if (extra) tbr.add("#:-;-:# Anti-Dupes.PedestalEmcGen.Broadcast");
 		tbr.add("        Kick: false");
@@ -282,7 +282,7 @@ public class HackDupeConfig extends TRConfig {
 		if (extra) tbr.add("#:-;-:# Anti-Dupes.PedestalEmcGen.ExecuteCommand.TriggerAfter");
 		tbr.add("    TeleportDupe:");
 		tbr.add("        Prevent: true");
-		if (extra) tbr.add("#:-;-:# Anti-Dupes.PreventTeleportDupe Dupes.PreventTeleportDupe");
+		if (extra) tbr.add("#:-;-:# Anti-Dupes.TeleportDupe.Prevent Dupes.PreventTeleportDupe");
 		tbr.add("    BroadcastString: \"&9{PLAYER} &ctried to dupe&6 {ITEM} &cusing &a{TYPE}&c!\"");
 		if (extra) tbr.add("#:-;-:# Anti-Dupes.BroadcastString Dupes.BroadcastString");
 		tbr.add("");

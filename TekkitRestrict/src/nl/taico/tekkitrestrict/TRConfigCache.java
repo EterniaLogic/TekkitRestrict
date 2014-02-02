@@ -14,35 +14,35 @@ public class TRConfigCache {
 	@SuppressWarnings("rawtypes")
 	public static void loadConfigCache(){
 		TRFileConfiguration config = tekkitrestrict.config;
-		Hacks.flys = new TRHackSettings();
-		Hacks.flys.enable = config.getBoolean2(ConfigFile.HackDupe, "Anti-Hacks.Fly.Enabled", true);
-		Hacks.flys.kick = config.getBoolean2(ConfigFile.HackDupe, "Anti-Hacks.Fly.Kick", true);
-		Hacks.flys.broadcast = config.getBoolean2(ConfigFile.HackDupe, "Anti-Hacks.Fly.Broadcast", true);
-		Hacks.flys.tolerance = config.getInt2(ConfigFile.HackDupe, "Anti-Hacks.Fly.Tolerance", 40);
-		Hacks.flys.value = (int) Math.round(config.getDouble2(ConfigFile.HackDupe, "Anti-Hacks.Fly.MinHeight", 3));
-		Hacks.flys.useCommand = config.getBoolean2(ConfigFile.HackDupe, "Anti-Hacks.Fly.ExecuteCommand.Enabled", false);
-		Hacks.flys.command = config.getString2(ConfigFile.HackDupe, "Anti-Hacks.Fly.ExecuteCommand.Command", "");
-		Hacks.flys.triggerAfter = config.getInt2(ConfigFile.HackDupe, "Anti-Hacks.Fly.ExecuteCommand.TriggerAfter", 1);
+		Hacks.fly = new TRHackSettings();
+		Hacks.fly.enable = config.getBoolean2(ConfigFile.HackDupe, "Anti-Hacks.Fly.Enabled", true);
+		Hacks.fly.kick = config.getBoolean2(ConfigFile.HackDupe, "Anti-Hacks.Fly.Kick", true);
+		Hacks.fly.broadcast = config.getBoolean2(ConfigFile.HackDupe, "Anti-Hacks.Fly.Broadcast", true);
+		Hacks.fly.tolerance = config.getInt2(ConfigFile.HackDupe, "Anti-Hacks.Fly.Tolerance", 40);
+		Hacks.fly.value = (int) Math.round(config.getDouble2(ConfigFile.HackDupe, "Anti-Hacks.Fly.MinHeight", 3));
+		Hacks.fly.useCommand = config.getBoolean2(ConfigFile.HackDupe, "Anti-Hacks.Fly.ExecuteCommand.Enabled", false);
+		Hacks.fly.command = config.getString2(ConfigFile.HackDupe, "Anti-Hacks.Fly.ExecuteCommand.Command", "");
+		Hacks.fly.triggerAfter = config.getInt2(ConfigFile.HackDupe, "Anti-Hacks.Fly.ExecuteCommand.TriggerAfter", 1);
 		
-		Hacks.forcefields = new TRHackSettings();
-		Hacks.forcefields.enable = config.getBoolean2(ConfigFile.HackDupe, "Anti-Hacks.Forcefield.Enabled", true);
-		Hacks.forcefields.kick = config.getBoolean2(ConfigFile.HackDupe, "Anti-Hacks.Forcefield.Kick", true);
-		Hacks.forcefields.broadcast = config.getBoolean2(ConfigFile.HackDupe, "Anti-Hacks.Forcefield.Broadcast", true);
-		Hacks.forcefields.tolerance = config.getInt2(ConfigFile.HackDupe, "Anti-Hacks.Forcefield.Tolerance", 20);
-		Hacks.forcefields.value = config.getDouble2(ConfigFile.HackDupe, "Anti-Hacks.Forcefield.Angle", 40);
-		Hacks.forcefields.useCommand = config.getBoolean2(ConfigFile.HackDupe, "Anti-Hacks.Forcefield.ExecuteCommand.Enabled", false);
-		Hacks.forcefields.command = config.getString2(ConfigFile.HackDupe, "Anti-Hacks.Forcefield.ExecuteCommand.Command", "");
-		Hacks.forcefields.triggerAfter = config.getInt2(ConfigFile.HackDupe, "Anti-Hacks.Forcefield.ExecuteCommand.TriggerAfter", 1);
+		Hacks.forcefield = new TRHackSettings();
+		Hacks.forcefield.enable = config.getBoolean2(ConfigFile.HackDupe, "Anti-Hacks.Forcefield.Enabled", true);
+		Hacks.forcefield.kick = config.getBoolean2(ConfigFile.HackDupe, "Anti-Hacks.Forcefield.Kick", true);
+		Hacks.forcefield.broadcast = config.getBoolean2(ConfigFile.HackDupe, "Anti-Hacks.Forcefield.Broadcast", true);
+		Hacks.forcefield.tolerance = config.getInt2(ConfigFile.HackDupe, "Anti-Hacks.Forcefield.Tolerance", 20);
+		Hacks.forcefield.value = config.getDouble2(ConfigFile.HackDupe, "Anti-Hacks.Forcefield.Angle", 40);
+		Hacks.forcefield.useCommand = config.getBoolean2(ConfigFile.HackDupe, "Anti-Hacks.Forcefield.ExecuteCommand.Enabled", false);
+		Hacks.forcefield.command = config.getString2(ConfigFile.HackDupe, "Anti-Hacks.Forcefield.ExecuteCommand.Command", "");
+		Hacks.forcefield.triggerAfter = config.getInt2(ConfigFile.HackDupe, "Anti-Hacks.Forcefield.ExecuteCommand.TriggerAfter", 1);
 		
-		Hacks.speeds = new TRHackSettings();
-		Hacks.speeds.enable = config.getBoolean2(ConfigFile.HackDupe, "Anti-Hacks.MoveSpeed.Enabled", true);
-		Hacks.speeds.kick = config.getBoolean2(ConfigFile.HackDupe, "Anti-Hacks.MoveSpeed.Kick", true);
-		Hacks.speeds.broadcast = config.getBoolean2(ConfigFile.HackDupe, "Anti-Hacks.MoveSpeed.Broadcast", true);
-		Hacks.speeds.tolerance = config.getInt2(ConfigFile.HackDupe, "Anti-Hacks.MoveSpeed.Tolerance", 30);
-		Hacks.speeds.value = config.getDouble2(ConfigFile.HackDupe, "Anti-Hacks.MoveSpeed.MaxMoveSpeed", 2.5d);
-		Hacks.speeds.useCommand = config.getBoolean2(ConfigFile.HackDupe, "Anti-Hacks.MoveSpeed.ExecuteCommand.Enabled", false);
-		Hacks.speeds.command = config.getString2(ConfigFile.HackDupe, "Anti-Hacks.MoveSpeed.ExecuteCommand.Command", "");
-		Hacks.speeds.triggerAfter = config.getInt2(ConfigFile.HackDupe, "Anti-Hacks.MoveSpeed.ExecuteCommand.TriggerAfter", 1);
+		Hacks.speed = new TRHackSettings();
+		Hacks.speed.enable = config.getBoolean2(ConfigFile.HackDupe, "Anti-Hacks.MoveSpeed.Enabled", true);
+		Hacks.speed.kick = config.getBoolean2(ConfigFile.HackDupe, "Anti-Hacks.MoveSpeed.Kick", true);
+		Hacks.speed.broadcast = config.getBoolean2(ConfigFile.HackDupe, "Anti-Hacks.MoveSpeed.Broadcast", true);
+		Hacks.speed.tolerance = config.getInt2(ConfigFile.HackDupe, "Anti-Hacks.MoveSpeed.Tolerance", 30);
+		Hacks.speed.value = config.getDouble2(ConfigFile.HackDupe, "Anti-Hacks.MoveSpeed.MaxMoveSpeed", 2.5d);
+		Hacks.speed.useCommand = config.getBoolean2(ConfigFile.HackDupe, "Anti-Hacks.MoveSpeed.ExecuteCommand.Enabled", false);
+		Hacks.speed.command = config.getString2(ConfigFile.HackDupe, "Anti-Hacks.MoveSpeed.ExecuteCommand.Command", "");
+		Hacks.speed.triggerAfter = config.getInt2(ConfigFile.HackDupe, "Anti-Hacks.MoveSpeed.ExecuteCommand.TriggerAfter", 1);
 		
 		Hacks.broadcastFormat = config.getString2(ConfigFile.HackDupe, "Anti-Hacks.BroadcastString", "&9{PLAYER} &ctried to &a{TYPE}&c-hack!");
 		
@@ -209,7 +209,7 @@ public class TRConfigCache {
 	}
 	
 	public static class Hacks {
-		public static TRHackSettings flys, forcefields, speeds;
+		public static TRHackSettings fly, forcefield, speed;
 		public static String broadcastFormat;
 	}
 	

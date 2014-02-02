@@ -44,6 +44,75 @@ SplitLogsLocation: "log"
 # Default: true
 FilterLogs: true
 
+# Here you can define the filters.
+# There are 5 different methods:
+# Contains - If a logmessage contains ...
+# StartsWith - If a logmessage starts with ...
+# EndsWith - If a logmessage ends with ...
+# Equals - If a logmessage is identical to ...
+# RegEx - If a logmessage matches ... (please do not use (?i))
+#
+# There are multiple types
+# Console - Filter messages only from the console, NOT the logs
+# ServerLog - Filter messages only from the server logs
+# ForgeServerLog - Filter messages only from the forge logs
+# All - Filter messages everywhere
+# Console_ServerLog - Filter messages from the console and server logs
+# Forge_ServerLog - Filter messages from forge logs and the server logs
+# 
+Filters:
+    Filter1:
+        Method: contains
+        CaseSensitive: false
+        Type: all
+        Messages: []
+    SpammyMessages:
+        Method: regex
+        CaseSensitive: true
+        Type: all
+        Messages:
+        - "Sending Triang: -*\d+, -*\d+\.\d+"
+        - "slotChanging\\(\\d+\\)"
+    MovedWrongly:
+        Method: regex
+        CaseSensitive: true
+        Type: console
+        Messages:
+        - "Got position -*\d+\.\d+, -*\d+\.\d+, -*\d+\.\d+"
+        - "Expected -*\d+\.\d+, -*\d+\.\d+, -*\d+\.\d+"
+    IPLostConnection:
+        Method: regex
+        CaseSensitive: true
+        Type: console_serverlog
+        Messages:
+        - "/\d+\.\d+\.\d+\.\d+:\d+ lost connection"
+    Join1:
+        Method: startswith
+        CaseSensitive: true
+        Type: console_serverlog
+        Messages:
+        - "Sending serverside check to: "
+    Join2:
+        Method: contains
+        CaseSensitive: true
+        Type: console_serverlog
+        Messages:
+        - " joined with: ["
+    ConnectionErrors:
+        Method: equals
+        CaseSensitive: true
+        Type: console_serverlog
+        Messages:
+        - "Connection reset"
+        - "Reached end of stream"
+    PurifyConsole:
+        Method: equals
+        CaseSensitive: true
+        Type: console
+        Messages:
+        - "GroupManager - INFO -  Data files refreshed."
+
+
 # If a String contains any of the items listed here, it will not be
 # logged. Does not work if FilterLogs is false.
 # To add loglevels, do the following:
@@ -51,17 +120,30 @@ FilterLogs: true
 LogFilter:
 - "joined with"
 - "overloaded?"
-- "perhaps you are running a custom one"
 - "latest artifact information"
-- "sending serverside check to"
-- "server permissions file permissions.yml is empty, ignoring it"
-- "connection reset"
 - "repair is active.."
 - "player found.."
 - "slotchanging("
-- "attempted to place a tile entity"
 - "chunk coordinates:"
-- "Sending Triang: "
+
+###########################################################################
+############################### Log Enhancer ##############################
+###########################################################################
+UseLogEnchancer: true
+EnchanceEssentialsCmd: true
+ChangeGive: true
+ShortenErrors: true
+EnhanceEssentialsCmdDeny: true
+#RemovePlayerTags: false
+
+Reformat:
+    Option1:
+#        Method: regex
+#        CaseSensitive: true
+#        M1:
+        Message: "\[(.*)\] \[(.*)\] (.*): (.*)"
+        Replacement: "\[($2)\] ($3): ($4)"
+    
 
 ###########################################################################
 ############################# Log Hacks/Dupes #############################

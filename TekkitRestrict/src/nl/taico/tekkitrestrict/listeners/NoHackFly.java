@@ -54,7 +54,7 @@ public class NoHackFly implements Listener {
 	 * @return If the player is flying.
 	 */
 	public static boolean isFlying(Player player) {
-		int flyTolerance = Hacks.flys.tolerance;
+		int flyTolerance = Hacks.fly.tolerance;
 		PlayerInventory inventory = player.getInventory();
 		ItemStack boots = inventory.getBoots();
 		if (boots != null){
@@ -110,7 +110,7 @@ public class NoHackFly implements Listener {
 				int y = loc.getBlockY();
 				// checks min height...
 				boolean flight = true;
-				for (int j = 0; j < Hacks.flys.value + 1; j++) {
+				for (int j = 0; j < Hacks.fly.value + 1; j++) {
 					Block b1 = player.getWorld().getBlockAt(x, y, z);//Get the block at the players position.
 					if (!b1.isEmpty()){
 						flight = false; //If there is a block, flight = false.

@@ -89,8 +89,8 @@ public class NoHackForcefield implements Listener {
 				// tekkitrestrict.log.info("proj:  "+pdir+" / "+angle);
 				//TRLogger.Log("debug", "Angle: " + angle);
 				// change between 0 and 360.
-				double cr1 = ((pdir + Hacks.forcefields.value) > 360) ? pdir + Hacks.forcefields.value - 360 : pdir + Hacks.forcefields.value;
-				double cr2 = ((pdir - Hacks.forcefields.value) < 0) ? 360 - Math.abs(pdir - Hacks.forcefields.value) : pdir - Hacks.forcefields.value;
+				double cr1 = ((pdir + Hacks.forcefield.value) > 360) ? pdir + Hacks.forcefield.value - 360 : pdir + Hacks.forcefield.value;
+				double cr2 = ((pdir - Hacks.forcefield.value) < 0) ? 360 - Math.abs(pdir - Hacks.forcefield.value) : pdir - Hacks.forcefield.value;
 				// r1 = 360 r2 = 5
 				// 360 + 30 = 390 - 360 = 30 < 5 false
 				// r1 = 5 r2 = 360
@@ -101,7 +101,7 @@ public class NoHackForcefield implements Listener {
 					Integer oldValue = tickTolerance.get(name);
 					if (oldValue == null) tickTolerance.put(name, 1);//If not exist yet, make one
 					else {//Otherwise, check if it exeeds the limit.
-						if ((oldValue+1) > Hacks.forcefields.tolerance) {
+						if ((oldValue+1) > Hacks.forcefield.tolerance) {
 							TRNoHack.handleHack(damager, HackType.forcefield);
 							tickTolerance.remove(name);
 						} else

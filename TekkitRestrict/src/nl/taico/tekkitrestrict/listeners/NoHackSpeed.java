@@ -42,11 +42,11 @@ public class NoHackSpeed implements Listener{
 					double ze = zOld - zNew;
 					double velo = Math.sqrt(xe*xe+ze*ze);
 
-					if (velo >= Hacks.speeds.value && velo <= maxmove) {
+					if (velo >= Hacks.speed.value && velo <= maxmove) {
 						Integer oldValue = tickTolerance.get(name);
 						if (oldValue == null) tickTolerance.put(name, 1);
 						else {
-							if ((oldValue + 1) > Hacks.speeds.tolerance) {
+							if ((oldValue + 1) > Hacks.speed.tolerance) {
 								Bukkit.getScheduler().scheduleSyncDelayedTask(tekkitrestrict.getInstance(), new Runnable(){
 									public void run(){
 										TRNoHack.handleHack(player, HackType.speed);

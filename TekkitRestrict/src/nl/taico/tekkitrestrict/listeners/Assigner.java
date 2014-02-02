@@ -53,13 +53,13 @@ public class Assigner {
 			PM.registerEvents(new LoginListener(), plugin);
 		}
 		
-		if (Hacks.forcefields.enable)
+		if (Hacks.forcefield.enable)
 			PM.registerEvents(new NoHackForcefield(), plugin);
 		
-		if (Hacks.speeds.enable)
+		if (Hacks.speed.enable)
 			PM.registerEvents(new NoHackSpeed(), plugin);
 		
-		if (Hacks.flys.enable)
+		if (Hacks.fly.enable)
 			PM.registerEvents(new NoHackFly(), plugin);
 	}
 	
