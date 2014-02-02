@@ -1,5 +1,8 @@
 package nl.taico.tekkitrestrict.objects;
 
+import ic2.common.ItemArmorJetpack;
+import ic2.common.ItemArmorJetpackElectric;
+
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 
@@ -144,5 +147,13 @@ public class TRItemStack{
 	}
 	public static void setTag(final ItemStack itemStack, final NBTTagCompound tag){
 		((CraftItemStack) itemStack).getHandle().setTag(tag);
+	}
+
+	public static int getJetpackCharge(ItemStack itemstack){
+		final net.minecraft.server.ItemStack mcis = getMCStack(itemstack);
+		final Item item = mcis.getItem();
+		if (item instanceof ItemArmorJetpack) return ((ItemArmorJetpack) item).getCharge(mcis);
+		else if (item instanceof ItemArmorJetpackElectric) return ((ItemArmorJetpackElectric) item).getCharge(mcis);
+		return 0;
 	}
 }

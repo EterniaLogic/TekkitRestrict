@@ -90,16 +90,21 @@ public class tekkitrestrict extends JavaPlugin {
 		
 		log = getLogger(); //Set the logger
 		
-		version = new TRVersion(getDescription().getVersion());//.equals("1.2") ? "1.20" : getDescription().getVersion());
+		version = new TRVersion(getDescription().getVersion());
 		Log.init();
 		
 		//#################### load Config ####################
 		saveDefaultConfig(false); //Copy config files
-
-		config = this.getConfigx(); //Load the configuration files
-		final double configVer = config.getDouble(ConfigFile.General, "ConfigVersion", 0.9);
+		final double configVer = reloadc("General.config.yml").getDouble("ConfigVersion", 0.9);
+		
+		//final double configVer = config.getDouble(ConfigFile.General, "ConfigVersion", 0.9);
 		if (configVer < 1.1) UpdateConfigFiles.v09();
-		else if (configVer != 2.1){
+		else if (configVer != 2.2){
+			if (configVer < 2.2){
+				File disclick = new File(getDataFolder(), "DisableClick.config.yml");
+				disclick.renameTo(new File(getDataFolder(), "DisableInteract.config.yml"));
+				Warning.load("The config DisableClick.config.yml has been renamed to DisableInteract.config.yml", false);
+			}
 			if (configVer < 2.1 && linkEEPatch()) EEPatchConfig.upgradeFile();
 			if (configVer < 2.0) SafeZonesConfig.upgradeFile();
 			if (configVer < 1.8) DatabaseConfig.upgradeFile();
@@ -113,10 +118,12 @@ public class tekkitrestrict extends JavaPlugin {
 			GeneralConfig.upgradeFile();
 			reloadConfig();
 			try {
-				Thread.sleep(10);
+				Thread.sleep(50);
 			} catch (InterruptedException e) {}
 			
 		}
+		
+		config = this.getConfigx(); //Load the configuration files
 		
 		try {//Load all settings
 			load();
@@ -580,7 +587,7 @@ public class tekkitrestrict extends JavaPlugin {
 		configList.add(reloadc("General.config.yml"));
 		configList.add(reloadc("Advanced.config.yml"));
 		configList.add(reloadc("ModModifications.config.yml"));
-		configList.add(reloadc("DisableClick.config.yml"));
+		configList.add(reloadc("DisableInteract.config.yml"));
 		configList.add(reloadc("DisableItems.config.yml"));
 		File hackfile = new File("plugins"+File.separator+"tekkitrestrict"+File.separator+"Hack.config.yml");
 		//File newhackfile = new File("plugins"+File.separator+"tekkitrestrict"+File.separator+"HackDupe.config.yml");
@@ -631,7 +638,9 @@ public class tekkitrestrict extends JavaPlugin {
 			saveResource("ModModifications.config.yml", false);
 		} catch (Exception e) {}
 		try {
-			saveResource("DisableClick.config.yml", false);
+			File disinteract = new File(getDataFolder(), "DisableInteract.config.yml");
+			File disclick = new File(getDataFolder(), "DisableClick.config.yml");
+			if (!disclick.exists() && !disinteract.exists()) saveResource("DisableInteract.config.yml", false);
 		} catch (Exception e) {}
 		try {
 			saveResource("DisableItems.config.yml", false);
@@ -677,7 +686,9 @@ public class tekkitrestrict extends JavaPlugin {
 			saveResource("ModModifications.config.yml", force);
 		} catch (Exception e) {}
 		try {
-			saveResource("DisableClick.config.yml", force);
+			File disinteract = new File(getDataFolder(), "DisableInteract.config.yml");
+			File disclick = new File(getDataFolder(), "DisableClick.config.yml");
+			if (!disclick.exists() && !disinteract.exists()) saveResource("DisableInteract.config.yml", force);
 		} catch (Exception e) {}
 		try {
 			saveResource("DisableItems.config.yml", force);

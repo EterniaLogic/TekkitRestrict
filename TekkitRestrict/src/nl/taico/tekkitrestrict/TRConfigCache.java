@@ -123,7 +123,7 @@ public class TRConfigCache {
 		Listeners.BlockCreativeContainer = config.getBoolean2(ConfigFile.LimitedCreative, "LimitedCreativeNoContainer", true);
 		Listeners.UseNoItem = config.getBoolean2(ConfigFile.General, "UseNoItem", true);
 		Listeners.UseLimitedCreative = config.getBoolean2(ConfigFile.General, "UseLimitedCreative", true);
-		Listeners.useNoCLickPerms = config.getBoolean2(ConfigFile.DisableClick, "UseNoClickPermissions", false);
+		Listeners.useNoCLickPerms = config.getBoolean2(ConfigFile.DisableInteract, "UseNoClickPermissions", false);
 		
 		LogFilter.replaceList = config.getStringList(ConfigFile.Logging, "LogFilter");
 		LogFilter.splitLogs = config.getBoolean2(ConfigFile.Logging, "SplitLogs", true);

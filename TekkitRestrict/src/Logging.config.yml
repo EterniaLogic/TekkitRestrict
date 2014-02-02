@@ -60,32 +60,44 @@ FilterLogs: true
 # Console_ServerLog - Filter messages from the console and server logs
 # Forge_ServerLog - Filter messages from forge logs and the server logs
 # 
+# Please make sure every groupname is unique
 Filters:
     Filter1:
         Method: contains
         CaseSensitive: false
         Type: all
         Messages: []
-    SpammyMessages:
-        Method: regex
-        CaseSensitive: true
-        Type: all
-        Messages:
-        - "Sending Triang: -*\d+, -*\d+\.\d+"
-        - "slotChanging\\(\\d+\\)"
-    MovedWrongly:
-        Method: regex
-        CaseSensitive: true
-        Type: console
-        Messages:
-        - "Got position -*\d+\.\d+, -*\d+\.\d+, -*\d+\.\d+"
-        - "Expected -*\d+\.\d+, -*\d+\.\d+, -*\d+\.\d+"
-    IPLostConnection:
+    SpammyMessages1:
+        Description: Spammy messages like slotChanging and Sending Triang
         Method: regex
         CaseSensitive: true
         Type: console_serverlog
         Messages:
-        - "/\d+\.\d+\.\d+\.\d+:\d+ lost connection"
+        - "Sending Triang: -*\\d+, -*\\d+\\.\\d+"
+        - "slotChanging\\(\\d+\\)"
+    SpammyMessages2:
+        Description: Filters out Repair is active.. and Player found.. Disable this if you have eepatch
+        Method: equals
+        CaseSensitive: true
+        Type: console_serverlog
+        Messages:
+        - "Repair is active.."
+        - "Player found.."
+#    MovedWrongly:
+#        Description: Filters incorrect moving warnings from the console.
+#        Method: regex
+#        CaseSensitive: true
+#        Type: console
+#        Messages:
+#        - "Got position -*\\d+\\.\\d+, -*\\d+\\.\\d+, -*\\d+\\.\\d+"
+#        - "Expected -*\\d+\\.\\d+, -*\\d+\\.\\d+, -*\\d+\\.\\d+"
+#    IPLostConnection:
+#        Description: Filters out xxx.xxx.xxx.xxx:xxxx lost connection
+#        Method: regex
+#        CaseSensitive: true
+#        Type: console_serverlog
+#        Messages:
+#        - "/\\d+\\.\\d+\\.\\d+\\.\\d+:\\d+ lost connection"
     Join1:
         Method: startswith
         CaseSensitive: true
@@ -93,24 +105,27 @@ Filters:
         Messages:
         - "Sending serverside check to: "
     Join2:
+        Description: Filters out the listing of mods a player has when joining
         Method: contains
         CaseSensitive: true
         Type: console_serverlog
         Messages:
         - " joined with: ["
     ConnectionErrors:
+        Description: Filters out Connection reset and End of stream messages.
         Method: equals
         CaseSensitive: true
         Type: console_serverlog
         Messages:
         - "Connection reset"
         - "Reached end of stream"
-    PurifyConsole:
-        Method: equals
-        CaseSensitive: true
-        Type: console
-        Messages:
-        - "GroupManager - INFO -  Data files refreshed."
+#    PurifyConsole:
+#        Description: Removes groupmanager info messages
+#        Method: equals
+#        CaseSensitive: true
+#        Type: console
+#        Messages:
+#        - "GroupManager - INFO -  Data files refreshed."
 
 
 # If a String contains any of the items listed here, it will not be
@@ -118,12 +133,7 @@ Filters:
 # To add loglevels, do the following:
 # - "loglevel: fine"
 LogFilter:
-- "joined with"
 - "overloaded?"
-- "latest artifact information"
-- "repair is active.."
-- "player found.."
-- "slotchanging("
 - "chunk coordinates:"
 
 ###########################################################################
@@ -136,13 +146,10 @@ ShortenErrors: true
 EnhanceEssentialsCmdDeny: true
 #RemovePlayerTags: false
 
-Reformat:
-    Option1:
-#        Method: regex
-#        CaseSensitive: true
-#        M1:
-        Message: "\[(.*)\] \[(.*)\] (.*): (.*)"
-        Replacement: "\[($2)\] ($3): ($4)"
+#Reformat:
+#    Option1:
+#        Message: "\[(.*)\] \[(.*)\] (.*): (.*)"
+#        Replacement: "\[($2)\] ($3): ($4)"
     
 
 ###########################################################################

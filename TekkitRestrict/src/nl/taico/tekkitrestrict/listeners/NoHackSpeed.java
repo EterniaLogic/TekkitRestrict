@@ -41,7 +41,11 @@ public class NoHackSpeed implements Listener{
 					double xe = xOld - xNew;
 					double ze = zOld - zNew;
 					double velo = Math.sqrt(xe*xe+ze*ze);
-
+					
+					//max 0.8 when running and jumping
+					//System.out.println(velo);
+					//max 0.6 when running and jumping on ice
+					//max 1.0 when running and jumping on ice, the speedy way
 					if (velo >= Hacks.speed.value && velo <= maxmove) {
 						Integer oldValue = tickTolerance.get(name);
 						if (oldValue == null) tickTolerance.put(name, 1);

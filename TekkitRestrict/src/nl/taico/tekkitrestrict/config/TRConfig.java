@@ -227,7 +227,7 @@ public abstract class TRConfig {
 	public static void upgradeAllConfig(){
 		AdvancedConfig.upgradeFile();
 		DatabaseConfig.upgradeFile();
-		DisableClickConfig.upgradeFile();
+		DisableInteractConfig.upgradeFile();
 		DisableItemsConfig.upgradeFile();
 		GeneralConfig.upgradeFile();
 		HackDupeConfig.upgradeFile();

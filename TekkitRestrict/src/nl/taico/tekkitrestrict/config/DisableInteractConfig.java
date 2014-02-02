@@ -2,7 +2,7 @@ package nl.taico.tekkitrestrict.config;
 
 import java.util.ArrayList;
 
-public class DisableClickConfig extends TRConfig {
+public class DisableInteractConfig extends TRConfig {
 	public static ArrayList<String> defaultContents(boolean extra){
 		ArrayList<String> tbr = new ArrayList<String>(60);
 		
@@ -14,7 +14,7 @@ public class DisableClickConfig extends TRConfig {
 		tbr.add("##########################################################################################");
 		tbr.add("");
 		tbr.add("##########################################################################################");
-		tbr.add("############################### DisableClick Configuration ###############################");
+		tbr.add("############################# DisableInteract Configuration ##############################");
 		tbr.add("##########################################################################################");
 		tbr.add("# UseNoClickPermissions");
 		tbr.add("# If you enable this, TekkitRestrict will check on every click action if the player that");
@@ -63,6 +63,6 @@ public class DisableClickConfig extends TRConfig {
 	}
 	
 	public static void upgradeFile(){
-		upgradeFile("DisableClick", convertDefaults(defaultContents(true)));
+		upgradeFile("DisableInteract", convertDefaults(defaultContents(true)));
 	}
 }

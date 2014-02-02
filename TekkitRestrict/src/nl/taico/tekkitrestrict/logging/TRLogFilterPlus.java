@@ -85,9 +85,10 @@ public class TRLogFilterPlus {
 			if (type == null) type = FilterType.ALL;
 			new TRLogFilterPlus(method, type, cs.getStringList("Messages"));
 		}
+		//TODO make a separate filter for log_and_console, which runs on the minecraft logger
 		((TRConsoleFilter) consoleFilter).reload();
-		((TRConsoleFilter) forgeFilter).reload();
-		((TRConsoleFilter) logFilter).reload();
+		((TRForgeFilter) forgeFilter).reload();
+		((TRLogFilter) logFilter).reload();
 	}
 	
 	public TRLogFilterPlus(TRFilterMethod method, FilterType type, Collection<String> filters){

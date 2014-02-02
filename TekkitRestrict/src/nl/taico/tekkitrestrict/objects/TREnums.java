@@ -49,7 +49,7 @@ public class TREnums {
 	}
 	
 	public enum ConfigFile {
-		General, Advanced, ModModifications, DisableClick, DisableItems, HackDupe, LimitedCreative, Logging, TPerformance, GroupPermissions, SafeZones, Database, EEPatch;
+		General, Advanced, ModModifications, DisableInteract, DisableItems, HackDupe, LimitedCreative, Logging, TPerformance, GroupPermissions, SafeZones, Database, EEPatch;
 	}
 	
 	public enum SSMode {

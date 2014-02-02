@@ -85,7 +85,7 @@ public class TRNoClick {
 	
 	public static void reload(){
 		disableClickItemActions.clear();
-		List<String> disableClicks = tekkitrestrict.config.getStringList(ConfigFile.DisableClick , "DisableClick");
+		List<String> disableClicks = tekkitrestrict.config.getStringList(ConfigFile.DisableInteract , "DisableClick");
 		for (String disableClick : disableClicks){
 			String msg = null;
 			if (disableClick.contains("{")){
@@ -96,7 +96,7 @@ public class TRNoClick {
 			String temp[] = disableClick.split(" ");
 			if (temp[0].equalsIgnoreCase("block")){
 				if (temp.length == 1){
-					Warning.config("You have an error in your DisableClick config: \"block\" is not a valid itemstring", false);
+					Warning.config("You have an error in your DisableInteract config: \"block\" is not a valid itemstring", false);
 					continue;
 				}
 				
@@ -104,7 +104,7 @@ public class TRNoClick {
 				try {
 					iss = TRItemProcessor.processItemString(temp[1]);
 				} catch (TRException ex) {
-					Warning.config("You have an error in your DisableClick.config.yml in DisableClick:", false);
+					Warning.config("You have an error in your DisableInteract.config.yml in DisableClick:", false);
 					Warning.config(ex.getMessage(), false);
 					continue;
 				}
@@ -126,7 +126,7 @@ public class TRNoClick {
 				try {
 					iss = TRItemProcessor.processItemString(temp[0]);
 				} catch (TRException ex) {
-					Warning.config("You have an error in your DisableClick.config.yml in DisableClick:", false);
+					Warning.config("You have an error in your DisableInteract.config.yml in DisableClick:", false);
 					Warning.config(ex.getMessage(), false);
 					continue;
 				}
@@ -150,7 +150,7 @@ public class TRNoClick {
 							else if (current.equals("block")) noclick.block = true;
 							else if (current.equals("safezone")) noclick.safezone = true;
 							else {
-								Log.Warning.config("You have an error in your DisableClick config: Invalid clicktype \""+current+"\"", false);
+								Log.Warning.config("You have an error in your DisableInteract config: Invalid clicktype \""+current+"\"", false);
 								Log.Warning.config("Valid types: left, right, both, trample, all, air, block, safezone", false);
 								continue;
 							}

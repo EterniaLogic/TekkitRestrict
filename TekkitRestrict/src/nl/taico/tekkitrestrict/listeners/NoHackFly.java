@@ -53,8 +53,8 @@ public class NoHackFly implements Listener {
 	 */
 	public static boolean isFlying(Player player) {
 		int flyTolerance = Hacks.fly.tolerance;
-		PlayerInventory inventory = player.getInventory();
-		ItemStack boots = inventory.getBoots();
+		final PlayerInventory inventory = player.getInventory();
+		final ItemStack boots = inventory.getBoots();
 		int minHeight = (int) Hacks.fly.value;
 		if (boots != null){
 			//checks if the player is wearing boots before deciding whether or not they are flyhacking
@@ -65,7 +65,7 @@ public class NoHackFly implements Listener {
 		    }
 		}
 		
-		ItemStack chest = inventory.getChestplate();
+		final ItemStack chest = inventory.getChestplate();
 		if (chest != null){
 			//jetpack check
 			if (chest.getTypeId() == 30209 || chest.getTypeId() == 30210) {
@@ -74,7 +74,7 @@ public class NoHackFly implements Listener {
 		}
 		
 		for (int i = 0; i<=8; i++){ //Ring on hotbar check
-			ItemStack itemStack = inventory.getItem(i);
+			final ItemStack itemStack = inventory.getItem(i);
 			if (itemStack == null) continue;
 			int id = itemStack.getTypeId();
 			
@@ -94,10 +94,11 @@ public class NoHackFly implements Listener {
 			*/
 		}
 		
-		EntityPlayer Eplayer = ((CraftPlayer) player).getHandle();
+		
 		if (player.isInsideVehicle()) return false;
 		
-		String name = player.getName();
+		final String name = player.getName();
+		EntityPlayer Eplayer = ((CraftPlayer) player).getHandle();
 		if (!Eplayer.abilities.isFlying) {
 			if (!player.isSneaking()) {
 				Location loc = player.getLocation();
@@ -126,8 +127,6 @@ public class NoHackFly implements Listener {
 						velo = playery - oldY;
 					
 					tickLastLoc.put(name, playery);
-					
-					//if (velo != 0) tekkitrestrict.log.info("[DEBUG] velo: " + velo);
 
 					// they are constant 0 or are going upwards
 					if (velo >= 0) {
