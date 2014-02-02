@@ -4,15 +4,12 @@ import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.minecraft.server.EntityPlayer;
-import net.minecraft.server.NBTTagCompound;
-import net.minecraft.server.TileEntity;
 
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
-import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -24,6 +21,7 @@ import org.bukkit.inventory.PlayerInventory;
 import nl.taico.tekkitrestrict.TRConfigCache.Hacks;
 import nl.taico.tekkitrestrict.functions.TRNoHack;
 import nl.taico.tekkitrestrict.objects.TREnums.HackType;
+import nl.taico.tekkitrestrict.objects.TRItemStack;
 
 public class NoHackFly implements Listener {
 	private static ConcurrentHashMap<String, Integer> tickTolerance = new ConcurrentHashMap<String, Integer>();
@@ -57,12 +55,12 @@ public class NoHackFly implements Listener {
 		int flyTolerance = Hacks.fly.tolerance;
 		PlayerInventory inventory = player.getInventory();
 		ItemStack boots = inventory.getBoots();
+		int minHeight = (int) Hacks.fly.value;
 		if (boots != null){
 			//checks if the player is wearing boots before deciding whether or not they are flyhacking
 			if (boots.getTypeId() == 30171 && (inventory.getBoots().getDurability() < 27)) { //wearing quantum boots. checks for charge
-		    	//if charged boots, increase fly tolerance. *10 is just an example
-				flyTolerance *= 5;
-		    } else if (boots.getTypeId() == 27582) { //checks for hurricane boots
+				minHeight += 12;//10 is required for this to work
+		    } else if (boots.getTypeId() == 27582) { //hurricane boots
 		    	return false; //has flyItem
 		    }
 		}
@@ -70,14 +68,8 @@ public class NoHackFly implements Listener {
 		ItemStack chest = inventory.getChestplate();
 		if (chest != null){
 			//jetpack check
-			if (chest.getTypeId() == 30209) {
-				int data = chest.getDurability();
-				if (data <= 25 && data != 0) return false; //Fuel check
-				
-			} else if (chest.getTypeId() == 30210) {
-				int data = chest.getDurability();
-				if (data < 18000 && data != 0) return false; //Fuel check
-				
+			if (chest.getTypeId() == 30209 || chest.getTypeId() == 30210) {
+				if (TRItemStack.getJetpackCharge(chest)>0) return false;
 			}
 		}
 		
@@ -86,6 +78,9 @@ public class NoHackFly implements Listener {
 			if (itemStack == null) continue;
 			int id = itemStack.getTypeId();
 			
+			if (id == 27536 || id == 27584) return false;
+			
+			/*
 			if (id == 27536){
 				NBTTagCompound tag = ((CraftItemStack)itemStack).getHandle().tag;
 				if (tag == null){
@@ -96,6 +91,7 @@ public class NoHackFly implements Listener {
 				}
 			}
 			else if (id == 27584) return false;
+			*/
 		}
 		
 		EntityPlayer Eplayer = ((CraftPlayer) player).getHandle();
@@ -110,16 +106,10 @@ public class NoHackFly implements Listener {
 				int y = loc.getBlockY();
 				// checks min height...
 				boolean flight = true;
-				for (int j = 0; j < Hacks.fly.value + 1; j++) {
+				for (int j = 0; j <= minHeight; j++) {
 					Block b1 = player.getWorld().getBlockAt(x, y, z);//Get the block at the players position.
 					if (!b1.isEmpty()){
 						flight = false; //If there is a block, flight = false.
-						break;
-					}
-					
-					TileEntity te1 = Eplayer.world.getTileEntity(x, y, z);
-					if (te1 != null){
-						flight = false;
 						break;
 					}
 					
