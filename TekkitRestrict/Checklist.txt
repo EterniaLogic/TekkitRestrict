@@ -1,0 +1,12 @@
+Hacks:
+FlyHack - Working perfectly - 1.22D1
+SpeedHack - Influenced by lag, will not fix it at this moment - 1.22D1
+ForcefieldHack - Testing required
+
+Dupes:
+
+Condenser+Gem of Eternal density antidupe - Working well - 1.22D1
+Alchemical Chest/Condenser + Breaking antidupe - Testing required
+
+Crashes:
+EnderChest crash - Testing required
