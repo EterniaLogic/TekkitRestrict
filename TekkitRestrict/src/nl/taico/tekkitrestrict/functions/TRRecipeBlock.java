@@ -25,8 +25,8 @@ public class TRRecipeBlock {
 
 	public static void blockConfigRecipes() {
 		List<String> ssr = tekkitrestrict.config.getStringList(ConfigFile.Advanced, "RecipeBlock");
-		for (String s : ssr) {
-			List<TRItem> iss;
+		for (final String s : ssr) {
+			final List<TRItem> iss;
 			try {
 				iss = TRItemProcessor.processItemString(s);
 			} catch (TRException ex) {
@@ -34,23 +34,23 @@ public class TRRecipeBlock {
 				Warning.config(ex.getMessage(), false);
 				continue;
 			}
-			for (TRItem ir : iss) {
+			for (final TRItem ir : iss) {
 				try {
 					blockRecipeVanilla(ir.id, ir.data);
 				} catch (Exception ex) {
-					Warning.other("Exception in '+TRRecipeBLock.blockRecipeVanilla(id:int, data:int):boolean'! Error: " + ex.toString(), false);
+					Warning.other("Exception in TRRecipeBLock.blockRecipeVanilla! Error: " + ex.toString(), false);
 				}
 				try {
 					blockRecipeForge(ir.id, ir.data);
 				} catch (Exception ex) {
-					Warning.other("Exception in '+TRRecipeBLock.blockRecipeForge(id:int, data:int):boolean'! Error: " + ex.toString(), false);
+					Warning.other("Exception in TRRecipeBLock.blockRecipeForge! Error: " + ex.toString(), false);
 				}
 			}
 		}
 
 		ssr = tekkitrestrict.config.getStringList(ConfigFile.Advanced, "RecipeFurnaceBlock");
-		for (String s : ssr) {
-			List<TRItem> iss;
+		for (final String s : ssr) {
+			final List<TRItem> iss;
 			try {
 				iss = TRItemProcessor.processItemString(s);
 			} catch (TRException ex) {
@@ -58,11 +58,11 @@ public class TRRecipeBlock {
 				Warning.config(ex.getMessage(), false);
 				continue;
 			}
-			for (TRItem ir : iss) {
+			for (final TRItem ir : iss) {
 				try {
 					blockFurnaceRecipe(ir.id, ir.data);
 				} catch (Exception ex) {
-					Warning.other("Exception in '+TRRecipeBLock.blockFurnaceRecipe(id:int, data:int):boolean'! Error: " + ex.toString(), false);
+					Warning.other("Exception in TRRecipeBLock.blockFurnaceRecipe(id:int, data:int)! Error: " + ex.toString(), false);
 				}
 			}
 		}
@@ -70,13 +70,13 @@ public class TRRecipeBlock {
 
 	public static boolean blockRecipeVanilla(int id, int data) {
 		boolean status = false;
-		Iterator<Recipe> recipes = Bukkit.recipeIterator();
+		final Iterator<Recipe> recipes = Bukkit.recipeIterator();
 		Recipe recipe;
 
 		while (recipes.hasNext()) {
 			if ((recipe = recipes.next()) != null) {
-				int tid = recipe.getResult().getTypeId();//was .getData().getItemTypeId();
-				int tdata = recipe.getResult().getDurability();
+				final int tid = recipe.getResult().getTypeId();//was .getData().getItemTypeId();
+				final int tdata = recipe.getResult().getDurability();
 				if (tid == id && (tdata == data || data == 0)) {
 					recipes.remove();
 					status = true;
@@ -90,24 +90,25 @@ public class TRRecipeBlock {
 	public static boolean blockRecipeForge(int id, int data) {
 		boolean status = false;
 		// loop through recipes...
-		List<Object> recipes = CraftingManager.getInstance().recipies;
+		final List<Object> recipes = CraftingManager.getInstance().recipies;
 
 		for (int i = 0; i < recipes.size(); i++) {
-			Object r = recipes.get(i);
+			final Object r = recipes.get(i);
 			if (r instanceof ShapedRecipe) {
-				ShapedRecipe recipe = (ShapedRecipe) r;
-				int tid = recipe.getResult().getTypeId();
-				int tdata = recipe.getResult().getDurability();
+				final ShapedRecipe recipe = (ShapedRecipe) r;
+				final int tid = recipe.getResult().getTypeId();
+				final int tdata = recipe.getResult().getDurability();
 				if (tid == id && (tdata == data || data == 0)) {
 					recipes.remove(i);
 					i--;
 					status = true;
+					continue;
 				}
 			}
 			if (r instanceof ShapelessRecipe) {
-				ShapelessRecipe recipe = (ShapelessRecipe) r;
-				int tid = recipe.getResult().getTypeId();
-				int tdata = recipe.getResult().getDurability();
+				final ShapelessRecipe recipe = (ShapelessRecipe) r;
+				final int tid = recipe.getResult().getTypeId();
+				final int tdata = recipe.getResult().getDurability();
 				if (tid == id && (tdata == data || data == 0)) {
 					recipes.remove(i--);
 					status = true;

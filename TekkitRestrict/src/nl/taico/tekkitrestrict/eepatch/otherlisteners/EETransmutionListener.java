@@ -12,7 +12,7 @@ import ee.events.other.EETransmutationTableEvent;
 public class EETransmutionListener implements Listener {
 	@EventHandler
 	public void onTrans(EETransmutationTableEvent event){
-		Player player = event.getPlayer();
+		final Player player = event.getPlayer();
 		if (player.hasPermission("tekkitrestrict.bypass.blockactions.transmutiontablet")) return;
 		
 		if (EEPSettings.trans.contains(event.getExtraInfo())){
