@@ -13,7 +13,7 @@ import ee.events.blocks.EEPedestalEvent;
 public class EEPedestalListener implements Listener {
 	@EventHandler
 	public void onPedestal(EEPedestalEvent event){
-		Player player = event.getActivationPlayer();
+		final Player player = event.getActivationPlayer();
 		if (player.hasPermission("tekkitrestrict.bypass.blockactions.pedestal")) return;
 
 		if (EEPSettings.pedestal.contains(event.getAction())){

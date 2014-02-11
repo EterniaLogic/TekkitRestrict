@@ -64,14 +64,14 @@ public class TRItemProcessor {
 					for (final String mod2 : gg2){
 						try {
 							temp.put(mod2, processMultiString(gg[1]));
-						} catch (final TRException ex) {
+						} catch (TRException ex) {
 							Warning.config(ex.toString(), false);
 						}
 					}
 				} else {
 					try {
 						temp.put(mod, processMultiString(gg[1]));
-					} catch (final TRException ex) {
+					} catch (TRException ex) {
 						Warning.config(ex.toString(), false);
 					}
 				}
@@ -97,7 +97,7 @@ public class TRItemProcessor {
 					}
 					temp.put(groupName, processMultiString(value));
 
-				} catch (final Exception ex) {
+				} catch (Exception ex) {
 					Warning.other("Error in PermissionGroups: " + ex.toString(), false);
 					Log.Exception(ex, false);
 				}
@@ -168,7 +168,7 @@ public class TRItemProcessor {
 			if (t[0].matches("\\d+")){//ID
 				try {
 					id2 = Integer.parseInt(t[0]);
-				} catch (final NumberFormatException ex){
+				} catch (NumberFormatException ex){
 					Warning.other("You have set an invalid limiter permission \""+perm+"\":", false);
 					Warning.other("Invalid entry: \"" + itemx + "\"!", false);
 					return false;
@@ -188,7 +188,7 @@ public class TRItemProcessor {
 				
 				try {
 					items = processItemName(t[0], data2);
-				} catch (final TRException ex) {}
+				} catch (TRException ex) {}
 				
 				if (items != null){
 					for (final TRItem item : items){
@@ -224,7 +224,7 @@ public class TRItemProcessor {
 				
 				try {
 				items = processItemName(itemx, -1);
-				} catch (final TRException ex2) {}
+				} catch (TRException ex2) {}
 				
 				if (items != null){
 					for (final TRItem item : items){
@@ -250,7 +250,7 @@ public class TRItemProcessor {
 		if (ins.contains(";")) {
 			final String[] itemsStr = ins.split(";");
 			final List<TRItem> l = new LinkedList<TRItem>();
-			for (String itemStr : itemsStr) {
+			for (final String itemStr : itemsStr) {
 				l.addAll(processItemString(itemStr));
 			}
 			return l;
@@ -1159,6 +1159,8 @@ public class TRItemProcessor {
 		}
 	}
 
+	private static final TRException semicolonEx = new TRException("You cannot use ; to separate items in a single item string. You can only use ranges, single items, itemnames or groups.");
+	private static final TRException starEx = new TRException("Using * to define all items is not supported. Please give the permission tekkitrestrict.[feature].blockall instead.");
 	/**
 	 * Processes an item string of the following kinds:<br>
 	 * - Ranges + 1 Damage value (1-5:1)<br>
@@ -1184,7 +1186,7 @@ public class TRItemProcessor {
 		itemx = itemx.toLowerCase().replace(":-", ":=");
 		final LinkedList<TRItem> tci = new LinkedList<TRItem>();
 		if (itemx.contains(";")){
-			throw new TRException("You cannot use ; to separate items in a single item string. You can only use ranges, single items, itemnames or groups.");
+			throw semicolonEx;
 		}
 		// converts a variable string into a list of data.
 
@@ -1279,7 +1281,7 @@ public class TRItemProcessor {
 		
 		//############################## ALL ITEMS ###########################
 		else if(itemx.equals("*")) {
-			throw new TRException("Using * to define all items is not supported. Please give the permission tekkitrestrict.[feature].blockall instead.");
+			throw starEx;
 		}
 		
 		//############################## SINGLE ID ###########################
@@ -1330,7 +1332,7 @@ public class TRItemProcessor {
 		itemx = itemx.toLowerCase().replace(":-", ":=");
 		final LinkedList<TRItem> tci = new LinkedList<TRItem>();
 		if (itemx.contains(";")){
-			throw new TRException("You cannot use ; to separate items in a single item string. You can only use ranges, single items, itemnames or groups.");
+			throw semicolonEx;
 		}
 		// converts a variable string into a list of data.
 
@@ -1426,7 +1428,7 @@ public class TRItemProcessor {
 		
 		//############################## ALL ITEMS ###########################
 		else if(itemx.equals("*")) {
-			throw new TRException("Using * to define all items is not supported. Please give the permission tekkitrestrict.[feature].blockall instead.");
+			throw starEx;
 		}
 		
 		//############################## SINGLE ID ###########################
@@ -1490,7 +1492,7 @@ public class TRItemProcessor {
 		itemx = itemx.toLowerCase().replace(":-", ":=");
 		final LinkedList<TRItem> tci = new LinkedList<TRItem>();
 		if (itemx.contains(";")){
-			throw new TRException("You cannot use ; to separate items in a single item string. You can only use ranges, single items, itemnames or groups.");
+			throw semicolonEx;
 		}
 		// converts a variable string into a list of data.
 
@@ -1580,7 +1582,7 @@ public class TRItemProcessor {
 		
 		//############################## ALL ITEMS ###########################
 		else if(itemx.equals("*")) {
-			throw new TRException("Using * to define all items is no longer supported. Please give the permission tekkitrestrict.[feature].blockall instead.");
+			throw starEx;
 		}
 		
 		//############################## SINGLE ID ###########################

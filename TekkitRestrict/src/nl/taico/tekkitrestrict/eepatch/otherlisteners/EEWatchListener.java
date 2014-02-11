@@ -12,7 +12,7 @@ import ee.events.other.EEWOFTEvent;
 public class EEWatchListener implements Listener {
 	@EventHandler
 	public void onWatch(EEWOFTEvent event){
-		Player player = event.getPlayer();
+		final Player player = event.getPlayer();
 		if (player.hasPermission("tekkitrestrict.bypass.blockactions.watch")) return;
 		
 		if (EEPSettings.watch.contains(event.getExtraInfo())){
