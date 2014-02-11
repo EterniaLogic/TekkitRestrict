@@ -47,7 +47,7 @@ public class TRLimiter {
 	
 	private static CopyOnWriteArrayList<TRLimiter> limiters = new CopyOnWriteArrayList<TRLimiter>();
 	//private static List<TRLimiter> limiters = Collections.synchronizedList(new LinkedList<TRLimiter>());
-	private static List<TRConfigLimit> configLimits = Collections.synchronizedList(new ArrayList<TRConfigLimit>());
+	private static List<TRConfigLimit> configLimits = new ArrayList<TRConfigLimit>();
 	private static Map<String, String> allBlockOwners = Collections.synchronizedMap(new HashMap<String, String>());
 	private static ConcurrentHashMap<String, List<TRPermLimit>> limiterPermCache = new ConcurrentHashMap<String, List<TRPermLimit>>();
 	private static boolean changing = false;
@@ -60,33 +60,33 @@ public class TRLimiter {
 		//}
 		limiterPermCache.clear();
 		
+		final ArrayList<TRConfigLimit> temp = new ArrayList<TRConfigLimit>();
 		final List<String> limitedBlocks = tekkitrestrict.config.getStringList(ConfigFile.Advanced, "LimitBlocks");
-		configLimits.clear();
 		for (String limBlock : limitedBlocks) {
 			String msg = null;
 			if (limBlock.contains("{")){
-				final String temp[] = limBlock.split("\\{");
-				limBlock = temp[0].trim();
-				msg = Log.replaceColors(temp[1].replace("}", ""));
+				final String tempe[] = limBlock.split("\\{");
+				limBlock = tempe[0].trim();
+				msg = Log.replaceColors(tempe[1].replace("}", ""));
 			}
 			try {
-				final String[] temp = limBlock.split(" ");
-				if (temp.length!=2){
+				final String[] tempe = limBlock.split(" ");
+				if (tempe.length!=2){
 					Warning.config("You have an error in your Advanced.config.yml in LimitBlocks:", false);
 					Warning.config("\""+limBlock+"\" does not follow the syntaxis \"itemIndex limit\"!", false);
 					continue;
 				}
 				final int limit;
 				try {
-					limit = Integer.parseInt(temp[1]);
+					limit = Integer.parseInt(tempe[1]);
 				} catch (NumberFormatException ex){
 					Warning.config("You have an error in your Advanced.config.yml in LimitBlocks:", false);
-					Warning.config("\""+temp[1]+"\" is not a valid number!", false);
+					Warning.config("\""+tempe[1]+"\" is not a valid number!", false);
 					continue;
 				}
 				final List<TRItem> items;
 				try {
-					items = TRItemProcessor.processItemString(temp[0]);
+					items = TRItemProcessor.processItemString(tempe[0]);
 				} catch (TRException ex) {
 					Warning.config("You have an error in your Advanced.config.yml in LimitBlocks:", false);
 					Warning.config(ex.getMessage(), false);
@@ -99,12 +99,13 @@ public class TRLimiter {
 					cLimit.data = ci.data;
 					cLimit.msg = (msg == null ? "" : msg);
 					cLimit.configcount = limit;
-					configLimits.add(cLimit);
+					temp.add(cLimit);
 				}
-			} catch (final Exception ex) {
+			} catch (Exception ex) {
 				Warning.config("LimitBlocks: has an error!", false);
 			}
 		}
+		configLimits = temp;
 	}
 	
 	/** Remove all limits from this player. */
@@ -148,8 +149,7 @@ public class TRLimiter {
 				if (pl.max == -2) return -1;
 				return pl.max;
 			} else {
-				for (int i = 0; i < configLimits.size(); i++) {
-					final TRConfigLimit cc = configLimits.get(i);
+				for (final TRConfigLimit cc : configLimits) {
 					if (cc.compare(thisid, thisdata)) {
 						lastString = cc.msg;
 						return cc.configcount;
@@ -665,7 +665,7 @@ public class TRLimiter {
 				if (dbin != null) dbin.close();
 			} catch (final SQLException ex2) {}
 			Warning.otherWarnings.add("[SEVERE] An error occurred while loading the limiter!");
-			tekkitrestrict.log.severe("An error occurred while loading the limiter!");
+			Log.severe("An error occurred while loading the limiter!");
 			Log.Exception(ex, true);
 		}
 	}
@@ -675,7 +675,7 @@ public class TRLimiter {
 	/**
 	 * Manages and removes bad data.
 	 * Determines if the limit exists at a location. If not, remove it.
-	 * Called by savethread.
+	 * Called by limiter manager
 	 */
 	public static void manageData() {
 		for (final TRLimiter lb : limiters) {
@@ -685,30 +685,11 @@ public class TRLimiter {
 					final Iterator<TRLocation> it = l.placedBlock.iterator();
 					while (it.hasNext()){
 						final TRLocation loc = it.next();
-						//tempLoc = loc;
-						
-						final Chunk chunk = loc.getChunk();//tempLoc.getChunk();
-						
-						//if (!chunk.isLoaded()){
-						//	chunk.load(false);
-							
-							/*
-							try {
-								Future<Chunk> returnFuture = Bukkit.getScheduler().callSyncMethod(tekkitrestrict.getInstance(), new Callable<Chunk>() {
-								   public Chunk call() {
-									   Chunk c = tempLoc.getChunk();
-									   c.load();
-								       return c;
-								   }
-								});
-								chunk = returnFuture.get();
-							} catch (Exception ex){
-								continue;
-							}*/
-						//}
+						final Chunk chunk = loc.getChunk();
 						
 						if(chunk.isLoaded()){
 							final Block b = loc.getBlock();
+							
 							if (b.getTypeId() != l.id){
 								it.remove();
 								changed = true;
@@ -716,16 +697,20 @@ public class TRLimiter {
 								it.remove();
 								changed = true;
 							}
-						} else {
-							Log.Debug("Chunk is not loaded at: "+chunk.getX() + ", " + chunk.getZ());
 						}
 					}
-				} catch (final ConcurrentModificationException ex){
+				} catch (ConcurrentModificationException ex){
 					continue;
 				}
 			}
 			
-			if (changed) saveLimiter(lb);
+			if (changed){
+				Bukkit.getScheduler().scheduleAsyncDelayedTask(tekkitrestrict.getInstance(), new Runnable(){
+					public void run(){
+						saveLimiter(lb);
+					}
+				});
+			}
 		}
 	}
 

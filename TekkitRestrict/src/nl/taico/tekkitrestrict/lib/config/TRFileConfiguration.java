@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -27,18 +28,20 @@ import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.representer.Representer;
 
 import nl.taico.tekkitrestrict.Log;
-import nl.taico.tekkitrestrict.tekkitrestrict;
 import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 
 @SuppressWarnings("rawtypes")
 public class TRFileConfiguration extends FileConfiguration {
+	public static HashMap<ConfigFile, YamlConfiguration> configs = new HashMap<ConfigFile, YamlConfiguration>();
+	
 	public TRFileConfiguration() {
 		super();
 	}
 
 	@Override
+	@Deprecated
 	public Object getDefault(String path) {
-		for (YamlConfiguration conf : tekkitrestrict.configList) {
+		for (YamlConfiguration conf : configs.values()) {
 			Object j;
 			if ((j = conf.getDefault(path)) != null) {
 				return j;
@@ -48,7 +51,7 @@ public class TRFileConfiguration extends FileConfiguration {
 	}
 	
 	@Nullable public Object getDefault(ConfigFile file, @NonNull String path) {
-		YamlConfiguration conf = tekkitrestrict.configList.get(file.ordinal());
+		YamlConfiguration conf = configs.get(file);
 		Object j;
 		if ((j = conf.getDefault(path)) != null) {
 			return j;
@@ -57,6 +60,7 @@ public class TRFileConfiguration extends FileConfiguration {
 	}
 
 	@Override
+	@Deprecated
 	public Object get(String path) {
 		return get(path, getDefault(path));
 	}
@@ -66,8 +70,9 @@ public class TRFileConfiguration extends FileConfiguration {
 	}
 
 	@Override
+	@Deprecated
 	public Object get(String path, Object def) {
-		for (YamlConfiguration conf : tekkitrestrict.configList) {
+		for (YamlConfiguration conf : configs.values()) {
 			Object j;
 			if ((j = conf.get(path, def)) != def) {
 				return j;
@@ -77,7 +82,7 @@ public class TRFileConfiguration extends FileConfiguration {
 	}
 	
 	public Object get(ConfigFile file, @NonNull String path, Object def) {
-		YamlConfiguration conf = tekkitrestrict.configList.get(file.ordinal());
+		YamlConfiguration conf = configs.get(file);
 		Object j;
 		if ((j = conf.get(path, def)) != def) {
 			return j;
@@ -110,6 +115,7 @@ public class TRFileConfiguration extends FileConfiguration {
 	}
 
 	@Override
+	@Deprecated
 	public boolean isString(String path) {
 		Object val = get(path);
 		return val instanceof String;
@@ -141,6 +147,7 @@ public class TRFileConfiguration extends FileConfiguration {
 	}
 
 	@Override
+	@Deprecated
 	public boolean isInt(String path) {
 		Object val = get(path);
 		return val instanceof Integer;
@@ -173,6 +180,7 @@ public class TRFileConfiguration extends FileConfiguration {
 	}
 
 	@Override
+	@Deprecated
 	public boolean isBoolean(String path) {
 		Object val = get(path);
 		return val instanceof Boolean;
@@ -203,6 +211,7 @@ public class TRFileConfiguration extends FileConfiguration {
 	}
 
 	@Override
+	@Deprecated
 	public boolean isDouble(String path) {
 		Object val = get(path);
 		return val instanceof Double;
@@ -229,6 +238,7 @@ public class TRFileConfiguration extends FileConfiguration {
 	}
 
 	@Override
+	@Deprecated
 	public boolean isLong(String path) {
 		Object val = get(path);
 		return val instanceof Long;
@@ -259,6 +269,7 @@ public class TRFileConfiguration extends FileConfiguration {
 	}
 
 	@Override
+	@Deprecated
 	public boolean isList(String path) {
 		Object val = get(path);
 		return val instanceof List;
@@ -592,8 +603,7 @@ public class TRFileConfiguration extends FileConfiguration {
 	}
 
 	@Override
-	public void loadFromString(String contents)
-			throws InvalidConfigurationException {
+	public void loadFromString(String contents) throws InvalidConfigurationException {
 		Validate.notNull(contents, "Contents cannot be null");
 		Map input;
 		try {
@@ -615,10 +625,8 @@ public class TRFileConfiguration extends FileConfiguration {
 	@Override
 	public String saveToString() {
 		yamlOptions.setIndent(options().indent());
-		yamlOptions
-				.setDefaultFlowStyle(org.yaml.snakeyaml.DumperOptions.FlowStyle.BLOCK);
-		yamlRepresenter
-				.setDefaultFlowStyle(org.yaml.snakeyaml.DumperOptions.FlowStyle.BLOCK);
+		yamlOptions.setDefaultFlowStyle(org.yaml.snakeyaml.DumperOptions.FlowStyle.BLOCK);
+		yamlRepresenter.setDefaultFlowStyle(org.yaml.snakeyaml.DumperOptions.FlowStyle.BLOCK);
 		String header = buildHeader();
 		String dump = yaml.dump(getValues(false));
 		if (dump.equals("{}\n")) {
@@ -677,15 +685,9 @@ public class TRFileConfiguration extends FileConfiguration {
 			config.load(file);
 		} catch (FileNotFoundException ex) {
 		} catch (IOException ex) {
-			Bukkit.getLogger().log(
-					Level.SEVERE,
-					(new StringBuilder()).append("Cannot load ").append(file)
-							.toString(), ex);
+			Bukkit.getLogger().log(Level.SEVERE, (new StringBuilder()).append("Cannot load ").append(file).toString(), ex);
 		} catch (InvalidConfigurationException ex) {
-			Bukkit.getLogger().log(
-					Level.SEVERE,
-					(new StringBuilder()).append("Cannot load ").append(file)
-							.toString(), ex);
+			Bukkit.getLogger().log(Level.SEVERE, (new StringBuilder()).append("Cannot load ").append(file).toString(), ex);
 		}
 		return config;
 	}
@@ -696,11 +698,9 @@ public class TRFileConfiguration extends FileConfiguration {
 		try {
 			config.load(stream);
 		} catch (IOException ex) {
-			Bukkit.getLogger().log(Level.SEVERE,
-					"Cannot load configuration from stream", ex);
+			Bukkit.getLogger().log(Level.SEVERE, "Cannot load configuration from stream", ex);
 		} catch (InvalidConfigurationException ex) {
-			Bukkit.getLogger().log(Level.SEVERE,
-					"Cannot load configuration from stream", ex);
+			Bukkit.getLogger().log(Level.SEVERE, "Cannot load configuration from stream", ex);
 		}
 		return config;
 	}

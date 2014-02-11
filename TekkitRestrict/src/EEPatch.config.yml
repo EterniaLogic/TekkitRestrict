@@ -522,6 +522,9 @@ Actions:
             # Ring of Ignition is on them.
             Ignition: true
 
+            # Interdict: If pedestals are allowed to push mobs away from them.
+            Interdict: true
+
             # Repair: If pedestals are allowed to repair items in the inventories of
             # nearby players if the Repair Talisman is on them.
             Repair: true

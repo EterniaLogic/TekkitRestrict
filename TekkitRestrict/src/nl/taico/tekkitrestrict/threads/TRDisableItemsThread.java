@@ -5,8 +5,8 @@ import ic2.common.ItemArmorElectric;
 import ic2.common.ItemElectricTool;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -38,20 +38,20 @@ import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 import ee.ItemEECharged;
 
 public class TRDisableItemsThread extends Thread {
-	private final ArrayList<Integer> ssDecharged = new ArrayList<Integer>();
-	private final ConcurrentHashMap<Integer, TRCharge> mCharges = new ConcurrentHashMap<Integer, TRCharge>();
-	private final ConcurrentHashMap<Integer, TRCharge> maxEU = new ConcurrentHashMap<Integer, TRCharge>();
-	private boolean reloading = false, busy = false;
+	private ArrayList<Integer> ssDecharged = new ArrayList<Integer>();
+	private HashMap<Integer, TRCharge> mCharges = new HashMap<Integer, TRCharge>();
+	private HashMap<Integer, TRCharge> maxEU = new HashMap<Integer, TRCharge>();
+	//private boolean reloading = false, busy = false;
 	
 	@Override
 	public void run() {
 		load();
 		while (true) {
-			if (!reloading){
+			//if (!reloading){
 				try {
 					// Disabled Items remover
 					final Player[] players = Bukkit.getServer().getOnlinePlayers();
-					busy = true;
+					//busy = true;
 					for (final Player player : players) {
 						try {
 							disableItems(player);
@@ -64,8 +64,8 @@ public class TRDisableItemsThread extends Thread {
 					Warning.other("An error occured in [ItemDisabler thread] (player loop)!", false);
 					Log.Exception(ex, true);
 				}
-				busy = false;
-			}
+				//busy = false;
+			//}
 			
 			try {
 				Thread.sleep(Threads.inventorySpeed);
@@ -76,6 +76,7 @@ public class TRDisableItemsThread extends Thread {
 	}
 	
 	private boolean checkSS;
+	private int err0 = 0, err1 = 0, err2 = 0;
 	private void disableItems(final Player player) {
 		if (player == null) return;
 		final PlayerInventory inv = player.getInventory();
@@ -153,9 +154,12 @@ public class TRDisableItemsThread extends Thread {
 								}
 							}
 					}
-				} catch (final Exception ex) {
+				} catch (Exception ex) {
+					if (err0 > 50) continue;
+					err0++;
 					Warning.other("Error: [ItemDisabler thread] (check inv) " + ex.toString(), false);
 					Log.debugEx(ex);
+					if (err0 == 50) Warning.other("This error will not be logged again because it has occured 50 times!", false);
 				}
 			} //End of first for loop
 			
@@ -200,8 +204,11 @@ public class TRDisableItemsThread extends Thread {
 					}
 					
 				} catch (Exception ex) {
+					if (err1 > 50) continue;
+					err1++;
 					Warning.other("Error: [ItemDisabler thread] (check armor) " + ex.toString(), false);
 					Log.debugEx(ex);
+					if (err1 == 50) Warning.other("This error will not be logged again because it has occured 50 times!", false);
 				}
 			}
 			
@@ -210,8 +217,11 @@ public class TRDisableItemsThread extends Thread {
 			if (changedArmor) inv.setArmorContents(st2);
 			
 		} catch (Exception ex) {
+			if (err2 > 50) return;
+			err2++;
 			Warning.other("Error: [ItemDisabler thread] " + ex.toString(), false);
 			Log.debugEx(ex);
+			if (err2 == 50) Warning.other("This error will not be logged again because it has occured 50 times!", false);
 		}
 	}
 	
@@ -460,122 +470,133 @@ public class TRDisableItemsThread extends Thread {
 	
 	private void load(){ reload(); }
 	public void reload() {
-		reloading = true;
-		int i = 0;
-		while (busy){
-			if (i == Threads.inventorySpeed+1000) break;
-			try {
-				Thread.sleep(1);
-				i++;
-			} catch (Exception ex){}
-		}
+		//reloading = true;
+		//int i = 0;
+		//while (busy){
+		//	if (i == Threads.inventorySpeed+1000) break;
+		//	try {
+		//		Thread.sleep(1);
+		//		i++;
+		//	} catch (Exception ex){}
+		//}
 		if (!SafeZones.UseSafeZones || !tekkitrestrict.EEEnabled || (!Threads.SSDechargeEE && !Threads.SSDisableArcane)) checkSS = false;
 		else checkSS = true;
 		
-		ssDecharged.clear();
-		mCharges.clear();
-		maxEU.clear();
-		
-		final List<String> dechargeSS = tekkitrestrict.config.getStringList(ConfigFile.ModModifications, "DechargeInSS");
-		for (final String s : dechargeSS) {
-			final List<TRItem> iss;
-			try {
-				iss = TRItemProcessor.processItemString(s);
-			} catch (TRException ex) {
-				Warning.config("You have an error in your ModModifications.config in DechargeInSS:", false);
-				Warning.config(ex.toString(), false);
-				continue;
+		{
+			final ArrayList<Integer> temp = new ArrayList<Integer>();
+			final List<String> dechargeSS = tekkitrestrict.config.getStringList(ConfigFile.ModModifications, "DechargeInSS");
+			for (final String s : dechargeSS) {
+				final List<TRItem> iss;
+				try {
+					iss = TRItemProcessor.processItemString(s);
+				} catch (TRException ex) {
+					Warning.config("You have an error in your ModModifications.config in DechargeInSS:", false);
+					Warning.config(ex.toString(), false);
+					continue;
+				}
+				
+				for (final TRItem iss1 : iss) temp.add(iss1.id);
+				
 			}
 			
-			for (final TRItem iss1 : iss) ssDecharged.add(iss1.id);
-			
-		}
-
-		final List<String> meu = tekkitrestrict.config.getStringList(ConfigFile.ModModifications, "MaxEU");
-		for (final String s : meu) {
-			if (!s.contains(" ")){
-				Warning.config("You have an error in your ModModifications.config in MaxEU!", false);
-				Warning.config("Invalid number of arguments in \""+s+"\". Required: 3", false);
-				continue;
-			}
-			
-			final String[] sseu = s.split(" ");
-			if (sseu.length != 3){
-				Warning.config("You have an error in your ModModifications.config in MaxEU!", false);
-				Warning.config("Invalid number of arguments in \""+s+"\". Required: 3", false);
-				continue;
-			}
-			final int eu, chrate;
-			
-			try {
-				eu = Integer.parseInt(sseu[1]);
-			} catch (NumberFormatException ex){
-				Warning.config("You have an error in your ModModifications.config in MaxEU!", false);
-				Warning.config("Invalid MaxEU value \""+sseu[1]+"\" in \""+s+"\"!", false);
-				continue;
-			}
-			try {
-				chrate = Integer.parseInt(sseu[2]);
-			} catch (NumberFormatException ex){
-				Warning.config("You have an error in your ModModifications.config in MaxEU!", false);
-				Warning.config("Invalid charge rate \""+sseu[2]+"\" in \""+s+"\"!", false);
-				continue;
-			}
-
-			final List<TRItem> iss;
-			try {
-				iss = TRItemProcessor.processItemString(sseu[0]);
-			} catch (TRException ex) {
-				Warning.config("You have an error in your ModModifications.config in MaxEU:", false);
-				Warning.config(ex.toString(), false);
-				continue;
-			}
-			for (final TRItem iss1 : iss) {
-				final TRCharge gg = new TRCharge();
-				gg.id = iss1.id;
-				gg.data = iss1.data;
-				gg.maxcharge = eu;
-				gg.chargerate = chrate;
-				maxEU.put(gg.id, gg);
-			}
-		}
-
-		// process charges...
-		final List<String> MaxCharges = tekkitrestrict.config.getStringList(ConfigFile.ModModifications, "MaxCharge");
-		for (final String charge : MaxCharges) {
-			if (!charge.contains(" ")) {
-				Log.Warning.config("You have an error in your maxchare list in ModModifications.config: \""+charge+"\" does not follow the format: \"itemstr percentage\"", false);
-				continue;
-			}
-			
-			final String[] sscharge = charge.replace("%", "").split(" ");
-			
-			final int max;
-			try {
-				max = Integer.parseInt(sscharge[1]);
-			} catch (NumberFormatException ex){
-				Warning.config("You have an error in your maxchare list in ModModifications.config: \""+sscharge[1]+"\" is not a valid number", false);
-				continue;
-			}
-			
-			final List<TRItem> iss;
-			try {
-				iss = TRItemProcessor.processItemString(sscharge[0]);
-			} catch (TRException ex) {
-				Warning.config("You have an error in your ModModifications.config in MaxCharge:", false);
-				Warning.config(ex.toString(), false);
-				continue;
-			}
-			for (final TRItem isr : iss) {
-				final TRCharge gg = new TRCharge();
-				gg.id = isr.id;
-				gg.data = isr.data;
-				gg.maxcharge = max;
-				mCharges.put(gg.id, gg);
-			}
+			ssDecharged = temp;
 		}
 		
-		reloading = false;
+		{
+			final HashMap<Integer, TRCharge> temp = new HashMap<Integer, TRCharge>();
+			final List<String> meu = tekkitrestrict.config.getStringList(ConfigFile.ModModifications, "MaxEU");
+			for (final String s : meu) {
+				if (!s.contains(" ")){
+					Warning.config("You have an error in your ModModifications.config in MaxEU!", false);
+					Warning.config("Invalid number of arguments in \""+s+"\". Required: 3", false);
+					continue;
+				}
+				
+				final String[] sseu = s.split(" ");
+				if (sseu.length != 3){
+					Warning.config("You have an error in your ModModifications.config in MaxEU!", false);
+					Warning.config("Invalid number of arguments in \""+s+"\". Required: 3", false);
+					continue;
+				}
+				final int eu, chrate;
+				
+				try {
+					eu = Integer.parseInt(sseu[1]);
+				} catch (NumberFormatException ex){
+					Warning.config("You have an error in your ModModifications.config in MaxEU!", false);
+					Warning.config("Invalid MaxEU value \""+sseu[1]+"\" in \""+s+"\"!", false);
+					continue;
+				}
+				try {
+					chrate = Integer.parseInt(sseu[2]);
+				} catch (NumberFormatException ex){
+					Warning.config("You have an error in your ModModifications.config in MaxEU!", false);
+					Warning.config("Invalid charge rate \""+sseu[2]+"\" in \""+s+"\"!", false);
+					continue;
+				}
+	
+				final List<TRItem> iss;
+				try {
+					iss = TRItemProcessor.processItemString(sseu[0]);
+				} catch (TRException ex) {
+					Warning.config("You have an error in your ModModifications.config in MaxEU:", false);
+					Warning.config(ex.toString(), false);
+					continue;
+				}
+				for (final TRItem iss1 : iss) {
+					final TRCharge gg = new TRCharge();
+					gg.id = iss1.id;
+					gg.data = iss1.data;
+					gg.maxcharge = eu;
+					gg.chargerate = chrate;
+					temp.put(gg.id, gg);
+				}
+			}
+			
+			maxEU = temp;
+		}
+		
+		{
+			// process charges...
+			final HashMap<Integer, TRCharge> temp = new HashMap<Integer, TRCharge>();
+			
+			final List<String> MaxCharges = tekkitrestrict.config.getStringList(ConfigFile.ModModifications, "MaxCharge");
+			for (final String charge : MaxCharges) {
+				if (!charge.contains(" ")) {
+					Log.Warning.config("You have an error in your maxchare list in ModModifications.config: \""+charge+"\" does not follow the format: \"itemstr percentage\"", false);
+					continue;
+				}
+				
+				final String[] sscharge = charge.replace("%", "").split(" ");
+				
+				final int max;
+				try {
+					max = Integer.parseInt(sscharge[1]);
+				} catch (NumberFormatException ex){
+					Warning.config("You have an error in your maxchare list in ModModifications.config: \""+sscharge[1]+"\" is not a valid number", false);
+					continue;
+				}
+				
+				final List<TRItem> iss;
+				try {
+					iss = TRItemProcessor.processItemString(sscharge[0]);
+				} catch (TRException ex) {
+					Warning.config("You have an error in your ModModifications.config in MaxCharge:", false);
+					Warning.config(ex.toString(), false);
+					continue;
+				}
+				for (final TRItem isr : iss) {
+					final TRCharge gg = new TRCharge();
+					gg.id = isr.id;
+					gg.data = isr.data;
+					gg.maxcharge = max;
+					temp.put(gg.id, gg);
+				}
+			}
+			mCharges = temp;
+		}
+		
+		//reloading = false;
 	}
 
 	/**

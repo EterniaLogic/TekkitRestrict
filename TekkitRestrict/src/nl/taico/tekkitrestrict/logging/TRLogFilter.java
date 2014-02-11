@@ -36,7 +36,6 @@ public class TRLogFilter implements Filter {
 			} catch (Exception ex){
 				return true;
 			}
-			TRSplitter.split(record);
 			//debug
 			//test calculation that takes a while to see if the server is affected
 			//if it is, let the LOG filter run on a separate thread

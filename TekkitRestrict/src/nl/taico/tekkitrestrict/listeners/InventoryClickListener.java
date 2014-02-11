@@ -23,7 +23,7 @@ public class InventoryClickListener implements Listener {
 	boolean logged = false;
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	private void onInventoryClick(InventoryClickEvent event){
-		//TR.getLogger().info("[DEBUG] RawSlot: "+event.getRawSlot());
+		//System.out.println("[DEBUG] Inventory Title: \"" + event.getView().getTitle()+"\"");
 		try {
 			Player player = (Player) event.getWhoClicked();
 			

@@ -135,6 +135,6 @@ FavorPerformanceOverMemory: false
 ######################################################################
 ######################################################################
 # Do NOT change this. It will reset the config files if you do.
-ConfigVersion: 1.8
+ConfigVersion: 2.2
 
 ######################################################################

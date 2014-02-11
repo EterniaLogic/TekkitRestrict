@@ -15,6 +15,7 @@ public class AdvancedConfig extends TRConfig {
 		tbr.add("##############################################################################");
 		tbr.add("############################# Advanced Functions #############################");
 		tbr.add("##############################################################################");
+		/*
 		tbr.add("");
 		tbr.add("# Limits the number of blocks a player can place. (Global)");
 		tbr.add("# Please note that these cannot be changed in-game.");
@@ -28,6 +29,7 @@ public class AdvancedConfig extends TRConfig {
 		if (extra) tbr.add("#:-;-:# LimitBlocks");//21
 		tbr.add("");
 		tbr.add("##############################################################################");
+		*/
 		tbr.add("# All items listed here will be uncraftable. You can also use mod names to");
 		tbr.add("# make all items of that mod uncraftable.");
 		tbr.add("#");

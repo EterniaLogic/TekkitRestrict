@@ -141,7 +141,7 @@ public class NameProcessor {
 	}
 	*/
 	
-	private static final LinkedHashMap<TRItem, String> All = new LinkedHashMap<TRItem, String>();
+	private static final LinkedHashMap<TRItem, String> All = new LinkedHashMap<TRItem, String>(1500);
 	static {
 		All.put(TRItem.parseItem(1,-1),"Stone");
 		All.put(TRItem.parseItem(2,-1),"Grass Block");
@@ -175,7 +175,8 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(17,1),"Spruce Wood");
 		All.put(TRItem.parseItem(17,2),"Birch Wood");
 		All.put(TRItem.parseItem(17,3),"Jungle Wood");
-		All.put(TRItem.parseItem(17,-1),"Wood (Logs)");
+		All.put(TRItem.parseItem(17,-1),"Wood");
+		All.put(TRItem.parseItem(17,-1),"Logs");
 		
 		All.put(TRItem.parseItem(18,0),"Oak Leaves");
 		All.put(TRItem.parseItem(18,1),"Spruce Leaves");
@@ -195,12 +196,12 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(24,-1),"Sandstone");
 		
 		All.put(TRItem.parseItem(25,-1),"Note Block");
-		All.put(TRItem.parseItem(26,-1),"Bed");
-		All.put(TRItem.parseItem(27,-1),"Powered Rail");
-		All.put(TRItem.parseItem(28,-1),"Detector Rail");
+		All.put(TRItem.parseItem(26,-1),"Bed (Block)");
+		All.put(TRItem.parseItem(27,-1),"Powered Rail (Block)");
+		All.put(TRItem.parseItem(28,-1),"Detector Rail (Block)");
 		All.put(TRItem.parseItem(29,-1),"Sticky Piston");
 		All.put(TRItem.parseItem(30,-1),"Cobweb");
-		All.put(TRItem.parseItem(31,-1),"Grass");
+		All.put(TRItem.parseItem(31,-1),"Tall Grass");
 		All.put(TRItem.parseItem(32,-1),"Dead Bush");
 		All.put(TRItem.parseItem(33,-1),"Piston");
 		All.put(TRItem.parseItem(35,-1),"Wool");
@@ -222,11 +223,11 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(52,-1),"Monster Spawner");
 		All.put(TRItem.parseItem(53,-1),"Wooden Stairs");
 		All.put(TRItem.parseItem(54,-1),"Chest");
-		All.put(TRItem.parseItem(55,-1),"Redstone Wire");
+		All.put(TRItem.parseItem(55,-1),"Redstone Wire (Block)");
 		All.put(TRItem.parseItem(56,-1),"Diamond Ore");
 		All.put(TRItem.parseItem(57,-1),"Block of Diamond");
 		All.put(TRItem.parseItem(58,-1),"Crafting Table");
-		All.put(TRItem.parseItem(59,-1),"Crops");
+		All.put(TRItem.parseItem(59,-1),"Crops (Block)");
 		All.put(TRItem.parseItem(60,-1),"Farmland");
 		All.put(TRItem.parseItem(61,-1),"Furnace");
 		All.put(TRItem.parseItem(62,-1),"Burning Furnace");
@@ -243,25 +244,25 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(73,-1),"Redstone Ore");
 		All.put(TRItem.parseItem(74,-1),"Glowing Redstone Ore");
 		All.put(TRItem.parseItem(75,-1),"Redstone Torch");
-		All.put(TRItem.parseItem(76,-1),"Redstone Torch");
+		All.put(TRItem.parseItem(76,-1),"Redstone Torch (On)");
 		All.put(TRItem.parseItem(77,-1),"Button");
 		All.put(TRItem.parseItem(78,-1),"Snow");
 		All.put(TRItem.parseItem(79,-1),"Ice");
 		All.put(TRItem.parseItem(80,-1),"Snow");
-		All.put(TRItem.parseItem(81,-1),"Cactus");
+		All.put(TRItem.parseItem(81,-1),"Cactus (Block)");
 		All.put(TRItem.parseItem(82,-1),"Clay");
-		All.put(TRItem.parseItem(83,-1),"Sugar cane");
+		All.put(TRItem.parseItem(83,-1),"Sugar cane (Block)");
 		All.put(TRItem.parseItem(84,-1),"Jukebox");
 		All.put(TRItem.parseItem(85,-1),"Fence");
-		All.put(TRItem.parseItem(86,-1),"Pumpkin");
+		All.put(TRItem.parseItem(86,-1),"Pumpkin Block");
 		All.put(TRItem.parseItem(87,-1),"Netherrack");
 		All.put(TRItem.parseItem(88,-1),"Soul Sand");
 		All.put(TRItem.parseItem(89,-1),"Glowstone");
 		All.put(TRItem.parseItem(90,-1),"Portal");
 		All.put(TRItem.parseItem(91,-1),"Jack 'o' Lantern");
-		All.put(TRItem.parseItem(92,-1),"Cake");
-		All.put(TRItem.parseItem(93,-1),"Redstone Repeater");
-		All.put(TRItem.parseItem(94,-1),"Redstone Repeater");
+		All.put(TRItem.parseItem(92,-1),"Cake (Block)");
+		All.put(TRItem.parseItem(93,-1),"Redstone Repeater (Block)");
+		All.put(TRItem.parseItem(94,-1),"Redstone Repeater (Block)");
 		All.put(TRItem.parseItem(95,-1),"Locked chest");
 		All.put(TRItem.parseItem(96,-1),"Trapdoor");
 		All.put(TRItem.parseItem(97,-1),"Monster Egg");
@@ -276,7 +277,7 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(100,-1),"Red Mushroom Block");
 		All.put(TRItem.parseItem(101,-1),"Iron Bars");
 		All.put(TRItem.parseItem(102,-1),"Glass Pane");
-		All.put(TRItem.parseItem(103,-1),"Melon");
+		All.put(TRItem.parseItem(103,-1),"Melon Block");
 		All.put(TRItem.parseItem(104,-1),"Pumpkin Stem");
 		All.put(TRItem.parseItem(105,-1),"Melon Stem");
 		All.put(TRItem.parseItem(106,-1),"Vines");
@@ -288,7 +289,7 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(112,-1),"Nether Brick");
 		All.put(TRItem.parseItem(113,-1),"Nether Brick Fence");
 		All.put(TRItem.parseItem(114,-1),"Nether Brick Stairs");
-		All.put(TRItem.parseItem(115,-1),"Nether Wart");
+		All.put(TRItem.parseItem(115,-1),"Nether Wart (Block)");
 		All.put(TRItem.parseItem(116,-1),"Enchantment Table");
 		All.put(TRItem.parseItem(117,-1),"Brewing Stand");
 		All.put(TRItem.parseItem(118,-1),"Cauldron");
@@ -2477,7 +2478,7 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(223,0),"Teleporter");
 		All.put(TRItem.parseItem(223,1),"Tesla Coil");
 		All.put(TRItem.parseItem(223,2),"Crop-Matron");
-		All.put(TRItem.parseItem(223,-1),"Teleporters, Tesla Coils and Crop-Matrons");
+		All.put(TRItem.parseItem(223,-1),"x223");
 		
 		All.put(TRItem.parseItem(224,0),"Copper Block");
 		All.put(TRItem.parseItem(224,1),"Tin Block");
@@ -2487,7 +2488,7 @@ public class NameProcessor {
 		
 		All.put(TRItem.parseItem(225,0),"Personal Safe");
 		All.put(TRItem.parseItem(225,1),"Trade-O-Mat");
-		All.put(TRItem.parseItem(225,-1),"Safes and Trade-O-Mats");
+		All.put(TRItem.parseItem(225,-1),"x225");
 		
 		All.put(TRItem.parseItem(226,-1),"Luminator");
 		
@@ -2741,12 +2742,12 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(383,9),"Spawn Painting");
 		All.put(TRItem.parseItem(383,10),"Spawn arrow");
 		All.put(TRItem.parseItem(383,11),"Spawn Snowball");
-		All.put(TRItem.parseItem(383,12),"Spawn entity.Fireball.name");
-		All.put(TRItem.parseItem(383,13),"Spawn entity.SmallFireball.name");
-		All.put(TRItem.parseItem(383,14),"Spawn entity.ThrownEnderpearl.name");
-		All.put(TRItem.parseItem(383,15),"Spawn entity.EyeOfEnderSignal.name");
-		All.put(TRItem.parseItem(383,16),"Spawn entity.ThrownPotion.name");
-		All.put(TRItem.parseItem(383,17),"Spawn entity.ThrownExpBottle.name");
+		All.put(TRItem.parseItem(383,12),"Spawn Fireball");
+		All.put(TRItem.parseItem(383,13),"Spawn SmallFireball");
+		All.put(TRItem.parseItem(383,14),"Spawn ThrownEnderpearl");
+		All.put(TRItem.parseItem(383,15),"Spawn EyeOfEnderSignal");
+		All.put(TRItem.parseItem(383,16),"Spawn ThrownPotion");
+		All.put(TRItem.parseItem(383,17),"Spawn ThrownExpBottle");
 		All.put(TRItem.parseItem(383,20),"Spawn Block of TNT");
 		All.put(TRItem.parseItem(383,21),"Spawn Falling Block");
 		All.put(TRItem.parseItem(383,40),"Spawn Minecart");
@@ -2777,7 +2778,7 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(383,97),"Spawn Snow Golem");
 		All.put(TRItem.parseItem(383,98),"Spawn Ocelot");
 		All.put(TRItem.parseItem(383,99),"Spawn Iron Golem");
-		All.put(TRItem.parseItem(383,119),"Spawn entity.entity.cart.chest.name");
+		All.put(TRItem.parseItem(383,119),"Spawn Minecart Chest");
 		All.put(TRItem.parseItem(383,-1),"Spawn Eggs");
 		
 		All.put(TRItem.parseItem(384,-1),"Bottle o' Enchanting");
@@ -3500,17 +3501,19 @@ public class NameProcessor {
 			Map<String, Short> durabilities = null;
 			try {
 				final ItemDb db = ((Essentials) Bukkit.getPluginManager().getPlugin("Essentials")).getItemDb();
-				final Field field1 = ItemDb.class.getField("items");
+				final Field field1 = ItemDb.class.getDeclaredField("items");
 				field1.setAccessible(true);
 				items = (Map<String, Integer>) field1.get(db);
-				final Field field2 = ItemDb.class.getField("durabilities");
+				final Field field2 = ItemDb.class.getDeclaredField("durabilities");
 				field2.setAccessible(true);
 				durabilities = (Map<String, Short>) field2.get(db);
 			} catch (Exception ex) {
+				Log.debugEx(ex);
 				return false;
 			}
 			
 			if (items == null || durabilities == null) return false;
+			
 			final ArrayList<String> it = new ArrayList<String>();
 	
 			it.add("energycollectormk1,126,0");
@@ -3727,6 +3730,7 @@ public class NameProcessor {
 			}
 			return true;
 		} catch (Exception ex){
+			Log.debugEx(ex);
 			return false;
 		}
 	}

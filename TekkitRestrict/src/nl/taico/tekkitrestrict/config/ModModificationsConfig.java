@@ -8,7 +8,7 @@ import nl.taico.tekkitrestrict.Log;
 
 public class ModModificationsConfig extends TRConfig {
 	public static ArrayList<String> defaultContents(boolean extra){
-		ArrayList<String> tbr = new ArrayList<String>(120);
+		ArrayList<String> tbr = new ArrayList<String>(130);
 		
 		tbr.add("##########################################################################################");
 		tbr.add("## Configuration file for TekkitRestrict                                                ##");
@@ -28,19 +28,23 @@ public class ModModificationsConfig extends TRConfig {
 		if (extra) tbr.add("#:-;-:# LimitFlightTime");
 		tbr.add("FlyLimitDailyMinutes: 9999999");
 		tbr.add("");
-		tbr.add("# Should offensive powers of gemarmor be allowed? (explosion, lightning)");
-		tbr.add("# Default: false");
-		tbr.add("AllowGemArmorOffensive: false");
+		tbr.add("# GemArmor settings. NOTE: these settings are obsolete to the ones in EEPatch.config.yml");
+		tbr.add("GemArmor:");
+		tbr.add("    # Should offensive powers of gemarmor be allowed? (explosion, lightning)");
+		tbr.add("    # Default: false");
+		tbr.add("    AllowOffensive: false");
 		if (extra) tbr.add("#:-;-:# AllowGemArmorOffensive");
-		tbr.add("");
-		tbr.add("# Should the defensive powers of gemarmor be allowed? (flying, automatic running)");
-		tbr.add("# Default: true");
-		tbr.add("AllowGemArmorDefensive: true");
+		tbr.add("    # Should the defensive powers of gemarmor be allowed? (flying, automatic running)");
+		tbr.add("    # Default: true");
+		tbr.add("    AllowDefensive: false");
 		if (extra) tbr.add("#:-;-:# AllowGemArmorDefensive");
 		tbr.add("");
-		tbr.add("# Set RedPower timers minimum time in seconds");
-		tbr.add("# Default: 1.0");
-		tbr.add("RPTimerMin: 1.0");
+		tbr.add("# Set the minimal time of Redpower timers to the value here.");
+		tbr.add("# Default: true, 1.0");
+		tbr.add("RPTimer:");
+		tbr.add("    SetMinimalTime: true");
+		if (extra) tbr.add("#:-;-:# AutoRPTimer");
+		tbr.add("    MinTime: 1.0");
 		if (extra) tbr.add("#:-;-:# RPTimerMin");
 		tbr.add("");
 		tbr.add("##########################################################################################");

@@ -13,7 +13,7 @@ import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.ItemInWorldManager;
 import net.minecraft.server.MinecraftServer;
 
-import nl.taico.tekkitrestrict.tekkitrestrict;
+import nl.taico.tekkitrestrict.Log;
 
 public class TRCmdHelper {
 	public static void msg(@NonNull final CommandSender sender, @NonNull final String command, @NonNull final String explanation){
@@ -78,7 +78,7 @@ public class TRCmdHelper {
 			return target;
 		} catch (Exception e) {
 			sender.sendMessage("Error while retrieving offline player data!");
-			tekkitrestrict.log.warning("Exception in openAlc.Playerz: " + e.getMessage());
+			Log.warning("Exception in openAlc.Playerz: " + e.getMessage());
 			return null;
 		}
 	}

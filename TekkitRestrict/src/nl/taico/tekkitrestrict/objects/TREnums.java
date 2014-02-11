@@ -41,15 +41,42 @@ public class TREnums {
 	
 	public enum TRClickType{
 		Left, Right, Both, Trample, All;
-		public boolean right(){return (this.equals(TRClickType.Right));}
-		public boolean left(){return (this.equals(TRClickType.Left));}
-		public boolean both(){return (this.equals(TRClickType.Both));}
-		public boolean trample(){return (this.equals(TRClickType.Trample));}
-		public boolean all(){return (this.equals(TRClickType.All));}
+		public boolean right(){
+			return this == Right;
+		}
+		public boolean left(){
+			return this == Left;
+		}
+		public boolean both(){
+			return this == Both;
+		}
+		public boolean trample(){
+			return this == Trample;
+		}
+		public boolean all(){
+			return this == All;
+		}
+		public boolean blockslr(){
+			return this == Both || this == All;
+		}
+		public String toString(){
+			switch (this){
+				case All:
+				case Both: return "clicking";
+				case Left: return "left-clicking";
+				case Right: return "right-clicking";
+				case Trample: return "trampling";
+				default: return "";
+			}
+		}
 	}
 	
 	public enum ConfigFile {
-		General, Advanced, ModModifications, DisableInteract, DisableItems, HackDupe, LimitedCreative, Logging, TPerformance, GroupPermissions, SafeZones, Database, EEPatch;
+		General, Advanced, ModModifications, DisableInteract, DisableItems, HackDupe, LimitedCreative, Logging, TPerformance, GroupPermissions, SafeZones, Database, Limiter, EEPatch;
+	}
+	
+	public enum ConfigFile2 {
+		General, Advanced, ModModifications, Banned, HackDupe, LimitedCreative, Logging, TPerformance, GroupPermissions, SafeZones, Database, Limiter, EEPatch;
 	}
 	
 	public enum SSMode {
@@ -228,6 +255,82 @@ public class TREnums {
 		}
 		public boolean isExtreme(){
 			return this.nr==4;
+		}
+	}
+
+	public enum TRMatchMethod {
+		STARTS_WITH, ENDS_WITH, CONTAINS, EQUALS, REGEX;
+		public boolean caseSensitive;
+		TRMatchMethod(){
+			caseSensitive = false;
+		}
+		TRMatchMethod(boolean caseSensitive){
+			this.caseSensitive = caseSensitive;
+		}
+		
+		public boolean isCaseSensitive(){
+			return this.caseSensitive;
+		}
+		public boolean isCS(){
+			return this.caseSensitive;
+		}
+		
+		public static TRMatchMethod byName(String name){
+			name = name.replace(" ", "").replace("_", "").toUpperCase();
+			for (TRMatchMethod m : TRMatchMethod.values()){
+				if (name.equals(m.name().replace("_", ""))) return m;
+			}
+			return null;
+		}
+	}
+	
+	public enum TRFilterType {
+		CONSOLE, CONSOLE_SERVER_LOG, SERVER_LOG, FORGE_SERVER_LOG, FORGE_LOG, ALL;
+		public boolean isConsole(){
+			return this == CONSOLE || this == CONSOLE_SERVER_LOG || this == ALL;
+		}
+		public boolean isServerLog(){
+			return this == SERVER_LOG || this == CONSOLE_SERVER_LOG || this == ALL || this == FORGE_SERVER_LOG;
+		}
+		public boolean isForgeLog(){
+			return this == FORGE_LOG || this == ALL || this == FORGE_SERVER_LOG;
+		}
+	}
+	
+	public enum TRSplitLevel{
+		SEVERE, WARNING, ERRORLEVELS, INFO, COMMAND, FINE, FINER, FINEST, FINELEVELS, ALL;
+		
+		public boolean matches(Level level){
+			switch (level.getName().toUpperCase()){
+				case "SEVERE": return isSevere();
+				case "WARNING": return isWarning();
+				case "INFO": return isInfo();
+				case "FINE": return isFine();
+				case "FINER": return isFiner();
+				case "FINEST": return isFinest();
+				default: return this == ALL;
+			}
+		}
+		public boolean isSevere(){
+			return this == SEVERE || this == ERRORLEVELS || this == ALL;
+		}
+		public boolean isWarning(){
+			return this == WARNING || this == ERRORLEVELS || this == ALL;
+		}
+		public boolean isInfo(){
+			return this == INFO || this == ALL;
+		}
+		public boolean isFine(){
+			return this == FINE || this == FINELEVELS || this == ALL;
+		}
+		public boolean isFiner(){
+			return this == FINER || this == FINELEVELS || this == ALL;
+		}
+		public boolean isFinest(){
+			return this == FINEST || this == FINELEVELS || this == ALL;
+		}
+		public boolean isCommand(){
+			return this == COMMAND;
 		}
 	}
 }

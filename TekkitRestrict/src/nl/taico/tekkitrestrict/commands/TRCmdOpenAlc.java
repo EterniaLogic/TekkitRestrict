@@ -102,7 +102,7 @@ public class TRCmdOpenAlc implements CommandExecutor {
 			
 			msgg(sender, "Opened " + OName + "'s " + getColor2(color) + ChatColor.GREEN + " Alchemy Bag!");
 			
-			tekkitrestrict.log.info(player.getName() + " opened " + OName + "'s " + getColor(color) + " Alchemy Bag!");
+			Log.info(player.getName() + " opened " + OName + "'s " + getColor(color) + " Alchemy Bag!");
 		} catch (Exception ex) {
 			msgr(sender, "An error has occurred processing your command.");
 			Warning.other("Exception in OpenAlc (TRCommandAlc.onCommand)! Error: " + ex.toString(), false);

@@ -42,38 +42,7 @@ public class TRPos {
 	public TRPos(final BlockVector loc1, final BlockVector loc2){
 		this(loc1.getBlockX(), loc1.getBlockY(), loc1.getBlockZ(), loc2.getBlockX(), loc2.getBlockY(), loc2.getBlockZ());
 	}
-	/**
-	 * @param loc1
-	 * @param loc2
-	 * @return
-	 * @deprecated Use new {@link #TRPos(BlockVector, BlockVector)} instead
-	 */
-	public static TRPos parse(@NonNull final BlockVector loc1, @NonNull final BlockVector loc2){
-		TRPos p = new TRPos();
-		p.x1 = loc1.getBlockX();
-		p.x2 = loc2.getBlockX();
-		p.y1 = loc1.getBlockY();
-		p.y2 = loc2.getBlockY();
-		p.z1 = loc1.getBlockZ();
-		p.z2 = loc2.getBlockZ();
-		if (p.x1 > p.x2){
-			int t = p.x1;
-			p.x1 = p.x2;
-			p.x2 = t;
-		}
-		if (p.y1 > p.y2){
-			int t = p.y1;
-			p.y1 = p.y2;
-			p.y2 = t;
-		}
-		if (p.z1 > p.z2){
-			int t = p.z1;
-			p.z1 = p.z2;
-			p.z2 = t;
-		}
-		p.isEmpty = false;
-		return p;
-	}
+	
 	public TRPos(final int x1, final int y1, final int z1, final int x2, final int y2, final int z2){
 		if (x1 > x2){
 			this.x1 = x2;

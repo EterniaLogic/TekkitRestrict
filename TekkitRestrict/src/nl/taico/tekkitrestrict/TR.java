@@ -14,7 +14,15 @@ public class TR {
 	}
 	
 	public static Logger getLogger(){
-		return tekkitrestrict.log;
+		return instance.getLogger();
+	}
+	
+	public static void saveDefaultConfig(boolean force){
+		instance.saveDefaultConfig(force);
+	}
+	
+	public static void reloadConfig(){
+		instance.reloadConfig();
 	}
 	
 	public static TRFileConfiguration getConfig(){

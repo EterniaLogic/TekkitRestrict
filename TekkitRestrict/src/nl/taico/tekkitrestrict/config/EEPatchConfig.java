@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class EEPatchConfig extends TRConfig {
 	public static ArrayList<String> defaultContents(boolean extra){
-		final ArrayList<String> tbr = new ArrayList<String>(extra ? 700 : 600);
+		final ArrayList<String> tbr = new ArrayList<String>(700);
 		
 		tbr.add("############################################################################################");
 		tbr.add("## Configuration file for TekkitRestrict                                                  ##");
@@ -622,6 +622,10 @@ public class EEPatchConfig extends TRConfig {
 		tbr.add("            # Ring of Ignition is on them.");
 		tbr.add("            Ignition: true");
 		if (extra) tbr.add("#:-;-:# Actions.Other.Pedestal.Ignition");
+		tbr.add("");
+		tbr.add("            # Interdict: If pedestals are allowed to push mobs away from them.");
+		tbr.add("            Interdict: true");
+		if (extra) tbr.add("#:-;-:# Actions.Other.Pedestal.Interdict");
 		tbr.add("");
 		tbr.add("            # Repair: If pedestals are allowed to repair items in the inventories of");
 		tbr.add("            # nearby players if the Repair Talisman is on them.");

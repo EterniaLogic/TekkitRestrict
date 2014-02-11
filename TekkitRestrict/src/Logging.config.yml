@@ -36,6 +36,85 @@ SplitLogs: true
 # Default: "log"
 SplitLogsLocation: "log"
 
+# There are 9 different levels:
+# Severe, Warning
+# Errorlevels: Severe and Warning
+# Info
+# Fine, Finer, Finest
+# Finelevels - Fine, Finer and Finest
+# All - All levels
+Splitters:
+    Option1:
+        Description: For the login and logout
+        File: Login
+        Level: Info
+        CaseSensitive: true
+        Method: Contains
+        Messages:
+        - " lost connection: disconnect."
+        - " logged in with entity id "
+        - " lost connection: user was kicked."
+    Chat:
+        Description: Set this to your own chatformat.
+        # <Rank> <Name>: <message> --> <(.*)> <(.*)>: (.*)
+        File: Chat
+        Level: Info
+        CaseSensitive: true
+        Method: Regex
+        Messages:
+        - "\\[(.*)\\] (.*): (.*)"
+    Errors:
+        Description: Logs all errors to a separate file.
+        File: Error
+        Level: ErrorLevels
+        CaseSensitive: true
+        Method: Regex
+        Messages: ["(.*)"]
+
+# Should all commands be logged to a file?
+# Default: Commands
+# Possible: a filename or false
+LogAllCommandsToFile: Command
+
+# Should NEI Item giving be logged to a file?
+# Default: SpawnItem
+# Possible: a filename or false
+LogNEIGiveToFile: SpawnItem
+
+# EndsWith is special here, in that it does not look at the arguments, like the other methods do
+# /fakecommand kick will not match "kick" with endswith
+CommandSplitters:
+    Private:
+        File: PrivateChat
+        Method: Regex
+        Commands:
+        - "e?m(sg)? .*"
+        - "e?tell .*"
+        - "e?r(eply)? .*"
+        - "e?mail .*"
+        - "e?whisper .*"
+    Punishments:
+        Description: Should include punishment commands from most plugins automatically
+        File: Punishment
+        Method: EndsWith
+        Commands:
+        - "kick"
+        - "ban"
+        - "mute"
+        - "jail"
+        - "pardon"
+        - "banip"
+        - "pardonip"
+    SpawnItems:
+        File: SpawnItem
+        Method: Regex
+        Commands:
+        - "i .*"
+        - "e?item .*"
+        - "e?give .*"
+        - "e?more .*"
+        - "e?un(l(imited)?)? .*"
+
 ###########################################################################
 ############################### Filter Logs ###############################
 ###########################################################################
@@ -62,19 +141,14 @@ FilterLogs: true
 # 
 # Please make sure every groupname is unique
 Filters:
-    Filter1:
-        Method: contains
-        CaseSensitive: false
-        Type: all
-        Messages: []
     SpammyMessages1:
         Description: Spammy messages like slotChanging and Sending Triang
         Method: regex
         CaseSensitive: true
         Type: console_serverlog
         Messages:
-        - "Sending Triang: -*\\d+, -*\\d+\\.\\d+"
-        - "slotChanging\\(\\d+\\)"
+        - "Sending Triang: (-?)(\\d+), (-?)(\\d+)\\.(\\d+)"
+        - "slotChanging\\((\\d+)\\)"
     SpammyMessages2:
         Description: Filters out Repair is active.. and Player found.. Disable this if you have eepatch
         Method: equals
@@ -83,21 +157,21 @@ Filters:
         Messages:
         - "Repair is active.."
         - "Player found.."
-#    MovedWrongly:
-#        Description: Filters incorrect moving warnings from the console.
-#        Method: regex
-#        CaseSensitive: true
-#        Type: console
-#        Messages:
-#        - "Got position -*\\d+\\.\\d+, -*\\d+\\.\\d+, -*\\d+\\.\\d+"
-#        - "Expected -*\\d+\\.\\d+, -*\\d+\\.\\d+, -*\\d+\\.\\d+"
+    MovedWrongly:
+        Description: Filters incorrect moving warnings from the console.
+        Method: regex
+        CaseSensitive: true
+        Type: console
+        Messages:
+        - "Got position (-?)(\\d+)\\.(\\d+), (-?)(\\d+)\\.(\\d+), (-?)(\\d+)\\.(\\d+)"
+        - "Expected (-?)(\\d+)\\.(\\d+), (-?)(\\d+)\\.(\\d+), (-?)(\\d+)\\.(\\d+)"
 #    IPLostConnection:
 #        Description: Filters out xxx.xxx.xxx.xxx:xxxx lost connection
 #        Method: regex
 #        CaseSensitive: true
 #        Type: console_serverlog
 #        Messages:
-#        - "/\\d+\\.\\d+\\.\\d+\\.\\d+:\\d+ lost connection"
+#        - "/(\\d+)\\.(\\d+)\\.(\\d+)\\.(\\d+):(\\d+) lost connection"
     Join1:
         Method: startswith
         CaseSensitive: true
@@ -127,17 +201,8 @@ Filters:
 #        Messages:
 #        - "GroupManager - INFO -  Data files refreshed."
 
-
-# If a String contains any of the items listed here, it will not be
-# logged. Does not work if FilterLogs is false.
-# To add loglevels, do the following:
-# - "loglevel: fine"
-LogFilter:
-- "overloaded?"
-- "chunk coordinates:"
-
 ###########################################################################
-############################### Log Enhancer ##############################
+############################# Console Enhancer ############################
 ###########################################################################
 UseLogEnchancer: true
 EnchanceEssentialsCmd: true
@@ -148,9 +213,8 @@ EnhanceEssentialsCmdDeny: true
 
 #Reformat:
 #    Option1:
-#        Message: "\[(.*)\] \[(.*)\] (.*): (.*)"
-#        Replacement: "\[($2)\] ($3): ($4)"
-    
+#        Message: "\\[(.*)\\] \\[(.*)\\] (.*): (.*)"
+#        Replacement: "\\[($2)\\] ($3): ($4)"
 
 ###########################################################################
 ############################# Log Hacks/Dupes #############################

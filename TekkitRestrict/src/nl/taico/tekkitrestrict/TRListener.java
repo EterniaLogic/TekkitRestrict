@@ -23,7 +23,7 @@ import nl.taico.tekkitrestrict.commands.TRCmdOpenAlc;
 import nl.taico.tekkitrestrict.commands.TRCmdOpenInv;
 import nl.taico.tekkitrestrict.functions.TRLWCProtect;
 import nl.taico.tekkitrestrict.functions.TRLimiter;
-import nl.taico.tekkitrestrict.functions.TRNoClick;
+import nl.taico.tekkitrestrict.functions.TRNoInteract;
 import nl.taico.tekkitrestrict.functions.TRNoDupeProjectTable;
 import nl.taico.tekkitrestrict.functions.TRNoItem;
 import nl.taico.tekkitrestrict.objects.TRItem;
@@ -145,7 +145,7 @@ public class TRListener implements Listener {
 		// lets do this based on a white-listed approach.
 		// First, lets loop through the DisableClick list to stop clicks.
 		// Perf: 8x
-		if (TRNoClick.isDisabled(event)){
+		if (TRNoInteract.isDisabled(event)){
 			event.setCancelled(true);
 			return;
 		}

@@ -101,7 +101,7 @@ public class TMetrics {
 			
 			int arch = 0;
 			if (osarch.equals("x86_64")) arch = 1;
-			int eepatch = tekkitrestrict.linkEEPatch()?1:0;
+			int eepatch = tekkitrestrict.hasEEPatch()?1:0;
 	
 			/*
 			params =  "id="+uid+"&"

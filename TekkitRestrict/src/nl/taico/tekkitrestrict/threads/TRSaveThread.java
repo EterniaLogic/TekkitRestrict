@@ -9,7 +9,7 @@ import nl.taico.tekkitrestrict.functions.TRLimiter;
 import nl.taico.tekkitrestrict.functions.TRSafeZone;
 
 public class TRSaveThread extends Thread {
-	private boolean err1, err2, err3, err4;
+	private boolean err1, err2, err3;//, err4;
 	private boolean saving = false;
 	private boolean last = false;
 	public boolean isSaving(){
@@ -58,16 +58,6 @@ public class TRSaveThread extends Thread {
 			//try {
 			//	TRNoHack.clearMaps();
 			//} catch (Exception ex) {}
-			
-			try {
-				TRLimiter.manageData();
-			} catch (Exception ex){
-				if (!err4){
-					Warning.other("An error occurred with the Limiter Data Manager! (This error will only be logged once)", false);
-					Log.Exception(ex, false);
-					err4 = true;
-				}
-			}
 			saving = false;
 			
 			if (tekkitrestrict.disable){

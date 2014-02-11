@@ -6,6 +6,7 @@ public class TRConfigManager {
 	public SimpleConfig TRGeneralConfig;
 	public TRConfigManager(){
 		SimpleConfigManager manager = new SimpleConfigManager(tekkitrestrict.getInstance());
+		@SuppressWarnings("unused")
 		String[] header = {
 			//"######################################################################", 
 			"Configuration file for TekkitRestrict", 

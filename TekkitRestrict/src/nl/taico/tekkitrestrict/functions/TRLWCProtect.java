@@ -1,7 +1,7 @@
 package nl.taico.tekkitrestrict.functions;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
@@ -23,22 +23,23 @@ import com.griefcraft.model.Permission;
 import com.griefcraft.model.Protection;
 
 public class TRLWCProtect {
-	public static CopyOnWriteArrayList<TRItem> lwcBlocked = new CopyOnWriteArrayList<TRItem>();
+	public static ArrayList<TRItem> lwcBlocked = new ArrayList<TRItem>();
 	
 	public static boolean init = false;
 	public static void reload(){
 		init = false;
 		final List<String> blockedList = tekkitrestrict.config.getStringList(ConfigFile.Advanced, "LWCPreventNearLocked");
-		lwcBlocked.clear();
+		final ArrayList<TRItem> temp = new ArrayList<TRItem>();
 		for (final String str : blockedList){
 			try {
-				lwcBlocked.addAll(TRItemProcessor.processItemString(str));
+				temp.addAll(TRItemProcessor.processItemString(str));
 			} catch (TRException ex) {
 				Warning.config("You have an error in your Advanced.config.yml in LWCPreventNearLocked:", false);
 				Warning.config(ex.getMessage(), false);
 				continue;
 			}
 		}
+		lwcBlocked = temp;
 	}
 	
 	private static void init(){

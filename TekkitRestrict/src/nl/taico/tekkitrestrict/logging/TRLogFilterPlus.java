@@ -13,77 +13,65 @@ import java.util.logging.Logger;
 
 import org.bukkit.configuration.ConfigurationSection;
 
+import nl.taico.tekkitrestrict.objects.TREnums.TRFilterType;
+import nl.taico.tekkitrestrict.objects.TREnums.TRMatchMethod;
+
 public class TRLogFilterPlus {
 	public static Filter consoleFilter = new TRConsoleFilter();
 	public static Filter forgeFilter = new TRForgeFilter();
 	public static Filter logFilter = new TRLogFilter();
 	
-	public enum TRFilterMethod {
-		STARTS_WITH, ENDS_WITH, CONTAINS, EQUALS, REGEX;
-		public boolean caseSensitive;
-		TRFilterMethod(){
-			caseSensitive = false;
+	private TRMatchMethod method;
+	private Set<String> filters = new HashSet<String>();
+	private final TRFilterType type;
+	public static ArrayList<TRLogFilterPlus> allFilters = new ArrayList<TRLogFilterPlus>();
+	
+	public static void assignFilters(){
+		for (final Handler h : Logger.getLogger("Minecraft").getHandlers()){
+			if (h instanceof ConsoleHandler)
+				h.setFilter(consoleFilter);
+			else if (h instanceof FileHandler)
+				h.setFilter(logFilter);
 		}
-		TRFilterMethod(boolean caseSensitive){
-			this.caseSensitive = caseSensitive;
-		}
-		
-		public boolean isCaseSensitive(){
-			return this.caseSensitive;
-		}
-		public boolean isCS(){
-			return this.caseSensitive;
-		}
-		
-		public static TRFilterMethod byName(String name){
-			name = name.replace(" ", "").replace("_", "").toUpperCase();
-			for (TRFilterMethod m : TRFilterMethod.values()){
-				if (name.equals(m.name().replace("_", ""))) return m;
-			}
-			return null;
-		}
-	}
-	public enum FilterType {
-		CONSOLE, CONSOLE_SERVER_LOG, SERVER_LOG, FORGE_SERVER_LOG, FORGE_LOG, ALL;
-		public boolean isConsole(){
-			return this == CONSOLE || this == CONSOLE_SERVER_LOG || this == ALL;
-		}
-		public boolean isServerLog(){
-			return this == SERVER_LOG || this == CONSOLE_SERVER_LOG || this == ALL || this == FORGE_SERVER_LOG;
-		}
-		public boolean isForgeLog(){
-			return this == FORGE_LOG || this == ALL || this == FORGE_SERVER_LOG;
+
+		for (final Handler h : Logger.getLogger("ForgeModLoader").getHandlers()){
+			if (h instanceof FileHandler) h.setFilter(forgeFilter);
 		}
 	}
 	
-	private TRFilterMethod method;
-	private Set<String> filters = new HashSet<String>();
-	private final FilterType type;
-	public static ArrayList<TRLogFilterPlus> allFilters = new ArrayList<TRLogFilterPlus>();
+	public static void disable(){
+		for (final Handler h : Logger.getLogger("Minecraft").getHandlers()){
+			if (h.getFilter() == consoleFilter || h.getFilter() == logFilter) h.setFilter(null);
+		}
+
+		for (final Handler h : Logger.getLogger("ForgeModLoader").getHandlers()){
+			if (h.getFilter() == forgeFilter) h.setFilter(null);
+		}
+	}
 	
 	public static void loadFilters(ConfigurationSection cs){
 		allFilters.clear();
 		for (String key : cs.getKeys(false)){
-			TRFilterMethod method = null;
+			TRMatchMethod method = null;
 			final String cmethod = cs.getString(key+".Method", "contains").replace("_", "").toUpperCase();
-			for (TRFilterMethod m : TRFilterMethod.values()){
+			for (TRMatchMethod m : TRMatchMethod.values()){
 				if (m.name().replace("_", "").equals(cmethod)){
 					method = m;
 					break;
 				}
 			}
-			if (method == null) method = TRFilterMethod.CONTAINS;
+			if (method == null) method = TRMatchMethod.CONTAINS;
 			method.caseSensitive = cs.getBoolean(key+".CaseSensitive", false);
 			final String ctype = cs.getString(key+".Type", "all").replace("_", "").toUpperCase();
-			FilterType type = null;
-			for (FilterType t : FilterType.values()){
+			TRFilterType type = null;
+			for (TRFilterType t : TRFilterType.values()){
 				if (t.name().replace("_", "").equals(ctype)){
 					type = t;
 					break;
 				}
 			}
-			if (type == null) type = FilterType.ALL;
-			new TRLogFilterPlus(method, type, cs.getStringList("Messages"));
+			if (type == null) type = TRFilterType.ALL;
+			new TRLogFilterPlus(method, type, cs.getStringList(key+".Messages"));
 		}
 		//TODO make a separate filter for log_and_console, which runs on the minecraft logger
 		((TRConsoleFilter) consoleFilter).reload();
@@ -91,7 +79,7 @@ public class TRLogFilterPlus {
 		((TRLogFilter) logFilter).reload();
 	}
 	
-	public TRLogFilterPlus(TRFilterMethod method, FilterType type, Collection<String> filters){
+	public TRLogFilterPlus(TRMatchMethod method, TRFilterType type, Collection<String> filters){
 		this.method = method;
 		this.type = type;
 		for (String filter : filters) addFilter(filter);
@@ -141,30 +129,11 @@ public class TRLogFilterPlus {
 		}
 	}
 	
-	public FilterType getType() {
+	public TRFilterType getType() {
 		return type;
 	}
 	
-	public static void assignFilters(){
-		final Logger mclogger = Logger.getLogger("Minecraft");
-		final Handler[] mchandlers = mclogger.getHandlers();
-		
-		for (Handler h : mchandlers){
-			if (h instanceof ConsoleHandler){
-				h.setFilter(consoleFilter);
-			} else if (h instanceof FileHandler){
-				h.setFilter(logFilter);
-			}
-		}
-
-		final Logger forgelogger = Logger.getLogger("ForgeModLoader");
-		for (Handler h : forgelogger.getHandlers()){
-			if (!(h instanceof FileHandler)) continue;
-			h.setFilter(forgeFilter);
-		}
-	}
-	
-	public static boolean matches(TRFilterMethod method, String input, String filter){
+	public static boolean matches(TRMatchMethod method, String input, String filter){
 		switch (method){
 			case REGEX:
 				if (!method.isCS()) input = input.toLowerCase(Locale.ENGLISH);

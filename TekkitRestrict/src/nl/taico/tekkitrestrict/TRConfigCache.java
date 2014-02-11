@@ -125,12 +125,20 @@ public class TRConfigCache {
 		Listeners.UseLimitedCreative = config.getBoolean2(ConfigFile.General, "UseLimitedCreative", true);
 		Listeners.useNoCLickPerms = config.getBoolean2(ConfigFile.DisableInteract, "UseNoClickPermissions", false);
 		
-		LogFilter.replaceList = config.getStringList(ConfigFile.Logging, "LogFilter");
-		LogFilter.splitLogs = config.getBoolean2(ConfigFile.Logging, "SplitLogs", true);
-		LogFilter.filterLogs = config.getBoolean2(ConfigFile.Logging, "FilterLogs", true);
+		//LogFilter.replaceList = config.getStringList(ConfigFile.Logging, "LogFilter");
+		//LogFilter.splitLogs = config.getBoolean2(ConfigFile.Logging, "SplitLogs", true);
+		//LogFilter.filterLogs = config.getBoolean2(ConfigFile.Logging, "FilterLogs", true);
 		LogFilter.logLocation = config.getString2(ConfigFile.Logging, "SplitLogsLocation", "log");
 		LogFilter.fileFormat = config.getString2(ConfigFile.Logging, "FilenameFormat", "{TYPE}-{DAY}-{MONTH}-{YEAR}.log");
 		LogFilter.logFormat = config.getString2(ConfigFile.Logging, "LogStringFormat", "[{HOUR}:{MINUTE}:{SECOND}] {INFO}");
+		
+		LogFilter.logAllCommandsFile = config.getString2(ConfigFile.Logging, "LogAllCommandsToFile", "Command");
+		if (LogFilter.logAllCommandsFile.equalsIgnoreCase("false")) LogFilter.logAllCommands = false;
+		else LogFilter.logAllCommands = true;
+		
+		LogFilter.logNEIGiveFile = config.getString2(ConfigFile.Logging, "LogNEIGiveToFile", "SpawnItem");
+		if (LogFilter.logNEIGiveFile.equalsIgnoreCase("false")) LogFilter.logNEIGive = false;
+		else LogFilter.logNEIGive = true;
 		
 		Threads.gemArmorSpeed = config.getInt2(ConfigFile.TPerformance, "GemArmorDThread", 120);
 		Threads.inventorySpeed = config.getInt2(ConfigFile.TPerformance, "InventoryThread", 400);
@@ -138,8 +146,8 @@ public class TRConfigCache {
 		Threads.SSEntityRemoverSpeed = config.getInt2(ConfigFile.TPerformance, "SSEntityRemoverThread", 350);
 		Threads.worldCleanerSpeed = config.getInt2(ConfigFile.TPerformance, "WorldCleanerThread", 15000);
 		
-		Threads.GAMovement = config.getBoolean2(ConfigFile.ModModifications, "AllowGemArmorDefensive", true);
-		Threads.GAOffensive = config.getBoolean2(ConfigFile.ModModifications, "AllowGemArmorOffensive", false);
+		Threads.GAMovement = config.getBoolean2(ConfigFile.ModModifications, "GemArmor.AllowDefensive", true);
+		Threads.GAOffensive = config.getBoolean2(ConfigFile.ModModifications, "GemArmor.AllowOffensive", false);
 		
 		Threads.SSDisableEntities = config.getBoolean2(ConfigFile.SafeZones, "InSafeZones.DisableEntities", false);
 		Threads.SSDisableEntitiesRange = config.getInt2(ConfigFile.SafeZones, "InSafeZones.DisableEntitiesRange", 3);
@@ -234,9 +242,12 @@ public class TRConfigCache {
 	}
 	
 	public static class LogFilter {
-		public static List<String> replaceList = new ArrayList<String>();
-		public static boolean splitLogs, filterLogs;
+		//public static List<String> replaceList = new ArrayList<String>();
+		//public static boolean splitLogs, filterLogs;
 		public static String logLocation, fileFormat, logFormat;
+		public static boolean logAllCommands, logNEIGive;
+		public static String logAllCommandsFile, logNEIGiveFile;
+		public static FileLog logAllCommandsLog, logNEIGiveLog;
 	}
 	
 	public static class Threads {

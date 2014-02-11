@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.tekkitrestrict;
 import nl.taico.tekkitrestrict.Log.Warning;
 
@@ -46,7 +47,7 @@ public abstract class TRConfig {
 	}
 	
 	protected static void upgradeFile(String name, ArrayList<String> content){
-		tekkitrestrict.log.info("Upgrading "+name+".config.yml file.");
+		Log.info("Upgrading "+name+".config.yml file.");
 		File configFile = new File("plugins"+s+"tekkitrestrict"+s+name+".config.yml");
 		if (configFile.exists()){
 			File backupfile = new File("plugins"+s+"tekkitrestrict"+s+name+".config_backup.yml");
@@ -76,11 +77,11 @@ public abstract class TRConfig {
 			try {if (output != null) output.close();} catch (IOException e1) {}
 			return;
 		}
-		tekkitrestrict.log.info(name+".config.yml file was upgraded successfully!");
+		Log.info(name+".config.yml file was upgraded successfully!");
 		Warning.loadWarnings.add(name+".config.yml file was upgraded! Please check the new/changed config settings!");
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "deprecation"})
 	protected static ArrayList<String> convertDefaults(ArrayList<String> defaults){
 		int j = defaults.size();
 		for (int i = 0;i<j;i++){
@@ -140,7 +141,7 @@ public abstract class TRConfig {
 						} else if (o instanceof String){
 							defaults.add(i, "- \"" + o.toString().replace("\\\"", "#;~;#").replace("\"", "\\\"").replace("#;~;#", "\\\"") + "\"");//input element after posstring, default values are after this one.
 						} else {
-							tekkitrestrict.log.severe("Error in Upgrader: invalid config entry, not Primitive or String");
+							Log.severe("Error in Upgrader: invalid config entry, not Primitive or String");
 							continue;
 						}
 						i++;//input next element after this one.
@@ -148,7 +149,7 @@ public abstract class TRConfig {
 					}
 					i--; j--;
 				} else {
-					tekkitrestrict.log.severe("Error in Upgrader: invalid config entry, obj is unknown object! Class: " + obj.getClass().getName());
+					Log.severe("Error in Upgrader: invalid config entry, obj is unknown object! Class: " + obj.getClass().getName());
 					continue;
 				}
 			}
@@ -156,7 +157,7 @@ public abstract class TRConfig {
 		return defaults;
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "deprecation"})
 	protected static ArrayList<String> convertDefaultsShortList(ArrayList<String> defaults){
 		int j = defaults.size();
 		for (int i = 0;i<j;i++){
@@ -200,7 +201,7 @@ public abstract class TRConfig {
 						if (isPrimitive(o) || o instanceof String){
 							toadd += "\""+o.toString().replace("\\\"", "#;~;#").replace("\"", "\\\"").replace("#;~;#", "\\\"")+"\", ";
 						} else {
-							tekkitrestrict.log.severe("Error in Upgrader: invalid config entry, not Primitive or String");
+							Log.severe("Error in Upgrader: invalid config entry, not Primitive or String");
 							continue;
 						}
 					}
@@ -214,7 +215,7 @@ public abstract class TRConfig {
 					
 					i--; j--;
 				} else {
-					tekkitrestrict.log.severe("Error in Upgrader: invalid config entry, obj is unknown object! Class: " + obj.getClass().getName());
+					Log.severe("Error in Upgrader: invalid config entry, obj is unknown object! Class: " + obj.getClass().getName());
 					defaults.remove(i);
 					i--; j--;
 					continue;

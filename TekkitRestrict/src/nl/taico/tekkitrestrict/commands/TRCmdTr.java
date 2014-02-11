@@ -5,15 +5,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Handler;
-import java.util.logging.Level;
 import java.util.logging.LogManager;
-import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
@@ -22,7 +19,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.eclipse.jdt.annotation.NonNull;
 
@@ -44,7 +40,7 @@ import nl.taico.tekkitrestrict.eepatch.EEPSettings;
 import nl.taico.tekkitrestrict.functions.TRChunkUnloader2;
 import nl.taico.tekkitrestrict.functions.TREMCSet;
 import nl.taico.tekkitrestrict.functions.TRLimiter;
-import nl.taico.tekkitrestrict.functions.TRNoClick;
+import nl.taico.tekkitrestrict.functions.TRNoInteract;
 import nl.taico.tekkitrestrict.functions.TRNoItem;
 import nl.taico.tekkitrestrict.functions.TRSafeZone;
 import nl.taico.tekkitrestrict.objects.TREnums.ChunkUnloadMethod;
@@ -55,6 +51,7 @@ import nl.taico.tekkitrestrict.objects.TRLocation;
 import nl.taico.tekkitrestrict.objects.TRPos;
 import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 import nl.taico.tekkitrestrict.objects.TREnums.SafeZone;
+import nl.taico.tekkitrestrict2.SettingsStorage;
 
 import static nl.taico.tekkitrestrict.commands.TRCmdHelper.*;
 
@@ -115,6 +112,10 @@ public class TRCmdTr implements CommandExecutor {
 		return true;
 	}
 	private void debugTesting(CommandSender sender, String args[]){
+		SettingsStorage.genBanned();
+		
+		if (0 == Integer.parseInt("0")) return;
+		
 		final Enumeration<String> cc = LogManager.getLogManager().getLoggerNames();
 		HashMap<Logger, Handler[]> handlers = new HashMap<Logger, Handler[]>();
 		while (cc.hasMoreElements()){
@@ -122,7 +123,8 @@ public class TRCmdTr implements CommandExecutor {
 			final Logger l = Logger.getLogger(s);
 			if (l == null) continue;
 			
-			sender.sendMessage("LoggerName: "+l.getName()+"; ManagerName: "+s);
+			sender.sendMessage("LoggerName : "+l.getName()+";");
+			sender.sendMessage("ManagerName: "+s);
 			
 			if (handlers.put(l, l.getHandlers()) != null) sender.sendMessage("Double logger found!");
 			
@@ -131,14 +133,14 @@ public class TRCmdTr implements CommandExecutor {
 			}
 		}
 		
-		
+		/*
 		HashSet<Handler> handlers2 = new HashSet<Handler>();
 		for (Handler[] val : handlers.values()){
 			for (Handler h : val){
 				if (!handlers2.add(h)) sender.sendMessage("    Duplicate Handler: "+h.toString());
 			}
-		}
-		
+		}*/
+		/*
 		msg(sender, "-------------------------------------------");
 		Handler[] mchandlers = Logger.getLogger("Minecraft").getHandlers();
 		for (Handler h : mchandlers){
@@ -147,14 +149,21 @@ public class TRCmdTr implements CommandExecutor {
 			} else {
 				h.publish(new LogRecord(Level.INFO, "Log file only message."));
 			}
-		}
-		
+		}*/
+		/*
 		Handler forgehandler = Logger.getLogger("ForgeModLoader").getHandlers()[0];
 		forgehandler.publish(new LogRecord(Level.INFO, "Forge Log file only message."));
 		msg(sender, "-------------------------------------------");
 		for (Plugin plugin : Bukkit.getPluginManager().getPlugins()){
 			msg(sender, "Plugin name="+plugin.getName()+"; Logger="+plugin.getLogger().getName());
-		}
+		}*/
+		
+		Logger mc = Logger.getLogger("Minecraft");
+		mc.warning("MCWarning");
+		Log.warning("Test warning");
+		Log.severe("Severe warning");
+		System.out.println(Log.trLogger.getUseParentHandlers());
+		System.out.println(Log.trLogger.getParent().getName());
 	}
 
 	private void help(CommandSender sender){
@@ -284,7 +293,7 @@ public class TRCmdTr implements CommandExecutor {
 		msg(sender, "");
 		msgb(sender, "Version: " + ChatColor.GREEN + tekkitrestrict.version.toMetricsVersion());
 		if (tekkitrestrict.useTMetrics){
-			msgb(sender, "Server UID: " + ChatColor.GREEN + tekkitrestrict.tmetrics.uid);
+			msgb(sender, "Server UID: " + ChatColor.GREEN + tekkitrestrict.getInstance().tmetrics.uid);
 		}
 		
 		if (!sender.hasPermission("tekkitrestrict.admin")) return;
@@ -571,15 +580,23 @@ public class TRCmdTr implements CommandExecutor {
 				TRNoItem.reload();
 				msg(sender, "Limited Creative Banned Items Reloaded!");
 			} else if (largs[2].equals("noclick")){
-				TRNoClick.reload();
+				TRNoInteract.reload();
 				msg(sender, "NoClick (disabled interactions) Reloaded!");
 			} else if (largs[2].equals("Logger") || largs[2].equals("logfilter") || largs[2].equals("logsplitter")){
-				LogFilter.replaceList = tekkitrestrict.config.getStringList(ConfigFile.Logging, "LogFilter");
-				LogFilter.splitLogs = tekkitrestrict.config.getBoolean(ConfigFile.Logging, "SplitLogs", true);
-				LogFilter.filterLogs = tekkitrestrict.config.getBoolean(ConfigFile.Logging, "FilterLogs", true);
+				//LogFilter.splitLogs = tekkitrestrict.config.getBoolean(ConfigFile.Logging, "SplitLogs", true);
+				//LogFilter.filterLogs = tekkitrestrict.config.getBoolean(ConfigFile.Logging, "FilterLogs", true);
 				LogFilter.logLocation = tekkitrestrict.config.getString(ConfigFile.Logging, "SplitLogsLocation", "log");
 				LogFilter.fileFormat = tekkitrestrict.config.getString(ConfigFile.Logging, "FilenameFormat", "{TYPE}-{DAY}-{MONTH}-{YEAR}.log");
 				LogFilter.logFormat = tekkitrestrict.config.getString(ConfigFile.Logging, "LogStringFormat", "[{HOUR}:{MINUTE}:{SECOND}] {INFO}");
+				
+				LogFilter.logAllCommandsFile = tekkitrestrict.config.getString2(ConfigFile.Logging, "LogAllCommandsToFile", "Command");
+				if (LogFilter.logAllCommandsFile.equalsIgnoreCase("false")) LogFilter.logAllCommands = false;
+				else LogFilter.logAllCommands = true;
+				
+				LogFilter.logNEIGiveFile = tekkitrestrict.config.getString2(ConfigFile.Logging, "LogNEIGiveToFile", "SpawnItem");
+				if (LogFilter.logNEIGiveFile.equalsIgnoreCase("false")) LogFilter.logNEIGive = false;
+				else LogFilter.logNEIGive = true;
+				
 				TRConfigCache.Logger.LogAmulets = tekkitrestrict.config.getBoolean(ConfigFile.Logging, "LogAmulets", false);
 				TRConfigCache.Logger.LogRings = tekkitrestrict.config.getBoolean(ConfigFile.Logging, "LogRings", false);
 				TRConfigCache.Logger.LogDMTools = tekkitrestrict.config.getBoolean(ConfigFile.Logging, "LogDMTools", false);
@@ -608,7 +625,7 @@ public class TRCmdTr implements CommandExecutor {
 	private void adminUpdate(CommandSender sender, String largs[]){
 		if (noPerm(sender, "admin.update")) return;
 		
-		if (tekkitrestrict.updater2 == null){
+		if (tekkitrestrict.updater == null){
 			msgr(sender, "The update check is disabled in the config.");
 			return;
 		}
@@ -626,19 +643,19 @@ public class TRCmdTr implements CommandExecutor {
 			return;
 		}
 		
-		final UpdateResult result = tekkitrestrict.updater2.getResult();
+		final UpdateResult result = tekkitrestrict.updater.getResult();
 		if (result == UpdateResult.DISABLED){
 			msgr(sender, "The update check is disabled in the global Updater config.");
 			return;
 		} else if (result == UpdateResult.SUCCESS){
-			msgg(sender, "The update " + ChatColor.YELLOW + tekkitrestrict.updater2.getLatestName() + ChatColor.GREEN + " is available, and has already been downloaded.");
+			msgg(sender, "The update " + ChatColor.YELLOW + tekkitrestrict.updater.getLatestName() + ChatColor.GREEN + " is available, and has already been downloaded.");
 			msgg(sender, "This update will be installed on the next server start.");
 		} else if (result == UpdateResult.UPDATE_AVAILABLE){
 			if (check){
-				msgg(sender, "The update " + ChatColor.YELLOW + tekkitrestrict.updater2.getLatestName() + ChatColor.GREEN + " is available.");
+				msgg(sender, "The update " + ChatColor.YELLOW + tekkitrestrict.updater.getLatestName() + ChatColor.GREEN + " is available.");
 				msgy(sender, "Use /tr admin update download to start downloading.");
 			} else {
-				msgg(sender, "TekkitRestrict will now start downloading " + ChatColor.YELLOW + tekkitrestrict.updater2.getLatestName() + ChatColor.GREEN + ".");
+				msgg(sender, "TekkitRestrict will now start downloading " + ChatColor.YELLOW + tekkitrestrict.updater.getLatestName() + ChatColor.GREEN + ".");
 				tekkitrestrict.getInstance().Update();
 			}
 		} else if (result == UpdateResult.NO_UPDATE){

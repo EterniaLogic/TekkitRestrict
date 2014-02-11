@@ -18,6 +18,7 @@ import net.minecraft.server.ChunkProviderServer;
 import net.minecraft.server.EntityHuman;
 import net.minecraft.server.WorldServer;
 
+import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.tekkitrestrict;
 import nl.taico.tekkitrestrict.TRConfigCache.ChunkUnloader;
 import nl.taico.tekkitrestrict.objects.TRChunkIndex;
@@ -110,7 +111,7 @@ public class TRChunkUnloader2 {
 				for (Chunk chunk : toUnload){
 					if (unloadChunk(chunk, forced)) i++;
 				}
-				tekkitrestrict.log.fine("Unloaded " + i + " chunks");
+				Log.fine("Unloaded " + i + " chunks");
 			}
 		});
 		
@@ -168,7 +169,7 @@ public class TRChunkUnloader2 {
 					if (unloadChunk(chunk, true)) i++;
 				}
 				if (sender instanceof Player) sender.sendMessage(ChatColor.GREEN + "Unloaded " + i + " chunks.");
-				tekkitrestrict.log.info("Unloaded " + i + " chunks");
+				Log.info("Unloaded " + i + " chunks");
 			}
 		});
 	}

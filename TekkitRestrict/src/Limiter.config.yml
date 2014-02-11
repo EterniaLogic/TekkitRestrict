@@ -1,0 +1,24 @@
+##############################################################################
+## Configuration file for TekkitRestrict                                    ##
+## Authors: Taeir, DreadEnd (aka DreadSlicer)                               ##
+## BukkitDev: http://dev.bukkit.org/server-mods/tekkit-restrict/            ##
+## Please ask questions/report issues on the BukkitDev page.                ##
+##############################################################################
+
+##############################################################################
+############################# Limiter Functions ##############################
+##############################################################################
+# Limits the number of blocks a player can place. (Global)
+# Please note that these cannot be changed in-game.
+#  ID Limit (Please use ONE space between the ID and limit to separate them)
+#- "153 1"
+#- "100-200 1"
+#- "52:55 1"
+#- "227-228:10 3"
+#- "ee 5"
+#- "50 10 {&cOnly &a10 &ctorches per player, sorry :P}"
+LimitBlocks: []
+
+##############################################################################
+##############################################################################
+##############################################################################

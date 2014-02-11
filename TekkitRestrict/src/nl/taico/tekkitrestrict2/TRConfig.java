@@ -1,4 +1,4 @@
-package nl.taico.tekkitrestrict.newconfig;
+package nl.taico.tekkitrestrict2;
 
 import java.io.File;
 import java.io.InputStream;
@@ -8,21 +8,20 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bukkit.configuration.ConfigurationSection;
-//import org.bukkit.configuration.file.FileConfiguration;
-//import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.plugin.java.JavaPlugin; 
 
-public class SimpleConfig {
+import nl.taico.tekkitrestrict.newconfig.*;
+
+public class TRConfig {
 	private int comments;
-	private SimpleConfigManager manager;
+	private ConfigManager manager;
 
 	private File file;
 	private FileConfiguration config;
 	private int linelength;
 
-	public SimpleConfig(InputStream configStream, File configFile, int comments, JavaPlugin plugin, int linelength) {
+	public TRConfig(InputStream configStream, File configFile, int comments, int linelength) {
 		this.comments = comments;
-		this.manager = new SimpleConfigManager(plugin);
+		this.manager = new ConfigManager();
 
 		this.file = configFile;
 		this.config = YamlConfiguration.loadConfiguration(configStream);
@@ -327,8 +326,10 @@ public class SimpleConfig {
 
 	public void set(String path, Object value, String comment) {
 		if(!this.config.contains(path)) {
+			this.config.set("TR_COMMENT_" + comments, "# ");
+			comments++;
 			for (String s : handleComment(comment)){
-				this.config.set(manager.getPluginName() + "_COMMENT_" + comments, s);
+				this.config.set("TR_COMMENT_" + comments, s);
 				comments++;
 			}
 		}
@@ -337,8 +338,12 @@ public class SimpleConfig {
 	}
 	
 	private String[] handleComment(String line){
-		if (line.length() <= linelength){//20 max
-			return new String[] {line};
+		if (line.length() <= linelength || (line.startsWith("####") && line.endsWith("####"))){//20 max
+			return new String[] {
+					line.replace("\"", "{DQUOTE}")
+						.replace("'", "{SQUOTE}")
+						.replace("\\n", "{NEWLINE}")
+						};
 		} else {
 			ArrayList<String> tbr = new ArrayList<String>();
 			String[] temp = line.split(" ");
@@ -358,40 +363,41 @@ public class SimpleConfig {
 					tbr.add(temp[i]);//TODO Change it so it breaks up the word instead.
 				}
 			}
-			tbr.add(l0.toString().trim());
+			tbr.add(l0.toString()
+					.trim()
+					.replace("\"", "{DQUOTE}")
+					.replace("'", "{SQUOTE}")
+					.replace("\\n", "{NEWLINE}")
+					);
 			return tbr.toArray(new String[0]);
 		}
 	}
 
-	/*
-	private String escape(String s){
-		return s.replace("\'", "\\\'").replace("\\n", "\\\\n");
-	}
-	*/
-	
 	public void set(String path, Object value, String[] comment) {
-		for(String comm : comment) {
-			if(!this.config.contains(path)) {
+		if(!this.config.contains(path)) {
+			this.config.set("TR_COMMENT_" + comments, "# ");
+			comments++;
+			for(String comm : comment) {
 				for (String s : handleComment(comm)){
-					this.config.set(manager.getPluginName() + "_COMMENT_" + comments, s);
+					if (!s.startsWith("#")) this.config.set("TR_COMMENT_" + comments, "# "+s);
+					else this.config.set("TR_COMMENT_" + comments, s);
 					comments++;
 				}
 			}
 		}
 
 		this.config.set(path, value);
-
 	}
 
 	public void setHeader(String[] header, int length) {
 		manager.setHeader(this.file, header, length);
-		this.comments = header.length + 2;
+		//this.comments = header.length + 2;
 		this.reloadConfig();
 	}
 	
 	public void setHeader(String[] header) {
 		manager.setHeader(this.file, header, linelength);
-		this.comments = header.length + 2;
+		//this.comments = header.length + 2;
 		this.reloadConfig();
 	}
 

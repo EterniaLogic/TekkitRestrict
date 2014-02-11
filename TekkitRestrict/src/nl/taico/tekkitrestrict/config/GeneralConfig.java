@@ -6,7 +6,7 @@ import java.util.ArrayList;
 public class GeneralConfig extends TRConfig {
 	public static String s = File.separator;
 	public static ArrayList<String> defaultContents(boolean extra){
-		final ArrayList<String> tbr = new ArrayList<String>(extra ? 140 : 130);
+		final ArrayList<String> tbr = new ArrayList<String>(extra ? 150 : 140);
 		tbr.add("######################################################################");
 		tbr.add("## Configuration file for TekkitRestrict                            ##");
 		tbr.add("## Authors: Taeir, DreadEnd (aka DreadSlicer)                       ##");
@@ -24,17 +24,21 @@ public class GeneralConfig extends TRConfig {
 		tbr.add("## Have fun, Play safe. Good luck.                                  ##");
 		tbr.add("## * DreadEnd * out.                                                ##");
 		tbr.add("######################################################################");
+		tbr.add("# Add Tekkit Material names (to get the name of the block/item, used");
+		tbr.add("# by logging plugins, Essentials, LWC, etc.) to Bukkit.");
+		tbr.add("AddTekkitMaterialNames: true");
+		if (extra) tbr.add("#:-;-:# AddTekkitMaterialNames");
+		tbr.add("");
+		tbr.add("# Add Equivalent Exchange items names to the Essentials Item Database");
+		tbr.add("# (used for /i, /give, /itemdb)");
+		tbr.add("AddEEItemsToEssentials: true");
+		if (extra) tbr.add("#:-;-:# AddEEItemsToEssentials");
+		tbr.add("");
 		tbr.add("# Patch ComputerCraft once to prevent some server crashes with");
 		tbr.add("# ComputerCraft computers.");
 		tbr.add("# Default: true");
 		tbr.add("PatchComputerCraft: true");
 		if (extra) tbr.add("#:-;-:# PatchComputerCraft");
-		tbr.add("");
-		tbr.add("# Change the lowest possible time for RedPower Timers to the value set");
-		tbr.add("# in ModModifications.config.yml");
-		tbr.add("# Default: true");
-		tbr.add("UseAutoRPTimer: true");
-		if (extra) tbr.add("#:-;-:# UseAutoRPTimer");
 		tbr.add("");
 		tbr.add("# TekkitRestrict has a Limiter. With it, you can set how many of a");
 		tbr.add("# certain block a player may have placed at a time.");
@@ -139,7 +143,7 @@ public class GeneralConfig extends TRConfig {
 		tbr.add("######################################################################");
 		tbr.add("######################################################################");
 		tbr.add("# Do NOT change this. It will reset the config files if you do.");
-		tbr.add("ConfigVersion: 2.1");
+		tbr.add("ConfigVersion: 2.3");
 		tbr.add("");
 		tbr.add("######################################################################");
 		return tbr;

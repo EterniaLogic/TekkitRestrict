@@ -15,17 +15,20 @@
 LimitFlightTime: false
 FlyLimitDailyMinutes: 9999999
 
-# Should offensive powers of gemarmor be allowed? (explosion, lightning)
-# Default: false
-AllowGemArmorOffensive: false
+# GemArmor settings. NOTE: these settings are obsolete to the ones in EEPatch.config.yml
+GemArmor:
+    # Should offensive powers of gemarmor be allowed? (explosion, lightning)
+    # Default: false
+    AllowOffensive: false
+    # Should the defensive powers of gemarmor be allowed? (flying, automatic running)
+    # Default: true
+    AllowDefensive: false
 
-# Should the defensive powers of gemarmor be allowed? (flying, automatic running)
-# Default: true
-AllowGemArmorDefensive: true
-
-# Set RedPower timers minimum time in seconds
-# Default: 1.0
-RPTimerMin: 1.0
+# Set the minimal time of Redpower timers to the value here.
+# Default: true, 1.0
+RPTimer:
+    SetMinimalTime: true
+    MinTime: 1.0
 
 ##########################################################################################
 ######################################### Set EMC ########################################

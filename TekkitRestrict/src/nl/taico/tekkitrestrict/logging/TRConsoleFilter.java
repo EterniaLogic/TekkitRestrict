@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.logging.Filter;
 import java.util.logging.LogRecord;
 
+import nl.taico.tekkitrestrict.Log;
+
 /**
  * Filter meant for ConsoleHandlers.
  * @author Taico
@@ -34,12 +36,9 @@ public class TRConsoleFilter implements Filter {
 					if (filter.matches(msg)) return false;
 				}
 			} catch (Exception ex){
-				return true;
+				Log.debugEx(ex);
 			}
-			TRSplitter.split(record);
-		} catch (Exception ex){
-			
-		}
+		} catch (Exception ex){}
 		return true;
 	}
 

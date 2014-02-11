@@ -199,7 +199,6 @@ public class TRNoDupe {
 		return str;
 	}
 	
-	
 	public static void playerLogout(@NonNull Player player){
 		
 		String n = player.getName();

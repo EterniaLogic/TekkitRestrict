@@ -1,15 +1,10 @@
 package nl.taico.tekkitrestrict.config;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.tekkitrestrict;
-import nl.taico.tekkitrestrict.Log.Warning;
 
 public class HackDupeConfig extends TRConfig {
 	public static ArrayList<String> defaultContents(boolean extra){
@@ -292,14 +287,14 @@ public class HackDupeConfig extends TRConfig {
 	}
 	
 	public static void upgradeOldHackFile(){
-		upgradeOldHackFile(convertDefaults2(defaultContents(true), true));
+		upgradeFile("HackDupe", convertDefaults2(defaultContents(true), true));
 	}
 	
 	public static void upgradeFile(){
 		upgradeFile("HackDupe", convertDefaults2(defaultContents(true), false));
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "deprecation"})
 	private static ArrayList<String> convertDefaults2(ArrayList<String> defaults, boolean fromold){
 		int j = defaults.size();
 		for (int i = 0;i<j;i++){
@@ -350,7 +345,7 @@ public class HackDupeConfig extends TRConfig {
 						if (isPrimitive(o) || o instanceof String){
 							toadd += "\""+o.toString()+"\", ";
 						} else {
-							tekkitrestrict.log.severe("Error in Upgrader: invalid config entry, not Primitive or String");
+							Log.severe("Error in Upgrader: invalid config entry, not Primitive or String");
 							continue;
 						}
 					}
@@ -364,7 +359,7 @@ public class HackDupeConfig extends TRConfig {
 					
 					i--; j--;
 				} else {
-					tekkitrestrict.log.severe("Error in Upgrader: invalid config entry, obj is unknown object! Class: " + obj.getClass().getName());
+					Log.severe("Error in Upgrader: invalid config entry, obj is unknown object! Class: " + obj.getClass().getName());
 					defaults.remove(i);
 					i--; j--;
 					continue;
@@ -373,7 +368,7 @@ public class HackDupeConfig extends TRConfig {
 		}
 		return defaults;
 	}
-	
+	/*
 	private static void upgradeOldHackFile(ArrayList<String> content){
 		tekkitrestrict.log.info("Upgrading Hack.config.yml file.");
 		File configFile = new File("plugins"+s+"tekkitrestrict"+s+"Hack.config.yml");
@@ -405,5 +400,5 @@ public class HackDupeConfig extends TRConfig {
 		}
 		tekkitrestrict.log.info("HackDupe.config.yml file was upgraded successfully!");
 		Log.Warning.loadWarnings.add("HackDupe.config.yml file was upgraded! Please check the new/changed config settings!");
-	}
+	}*/
 }

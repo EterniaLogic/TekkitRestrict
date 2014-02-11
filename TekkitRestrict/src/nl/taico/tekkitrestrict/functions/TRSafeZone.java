@@ -122,7 +122,7 @@ public class TRSafeZone {
 					if (region != null){
 						BlockVector loc1 = region.getMinimumPoint();
 						BlockVector loc2 = region.getMaximumPoint();
-						sz.location = TRPos.parse(loc1, loc2);
+						sz.location = new TRPos(loc1, loc2);
 						sz.pluginRegion = region;
 						/*
 						sz.x1 = loc1.getBlockX();
@@ -419,7 +419,7 @@ public class TRSafeZone {
 				
 				TRSafeZone zone = new TRSafeZone();
 				zone.mode = 1;
-				zone.location = TRPos.parse(loc1, loc2);
+				zone.location = new TRPos(loc1, loc2);
 				zone.pluginRegion = pr;
 				zone.locSet = true;
 

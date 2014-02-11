@@ -1,10 +1,10 @@
 package nl.taico.tekkitrestrict;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.eclipse.jdt.annotation.NonNull;
@@ -22,7 +22,11 @@ public class TRItemProcessor {
 	//Block Dmg values: 0-15 (4bits)
 	//Item Dmg values: 0-65536 (2 bytes)
 	//Data: 5 chars
-	public static ConcurrentHashMap<String, List<TRItem>> groups = new ConcurrentHashMap<String, List<TRItem>>();
+	
+	/**
+	 * Upon reloading, the old map is discarded. Holding a reference of this object is not advised.
+	 */
+	public static HashMap<String, List<TRItem>> groups = new HashMap<String, List<TRItem>>();
 	private static final String[] modItems = new String[] {
 		"ee|equivalentexchange=27520-27599;126-130",
 		"buildcraft=153-174;4056-4066;4298-4324",
@@ -50,6 +54,7 @@ public class TRItemProcessor {
 
 	public static void reload() {
 		groups.clear();
+		final HashMap<String, List<TRItem>> temp = new HashMap<String, List<TRItem>>();
 		for (final String s : modItems) {
 			if (s.contains("=")) {
 				final String[] gg = s.split("=");
@@ -58,20 +63,21 @@ public class TRItemProcessor {
 					final String[] gg2 = mod.split("\\|");
 					for (final String mod2 : gg2){
 						try {
-							groups.put(mod2, processMultiString(gg[1]));
+							temp.put(mod2, processMultiString(gg[1]));
 						} catch (final TRException ex) {
 							Warning.config(ex.toString(), false);
 						}
 					}
 				} else {
 					try {
-						groups.put(mod, processMultiString(gg[1]));
+						temp.put(mod, processMultiString(gg[1]));
 					} catch (final TRException ex) {
 						Warning.config(ex.toString(), false);
 					}
 				}
 			}
 		}
+		
 
 		// pre-load variables
 		final ConfigurationSection cs = tekkitrestrict.config.getConfigurationSection(ConfigFile.GroupPermissions, "PermissionGroups");
@@ -89,7 +95,7 @@ public class TRItemProcessor {
 						Log.Warning.config("Invalid value in PermissionGroups: Invalid value \""+value+"\"!", false);
 						continue;
 					}
-					groups.put(groupName, processMultiString(value));
+					temp.put(groupName, processMultiString(value));
 
 				} catch (final Exception ex) {
 					Warning.other("Error in PermissionGroups: " + ex.toString(), false);
@@ -97,6 +103,8 @@ public class TRItemProcessor {
 				}
 			}
 		}
+		
+		groups = temp;
 	}
 	
 	public static boolean isInRange(@NonNull final String range, final int id, final int data, @NonNull final String perm){

@@ -92,9 +92,9 @@ public class SafeZonesConfig extends TRConfig {
 		if (extra) tbr.add("#:-;-:# SSEnabledPlugins.WorldGuard");
 		tbr.add("    Factions: true");
 		if (extra) tbr.add("#:-;-:# SSEnabledPlugins.Factions");
-		tbr.add("    Towny: true");
+		tbr.add("    Towny: false");
 		if (extra) tbr.add("#:-;-:# SSEnabledPlugins.Towny");
-		tbr.add("    PreciousStones: true");
+		tbr.add("    PreciousStones: false");
 		if (extra) tbr.add("#:-;-:# SSEnabledPlugins.PreciousStones");
 		tbr.add("");
 		tbr.add("##########################################################################################");
