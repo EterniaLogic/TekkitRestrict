@@ -52,46 +52,46 @@ permissions:
     tekkitrestrict.bypass.creative:
         description: Enables the use of any block in creative.
     tekkitrestrict.bypass.safezone:
-        description:  Enables somebody to bypass all safezone.
+        description: Enables somebody to bypass all safezone.
     tekkitrestrict.bypass.noitem:
         description: Allows the use of all items as described in noitem.
     tekkitrestrict.bypass.hack:
-        description:  Enables somebody to bypass no oil derrick preventers.
+        description: Enables somebody to bypass no oil derrick preventers.
     tekkitrestrict.bypass.hack.fly:
-        description:  Enables somebody to bypass the anti-fly hack.
+        description: Enables somebody to bypass the anti-fly hack.
     tekkitrestrict.bypass.hack.forcefield:
-        description:  Enables somebody to bypass the anti-forcefield hack.
+        description: Enables somebody to bypass the anti-forcefield hack.
     tekkitrestrict.bypass.hack.speed:
-        description:  Enables somebody to bypass the anti-speed hack.
+        description: Enables somebody to bypass the anti-speed hack.
     tekkitrestrict.bypass.gemarmor.defensive:
         description: Enables someone to use gemarmor defensively.
     tekkitrestrict.bypass.gemarmor.offensive:
         description: Enables someone to use gemarmor offensive.
     tekkitrestrict.bypass.dupe:
-        description:  Enables somebody to bypass the anti-dupe.
+        description: Enables somebody to bypass the anti-dupe.
         default: false
     tekkitrestrict.bypass.dupe.alcbag:
-        description:  Enables somebody to bypass the anti-dupe for alchemy bags.
+        description: Enables somebody to bypass the anti-dupe for alchemy bags.
         default: false
     tekkitrestrict.bypass.dupe.projecttable:
-        description:  Enables somebody to bypass the anti-dupe for project tables
+        description: Enables somebody to bypass the anti-dupe for project tables
         default: false
     tekkitrestrict.bypass.dupe.rmfurnace:
-        description:  Enables somebody to bypass the anti-dupe for rm furnaces.
+        description: No longer used. Enables somebody to bypass the anti-dupe for rm furnaces.
         default: false
     tekkitrestrict.bypass.dupe.tankcart:
-        description:  Enables somebody to bypass the anti-dupe for tank carts.
+        description: No longer used. Enables somebody to bypass the anti-dupe for tank carts.
         default: false
     tekkitrestrict.bypass.dupe.transtablet:
-        description:  Enables somebody to bypass the anti-dupe for the transmution tablet.
+        description: Enables somebody to bypass the anti-dupe for the transmution tablet.
     tekkitrestrict.bypass.dupe.pedestal:
-        description:  Enables somebody to bypass the anti-dupe for the pedestal emc generator.
+        description: Enables somebody to bypass the anti-dupe for the pedestal emc generator.
     tekkitrestrict.bypass.limiter:
-        description:  Enables somebody to have no block limits.
+        description: Enables somebody to have no block limits.
     tekkitrestrict.bypass.lwc:
-        description:  Enables somebody to bypass LWC attached protections.
+        description: Enables somebody to bypass LWC attached protections.
     tekkitrestrict.bypass.flylimit:
-        description:  Bypass global flight time limit
+        description: Bypass global flight time limit
     tekkitrestrict.notify.hack:
         description: Get notified if someone hacks.
         default: op
