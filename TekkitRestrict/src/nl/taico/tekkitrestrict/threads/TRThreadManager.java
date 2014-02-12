@@ -1,5 +1,13 @@
 package nl.taico.tekkitrestrict.threads;
 
+import org.bukkit.Bukkit;
+
+import nl.taico.tekkitrestrict.Log;
+import nl.taico.tekkitrestrict.tekkitrestrict;
+import nl.taico.tekkitrestrict.Log.Warning;
+import nl.taico.tekkitrestrict.TRConfigCache.Threads;
+import nl.taico.tekkitrestrict.functions.TRChunkUnloader;
+
 public class TRThreadManager {
 	/** Thread will trigger again if interrupted. */
 	public TRSaveThread saveThread = new TRSaveThread();
@@ -52,5 +60,24 @@ public class TRThreadManager {
 		} catch (InterruptedException ex) {
 			ex.printStackTrace();
 		}
+	}
+	
+	public static void scheduleChunkUnloader(){
+		Bukkit.getScheduler().scheduleSyncRepeatingTask(tekkitrestrict.getInstance(), new Runnable(){
+			private boolean err1 = false;
+			public void run(){
+				try {
+					TRChunkUnloader.unloadSChunks();
+				} catch (Exception ex) {
+					if (!err1){
+						Warning.other("An error occurred in the ChunkUnloader! (This error will only be logged once)", false);
+						Log.Exception(ex, false);
+						err1 = true;
+					}
+				}
+			}
+		}, Threads.worldCleanerSpeed, Threads.worldCleanerSpeed);
+		
+		//TODO make a separate speed for the chunk unloader.
 	}
 }

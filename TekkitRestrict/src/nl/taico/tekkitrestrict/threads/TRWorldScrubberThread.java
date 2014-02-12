@@ -11,7 +11,6 @@ import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.tekkitrestrict;
 import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.TRConfigCache.Threads;
-import nl.taico.tekkitrestrict.functions.TRChunkUnloader;
 import nl.taico.tekkitrestrict.functions.TRNoItem;
 
 public class TRWorldScrubberThread extends Thread {
@@ -33,39 +32,27 @@ public class TRWorldScrubberThread extends Thread {
 		}
 	}
 
-	private boolean err1, err2;
+	private boolean err2;
 	/**
 	 * Runs TRChunkUnloader.unloadSChunks().<br>
 	 * Then if UseRPTimer or RemoveDisabledBlocks is turned on, it will execute those features.
 	 */
 	private void doWScrub() {
-		try {
-			TRChunkUnloader.unloadSChunks();
-		} catch (Exception ex) {
-			if (!err1){
-				Warning.other("An error occurred in the ChunkUnloader! (This error will only be logged once)", false);
-				Log.Exception(ex, false);
-				err1 = true;
-			}
-		}
-		
 		if (!Threads.RMDB) return;
 		
 		try {
-			Server server = tekkitrestrict.getInstance().getServer();
+			final Server server = tekkitrestrict.getInstance().getServer();
 			
-			List<World> worlds = server.getWorlds();
-			for (World bukkitWorld : worlds) { //For each world
-				Chunk[] loadedChunks = bukkitWorld.getLoadedChunks();
+			final List<World> worlds = server.getWorlds();
+			for (final World bukkitWorld : worlds) { //For each world
+				final Chunk[] loadedChunks = bukkitWorld.getLoadedChunks();
 				
-				for (Chunk c : loadedChunks) { //For each loaded chunk
+				for (final Chunk c : loadedChunks) { //For each loaded chunk
 					for (int x = 0; x < 16; x++) {
 						for (int z = 0; z < 16; z++) {
 							for (int y = 0; y < 256; y++) {
-								Block bl = c.getBlock(x, y, z);
-								if (TRNoItem.isBlockBanned(bl)) {
-									bl.setTypeId(Threads.ChangeDisabledItemsIntoId);
-								}
+								final Block bl = c.getBlock(x, y, z);
+								if (TRNoItem.isBlockBanned(bl)) bl.setTypeId(Threads.ChangeDisabledItemsIntoId);
 							}
 						}
 					}
