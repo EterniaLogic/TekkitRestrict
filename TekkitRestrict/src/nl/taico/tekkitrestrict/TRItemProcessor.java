@@ -11,7 +11,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
 import nl.taico.tekkitrestrict.Log.Warning;
-import nl.taico.tekkitrestrict.functions.TRNoItem;
 import nl.taico.tekkitrestrict.objects.TRItem;
 import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 
@@ -1259,7 +1258,7 @@ public class TRItemProcessor {
 				
 				if (items != null){
 					for (final TRItem it : items){
-						final TRItem it2 = (TRItem) it.clone();
+						final TRItem it2 = it.clone();
 						it2.msg = message;
 						tci.add(it2);
 					}
@@ -1293,7 +1292,7 @@ public class TRItemProcessor {
 				List<TRItem> items = groups.get(itemx);
 				if (items != null){
 					for (final TRItem it : items){
-						final TRItem it2 = (TRItem) it.clone();
+						final TRItem it2 = it.clone();
 						it2.msg = message;
 						tci.add(it2);
 					}
@@ -1316,7 +1315,7 @@ public class TRItemProcessor {
 			return tci;
 		}
 	}
-
+/*
 	@NonNull public static List<TRItem> processNoItemString(@NonNull final String item) throws TRException {
 		String itemx;
 		String message = "";
@@ -1463,7 +1462,7 @@ public class TRItemProcessor {
 			tci.add(TRItem.parseItem(id, -1, message));
 			return tci;
 		}
-	}
+	}*/
 
 	
 	
@@ -1565,7 +1564,7 @@ public class TRItemProcessor {
 				
 				if (items != null){
 					for (final TRItem it : items){
-						final TRItem it2 = (TRItem) it.clone();
+						final TRItem it2 = it.clone();
 						it2.msg = message;
 						tci.add(it2);
 					}
@@ -1594,7 +1593,7 @@ public class TRItemProcessor {
 				List<TRItem> items = groups.get(itemx);
 				if (items != null){
 					for (final TRItem it : items){
-						final TRItem it2 = (TRItem) it.clone();
+						final TRItem it2 = it.clone();
 						it2.msg = message;
 						tci.add(it2);
 					}

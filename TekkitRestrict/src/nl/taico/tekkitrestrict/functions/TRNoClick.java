@@ -12,7 +12,7 @@ import org.bukkit.inventory.ItemStack;
 
 import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.TRException;
-import nl.taico.tekkitrestrict.TRItemProcessor;
+import nl.taico.tekkitrestrict.TRItemProcessor2;
 import nl.taico.tekkitrestrict.objects.TRItem;
 import nl.taico.tekkitrestrict2.SettingsStorage;
 
@@ -130,7 +130,7 @@ public class TRNoClick {
 			String[] temp = s.split(" ");
 			TRNoClick nc = new TRNoClick();
 			try {
-				nc.items = TRItemProcessor.processItemString(temp[0]+msg);
+				nc.items = TRItemProcessor2.processString(temp[0]+msg);
 			} catch (TRException e) {
 				Warning.config("You have an error in your Banned.yml: "+e.getMessage(), false);
 				continue;

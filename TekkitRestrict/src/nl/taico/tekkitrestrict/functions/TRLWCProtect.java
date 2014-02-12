@@ -12,7 +12,7 @@ import org.eclipse.jdt.annotation.NonNull;
 
 import nl.taico.tekkitrestrict.TRConfigCache;
 import nl.taico.tekkitrestrict.TRException;
-import nl.taico.tekkitrestrict.TRItemProcessor;
+import nl.taico.tekkitrestrict.TRItemProcessor2;
 import nl.taico.tekkitrestrict.tekkitrestrict;
 import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.objects.TRItem;
@@ -32,7 +32,7 @@ public class TRLWCProtect {
 		final ArrayList<TRItem> temp = new ArrayList<TRItem>();
 		for (final String str : blockedList){
 			try {
-				temp.addAll(TRItemProcessor.processItemString(str));
+				temp.addAll(TRItemProcessor2.processString(str));
 			} catch (TRException ex) {
 				Warning.config("You have an error in your Advanced.config.yml in LWCPreventNearLocked:", false);
 				Warning.config(ex.getMessage(), false);

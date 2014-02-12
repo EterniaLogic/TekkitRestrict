@@ -10,19 +10,30 @@ public class TRItem {
 	public int data;
 	public String msg = "";
 	
+	public TRItem(){}
+	
+	public TRItem(final int id){
+		this.id = id;
+		this.data = -1;
+	}
+	
+	public TRItem(final int id, final int data){
+		this.id = id;
+		this.data = data;
+	}
+	
+	public TRItem(final int id, final int data, final String msg){
+		this.id = id;
+		this.data = data;
+		this.msg = msg;
+	}
+	
 	@NonNull public static TRItem parseItem(final int id, final int data, @Nullable final String msg) {
-		TRItem item = new TRItem();
-		item.id = id;
-		item.data = data;
-		item.msg = msg;
-		return item;
+		return new TRItem(id, data, msg);
 	}
 	
 	@NonNull public static TRItem parseItem(final int id, final int data) {
-		TRItem item = new TRItem();
-		item.id = id;
-		item.data = data;
-		return item;
+		return new TRItem(id, data);
 	}
 	
 	@Override
@@ -40,6 +51,7 @@ public class TRItem {
 		return new StringBuilder(12).append(id).append(":").append(data).toString();
 	}
 	
+	/*
 	@Override
 	public Object clone(){
 		final TRItem ti = new TRItem();
@@ -47,6 +59,15 @@ public class TRItem {
 		ti.data = this.data;
 		ti.msg = this.msg;
 		return ti;
+	}*/
+	
+	@Override
+	public TRItem clone(){
+		return new TRItem(this.id, this.data, this.msg);
+	}
+	
+	public TRItem cloneAndSetMsg(String msg){
+		return new TRItem(this.id, this.data, msg);
 	}
 	
 	public static boolean compareNP(@NonNull final TRItem item, @NonNull final TRItem np){

@@ -3451,7 +3451,7 @@ public class NameProcessor {
 	 */
 	@Nullable public static TRItem getItem(@NonNull final String string){
 		final TRItem it = AllNames.get(string.replace(" ", "").toLowerCase());
-		return it == null ? null : (TRItem) it.clone();
+		return it == null ? null : it.clone();
 	}
 	
 	@NonNull public static LinkedHashMap<TRItem, String> getDefaultBlocks(@Nullable LinkedHashMap<TRItem, String> map){
@@ -3459,7 +3459,7 @@ public class NameProcessor {
 		final Iterator<Entry<TRItem, String>> all = All.entrySet().iterator();
 		while (all.hasNext()){
 			final Entry<TRItem, String> entry = all.next(); 
-			map.put((TRItem) entry.getKey().clone(), entry.getValue());
+			map.put(entry.getKey().clone(), entry.getValue());
 			if (entry.getKey().id == 124) break;
 		}
 		return map;
@@ -3473,7 +3473,7 @@ public class NameProcessor {
 			final Entry<TRItem, String> entry = all.next(); 
 			final TRItem item = entry.getKey();
 			if (item.id < 126) continue;
-			map.put((TRItem) item.clone(), entry.getValue());
+			map.put(item.clone(), entry.getValue());
 			if (item.id == 130) break;
 		}
 		return map;

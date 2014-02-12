@@ -26,7 +26,7 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.TRException;
-import nl.taico.tekkitrestrict.TRItemProcessor;
+import nl.taico.tekkitrestrict.TRItemProcessor2;
 import nl.taico.tekkitrestrict.TRListener;
 import nl.taico.tekkitrestrict.TRPermHandler;
 import nl.taico.tekkitrestrict.tekkitrestrict;
@@ -86,7 +86,7 @@ public class TRLimiter {
 				}
 				final List<TRItem> items;
 				try {
-					items = TRItemProcessor.processItemString(tempe[0]);
+					items = TRItemProcessor2.processString(tempe[0]);
 				} catch (TRException ex) {
 					Warning.config("You have an error in your Advanced.config.yml in LimitBlocks:", false);
 					Warning.config(ex.getMessage(), false);

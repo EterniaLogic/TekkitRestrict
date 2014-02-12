@@ -13,7 +13,7 @@ import org.eclipse.jdt.annotation.NonNull;
 
 import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.TRException;
-import nl.taico.tekkitrestrict.TRItemProcessor;
+import nl.taico.tekkitrestrict.TRItemProcessor2;
 import nl.taico.tekkitrestrict.tekkitrestrict;
 import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.TRConfigCache.Listeners;
@@ -74,7 +74,7 @@ public class TRNoInteract {
 				
 				final List<TRItem> iss;
 				try {
-					iss = TRItemProcessor.processItemString(tempe[1]);
+					iss = TRItemProcessor2.processString(tempe[1]);
 				} catch (TRException ex) {
 					Warning.config("You have an error in your DisableInteract.config.yml in DisableClick:", false);
 					Warning.config(ex.getMessage(), false);
@@ -94,7 +94,7 @@ public class TRNoInteract {
 				//Id's and data
 				final List<TRItem> iss;
 				try {
-					iss = TRItemProcessor.processItemString(tempe[0]);
+					iss = TRItemProcessor2.processString(tempe[0]);
 				} catch (TRException ex) {
 					Warning.config("You have an error in your DisableInteract.config.yml in DisableClick:", false);
 					Warning.config(ex.getMessage(), false);

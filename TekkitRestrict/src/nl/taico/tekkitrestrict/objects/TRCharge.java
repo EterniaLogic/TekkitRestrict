@@ -26,7 +26,7 @@ public class TRCharge extends TRItem {
 	}
 	
 	@Override
-	@NonNull public Object clone(){
+	@NonNull public TRCharge clone(){
 		final TRCharge tc = new TRCharge();
 		tc.id = this.id;
 		tc.data = this.data;

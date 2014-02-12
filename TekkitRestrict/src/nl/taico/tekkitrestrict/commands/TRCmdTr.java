@@ -51,6 +51,7 @@ import nl.taico.tekkitrestrict.objects.TRLocation;
 import nl.taico.tekkitrestrict.objects.TRPos;
 import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 import nl.taico.tekkitrestrict.objects.TREnums.SafeZone;
+import nl.taico.tekkitrestrict.objects.itemprocessor.TRMod;
 import nl.taico.tekkitrestrict2.SettingsStorage;
 
 import static nl.taico.tekkitrestrict.commands.TRCmdHelper.*;
@@ -1306,20 +1307,38 @@ public class TRCmdTr implements CommandExecutor {
 			msgr(sender, largs[1] + " is not a valid number!");
 			return;
 		}
+		
 		final List<TRItem> banned = TRNoItem.getBannedItems();
-		final int lastpage = (int) Math.ceil(banned.size()/8);
+		
+		int bsize = banned.size();
+		int bmsize = TRNoItem.bannedMods.size();
+		final int size = bsize + bmsize;
+		final int lastpage = (int) Math.ceil(size/8);
 		final int start = (page-1) * 8; //8
-		final int end = page * 8; //15
-		if (page <= 0 || start > banned.size()){
+		int end = page * 8; //15
+		
+		if (page <= 0 || start > size){
 			msgr(sender, "Page " + page + " does not exist!");
 			msgr(sender, "Last page: " + lastpage + ".");
 			return;
 		}
-		//TRItemProcessor.
-		if (banned.size() > 0){
+		
+		
+		if (bmsize > 0){
 			msgb(sender, "Banned Items - Page " + page + " of " + lastpage);
 			msgr(sender, "" + ChatColor.BOLD + "Banned Item - " + ChatColor.RED + "Reason");
-			for (int i = start; i<banned.size() && i < end; i++){
+			int i = start;
+			boolean b = false;
+			for (; i<bmsize && i < end; i++){
+				msgg(sender, TRNoItem.bannedMods.get(i).mainName + " - " + ChatColor.BLUE + "All items of this mod are banned");
+				b = true;
+			}
+			if (b){
+				end = end-i;
+				i = 0;
+			}
+			
+			for (; i<bsize && i < end; i++){
 				final TRItem it = banned.get(i);
 				
 				final String name = NameProcessor.getName(it);
@@ -1334,7 +1353,27 @@ public class TRCmdTr implements CommandExecutor {
 				
 				if (reason.isEmpty()) reason = "None";
 				
-				msgg(sender, NameProcessor.getName(it) + " - " + ChatColor.BLUE + it.msg);
+				msgg(sender, NameProcessor.getName(it) + " - " + ChatColor.BLUE + reason);
+			}
+		} else if (bsize > 0){
+			msgb(sender, "Banned Items - Page " + page + " of " + lastpage);
+			msgr(sender, "" + ChatColor.BOLD + "Banned Item - " + ChatColor.RED + "Reason");
+			for (int i = start; i<bsize && i < end; i++){
+				final TRItem it = banned.get(i);
+				
+				final String name = NameProcessor.getName(it);
+				if (name == null) continue;
+				
+				String reason = it.msg;
+				if (reason == null || reason.isEmpty()) reason = "None";
+				else if (reason.toLowerCase().contains("reason:")){
+					reason = reason.split("(?i)Reason:")[1].trim();
+					if (reason.isEmpty()) reason = it.msg;
+				}
+				
+				if (reason.isEmpty()) reason = "None";
+				
+				msgg(sender, NameProcessor.getName(it) + " - " + ChatColor.BLUE + reason);
 			}
 		} else {
 			msgg(sender, "There are no banned items!");
