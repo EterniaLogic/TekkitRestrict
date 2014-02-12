@@ -29,7 +29,7 @@ import nl.taico.tekkitrestrict.TR.FixPack;
 import nl.taico.tekkitrestrict.TRConfigCache;
 import nl.taico.tekkitrestrict.TRDB;
 import nl.taico.tekkitrestrict.TRException;
-import nl.taico.tekkitrestrict.TRItemProcessor;
+import nl.taico.tekkitrestrict.TRItemProcessor2;
 import nl.taico.tekkitrestrict.TRPerformance;
 import nl.taico.tekkitrestrict.tekkitrestrict;
 import nl.taico.tekkitrestrict.Log.Warning;
@@ -51,7 +51,6 @@ import nl.taico.tekkitrestrict.objects.TRLocation;
 import nl.taico.tekkitrestrict.objects.TRPos;
 import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 import nl.taico.tekkitrestrict.objects.TREnums.SafeZone;
-import nl.taico.tekkitrestrict.objects.itemprocessor.TRMod;
 import nl.taico.tekkitrestrict2.SettingsStorage;
 
 import static nl.taico.tekkitrestrict.commands.TRCmdHelper.*;
@@ -401,7 +400,7 @@ public class TRCmdTr implements CommandExecutor {
 		try {
 			List<TRItem> iss;
 			try {
-				iss = TRItemProcessor.processItemString(largs[2]);
+				iss = TRItemProcessor2.processString(largs[2]);
 			} catch (TRException ex) {
 				msgr(sender, "Invalid item string:");
 				msgr(sender, ex.getMessage());
@@ -443,7 +442,7 @@ public class TRCmdTr implements CommandExecutor {
 		try {
 			List<TRItem> iss;
 			try {
-				iss = TRItemProcessor.processItemString(largs[2]);
+				iss = TRItemProcessor2.processString(largs[2]);
 			} catch (TRException ex) {
 				msgr(sender, "Invalid item string:");
 				msgr(sender, ex.getMessage());
@@ -1212,7 +1211,7 @@ public class TRCmdTr implements CommandExecutor {
 		try {
 			List<TRItem> iss;
 			try {
-				iss = TRItemProcessor.processItemString(largs[4]);
+				iss = TRItemProcessor2.processString(largs[4]);
 			} catch (TRException ex) {
 				msgr(sender, "Invalid item string:");
 				msgr(sender, ex.getMessage());

@@ -171,7 +171,7 @@ public class TRPermHandler {
 			final String gp[] = negPerm.split("\\.");//tekkitrestrict;limiter;id;data
 			try {
 				if (gp.length == 5){
-					final List<TRItem> items = TRItemProcessor.processItemString(gp[2]+":"+gp[3]);
+					final List<TRItem> items = TRItemProcessor2.processString(gp[2]+":"+gp[3]);
 					for (final TRItem item : items){
 						TRPermLimit t = new TRPermLimit();
 						t.id = item.id;
@@ -180,7 +180,7 @@ public class TRPermHandler {
 						tbr.add(t);
 					}
 				} else if (gp.length == 4){
-					final List<TRItem> items = TRItemProcessor.processItemString(gp[2]);
+					final List<TRItem> items = TRItemProcessor2.processString(gp[2]);
 					for (final TRItem item : items){
 						final TRPermLimit t = new TRPermLimit();
 						t.id = item.id;
@@ -214,7 +214,7 @@ public class TRPermHandler {
 						continue;
 					}
 					
-					final List<TRItem> items = TRItemProcessor.processItemString(gp[2]+":"+gp[3]);
+					final List<TRItem> items = TRItemProcessor2.processString(gp[2]+":"+gp[3]);
 					for (final TRItem item : items){
 						final TRPermLimit t = new TRPermLimit();
 						t.id = item.id;
@@ -233,7 +233,7 @@ public class TRPermHandler {
 						continue;
 					}
 					
-					final List<TRItem> items = TRItemProcessor.processItemString(gp[2]);
+					final List<TRItem> items = TRItemProcessor2.processString(gp[2]);
 					for (final TRItem item : items){
 						final TRPermLimit t = new TRPermLimit();
 						t.id = item.id;

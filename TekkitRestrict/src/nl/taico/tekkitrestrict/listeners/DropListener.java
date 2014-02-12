@@ -16,7 +16,7 @@ public class DropListener implements Listener {
 		if (Listeners.UseLimitedCreative && event.getPlayer().getGameMode() == GameMode.CREATIVE){
 			if (!event.getPlayer().hasPermission("tekkitrestrict.bypass.creative")) {
 				event.setCancelled(true);
-				event.getPlayer().sendMessage(ChatColor.RED + "[TRLimitedCreative] You cannot drop items!");
+				event.getPlayer().sendMessage(ChatColor.RED + "[TRLimitedCreative] You cannot drop items in creative mode!");
 				return;
 			}
 		}

@@ -9,7 +9,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.List;
 import java.util.logging.Level;
 
 import net.minecraft.server.RedPowerLogic;
@@ -545,30 +544,7 @@ public class tekkitrestrict extends JavaPlugin {
 			g.addPlotter(new Metrics.Plotter("Recipe blocks") {
 				@Override
 				public int getValue() {
-					try{
-						int size = 0;
-						List<String> ssr = tekkitrestrict.config.getStringList(ConfigFile.Advanced, "RecipeBlock");
-						for (String s : ssr) {
-							
-							try {
-								size += TRItemProcessor.processItemString(s).size();
-							} catch (TRException e) {
-								continue;
-							}
-
-						}
-						ssr = tekkitrestrict.config.getStringList(ConfigFile.Advanced, "RecipeFurnaceBlock");
-						for (String s : ssr) {
-							try {
-								size += TRItemProcessor.processItemString(s).size();
-							} catch (TRException e) {
-								continue;
-							}
-						}
-						return size;
-					} catch(Exception ex){
-						return 0;
-					}
+					return TRRecipeBlock.furnaceSize + TRRecipeBlock.recipesSize;
 				}
 			});
 			

@@ -28,7 +28,7 @@ public class InteractListener implements Listener {
 
 	/** Log EE tools. */
 	private void itemLogUse(Player player, ItemStack item, Action action, boolean cancelled) {
-		ItemStack a = player.getItemInHand();
+		final ItemStack a = player.getItemInHand();
 		if (a == null) return;
 
 		if (cancelled && (action == Action.LEFT_CLICK_AIR || action == Action.RIGHT_CLICK_AIR)) cancelled = false;
@@ -53,8 +53,9 @@ public class InteractListener implements Listener {
 	
 	private void logUse(String logname, Player player, int id, boolean cancelled){
 		if (!isLoggable(logname)) return;
-		Location loc = player.getLocation();
-		FileLog filelog = FileLog.getLogOrMake(logname, true, false);
+		final FileLog filelog = FileLog.getLogOrMake(logname, true, false);
+		final Location loc = player.getLocation();
+		
 		filelog.log("[" + player.getName() + "][" + player.getWorld().getName() +
 				" - " + loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ() + "] used (" + id + ") `" + NameProcessor.getEEName(id) + "`" + (cancelled ? " (Action was cancelled)":""));
 	}

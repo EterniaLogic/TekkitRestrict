@@ -251,7 +251,7 @@ public class TRConfigCache {
 	}
 	
 	public static class Threads {
-		public static int saveSpeed, worldCleanerSpeed, inventorySpeed, SSEntityRemoverSpeed, gemArmorSpeed;
+		public static int saveSpeed, worldCleanerSpeed, inventorySpeed, SSEntityRemoverSpeed, gemArmorSpeed, chunkUnloaderSpeed;
 		public static boolean GAMovement, GAOffensive;
 		public static boolean SSDisableEntities, SSDechargeEE, SSDisableArcane;
 		public static boolean RMDB;//, UseRPTimer;

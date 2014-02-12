@@ -695,13 +695,22 @@ public class SettingsStorage {
 		{
 			final String[] comment = new String[] {
 				"The amount of time the WorldCleanerThread sleeps for.",
-				"This thread takes care of the ChunkUnloader and the WorldScrubber.",
+				"This thread takes care of the Removal of Banned blocks from the world.",
 				"",
-				"Recommended: [30000-90000]",
+				"Recommended: [60000-120000] (1-2 minutes)",
 				"Default: 60000",
-				"# WorldCleanerThread: 60000"
 			};
 			performanceConfig.set("WorldCleanerThread", 60000, comment);
+		}
+		
+		{
+			final String[] comment = new String[] {
+				"The time between checking for unloading chunks. If the amount of chunks loaded is to high, chunks will be unloaded shortly after the check.",
+				"",
+				"Recommended: [60000-120000] (1-2 minutes)",
+				"Default: 90000",
+			};
+			performanceConfig.set("ChunkUnloader", 90000, comment);
 		}
 		
 		{
@@ -748,6 +757,7 @@ public class SettingsStorage {
 			  + "for.",
 				"If you set this too high, players might be able to use their powers by spamming.",
 				"If you set this too low, it might lag the server.",
+				"If you have EEPatch installed, you can ignore this setting.",
 				"",
 				"Recommended: [100-200]",
 				"Default: 120"
@@ -783,13 +793,22 @@ public class SettingsStorage {
 		{
 			final String[] comment = new String[] {
 				"The amount of time the WorldCleanerThread sleeps for.",
-				"This thread takes care of the ChunkUnloader and the WorldScrubber.",
+				"This thread takes care of the Removal of Banned blocks from the world.",
 				"",
-				"Recommended: [30000-90000]",
+				"Recommended: [60000-120000] (1-2 minutes)",
 				"Default: 60000",
-				"# WorldCleanerThread: 60000"
 			};
 			limitedCreativeConfig.set("WorldCleanerThread", 60000, comment);
+		}
+		
+		{
+			final String[] comment = new String[] {
+				"The time between checking for unloading chunks. If the amount of chunks loaded is to high, chunks will be unloaded shortly after the check.",
+				"",
+				"Recommended: [60000-120000] (1-2 minutes)",
+				"Default: 90000",
+			};
+			limitedCreativeConfig.set("ChunkUnloader", 60000, comment);
 		}
 		
 		{

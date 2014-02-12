@@ -43,8 +43,5 @@ public class QuitListener implements Listener{
 		if (TRConfigCache.Global.favorPerformanceOverMemory) return;
 		TRNoHack.playerLogout(player);
 		TRNoDupe.playerLogout(player);
-		
-		
-		
 	}
 }

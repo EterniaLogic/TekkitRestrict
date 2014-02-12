@@ -22,7 +22,7 @@ import net.minecraft.server.NBTTagCompound;
 import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.NameProcessor;
 import nl.taico.tekkitrestrict.TRException;
-import nl.taico.tekkitrestrict.TRItemProcessor;
+import nl.taico.tekkitrestrict.TRItemProcessor2;
 import nl.taico.tekkitrestrict.tekkitrestrict;
 import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.TRConfigCache.Listeners;
@@ -120,8 +120,8 @@ public class TRDisableItemsThread extends Thread {
 					
 					if (banned != null) {
 						if (banned.isEmpty()){
-							if (!c) banned = ChatColor.RED + "Removed "+NameProcessor.getName(TRItem.parseItem(id, data))+" ("+id+":"+data+") from your inventory. Reason: This item is banned!";
-							else banned = ChatColor.RED + "Removed "+NameProcessor.getName(TRItem.parseItem(id, data))+" ("+id+":"+data+") from your inventory. Reason: This item is banned in creative!";
+							if (!c) banned = ChatColor.RED + "Removed "+NameProcessor.getName(new TRItem(id, data))+" ("+id+":"+data+") from your inventory. Reason: This item is banned!";
+							else banned = ChatColor.RED + "Removed "+NameProcessor.getName(new TRItem(id, data))+" ("+id+":"+data+") from your inventory. Reason: This item is banned in creative!";
 						}
 						TRItem.sendBannedMessage(player, banned);
 						changedInv = true;
@@ -189,8 +189,8 @@ public class TRDisableItemsThread extends Thread {
 					
 					if (banned != null) {
 						if (banned.isEmpty()){
-							if (!c) banned = ChatColor.RED + "Removed "+NameProcessor.getName(TRItem.parseItem(id, data))+" ("+id+":"+data+") from your inventory. Reason: This item is banned!";
-							else banned = ChatColor.RED + "Removed "+NameProcessor.getName(TRItem.parseItem(id, data))+" ("+id+":"+data+") from your inventory. Reason: This item is banned in creative!";
+							if (!c) banned = ChatColor.RED + "Removed "+NameProcessor.getName(new TRItem(id, data))+" ("+id+":"+data+") from your inventory. Reason: This item is banned!";
+							else banned = ChatColor.RED + "Removed "+NameProcessor.getName(new TRItem(id, data))+" ("+id+":"+data+") from your inventory. Reason: This item is banned in creative!";
 						}
 						TRItem.sendBannedMessage(player, banned);
 						changedArmor = true;
@@ -488,7 +488,7 @@ public class TRDisableItemsThread extends Thread {
 			for (final String s : dechargeSS) {
 				final List<TRItem> iss;
 				try {
-					iss = TRItemProcessor.processItemString(s);
+					iss = TRItemProcessor2.processString(s);
 				} catch (TRException ex) {
 					Warning.config("You have an error in your ModModifications.config in DechargeInSS:", false);
 					Warning.config(ex.toString(), false);
@@ -537,7 +537,7 @@ public class TRDisableItemsThread extends Thread {
 	
 				final List<TRItem> iss;
 				try {
-					iss = TRItemProcessor.processItemString(sseu[0]);
+					iss = TRItemProcessor2.processString(sseu[0]);
 				} catch (TRException ex) {
 					Warning.config("You have an error in your ModModifications.config in MaxEU:", false);
 					Warning.config(ex.toString(), false);
@@ -579,7 +579,7 @@ public class TRDisableItemsThread extends Thread {
 				
 				final List<TRItem> iss;
 				try {
-					iss = TRItemProcessor.processItemString(sscharge[0]);
+					iss = TRItemProcessor2.processString(sscharge[0]);
 				} catch (TRException ex) {
 					Warning.config("You have an error in your ModModifications.config in MaxCharge:", false);
 					Warning.config(ex.toString(), false);
