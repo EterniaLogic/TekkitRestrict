@@ -337,6 +337,17 @@ public class TRConfig {
 		this.config.set(path, value);
 	}
 	
+	@Deprecated
+	public void setComment(String... comment){
+		for(String comm : comment) {
+			for (String s : handleComment(comm)){
+				if (!s.startsWith("#")) this.config.set("TR_COMMENT_" + comments, "# "+s);
+				else this.config.set("TR_COMMENT_" + comments, s);
+				comments++;
+			}
+		}
+	}
+	
 	private String[] handleComment(String line){
 		if (line.length() <= linelength || (line.startsWith("####") && line.endsWith("####"))){//20 max
 			return new String[] {

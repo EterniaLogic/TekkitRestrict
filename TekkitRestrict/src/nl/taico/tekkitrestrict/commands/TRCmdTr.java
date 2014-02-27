@@ -113,6 +113,14 @@ public class TRCmdTr implements CommandExecutor {
 	}
 	private void debugTesting(CommandSender sender, String args[]){
 		SettingsStorage.genBanned();
+		SettingsStorage.genCreative();
+		SettingsStorage.genDatabase();
+		SettingsStorage.genGroupPerms();
+		SettingsStorage.genHackDupe();
+		SettingsStorage.genLimiter();
+		SettingsStorage.genPerformance();
+		SettingsStorage.genSafeZones();
+		SettingsStorage.getLogging();
 		
 		if (0 == Integer.parseInt("0")) return;
 		
