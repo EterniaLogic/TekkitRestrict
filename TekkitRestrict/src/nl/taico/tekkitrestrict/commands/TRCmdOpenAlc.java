@@ -18,7 +18,6 @@ import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.tekkitrestrict;
 import nl.taico.tekkitrestrict.objects.OpenAlcObj;
-import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 
 import static nl.taico.tekkitrestrict.commands.TRCmdHelper.*;
 import ee.AlchemyBagData;
@@ -34,11 +33,6 @@ public class TRCmdOpenAlc implements CommandExecutor {
 
 		if (!sender.hasPermission("tekkitrestrict.openalc")){
 			msgr(sender, "You are not allowed to use this command!");
-			return false;
-		}
-		
-		if (!tekkitrestrict.config.getBoolean(ConfigFile.General, "UseOpenAlc", true)){
-			msgr(sender, "Openalc is disabled!");
 			return false;
 		}
 		

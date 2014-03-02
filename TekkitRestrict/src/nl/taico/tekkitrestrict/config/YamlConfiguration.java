@@ -1,4 +1,4 @@
-package nl.taico.tekkitrestrict.lib.config;
+package nl.taico.tekkitrestrict.config;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -17,14 +17,12 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.representer.Representer;
 
-import nl.taico.tekkitrestrict.Log;
-
 /**
  * An implementation of {@link Configuration} which saves all files in Yaml.
  * Note that this implementation is not synchronized.
  */
 public class YamlConfiguration extends FileConfiguration {
-	protected static final String COMMENT_PREFIX = "# ";
+	protected static final String COMMENT_PREFIX = "##";
 	protected static final String BLANK_CONFIG = "{}\n";
 	private final DumperOptions yamlOptions;
 	private final Representer yamlRepresenter;
@@ -41,7 +39,7 @@ public class YamlConfiguration extends FileConfiguration {
 		yamlOptions.setIndent(options().indent());
 		yamlOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
 		yamlRepresenter.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-
+		yamlOptions.setWidth(10000);
 		String header = buildHeader();
 		String dump = yaml.dump(getValues(false));
 
@@ -50,10 +48,6 @@ public class YamlConfiguration extends FileConfiguration {
 		}
 
 		return header + dump;
-	}
-
-	public void debugY() {
-		Log.info(saveToString());
 	}
 
 	@Override
@@ -65,8 +59,7 @@ public class YamlConfiguration extends FileConfiguration {
 	}
 
 	@Override
-	public void loadFromString(String contents)
-			throws InvalidConfigurationException {
+	public void loadFromString(String contents) throws InvalidConfigurationException {
 		Validate.notNull(contents, "Contents cannot be null");
 
 		Map<?, ?> input;
@@ -88,15 +81,13 @@ public class YamlConfiguration extends FileConfiguration {
 		}
 	}
 
-	protected void convertMapsToSections(Map<?, ?> input,
-			ConfigurationSection section) {
+	protected void convertMapsToSections(Map<?, ?> input, ConfigurationSection section) {
 		for (Map.Entry<?, ?> entry : input.entrySet()) {
 			String key = entry.getKey().toString();
 			Object value = entry.getValue();
 
 			if (value instanceof Map) {
-				convertMapsToSections((Map<?, ?>) value,
-						section.createSection(key));
+				convertMapsToSections((Map<?, ?>) value, section.createSection(key));
 			} else {
 				section.set(key, value);
 			}
@@ -112,13 +103,13 @@ public class YamlConfiguration extends FileConfiguration {
 		for (int i = 0; (i < lines.length) && (readingHeader); i++) {
 			String line = lines[i];
 
-			if (line.startsWith(COMMENT_PREFIX)) {
+			if (line.startsWith("#")) {
 				if (i > 0) {
 					result.append("\n");
 				}
 
-				if (line.length() > COMMENT_PREFIX.length()) {
-					result.append(line.substring(COMMENT_PREFIX.length()));
+				if (line.length() > "#".length()) {
+					result.append(line.substring("#".length()));
 				}
 
 				foundHeader = true;
@@ -162,7 +153,7 @@ public class YamlConfiguration extends FileConfiguration {
 
 			if ((startedHeader) || (lines[i].length() != 0)) {
 				builder.insert(0, lines[i]);
-				builder.insert(0, COMMENT_PREFIX);
+				builder.insert(0, "#");
 				startedHeader = true;
 			}
 		}
@@ -230,11 +221,9 @@ public class YamlConfiguration extends FileConfiguration {
 		try {
 			config.load(stream);
 		} catch (IOException ex) {
-			Bukkit.getLogger().log(Level.SEVERE,
-					"Cannot load configuration from stream", ex);
+			Bukkit.getLogger().log(Level.SEVERE, "Cannot load configuration from stream", ex);
 		} catch (InvalidConfigurationException ex) {
-			Bukkit.getLogger().log(Level.SEVERE,
-					"Cannot load configuration from stream", ex);
+			Bukkit.getLogger().log(Level.SEVERE, "Cannot load configuration from stream", ex);
 		}
 
 		return config;

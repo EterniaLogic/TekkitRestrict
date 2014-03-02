@@ -1,4 +1,4 @@
-package nl.taico.tekkitrestrict.newconfig;
+package nl.taico.tekkitrestrict.config;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -12,53 +12,31 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 
-import org.bukkit.plugin.java.JavaPlugin;
-
 import nl.taico.tekkitrestrict.TRException;
+import nl.taico.tekkitrestrict.tekkitrestrict;
 
-public class SimpleConfigManager {
-
-	private JavaPlugin plugin;
-
-	/**
-	 * Manage custom configurations and files
-	 */
-	public SimpleConfigManager(JavaPlugin plugin) {
-		this.plugin = plugin;
-	}
-
+public class ConfigManager {
 	/**
 	 * Get new configuration with header
 	 * @param filePath - Path to file
-	 * @return - New SimpleConfig
+	 * @return - New TRConfig
 	 * @throws TRException 
 	 */
-	public SimpleConfig getNewConfig(String filePath, String[] header, int length) {
-		File file = this.getConfigFile(filePath);
+	public TRConfig getNewConfig(String filePath, String[] header, int length) {
+		final File file = this.getConfigFile(filePath);
 
+		boolean existed = file.exists();
 		if (!file.exists()) {
 			this.prepareFile(filePath);
 
 			if (header != null && header.length != 0) {
 				this.setHeader(file, header, length);
 			}
-
 		}
 
-		SimpleConfig config = new SimpleConfig(this.getConfigContent(filePath), file, this.getCommentsNum(file), plugin, length);
-		return config;
+		return new TRConfig(this.getConfigContent(file), file, this.getCommentsNum(file), length, existed);
 	}
-
-	/**
-	 * Get new configuration
-	 * @param filePath - Path to file
-	 * @return - New SimpleConfig
-	 * @throws TRException 
-	 */
-	public SimpleConfig getNewConfig(String filePath) {
-		return this.getNewConfig(filePath, null, 84);
-	}
-
+	
 	/**
 	 * Get configuration file from string
 	 * @param file - File path
@@ -73,17 +51,17 @@ public class SimpleConfigManager {
 
 		if (file.contains("/")) {
 			if (file.startsWith("/")) {
-				configFile = new File(plugin.getDataFolder() + file.replace("/", File.separator));
+				configFile = new File(tekkitrestrict.getInstance().getDataFolder() + file.replace("/", File.separator));
 			} else {
-				configFile = new File(plugin.getDataFolder() + File.separator + file.replace("/", File.separator));
+				configFile = new File(tekkitrestrict.getInstance().getDataFolder() + File.separator + file.replace("/", File.separator));
 			}
 		} else {
-			configFile = new File(plugin.getDataFolder(), file);
+			configFile = new File(tekkitrestrict.getInstance().getDataFolder(), file);
 		}
 
 		return configFile;
 	}
-
+	
 	/**
 	 * Create new file for config and copy resource into it
 	 * @param file - Path to file
@@ -91,25 +69,22 @@ public class SimpleConfigManager {
 	 */
 	public void prepareFile(String filePath, String resource) {
 		File file = this.getConfigFile(filePath);
-		if (file == null){
-			return;
-		}
-		if (file.exists()) {
-			return;
-		}
-
+		if (file == null) return;
+		
+		if (file.exists()) return;
+		
 		try {
 			file.getParentFile().mkdirs();
 			file.createNewFile();
 
 			if (resource != null && !resource.isEmpty()) {
-				this.copyResource(plugin.getResource(resource), file);
+				this.copyResource(tekkitrestrict.getInstance().getResource(resource), file);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-
+	
 	/**
 	 * Create new file for config without resource
 	 * @param file - File to create
@@ -117,7 +92,7 @@ public class SimpleConfigManager {
 	public void prepareFile(String filePath) {
 		this.prepareFile(filePath, null);
 	}
-
+	
 	/**
 	 * Adds header block to config
 	 * @param file - Config file
@@ -126,11 +101,11 @@ public class SimpleConfigManager {
 	 */
 	public void setHeader(File file, String[] header, int length) {
 		if (!file.exists()) return;
-		if (length < 20) length = 20;
+		if (length < 23) length = 23;
 
 		try {
 			String currentLine;
-			StringBuilder config = new StringBuilder("");
+			StringBuilder config = new StringBuilder();
 			BufferedReader reader = new BufferedReader(new FileReader(file));
 
 			while ((currentLine = reader.readLine()) != null) {
@@ -176,33 +151,10 @@ public class SimpleConfigManager {
 					while (ll.length() <= length) ll.append(" ");
 					config.append("## ").append(ll).append("##\n");
 				}
-				/*
-				if (line.length() > 50) {
-					continue;
-				}
-
-				int length = (50 - line.length()) / 2;
-				StringBuilder finalLine = new StringBuilder(line);
-
-				for (int i = 0; i < length; i++) {
-					finalLine.append(" ");
-					finalLine.reverse();
-					finalLine.append(" ");
-					finalLine.reverse();
-				}
-
-				if (line.length() % 2 != 0) {
-					finalLine.append(" ");
-				}
-				config.append("# " + finalLine.toString());
-				*/
-				//config.append("# < " + finalLine.toString() + " > #\n");
 			}
 			
-			config.append(base);
-
-			//config.append("# +----------------------------------------------------+ #");
-
+			config.append(base).append("\n");
+			
 			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 			writer.write(this.prepareConfigString(config.toString()));
 			writer.flush();
@@ -211,7 +163,7 @@ public class SimpleConfigManager {
 			e.printStackTrace();
 		}
 	}
-
+	
 	/**
 	 * Read file and make comments SnakeYAML friendly
 	 * @param filePath - Path to file
@@ -225,22 +177,26 @@ public class SimpleConfigManager {
 		try {
 			int commentNum = 0;
 
-			String addLine;
+			//StringBuilder addLine = new StringBuilder();
 			String currentLine;
-			String pluginName = this.getPluginName();
 
-			StringBuilder whole = new StringBuilder("");
+			StringBuilder whole = new StringBuilder();
 			BufferedReader reader = new BufferedReader(new FileReader(file));
 
 			while ((currentLine = reader.readLine()) != null) {
-
-				if (currentLine.startsWith("#") && !currentLine.startsWith("##")) {
-					addLine = pluginName+"_COMMENT_"+commentNum+": \"" + currentLine.substring(1).replace("\\\"", "\"").replace("\"", "\\\"") + "\"";
-					//addLine = currentLine.replaceFirst("#", pluginName + "_COMMENT_" + commentNum + ":");
-					whole.append(addLine + "\n");
+				if (currentLine.startsWith("#") && !currentLine.equals("#")){
+					whole.append("TR_COMMENT_")
+						   .append(commentNum)
+						   .append(": \"")
+						   .append(
+								currentLine.replace("\"", "{DQUOTE}")
+										   .replace("'", "{SQUOTE}")
+										   .replace("\\n", "{NEWLINE}")
+								  )
+						   .append("\"\n");
 					commentNum++;
 				} else {
-					whole.append(currentLine + "\n");
+					whole.append(currentLine).append("\n");
 				}
 
 			}
@@ -255,7 +211,7 @@ public class SimpleConfigManager {
 			return null;
 		}
 	}
-
+	
 	/**
 	 * Get comments from file
 	 * @param file - File
@@ -283,7 +239,7 @@ public class SimpleConfigManager {
 			return 0;
 		}
 	}
-
+	
 	/**
 	 * Get config content from file
 	 * @param filePath - Path to file
@@ -292,60 +248,33 @@ public class SimpleConfigManager {
 	public InputStream getConfigContent(String filePath) {
 		return this.getConfigContent(this.getConfigFile(filePath));
 	}
-
+	
 	private String prepareConfigString(String configString) {
-		int lastLine = 0;
-
-		String[] lines = configString.split("\n");
-		StringBuilder config = new StringBuilder("");
+		final String[] lines = configString.split("\n");
+		StringBuilder config = new StringBuilder();
 
 		for (String line : lines) {
-			if (line.startsWith(this.getPluginName() + "_COMMENT")) {
-				String comment = line.trim().substring(line.indexOf(":") + 1);
-				System.out.println("[Pre] #"+comment);
-				if (!comment.equals(" ''")) comment = comment.replace("''", "'");
-				comment = "#" + comment;
-				System.out.println("[Pot] "+comment);
-				if (comment.startsWith("####") && comment.endsWith("####")) {
-					lastLine = 0;
-
-					config.append(comment).append("\n");
-				} else {
-
-					/*
-					 * Last line = 0 - Comment
-					 * Last line = 1 - Normal path
-					 */
-
-					String normalComment;
-
-					if (comment.startsWith("# '")) {
-						normalComment = comment.substring(0, comment.length() - 1).replaceFirst("# '", "# ");
-					} else {
-						normalComment = comment;
-					}
-
-					if (lastLine == 0) {
-						config.append(normalComment + "\n");
-					} else if (lastLine == 1) {//start new comment
-						config.append("\n" + normalComment + "\n");
-					}
-
-					lastLine = 0;
-
-				}
-
+			//TR_COMMENT_1: "# hoi"
+			//TR_COMMENT_2: '########################'
+			if (!line.startsWith("TR_COMMENT")){
+				config.append(line).append("\n");
 			} else {
-				config.append(line + "\n");
-				lastLine = 1;
+				String c = line.substring(line.indexOf(":") + 1).trim();
+				if ((c.startsWith("\"") && c.endsWith("\"")) || (c.startsWith("'") && c.endsWith("'"))){
+					c = c.substring(1, c.length()-1);
+				}
+				config.append(
+						c.replace("{DQUOTE}", "\"")
+						 .replace("{SQUOTE}", "'")
+						 .replace("{NEWLINE}", "\\n")
+						).append("\n");
+				//# hoi
+				//######################
 			}
-
 		}
-
 		return config.toString();
-
 	}
-
+	
 	/**
 	 * Saves configuration to file
 	 * @param configString - Config string
@@ -363,11 +292,6 @@ public class SimpleConfigManager {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-	}
-
-	public String getPluginName() {
-		return plugin.getDescription().getName();
 	}
 
 	/**
@@ -376,7 +300,6 @@ public class SimpleConfigManager {
 	 * @param file - File to write
 	 */
 	private void copyResource(InputStream resource, File file) {
-
 		try {
 			OutputStream out = new FileOutputStream(file);
 
@@ -389,11 +312,9 @@ public class SimpleConfigManager {
 
 			out.close();
 			resource.close();
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 	}
 
 }

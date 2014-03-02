@@ -10,17 +10,16 @@ import java.util.regex.Pattern;
 
 import org.bukkit.configuration.ConfigurationSection;
 
-import nl.taico.tekkitrestrict.tekkitrestrict;
-import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
+import nl.taico.tekkitrestrict.config.SettingsStorage;
 
 public class TRLogEnhancer {
 	public static void reload(){
-		enhanceCMD = tekkitrestrict.config.getBoolean2(ConfigFile.Logging, "EnchanceEssentialsCmd", true);
-		changeGive = tekkitrestrict.config.getBoolean2(ConfigFile.Logging, "ChangeGive", true);
-		shortenErrors = tekkitrestrict.config.getBoolean2(ConfigFile.Logging, "ShortenErrors", true);
-		enhanceCMDDeny = tekkitrestrict.config.getBoolean2(ConfigFile.Logging, "EnhanceEssentialsCmdDeny", true);
+		enhanceCMD = SettingsStorage.loggingConfig.getBoolean("EnchanceEssentialsCmd", true);
+		changeGive = SettingsStorage.loggingConfig.getBoolean("ChangeGive", true);
+		shortenErrors = SettingsStorage.loggingConfig.getBoolean("ShortenErrors", true);
+		enhanceCMDDeny = SettingsStorage.loggingConfig.getBoolean("EnhanceEssentialsCmdDeny", true);
 		
-		ConfigurationSection cs = tekkitrestrict.config.getConfigurationSection(ConfigFile.Logging, "Reformat");
+		ConfigurationSection cs = SettingsStorage.loggingConfig.getConfigurationSection("Reformat");
 		if (cs == null){
 			replacements.clear();
 			return;

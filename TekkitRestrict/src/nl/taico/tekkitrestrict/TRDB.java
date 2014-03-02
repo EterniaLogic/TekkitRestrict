@@ -10,19 +10,19 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import nl.taico.tekkitrestrict.Log.Warning;
-import nl.taico.tekkitrestrict.config.DatabaseConfig;
 import nl.taico.tekkitrestrict.database.DBException;
 import nl.taico.tekkitrestrict.database.MySQL;
 import nl.taico.tekkitrestrict.database.SQLite;
 import nl.taico.tekkitrestrict.objects.TRDBSS;
-import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 import nl.taico.tekkitrestrict.objects.TREnums.DBType;
+
+import static nl.taico.tekkitrestrict.config.SettingsStorage.*;
 
 public class TRDB {
 	private static boolean newdb = false;
 	/** @return If opening the database was successful. */
 	public static boolean loadDB() {
-		if (tekkitrestrict.config.getBoolean(ConfigFile.Database, "TransferDBFromSQLiteToMySQL", false)){
+		if (databaseConfig.getBoolean("TransferDBFromSQLiteToMySQL", false)){
 			{
 				String msg = "[DB] Transferring SQLite database to MySQL...";
 				Warning.dbWarnings.add(msg);
@@ -64,17 +64,17 @@ public class TRDB {
 				return false;
 			}
 			
-			DatabaseConfig.upgradeFile();
-			tekkitrestrict.getInstance().reloadConfig();
+			databaseConfig.set("TransferDBFromSQLiteToMySQL", false);
+			reloadConfigs();
 			
-			final String type = tekkitrestrict.config.getString(ConfigFile.Database, "DatabaseType", "sqlite").toLowerCase();
+			final String type = databaseConfig.getString("DatabaseType", "sqlite").toLowerCase();
 			if (!type.equals("mysql")){
 				final String msg = "[DB] You have transferred to MySQL but you still have SQLite set as your preferred database type! TekkitRestrict will continue to use SQLite until you change it in the config!";
 				Warning.dbWarnings.add("[SEVERE] "+ msg);
 				Warning.loadWarnings.add("[SEVERE] "+ msg);
 				Log.severe(msg);
 			}
-		} else if (tekkitrestrict.config.getBoolean(ConfigFile.Database, "TransferDBFromMySQLToSQLite", false)){
+		} else if (databaseConfig.getBoolean("TransferDBFromMySQLToSQLite", false)){
 			{
 				final String msg = "[DB] Transferring MySQL database to SQLite...";
 				Warning.dbWarnings.add(msg);
@@ -83,11 +83,11 @@ public class TRDB {
 			}
 			
 			tekkitrestrict.dbtype = DBType.MySQL;
-			final String host = tekkitrestrict.config.getString(ConfigFile.Database, "MySQL.Hostname", "localhost");
-			final String port = tekkitrestrict.config.getString(ConfigFile.Database, "MySQL.Port", "3306");
-			final String database = tekkitrestrict.config.getString(ConfigFile.Database, "MySQL.Database", "minecraft");
-			final String user = tekkitrestrict.config.getString(ConfigFile.Database, "MySQL.Username", "root");
-			final String password = tekkitrestrict.config.getString(ConfigFile.Database, "MySQL.Password", "");
+			final String host = databaseConfig.getString("MySQL.Hostname", "localhost");
+			final String port = databaseConfig.getString("MySQL.Port", "3306");
+			final String database = databaseConfig.getString("MySQL.Database", "minecraft");
+			final String user = databaseConfig.getString("MySQL.Username", "root");
+			final String password = databaseConfig.getString("MySQL.Password", "");
 			try {
 				tekkitrestrict.db = new MySQL(host, port, database, user, password);
 			} catch (DBException ex){
@@ -122,10 +122,10 @@ public class TRDB {
 				return false;
 			}
 			
-			DatabaseConfig.upgradeFile();
-			tekkitrestrict.getInstance().reloadConfig();
+			databaseConfig.set("TransferDBFromMySQLToSQLite", false);
+			reloadConfigs();
 			
-			final String type = tekkitrestrict.config.getString(ConfigFile.Database, "DatabaseType", "sqlite").toLowerCase();
+			final String type = databaseConfig.getString("DatabaseType", "sqlite").toLowerCase();
 			if (!type.equals("sqlite")){
 				final String msg = "[DB] You have transferred to SQLite but you still have MySQL set as your preferred database type! TekkitRestrict will continue to use MySQL until you change it in the config!";
 				Warning.dbWarnings.add("[SEVERE] "+ msg);
@@ -134,7 +134,7 @@ public class TRDB {
 			}
 		}
 		
-		final String type = tekkitrestrict.config.getString(ConfigFile.Database, "DatabaseType", "sqlite").toLowerCase();
+		final String type = databaseConfig.getString("DatabaseType", "sqlite").toLowerCase();
 		
 		if (type.equals("sqlite")){
 			tekkitrestrict.dbtype = DBType.SQLite;
@@ -148,11 +148,11 @@ public class TRDB {
 			return tekkitrestrict.db.open();
 		} else if (type.equals("mysql")){
 			tekkitrestrict.dbtype = DBType.MySQL;
-			final String host = tekkitrestrict.config.getString(ConfigFile.Database, "MySQL.Hostname", "localhost");
-			final String port = tekkitrestrict.config.getString(ConfigFile.Database, "MySQL.Port", "3306");
-			final String database = tekkitrestrict.config.getString(ConfigFile.Database, "MySQL.Database", "minecraft");
-			final String user = tekkitrestrict.config.getString(ConfigFile.Database, "MySQL.Username", "root");
-			final String password = tekkitrestrict.config.getString(ConfigFile.Database, "MySQL.Password", "");
+			final String host = databaseConfig.getString("MySQL.Hostname", "localhost");
+			final String port = databaseConfig.getString("MySQL.Port", "3306");
+			final String database = databaseConfig.getString("MySQL.Database", "minecraft");
+			final String user = databaseConfig.getString("MySQL.Username", "root");
+			final String password = databaseConfig.getString("MySQL.Password", "");
 			try {
 				tekkitrestrict.db = new MySQL(host, port, database, user, password);
 			} catch (DBException ex){
@@ -694,11 +694,11 @@ public class TRDB {
 		Log.info("[DB] Found "+j+" SafeZones to transfer.");
 		
 		tekkitrestrict.dbtype = DBType.MySQL;
-		final String host = tekkitrestrict.config.getString(ConfigFile.Database, "MySQL.Hostname", "localhost");
-		final String port = tekkitrestrict.config.getString(ConfigFile.Database, "MySQL.Port", "3306");
-		final String database = tekkitrestrict.config.getString(ConfigFile.Database, "MySQL.Database", "minecraft");
-		final String user = tekkitrestrict.config.getString(ConfigFile.Database, "MySQL.Username", "root");
-		final String password = tekkitrestrict.config.getString(ConfigFile.Database, "MySQL.Password", "");
+		final String host = databaseConfig.getString("MySQL.Hostname", "localhost");
+		final String port = databaseConfig.getString("MySQL.Port", "3306");
+		final String database = databaseConfig.getString("MySQL.Database", "minecraft");
+		final String user = databaseConfig.getString("MySQL.Username", "root");
+		final String password = databaseConfig.getString("MySQL.Password", "");
 		try {
 			tekkitrestrict.db = new MySQL(host, port, database, user, password);
 		} catch (DBException ex){

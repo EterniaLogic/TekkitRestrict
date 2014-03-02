@@ -8,7 +8,7 @@ import org.bukkit.Bukkit;
 
 import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.tekkitrestrict;
-import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
+import nl.taico.tekkitrestrict.config.SettingsStorage;
 
 public class TREMCSet {
 	public static void reload() {
@@ -52,7 +52,7 @@ public class TREMCSet {
 			return;
 		}
 		
-		final List<String> configEMC = tekkitrestrict.config.getStringList(ConfigFile.ModModifications, "SetEMC");
+		final List<String> configEMC = SettingsStorage.modModificationsConfig.getStringList("SetEMC");
 		
 		for (final String current : configEMC){
 			if (!current.contains(" ")){

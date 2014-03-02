@@ -3,7 +3,6 @@ package nl.taico.tekkitrestrict;
 import java.lang.reflect.Field;
 import java.util.logging.Logger;
 
-import nl.taico.tekkitrestrict.lib.config.TRFileConfiguration;
 import nl.taico.tekkitrestrict.objects.TRVersion;
 
 public class TR {
@@ -17,16 +16,14 @@ public class TR {
 		return instance.getLogger();
 	}
 	
+	@Deprecated
 	public static void saveDefaultConfig(boolean force){
 		instance.saveDefaultConfig(force);
 	}
 	
+	@Deprecated
 	public static void reloadConfig(){
 		instance.reloadConfig();
-	}
-	
-	public static TRFileConfiguration getConfig(){
-		return tekkitrestrict.config;
 	}
 	
 	public static void reload(boolean listeners, boolean silent){

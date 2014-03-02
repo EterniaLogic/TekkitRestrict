@@ -14,11 +14,10 @@ import org.eclipse.jdt.annotation.NonNull;
 import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.TRException;
 import nl.taico.tekkitrestrict.TRItemProcessor2;
-import nl.taico.tekkitrestrict.tekkitrestrict;
 import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.TRConfigCache.Listeners;
+import nl.taico.tekkitrestrict.config.SettingsStorage;
 import nl.taico.tekkitrestrict.objects.TRItem;
-import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 
 public class TRNoInteract {
 	public int id, data;
@@ -57,7 +56,7 @@ public class TRNoInteract {
 	
 	public static void reload(){
 		final LinkedList<TRNoInteract> temp = new LinkedList<TRNoInteract>();
-		final List<String> disableClicks = tekkitrestrict.config.getStringList(ConfigFile.DisableInteract , "DisableClick");
+		final List<String> disableClicks = SettingsStorage.bannedConfig.getStringList("BannedInteracts");
 		for (String disableClick : disableClicks){
 			String msg = null;
 			if (disableClick.contains("{")){

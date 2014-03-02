@@ -1,17 +1,17 @@
-package nl.taico.tekkitrestrict.lib.config;
+package nl.taico.tekkitrestrict.config;
 
 import org.apache.commons.lang.Validate;
 
 public class YamlConfigurationOptions extends FileConfigurationOptions {
 
-	public YamlConfigurationOptions(TRFileConfiguration trFileConfiguration) {
-		super(trFileConfiguration);
-		indent = 2;
+	public YamlConfigurationOptions(FileConfiguration config) {
+		super(config);
+		indent = 4;
 	}
 
 	public YamlConfigurationOptions(YamlConfiguration yamlConfiguration) {
 		super(yamlConfiguration);
-		indent = 2;
+		indent = 4;
 	}
 
 	@Override
@@ -49,8 +49,7 @@ public class YamlConfigurationOptions extends FileConfigurationOptions {
 
 	public YamlConfigurationOptions indent(int value) {
 		Validate.isTrue(value >= 2, "Indent must be at least 2 characters");
-		Validate.isTrue(value <= 9,
-				"Indent cannot be greater than 9 characters");
+		Validate.isTrue(value <= 9, "Indent cannot be greater than 9 characters");
 		indent = value;
 		return this;
 	}

@@ -71,14 +71,6 @@ public class TREnums {
 		}
 	}
 	
-	public enum ConfigFile {
-		General, Advanced, ModModifications, DisableInteract, DisableItems, HackDupe, LimitedCreative, Logging, TPerformance, GroupPermissions, SafeZones, Database, Limiter, EEPatch;
-	}
-	
-	public enum ConfigFile2 {
-		General, Advanced, ModModifications, Banned, HackDupe, LimitedCreative, Logging, TPerformance, GroupPermissions, SafeZones, Database, Limiter, EEPatch;
-	}
-	
 	public enum SSMode {
 		All, Admin, Specific, SpecificAdmin;
 		

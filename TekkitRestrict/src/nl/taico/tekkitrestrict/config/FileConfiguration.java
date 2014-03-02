@@ -1,4 +1,4 @@
-package nl.taico.tekkitrestrict.newconfig;
+package nl.taico.tekkitrestrict.config;
 
 import java.io.BufferedReader;
 import java.io.File;

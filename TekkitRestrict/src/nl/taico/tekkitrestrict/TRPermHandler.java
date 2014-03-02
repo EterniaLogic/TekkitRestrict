@@ -13,7 +13,6 @@ import org.anjocaido.groupmanager.data.User;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
-import org.bukkit.plugin.RegisteredServiceProvider;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -30,42 +29,6 @@ import de.bananaco.bpermissions.api.util.Permission;
 
 public class TRPermHandler {
 	public static PermissionManager permEx;
-	private static RegisteredServiceProvider<net.milkbowl.vault.permission.Permission> v;
-
-	/**
-	 * @deprecated Unnecessary, use player.hasPermission("tekkitrestrict."+type+"."+node1) instead
-	 */
-	public static boolean hasPermission(@NonNull Player player, @NonNull String type, @NonNull String node1, @NonNull String node2) {
-		Log.Debug("[WARNING] Call to deprecated permission checker!");
-		try {
-			String n1 = node1.isEmpty() ? "" : "." + node1;
-			String n2 = node2.isEmpty() ? "" : "." + node2;
-			String perm = "tekkitrestrict." + type + n1 + n2;
-
-			PluginManager pm = Bukkit.getPluginManager();
-			if(pm.isPluginEnabled("Vault")){
-				if(v == null) v = Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
-		        if (v != null) {
-		        	net.milkbowl.vault.permission.Permission permission = v.getProvider();
-		        	return permission.has(player, perm);
-		        }
-			} else if (pm.isPluginEnabled("PermissionsEx")) {
-				if (permEx == null) permEx = ru.tehkode.permissions.bukkit.PermissionsEx.getPermissionManager();
-				return permEx.getUser(player).has(perm);
-			} else if (pm.isPluginEnabled("bPermissions")) {
-				return ApiLayer.hasPermission(player.getWorld().getName(), CalculableType.USER, player.getName(), perm);
-			} else if (pm.isPluginEnabled("GroupManager")) {
-				GroupManager ps = (GroupManager) pm.getPlugin("GroupManager");
-				return ps.getWorldsHolder().getWorldData(player).getUser(player.getName()).hasSamePermissionNode(perm);
-			} else {
-				return player.hasPermission(perm);
-			}
-		} catch (Exception ex) {
-			Warning.other("An error occurred in the PermHandler ('+TRPermHandler.hasPermission(...):boolean')!", false);
-			Log.Exception(ex, false);
-		}
-		return false;
-	}
 
 	private static boolean logged = false;
 	@Nullable public static TRPermLimit getPermLimitFromPerm(@NonNull final Player player, @NonNull final String permBase, final int id, final int data) {
@@ -76,14 +39,14 @@ public class TRPermHandler {
 			final String gp[] = negPerm.split("\\.");//tekkitrestrict;limiter;id;data
 			try {
 				if (gp.length == 5){
-					if (TRItemProcessor.isInRange(gp[2]+":"+gp[3], id, data, negPerm)){
+					if (TRItemProcessor2.isInRange(gp[2]+":"+gp[3], id, data, negPerm)){
 						t.id = id;
 						t.data = Integer.parseInt(gp[3]);
 						t.max = -2;
 						return t;
 					}
 				} else if (gp.length == 4){
-					if (TRItemProcessor.isInRange(gp[2], id, data, negPerm)){
+					if (TRItemProcessor2.isInRange(gp[2], id, data, negPerm)){
 						t.id = id;
 						t.data = -1;
 						t.max = -2;
@@ -124,7 +87,7 @@ public class TRPermHandler {
 			final String gp[] = perm.split("\\.");//tekkitrestrict;limiter;id
 			try {
 				if (gp.length == 5){
-					if (TRItemProcessor.isInRange(gp[2]+":"+gp[3], id, data, perm)){
+					if (TRItemProcessor2.isInRange(gp[2]+":"+gp[3], id, data, perm)){
 						try {
 							t.id = id;
 							t.data = Integer.parseInt(gp[3]);
@@ -137,7 +100,7 @@ public class TRPermHandler {
 						}
 					}
 				} else if (gp.length == 4) {
-					if (TRItemProcessor.isInRange(gp[2], id, data, perm)){
+					if (TRItemProcessor2.isInRange(gp[2], id, data, perm)){
 						try {
 							t.id = id;
 							t.data = -1;

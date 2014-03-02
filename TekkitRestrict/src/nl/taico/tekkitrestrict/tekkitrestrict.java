@@ -5,10 +5,12 @@
 package nl.taico.tekkitrestrict;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.channels.FileChannel;
 import java.util.logging.Level;
 
 import net.minecraft.server.RedPowerLogic;
@@ -18,10 +20,12 @@ import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.eclipse.jdt.annotation.NonNull;
 
 import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.commands.*;
-import nl.taico.tekkitrestrict.config.*;
+import nl.taico.tekkitrestrict.config.EEPatchConfig;
+import nl.taico.tekkitrestrict.config.SettingsStorage;
 import nl.taico.tekkitrestrict.database.Database;
 import nl.taico.tekkitrestrict.eepatch.EEPSettings;
 import nl.taico.tekkitrestrict.functions.TRChunkUnloader2;
@@ -32,19 +36,17 @@ import nl.taico.tekkitrestrict.functions.TRNoInteract;
 import nl.taico.tekkitrestrict.functions.TRNoItem;
 import nl.taico.tekkitrestrict.functions.TRRecipeBlock;
 import nl.taico.tekkitrestrict.functions.TRSafeZone;
-import nl.taico.tekkitrestrict.lib.config.TRFileConfiguration;
-import nl.taico.tekkitrestrict.lib.config.YamlConfiguration;
 import nl.taico.tekkitrestrict.listeners.Assigner;
 import nl.taico.tekkitrestrict.logging.TRLogFilterPlus;
 import nl.taico.tekkitrestrict.logging.TRLogSplitterPlus;
 import nl.taico.tekkitrestrict.objects.TRVersion;
-import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 import nl.taico.tekkitrestrict.objects.TREnums.DBType;
 import nl.taico.tekkitrestrict.threads.TRThreadManager;
 
+import static nl.taico.tekkitrestrict.config.SettingsStorage.*;
+
 public class tekkitrestrict extends JavaPlugin {
-	private static tekkitrestrict instance;
-	public static TRFileConfiguration config;
+	public static tekkitrestrict instance;
 	public static boolean EEEnabled = false;
 	public static Boolean EEPatch = null, FixPack = null;
 	
@@ -68,46 +70,7 @@ public class tekkitrestrict extends JavaPlugin {
 		version = new TRVersion(getDescription().getVersion());
 		Log.init();
 		
-		saveDefaultConfig(false); //Copy config files
-		
-		config = this.getConfigx(); //Load the configuration files
-		
-		final double configVer = config.getDouble(ConfigFile.General, "ConfigVersion", 0.9);
-		if (configVer < 1.1) UpdateConfigFiles.v09();
-		else if (configVer != 2.3){
-			if (configVer < 2.3){
-				if (hasEEPatch()) EEPatchConfig.upgradeFile();
-				ModModificationsConfig.upgradeFile();
-			}
-			if (configVer < 2.2){
-				File disclick = new File(getDataFolder(), "DisableClick.config.yml");
-				disclick.renameTo(new File(getDataFolder(), "DisableInteract.config.yml"));
-				Warning.load("The config DisableClick.config.yml has been renamed to DisableInteract.config.yml", false);
-			}
-			if (configVer < 2.1 && hasEEPatch()) EEPatchConfig.upgradeFile();
-			if (configVer < 2.0) SafeZonesConfig.upgradeFile();
-			if (configVer < 1.8) DatabaseConfig.upgradeFile();
-			if (configVer < 1.7) LoggingConfig.upgradeFile();
-			if (configVer < 1.5){
-				AdvancedConfig.upgradeFile();
-				
-				final File hackfile = new File(getDataFolder(), "Hack.config.yml");
-				final File newHackFile = new File(getDataFolder(), "HackDupe.config.yml");
-				if (hackfile.exists()){
-					if (!newHackFile.exists()) hackfile.renameTo(newHackFile);
-					else hackfile.delete();
-				}
-				HackDupeConfig.upgradeOldHackFile();
-				ModModificationsConfig.upgradeFile();
-				TPerformanceConfig.upgradeFile();
-			}
-			GeneralConfig.upgradeFile();
-			reloadConfig();
-			try {
-				Thread.sleep(50);
-			} catch (InterruptedException e) {}
-			
-		}
+		SettingsStorage.loadConfigs();
 		
 		//#################################################### load Settings ####################################################
 		try {
@@ -148,9 +111,9 @@ public class tekkitrestrict extends JavaPlugin {
 		
 		
 		//####################################################### RPTimer #######################################################
-		if (config.getBoolean2(ConfigFile.ModModifications, "RPTimer.SetMinimalTime", false)){
+		if (modModificationsConfig.getBoolean("RPTimer.SetMinimalTime", true)){
 			try {
-				final double value = config.getDouble(ConfigFile.ModModifications, "RPTimer.MinTime", 1.0d);
+				final double value = modModificationsConfig.getDouble("RPTimer.MinTime", 1.0d);
 				RedPowerLogic.minInterval = (int) Math.round((value-0.1d) * 20d); // set minimum interval for logic timers...
 				Log.fine("Set the RedPower Timer Min interval to " + value + " seconds.");
 			} catch (Exception ex) {
@@ -162,12 +125,12 @@ public class tekkitrestrict extends JavaPlugin {
 		
 		
 		//####################################################### Patch CC ######################################################
-		if (config.getBoolean2(ConfigFile.General, "PatchComputerCraft", true)) TRPatches.patchCC();
+		if (generalConfig.getBoolean("PatchComputerCraft", true)) TRPatches.patchCC();
 		//#######################################################################################################################
 		
 		
 		//################################################ Tekkit Material Names ################################################
-		if (config.getBoolean2(ConfigFile.General, "AddTekkitMaterialNames", true)){
+		if (generalConfig.getBoolean("AddTekkitMaterialNames", true)){
 			NameProcessor.addTekkitMaterials();
 			Log.fine("Added Tekkit Material Names");
 		}
@@ -248,9 +211,9 @@ public class tekkitrestrict extends JavaPlugin {
 		//#################################################### Check Update #####################################################
 		schedule(false, new Runnable() {
 			public void run(){
-				if (config.getBoolean2(ConfigFile.General, "Auto-Update", true)){
+				if (generalConfig.getBoolean("Auto-Update", true)){
 					updater = new Updater(tekkitrestrict.this, 44061, tekkitrestrict.this.getFile(), Updater.UpdateType.DEFAULT, true);
-				} else if (config.getBoolean2(ConfigFile.General, "CheckForUpdateOnStartup", true)){
+				} else if (generalConfig.getBoolean("CheckForUpdateOnStartup", true)){
 					updater = new Updater(tekkitrestrict.this, 44061, tekkitrestrict.this.getFile(), Updater.UpdateType.NO_DOWNLOAD, true);
 					if (updater.getResult() == Updater.UpdateResult.UPDATE_AVAILABLE) Log.info(ChatColor.GREEN + "There is an update available: " + updater.getLatestName() + ". Use /tr admin update ingame to update.");
 				}
@@ -299,8 +262,8 @@ public class tekkitrestrict extends JavaPlugin {
 		updater = null;
 		db = null;
 		tmetrics = null;
-		config = null;
-		TRFileConfiguration.configs = null;
+		
+		//TRFileConfiguration.configs = null;
 		instance = null;
 	}
 	
@@ -353,17 +316,17 @@ public class tekkitrestrict extends JavaPlugin {
 	public void load(){
 		TRConfigCache.loadConfigCache();
 		//################################################## Load New Logging ###################################################
-		if (config.getBoolean2(ConfigFile.Logging, "FilterLogs", true)){
-			TRLogFilterPlus.loadFilters(config.getConfigurationSection(ConfigFile.Logging, "Filters"));
+		if (loggingConfig.getBoolean("FilterLogs", true)){
+			TRLogFilterPlus.loadFilters(loggingConfig.getConfigurationSection("Filters"));
 			TRLogFilterPlus.assignFilters();
 		}
-		if (config.getBoolean2(ConfigFile.Logging, "SplitLogs", true)){
-			TRLogSplitterPlus.loadSplitters(config.getConfigurationSection(ConfigFile.Logging, "Splitters"), config.getConfigurationSection(ConfigFile.Logging, "CommandSplitters"));
+		if (loggingConfig.getBoolean("SplitLogs", true)){
+			TRLogSplitterPlus.loadSplitters(loggingConfig.getConfigurationSection("Splitters"), loggingConfig.getConfigurationSection("CommandSplitters"));
 			TRLogSplitterPlus.assignSplitter();
 		}
 		//#######################################################################################################################
 		
-		TRItemProcessor.reload();
+		TRItemProcessor2.load();
 		TRNoItem.reload(); //Banned items and limited creative.
 		TRNoInteract.reload();
 		TRLimiter.reload();
@@ -385,13 +348,13 @@ public class tekkitrestrict extends JavaPlugin {
 		
 		final int id = Bukkit.getScheduler().scheduleAsyncDelayedTask(this, new Runnable(){
 			public void run(){
-				reloadConfig();
+				SettingsStorage.reloadConfigs();
 				
 				load();
 				TRThreadManager.reload();
 				
 				//Stop TMetrics if the user disabled it in the config and reloaded.
-				if (!config.getBoolean(ConfigFile.General, "UseTMetrics", true)){
+				if (!generalConfig.getBoolean("UseTMetrics", true)){
 					tmetrics.stop();
 				}
 				if (listeners){
@@ -411,60 +374,26 @@ public class tekkitrestrict extends JavaPlugin {
 			Log.severe("Unable to reload tekkitrestrict! Error: cannot schedule reload.");
 		}
 	}
-
-	private TRFileConfiguration getConfigx() {
-		if (TRFileConfiguration.configs.size() == 0) reloadConfig();
-		
-		return (new TRFileConfiguration());
-	}
 	
 	@Override
+	@Deprecated
 	public void reloadConfig() {
-		TRFileConfiguration.configs.clear();
-		TRFileConfiguration.configs.put(ConfigFile.General, reloadc("General.config.yml"));
-		TRFileConfiguration.configs.put(ConfigFile.Advanced, reloadc("Advanced.config.yml"));
-		TRFileConfiguration.configs.put(ConfigFile.ModModifications, reloadc("ModModifications.config.yml"));
-		TRFileConfiguration.configs.put(ConfigFile.DisableInteract, reloadc("DisableInteract.config.yml"));
-		TRFileConfiguration.configs.put(ConfigFile.DisableItems, reloadc("DisableItems.config.yml"));
-		TRFileConfiguration.configs.put(ConfigFile.HackDupe, reloadc("HackDupe.config.yml"));
-		TRFileConfiguration.configs.put(ConfigFile.LimitedCreative, reloadc("LimitedCreative.config.yml"));
-		TRFileConfiguration.configs.put(ConfigFile.Logging, reloadc("Logging.config.yml"));
-		TRFileConfiguration.configs.put(ConfigFile.TPerformance, reloadc("TPerformance.config.yml"));
-		TRFileConfiguration.configs.put(ConfigFile.GroupPermissions, reloadc("GroupPermissions.config.yml"));
-		TRFileConfiguration.configs.put(ConfigFile.SafeZones, reloadc("SafeZones.config.yml"));
-		TRFileConfiguration.configs.put(ConfigFile.Database, reloadc("Database.config.yml"));
-		TRFileConfiguration.configs.put(ConfigFile.Limiter, reloadc("Limiter.config.yml"));
-		if (hasEEPatch())
-			TRFileConfiguration.configs.put(ConfigFile.EEPatch, reloadc("EEPatch.config.yml"));
-		else
-			TRFileConfiguration.configs.put(ConfigFile.EEPatch, new YamlConfiguration());
-	}
-	/** Loads a configuration with the given filename. */
-
-	private YamlConfiguration reloadc(String loc) {
-		final File cf = new File(getDataFolder(), loc);
-		final YamlConfiguration conf = YamlConfiguration.loadConfiguration(cf);
-		// newConfig.loadFromString(s)
-		final InputStream defConfigStream = getResource(loc);
-		if (defConfigStream != null) {
-			final YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(defConfigStream);
-			conf.setDefaults(defConfig);
-			try {
-				defConfigStream.close();
-			} catch (IOException ex) {
-				Warning.load("Exception while trying to (re)load the config!", false);
-				Log.Exception(ex, true);
-			}
-		}
-		return conf;
+		reloadConfigs();
 	}
 	
 	@Override
+	@Deprecated
 	public void saveDefaultConfig() {
 		saveDefaultConfig(false);
 	}
 	
+	@Deprecated
 	public void saveDefaultConfig(boolean force) {
+		if (force){
+			EEPatchConfig.saveDefaultConfigForced();
+		} else {
+			EEPatchConfig.saveDefaultConfig();
+		}
 		try {
 			saveResource("General.config.yml", force);
 			saveResource("Advanced.config.yml", force);
@@ -566,9 +495,9 @@ public class tekkitrestrict extends JavaPlugin {
 	}
 	
 	private final void initTMetrics(){
-		tmetrics = new TMetrics(this, config.getBoolean2(ConfigFile.General, "ShowTMetricsWarnings", true));
+		tmetrics = new TMetrics(this, generalConfig.getBoolean("ShowTMetricsWarnings", true));
 		
-		if (config.getBoolean2(ConfigFile.General, "UseTMetrics", true)){
+		if (generalConfig.getBoolean("UseTMetrics", true)){
 			tmetrics.start();
 		}
 	}
@@ -617,7 +546,7 @@ public class tekkitrestrict extends JavaPlugin {
 	
 	/** Schedule the addition of EE2 items to Essentials. */
 	private final void addEEItemsToEssentials(){
-		if (Bukkit.getPluginManager().isPluginEnabled("Essentials") && config.getBoolean2(ConfigFile.General, "AddEEItemsToEssentials", true)){
+		if (Bukkit.getPluginManager().isPluginEnabled("Essentials") && generalConfig.getBoolean("AddEEItemsToEssentials", true)){
 			schedule(true, new Runnable(){
 				public void run(){
 					if (NameProcessor.addEEItemsToEssentials()){
@@ -640,5 +569,35 @@ public class tekkitrestrict extends JavaPlugin {
 				Log.debugEx(ex);
 			}
 		}
+	}
+
+	public static boolean backupConfig(@NonNull final String sourceString, @NonNull final String destString){
+		try {
+			final File sourceFile = new File(sourceString);
+			final File destFile = new File(destString);
+			if (!sourceFile.exists()) return false;
+			
+			if(!destFile.exists()) destFile.createNewFile();
+			
+			FileChannel source = null;
+			FileChannel destination = null;
+
+			try {
+				source = new FileInputStream(sourceFile).getChannel();
+				destination = new FileOutputStream(destFile).getChannel();
+				destination.transferFrom(source, 0, source.size());
+			} finally {
+				if(source != null) source.close();
+				if(destination != null) destination.close();
+			}
+
+			if(source != null) source.close();
+			if(destination != null) destination.close();
+
+		} catch (final IOException ex){
+			Warning.load("Cannot backup config: " + sourceString, false);
+			return false;
+		}
+		return true;
 	}
 }

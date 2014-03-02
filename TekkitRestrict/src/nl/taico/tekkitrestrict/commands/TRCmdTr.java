@@ -33,9 +33,9 @@ import nl.taico.tekkitrestrict.TRItemProcessor2;
 import nl.taico.tekkitrestrict.TRPerformance;
 import nl.taico.tekkitrestrict.tekkitrestrict;
 import nl.taico.tekkitrestrict.Log.Warning;
-import nl.taico.tekkitrestrict.TRConfigCache.LogFilter;
 import nl.taico.tekkitrestrict.Updater.UpdateResult;
 import nl.taico.tekkitrestrict.api.SafeZones.SafeZoneCreate;
+import nl.taico.tekkitrestrict.config.SettingsStorage;
 import nl.taico.tekkitrestrict.eepatch.EEPSettings;
 import nl.taico.tekkitrestrict.functions.TRChunkUnloader2;
 import nl.taico.tekkitrestrict.functions.TREMCSet;
@@ -49,9 +49,7 @@ import nl.taico.tekkitrestrict.objects.TRItem;
 import nl.taico.tekkitrestrict.objects.TRLimit;
 import nl.taico.tekkitrestrict.objects.TRLocation;
 import nl.taico.tekkitrestrict.objects.TRPos;
-import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 import nl.taico.tekkitrestrict.objects.TREnums.SafeZone;
-import nl.taico.tekkitrestrict2.SettingsStorage;
 
 import static nl.taico.tekkitrestrict.commands.TRCmdHelper.*;
 
@@ -112,15 +110,22 @@ public class TRCmdTr implements CommandExecutor {
 		return true;
 	}
 	private void debugTesting(CommandSender sender, String args[]){
+		SettingsStorage.genAdvanced();
 		SettingsStorage.genBanned();
 		SettingsStorage.genCreative();
 		SettingsStorage.genDatabase();
+		SettingsStorage.genEEPatch();
+		SettingsStorage.genGeneral();
 		SettingsStorage.genGroupPerms();
 		SettingsStorage.genHackDupe();
 		SettingsStorage.genLimiter();
+		SettingsStorage.genLogging();
+		SettingsStorage.genModifications();
 		SettingsStorage.genPerformance();
 		SettingsStorage.genSafeZones();
-		SettingsStorage.getLogging();
+		SettingsStorage.genUnload();
+		
+		
 		
 		if (0 == Integer.parseInt("0")) return;
 		
@@ -576,8 +581,7 @@ public class TRCmdTr implements CommandExecutor {
 		if (noPerm(sender, "admin.reload")) return;
 		
 		if (largs.length == 3){
-			tekkitrestrict.getInstance().saveDefaultConfig(false);
-			tekkitrestrict.getInstance().reloadConfig();
+			SettingsStorage.reloadConfigs();
 			if (largs[2].equals("limiter")){
 				TRLimiter.reload();
 				msg(sender, "Limiter Reloaded!");
@@ -590,28 +594,6 @@ public class TRCmdTr implements CommandExecutor {
 			} else if (largs[2].equals("noclick")){
 				TRNoInteract.reload();
 				msg(sender, "NoClick (disabled interactions) Reloaded!");
-			} else if (largs[2].equals("Logger") || largs[2].equals("logfilter") || largs[2].equals("logsplitter")){
-				//LogFilter.splitLogs = tekkitrestrict.config.getBoolean(ConfigFile.Logging, "SplitLogs", true);
-				//LogFilter.filterLogs = tekkitrestrict.config.getBoolean(ConfigFile.Logging, "FilterLogs", true);
-				LogFilter.logLocation = tekkitrestrict.config.getString(ConfigFile.Logging, "SplitLogsLocation", "log");
-				LogFilter.fileFormat = tekkitrestrict.config.getString(ConfigFile.Logging, "FilenameFormat", "{TYPE}-{DAY}-{MONTH}-{YEAR}.log");
-				LogFilter.logFormat = tekkitrestrict.config.getString(ConfigFile.Logging, "LogStringFormat", "[{HOUR}:{MINUTE}:{SECOND}] {INFO}");
-				
-				LogFilter.logAllCommandsFile = tekkitrestrict.config.getString2(ConfigFile.Logging, "LogAllCommandsToFile", "Command");
-				if (LogFilter.logAllCommandsFile.equalsIgnoreCase("false")) LogFilter.logAllCommands = false;
-				else LogFilter.logAllCommands = true;
-				
-				LogFilter.logNEIGiveFile = tekkitrestrict.config.getString2(ConfigFile.Logging, "LogNEIGiveToFile", "SpawnItem");
-				if (LogFilter.logNEIGiveFile.equalsIgnoreCase("false")) LogFilter.logNEIGive = false;
-				else LogFilter.logNEIGive = true;
-				
-				TRConfigCache.Logger.LogAmulets = tekkitrestrict.config.getBoolean(ConfigFile.Logging, "LogAmulets", false);
-				TRConfigCache.Logger.LogRings = tekkitrestrict.config.getBoolean(ConfigFile.Logging, "LogRings", false);
-				TRConfigCache.Logger.LogDMTools = tekkitrestrict.config.getBoolean(ConfigFile.Logging, "LogDMTools", false);
-				TRConfigCache.Logger.LogRMTools = tekkitrestrict.config.getBoolean(ConfigFile.Logging, "LogRMTools", false);
-				TRConfigCache.Logger.LogEEMisc = tekkitrestrict.config.getBoolean(ConfigFile.Logging, "LogEEMisc", false);
-				TRConfigCache.Logger.LogEEDestructive = tekkitrestrict.config.getBoolean(ConfigFile.Logging, "LogEEDestructive", false);
-				msg(sender, "Log Filter/Splitter Reloaded!");
 			} else if (largs[2].equals("emcset")){
 				TREMCSet.reload();
 				msg(sender, "EMC setter Reloaded!");
@@ -621,7 +603,7 @@ public class TRCmdTr implements CommandExecutor {
 				else
 					msgr(sender, "Unknown subcommand! Possible subcommands: ");
 				
-				msgy(sender, "Limiter, Noitem, LimitedCreative, NoClick, Logger and EMCSet");
+				msgy(sender, "Limiter, Noitem, LimitedCreative, NoClick and EMCSet");
 			}
 			return;
 		}
@@ -781,7 +763,12 @@ public class TRCmdTr implements CommandExecutor {
 			msgr(sender, "Unknown class! "+ChatColor.GOLD+"Available classes: " + pClasses + " and EEPatch");
 			return;
 		} else {
+			
 			msgr(sender, "Invalid syntax! Usage: /tr admin test <class> <field>");
+			Class<?>[] classes = TRConfigCache.class.getDeclaredClasses();
+			StringBuilder pClasses = new StringBuilder();
+			for (Class<?> c : classes) pClasses.append(" ").append(c.getSimpleName());
+			msgr(sender, "Available classes: " + pClasses.toString().trim().replace(" ", ", "));
 			return;
 		}
 	}

@@ -1,4 +1,4 @@
-package nl.taico.tekkitrestrict.newconfig;
+package nl.taico.tekkitrestrict.config;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

@@ -13,8 +13,8 @@ import org.bukkit.inventory.ItemStack;
 import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.TRException;
 import nl.taico.tekkitrestrict.TRItemProcessor2;
+import nl.taico.tekkitrestrict.config.SettingsStorage;
 import nl.taico.tekkitrestrict.objects.TRItem;
-import nl.taico.tekkitrestrict2.SettingsStorage;
 
 public class TRNoClick {
 	public static HashMap<String, String> inventories = new HashMap<String, String>();

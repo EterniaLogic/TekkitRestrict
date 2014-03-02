@@ -1,9 +1,6 @@
 package nl.taico.tekkitrestrict.objects;
 
-import org.eclipse.jdt.annotation.NonNull;
-
-import nl.taico.tekkitrestrict.tekkitrestrict;
-import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
+import nl.taico.tekkitrestrict.config.SettingsStorage;
 
 public class TRVersion {
 	public String fullVer;
@@ -13,7 +10,8 @@ public class TRVersion {
 	public boolean dev;
 	public int extra = -1;
 	
-	public TRVersion(@NonNull String str){
+	public TRVersion(String str){
+		if (str == null) return;
 		//str = str.toLowerCase();
 		if (str.toLowerCase().contains("tekkitrestrict")){
 			str = str.replaceAll("(?i)tekkitrestrict", "");
@@ -51,7 +49,8 @@ public class TRVersion {
 		}
 	}
 	
-	public boolean isNewer(@NonNull final TRVersion ver2){
+	public boolean isNewer(final TRVersion ver2){
+		if (ver2 == null) return false;
 		if (this.major > ver2.major) return false;
 		if (this.minor > ver2.minor) return false;
 		
@@ -86,7 +85,8 @@ public class TRVersion {
 		}
 	}
 	
-	public boolean shouldUpdate(@NonNull final TRVersion ver2){
+	public boolean shouldUpdate(final TRVersion ver2){
+		if (ver2 == null) return false;
 		if (this.major > ver2.major) return false;
 		if (this.minor > ver2.minor) return false;
 		
@@ -100,7 +100,7 @@ public class TRVersion {
 					return false;									//1.18 beta x not newer than 1.18 beta x
 				}
 			} else {												//1.18 dev
-				if (tekkitrestrict.config.getBoolean(ConfigFile.General, "UpdateToDevelopmentVersions", false)){
+				if (SettingsStorage.generalConfig.getBoolean("UpdateToDevelopmentVersions", false)){
 					if (ver2.minor > this.minor) return true;		//update to new dev from beta
 					return false;									//only update to devs on new minors.
 				}
@@ -118,7 +118,7 @@ public class TRVersion {
 					return false;									//1.18 dev x not newer than 1.18 dev x
 				}
 			} else {												//new == 1.18 beta
-				if (tekkitrestrict.config.getBoolean(ConfigFile.General, "UpdateToBetaVersions", false)){
+				if (SettingsStorage.generalConfig.getBoolean("UpdateToBetaVersions", false)){
 					if (ver2.minor >= this.minor) return true;		//update to new beta indeed. Also update to beta on same minor, as that is newer
 					return false;									//impossible?
 				}
@@ -129,9 +129,9 @@ public class TRVersion {
 		} else {													//1.18 release
 			if (ver2.beta || ver2.dev){								//dont update to devs or betas, not even newer ones.
 				if (ver2.minor == this.minor) return false;			//dont update to lower version
-				if (ver2.beta && tekkitrestrict.config.getBoolean(ConfigFile.General, "UpdateToBetaVersions", false)){
+				if (ver2.beta && SettingsStorage.generalConfig.getBoolean("UpdateToBetaVersions", false)){
 					return true;									//1.19 beta is newer than 1.18 release
-				} else if (ver2.dev && tekkitrestrict.config.getBoolean(ConfigFile.General, "UpdateToDevelopmentVersions", false)){
+				} else if (ver2.dev && SettingsStorage.generalConfig.getBoolean("UpdateToDevelopmentVersions", false)){
 					return true;									//1.19 dev is newer than 1.18 release
 				}
 				return false;
@@ -142,7 +142,7 @@ public class TRVersion {
 		}
 	}
 	
-	@NonNull public String toMetricsVersion(){
+	public String toMetricsVersion(){
 		String base = "" + major + "." + minor;
 		if (beta) base += " Beta " + extra;
 		else if (dev) base += " Dev " + extra;

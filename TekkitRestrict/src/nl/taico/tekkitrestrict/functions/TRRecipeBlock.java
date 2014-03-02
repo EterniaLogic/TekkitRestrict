@@ -9,10 +9,9 @@ import net.minecraft.server.FurnaceRecipes;
 
 import nl.taico.tekkitrestrict.TRException;
 import nl.taico.tekkitrestrict.TRItemProcessor2;
-import nl.taico.tekkitrestrict.tekkitrestrict;
 import nl.taico.tekkitrestrict.Log.Warning;
+import nl.taico.tekkitrestrict.config.SettingsStorage;
 import nl.taico.tekkitrestrict.objects.TRItem;
-import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 
 public class TRRecipeBlock {
 	public static int recipesSize, furnaceSize;
@@ -22,7 +21,7 @@ public class TRRecipeBlock {
 
 	public static void blockConfigRecipes() {
 		recipesSize = 0;
-		List<String> ssr = tekkitrestrict.config.getStringList(ConfigFile.Advanced, "RecipeBlock");
+		List<String> ssr = SettingsStorage.advancedConfig.getStringList("RecipeBlock");
 		for (final String s : ssr) {
 			final List<TRItem> iss;
 			try {
@@ -42,7 +41,7 @@ public class TRRecipeBlock {
 			}
 		}
 
-		ssr = tekkitrestrict.config.getStringList(ConfigFile.Advanced, "RecipeFurnaceBlock");
+		ssr = SettingsStorage.advancedConfig.getStringList("RecipeFurnaceBlock");
 		for (final String s : ssr) {
 			final List<TRItem> iss;
 			try {

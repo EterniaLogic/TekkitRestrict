@@ -28,12 +28,12 @@ import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.TRConfigCache.Listeners;
 import nl.taico.tekkitrestrict.TRConfigCache.SafeZones;
 import nl.taico.tekkitrestrict.TRConfigCache.Threads;
+import nl.taico.tekkitrestrict.config.SettingsStorage;
 import nl.taico.tekkitrestrict.functions.TRNoItem;
 import nl.taico.tekkitrestrict.functions.TRSafeZone;
 import nl.taico.tekkitrestrict.objects.TRCharge;
 import nl.taico.tekkitrestrict.objects.TRItem;
 import nl.taico.tekkitrestrict.objects.TRItemStack;
-import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 
 import ee.ItemEECharged;
 
@@ -484,7 +484,7 @@ public class TRDisableItemsThread extends Thread {
 		
 		{
 			final ArrayList<Integer> temp = new ArrayList<Integer>();
-			final List<String> dechargeSS = tekkitrestrict.config.getStringList(ConfigFile.ModModifications, "DechargeInSS");
+			final List<String> dechargeSS = SettingsStorage.modModificationsConfig.getStringList("DechargeInSS");
 			for (final String s : dechargeSS) {
 				final List<TRItem> iss;
 				try {
@@ -504,7 +504,7 @@ public class TRDisableItemsThread extends Thread {
 		
 		{
 			final HashMap<Integer, TRCharge> temp = new HashMap<Integer, TRCharge>();
-			final List<String> meu = tekkitrestrict.config.getStringList(ConfigFile.ModModifications, "MaxEU");
+			final List<String> meu = SettingsStorage.modModificationsConfig.getStringList("MaxEU");
 			for (final String s : meu) {
 				if (!s.contains(" ")){
 					Warning.config("You have an error in your ModModifications.config in MaxEU!", false);
@@ -560,7 +560,7 @@ public class TRDisableItemsThread extends Thread {
 			// process charges...
 			final HashMap<Integer, TRCharge> temp = new HashMap<Integer, TRCharge>();
 			
-			final List<String> MaxCharges = tekkitrestrict.config.getStringList(ConfigFile.ModModifications, "MaxCharge");
+			final List<String> MaxCharges = SettingsStorage.modModificationsConfig.getStringList("MaxCharge");
 			for (final String charge : MaxCharges) {
 				if (!charge.contains(" ")) {
 					Log.Warning.config("You have an error in your maxchare list in ModModifications.config: \""+charge+"\" does not follow the format: \"itemstr percentage\"", false);

@@ -5,28 +5,23 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
 
 import nl.taico.tekkitrestrict.Log;
-import nl.taico.tekkitrestrict.TRConfigCache.LogFilter;
-import nl.taico.tekkitrestrict.TRConfigCache.Logger;
 import nl.taico.tekkitrestrict.TRListener;
 import nl.taico.tekkitrestrict.tekkitrestrict;
+import nl.taico.tekkitrestrict.TRConfigCache.LogFilter;
+import nl.taico.tekkitrestrict.TRConfigCache.Logger;
 import nl.taico.tekkitrestrict.TRConfigCache.Dupes;
 import nl.taico.tekkitrestrict.TRConfigCache.Hacks;
 import nl.taico.tekkitrestrict.TRConfigCache.Listeners;
-import nl.taico.tekkitrestrict.eepatch.EEChargeListener;
-import nl.taico.tekkitrestrict.eepatch.EEDuplicateListener;
-import nl.taico.tekkitrestrict.eepatch.EEPSettings;
+import nl.taico.tekkitrestrict.config.EEPatchConfig;
+import nl.taico.tekkitrestrict.config.SettingsStorage;
+import nl.taico.tekkitrestrict.eepatch.*;
 import nl.taico.tekkitrestrict.eepatch.amuletlisteners.EEAmuletListener;
 import nl.taico.tekkitrestrict.eepatch.destlisteners.EEDestructionListener;
-import nl.taico.tekkitrestrict.eepatch.otherlisteners.EEPedestalListener;
-import nl.taico.tekkitrestrict.eepatch.otherlisteners.EEPhilosopherListener;
-import nl.taico.tekkitrestrict.eepatch.otherlisteners.EETransmutionListener;
-import nl.taico.tekkitrestrict.eepatch.otherlisteners.EEWatchListener;
+import nl.taico.tekkitrestrict.eepatch.otherlisteners.*;
 import nl.taico.tekkitrestrict.eepatch.ringlisteners.EERingListener;
-import nl.taico.tekkitrestrict.eepatch.toollisteners.EEDMToolListener;
-import nl.taico.tekkitrestrict.eepatch.toollisteners.EERMToolListener;
+import nl.taico.tekkitrestrict.eepatch.toollisteners.*;
 import nl.taico.tekkitrestrict.logging.TRCmdListener;
 import nl.taico.tekkitrestrict.logging.TRNeiListener;
-import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 
 public class Assigner {
 	/**
@@ -77,7 +72,7 @@ public class Assigner {
 		if (Hacks.fly.enable)
 			register("Anti Fly Hack", new NoHackFly(), PM, plugin);
 		
-		if (tekkitrestrict.config.getBoolean2(ConfigFile.Logging, "SplitLogs", true))
+		if (SettingsStorage.loggingConfig.getBoolean("SplitLogs", true))
 			register("SplitLogs Command", new TRCmdListener(), PM, plugin);
 		
 		if (LogFilter.logNEIGive)
@@ -119,7 +114,7 @@ public class Assigner {
 			!EEPSettings.rmhammer.isEmpty() || !EEPSettings.rmshears.isEmpty() || !EEPSettings.rmsword.isEmpty() || !EEPSettings.katar.isEmpty() || !EEPSettings.morningstar.isEmpty())
 			register("EERMTools", new EERMToolListener(), PM, tr);
 		
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "AllowRMFurnaceOreDuplication", true))
+		if (!EEPatchConfig.getConfig().getBoolean("AllowRMFurnaceOreDuplication", true))
 			register("EEDuplication", new EEDuplicateListener(), PM, tr);
 		
 		if (!EEPSettings.MaxCharge.isEmpty())

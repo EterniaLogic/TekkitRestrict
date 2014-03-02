@@ -11,11 +11,10 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import nl.taico.tekkitrestrict.TRException;
 import nl.taico.tekkitrestrict.TRItemProcessor2;
-import nl.taico.tekkitrestrict.tekkitrestrict;
 import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.TRConfigCache.Listeners;
+import nl.taico.tekkitrestrict.config.SettingsStorage;
 import nl.taico.tekkitrestrict.objects.TRItem;
-import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 import nl.taico.tekkitrestrict.objects.itemprocessor.TRMod;
 
 /**
@@ -51,7 +50,7 @@ public class TRNoItem {
 	 * Loads the Disabled Items from the config.
 	 */
 	private static void allocateDisabledItems() {
-		final List<String> di = tekkitrestrict.config.getStringList(ConfigFile.DisableItems, "DisableItems");
+		final List<String> di = SettingsStorage.bannedConfig.getStringList("BannedItems");
 		final LinkedList<TRItem> temp1 = new LinkedList<TRItem>();
 		
 		for (String str : di) {
@@ -73,7 +72,7 @@ public class TRNoItem {
 		DisabledItems = temp1;
 	}
 	private static void allocateDisabledCreativeItems() {
-		final List<String> di = tekkitrestrict.config.getStringList(ConfigFile.LimitedCreative, "LimitedCreative");
+		final List<String> di = SettingsStorage.limitedCreativeConfig.getStringList("LimitedCreative");
 		final LinkedList<TRItem> temp1 = new LinkedList<TRItem>();
 		
 		for (String str : di) {

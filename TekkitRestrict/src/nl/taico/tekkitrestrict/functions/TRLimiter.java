@@ -31,12 +31,12 @@ import nl.taico.tekkitrestrict.TRListener;
 import nl.taico.tekkitrestrict.TRPermHandler;
 import nl.taico.tekkitrestrict.tekkitrestrict;
 import nl.taico.tekkitrestrict.Log.Warning;
+import nl.taico.tekkitrestrict.config.SettingsStorage;
 import nl.taico.tekkitrestrict.objects.TRConfigLimit;
 import nl.taico.tekkitrestrict.objects.TRItem;
 import nl.taico.tekkitrestrict.objects.TRLimit;
 import nl.taico.tekkitrestrict.objects.TRLocation;
 import nl.taico.tekkitrestrict.objects.TRPermLimit;
-import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 
 public class TRLimiter {
 	private int expire = -1;
@@ -61,7 +61,7 @@ public class TRLimiter {
 		limiterPermCache.clear();
 		
 		final ArrayList<TRConfigLimit> temp = new ArrayList<TRConfigLimit>();
-		final List<String> limitedBlocks = tekkitrestrict.config.getStringList(ConfigFile.Advanced, "LimitBlocks");
+		final List<String> limitedBlocks = SettingsStorage.limiterConfig.getStringList("LimitBlocks");
 		for (String limBlock : limitedBlocks) {
 			String msg = null;
 			if (limBlock.contains("{")){

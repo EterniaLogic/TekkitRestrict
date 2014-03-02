@@ -1,4 +1,4 @@
-package nl.taico.tekkitrestrict.newconfig;
+package nl.taico.tekkitrestrict.config;
 
 import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.configuration.MemoryConfigurationOptions;

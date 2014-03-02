@@ -1,21 +1,23 @@
-package nl.taico.tekkitrestrict2;
+package nl.taico.tekkitrestrict.config;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class SettingsStorage {
 	public static ConfigManager manager = new ConfigManager();
-	public static TRConfig bannedConfig,
-						   groupPermsConfig,
-						   safeZoneConfig,
-						   hackDupeConfig,
-						   databaseConfig,
-						   performanceConfig,
-						   limitedCreativeConfig,
-						   limiterConfig,
-						   loggingConfig,
-						   modModificationsConfig,
-						   unloadConfig;
+	public static TRConfig advancedConfig;
+	public static TRConfig bannedConfig;
+	public static TRConfig databaseConfig;
+	public static TRConfig generalConfig;
+	public static TRConfig groupPermsConfig;
+	public static TRConfig hackDupeConfig;
+	public static TRConfig limitedCreativeConfig;
+	public static TRConfig limiterConfig;
+	public static TRConfig loggingConfig;
+	public static TRConfig modModificationsConfig;
+	public static TRConfig performanceConfig;
+	public static TRConfig safeZoneConfig;
+	public static TRConfig unloadConfig;
 	
 	private static final String[] header = {
 		"Configuration file for TekkitRestrict",
@@ -24,24 +26,147 @@ public class SettingsStorage {
 		"Please ask questions/report issues on the BukkitDev page."
 	};
 	
-	public static void genBanned(){
-		bannedConfig = manager.getNewConfig("Banned.yml", header, 93);
+	private static List<String> filledList(String... strings){
+		final List<String> tbr = new ArrayList<String>();
+		for (final String s : strings) tbr.add(s);
+		return tbr;
+	}
+	
+	public static void loadConfigs(){
+		genAdvanced();
+		genBanned();
+		genCreative();
+		genDatabase();
+		genEEPatch();
+		genGeneral();
+		genGroupPerms();
+		genHackDupe();
+		genLimiter();
+		genLogging();
+		genModifications();
+		genPerformance();
+		genSafeZones();
+		genUnload();
+	}
+	
+	public static void reloadConfigs(){
+		advancedConfig.reloadConfig();
+		bannedConfig.reloadConfig();
+		databaseConfig.reloadConfig();
+		generalConfig.reloadConfig();
+		groupPermsConfig.reloadConfig();
+		hackDupeConfig.reloadConfig();
+		limitedCreativeConfig.reloadConfig();
+		limiterConfig.reloadConfig();
+		loggingConfig.reloadConfig();
+		modModificationsConfig.reloadConfig();
+		performanceConfig.reloadConfig();
+		safeZoneConfig.reloadConfig();
+		unloadConfig.reloadConfig();
+		
+		EEPatchConfig.reloadConfig();
+	}
+	
+	public static void genAdvanced(){
+		advancedConfig = manager.getNewConfig("Advanced.yml", header, 93);
+		if (!advancedConfig.isNewConfig()) return;
 		
 		{
 			final String[] comment = new String[] {
-					"###################################################################################################",
-					"########################################### Banned Items ##########################################",
-					"###################################################################################################",
-					"Should disabledItemBlocks be removed from the map?",
-					"WARNING: It can cause lag as the complete map has to be searched for disabled blocks.",
-					"Default: false"
+				"####################################################################################################",
+				"######################################## Advanced Functions ########################################",
+				"####################################################################################################",
+				"# All items listed here will be uncraftable. You can also use mod names to make all items of that mod uncraftable.",
+				"",
+				"# Please note that removed recipes can NOT be re-added with /tr admin reload.",
+				"# In order to get them back you have to restart the server.",
+				"",
+				"# Examples:",
+				"# RecipeBlock:",
+				"# - \"27232\"",
+				"# - \"126:3\"",
+				"# - \"ee\""
+			};
+			advancedConfig.set("RecipeBlock", new ArrayList<String>(), comment);
+		}
+		{
+			final String[] comment = new String[] {
+				"####################################################################################################",
+				"# All items listed here will be unable to be smelted.",
+				"#",
+				"# For example, if you add 17 (log), you will be unable to smelt logs into",
+				"# charcoal.",
+				"#",
+				"# Please note that removed recipes can NOT be readded with /tr admin reload.",
+				"# In order to get them back you have to restart the server.",
+				"#",
+				"# Examples:",
+				"# RecipeFurnaceBlock:",
+				"# - \"27232\"",
+				"# - \"126:3\""
+			};
+			advancedConfig.set("RecipeFurnaceBlock", new ArrayList<String>(), comment);
+		}
+
+		{
+			final String[] comment = new String[] {
+				"####################################################################################################",
+				"# LWC Protection Extension for Tekkit",
+				"",
+				"# All items listed here cannot be placed next to a lockette unless the player",
+				"# has access to it. This is useful for preventing players from \"pumping\"",
+				"# items out of chests, using block breakers to break chests, etc.",
+				"",
+				"# Default:",
+				"# LWCPreventNearLocked:",
+				"# - \"4306 {&cYou are not allowed to place pipes next to someone elses Locked blocks!}\"",
+				"# - \"4301 {&cYou are not allowed to place pipes next to someone elses Locked blocks!}\"",
+				"# - \"150 {&cNo blockbreakers/transposers next to someone elses Locked block!}\"",
+				"# - \"136 {&cYou are not allowed to place redpower tubes/covers next to someone elses Locked blocks!}\"",
+				"# - 166"
+			};
+			
+			final List<String> content = new ArrayList<String>(5);
+			content.add("4306 {&cYou are not allowed to place pipes next to someone elses Locked blocks!}");
+			content.add("4301 {&cYou are not allowed to place pipes next to someone elses Locked blocks!}");
+			content.add("150 {&cNo blockbreakers/transposers next to someone elses Locked block!}");
+			content.add("136 {&cYou are not allowed to place redpower tubes/covers next to someone elses Locked blocks!}");
+			content.add("166");
+			advancedConfig.set("LWCPreventNearLocked", content, comment);
+		}
+		
+		advancedConfig.saveConfig();
+	}
+	
+	public static void genBanned(){
+		bannedConfig = manager.getNewConfig("Banned.yml", header, 93);
+		if (!bannedConfig.isNewConfig()) return;
+		{
+			final String[] comment = new String[] {
+				"###################################################################################################",
+				"########################################### Banned Items ##########################################",
+				"###################################################################################################",
+				"In the list below, you can set items that will be banned for all players on the server, except if "
+			  + "they have the bypass permission. When they try to make the item, they will be stopped. If they "
+			  + "somehow manage to get the item, it will be removed from their inventory shortly after.",
+			  	"",
+			  	"UseBannedItems: Should this feature be enabled?",
+			  	"Default: true"
+			};
+			bannedConfig.set("UseItemBanner", true, comment);
+		}
+		{
+			final String[] comment = new String[] {
+				"Should disabledItemBlocks be removed from the map?",
+				"WARNING: It can cause lag as the complete map has to be searched for disabled blocks.",
+				"Default: false"
 			};
 			bannedConfig.set("RemoveDisabledItemBlocks", false, comment);
 		}
 		{
 			final String[] comment = new String[] {
-					"When a disabled item is found in someone's inventory, it is changed into this item ID.",
-					"Default: 3 (dirt)"
+				"When a disabled item is found in someone's inventory, it is changed into this item ID.",
+				"Default: 3 (dirt)"
 			};
 			bannedConfig.set("ChangeDisabledItemsIntoId", false, comment);
 		}
@@ -241,8 +366,260 @@ public class SettingsStorage {
 		bannedConfig.saveConfig();		
 	}
 	
+	public static void genCreative(){
+		limitedCreativeConfig = manager.getNewConfig("LimitedCreative.yml", header, 93);
+		if (!limitedCreativeConfig.isNewConfig()) return;
+		{
+			final String[] comment = new String[] {
+				"###################################################################################################",
+				"################################# Limited Creative Configuration ##################################",
+				"###################################################################################################",
+				"Limited creative is a function of TekkitRestrict where you can disallow items for players in "
+			  + "creative mode. This way, you can give creative mode to people without having to worry about them "
+			  + "making tons of Collectors, Solar panels, Red Matter Blocks and so on. You only have to set the "
+			  + "items you don't want people to use in creative mode here, and TekkitRestrict will do the rest.",
+				"",
+				"Limited creative will also prevent players in creative mode from dropping items on the ground.",
+				"This makes sure they don't give items to players in survival mode.",
+				"",
+				"Disable (false) or enable (true) Limited creative.",
+				"Default: false"
+			};
+			limitedCreativeConfig.set("UseLimitedCreative", false, comment);
+		}
+		
+		{
+			final String[] comment = new String[] {
+				"If you set this option to true, it will prevent the use of ANY container while a player is in "
+			  + "creative mode. This means that he cannot place his creative diamond blocks in a chest and then "
+			  + "use them in survival. ",
+				"If this is enabled, it prevents the use of ANY container while in creative mode. This is "
+			  + "everything you can interact with, with the exception of your own inventory.",
+				"Default: true"
+			};
+			limitedCreativeConfig.set("LimitedCreativeNoContainer", true, comment);
+		}
+		
+		{
+			final String[] comment = new String[] {
+				"Here you can set the items you don't want creative players to use. You can enter mods, id's, item "
+			  + "names, and more.",
+				"Examples:",
+				"- \"EE {&cYou are not allowed to use Equivalent Exchange when you are in creative mode!}\"",
+				"- \"1 {&cStone is banned for creative players!}\"",
+				"- \"35:15 {&cWe just hate black wool, so don't build with it!}\"",
+				"- 50",
+				"- \"NetherGoldOre {&6Nether ores are explosive, so you are not allowed to build with them!}\"",
+				"",
+				"For a full list of mods, usable item names and more examples, see Info.yml"
+			};
+			final List<String> content = new ArrayList<String>();
+			content.add("RedPowerControl");
+			content.add("RedPowerLogic");
+			content.add("RedPowerMachine");
+			content.add("WirelessRedstone");
+			content.add("BuildCraft");
+			content.add("AdditionalPipes");
+			content.add("AdvancedMachines");
+			content.add("IndustrialCraft");
+			content.add("NuclearControl");
+			content.add("CompactSolars");
+			content.add("ChargingBench");
+			content.add("PowerConverters");
+			content.add("Mffs");
+			content.add("RailCraft");
+			content.add("TubeStuffs");
+			content.add("IronChests");
+			content.add("BalkonWeaponMod");
+			content.add("EnderChest");
+			content.add("ChunkLoaders");
+			
+			limitedCreativeConfig.set("LimitedCreative", content, comment);
+		}
+		
+		limitedCreativeConfig.saveConfig();
+	}
+	
+	public static void genDatabase(){
+		databaseConfig = manager.getNewConfig("Database.yml", header, 93);
+		if (!databaseConfig.isNewConfig()) return;
+		{
+			final String[] comment = new String[] {
+				"###################################################################################################",
+				"###################################### Database Configuration #####################################",
+				"###################################################################################################",
+				"Set the type of database tekkitrestrict should use.",
+				"Possible: SQLite, MySQL",
+				"Default: SQLite"
+			};
+			databaseConfig.set("DatabaseType", "SQLite", comment);
+		}
+		{
+			final String[] comment = new String[] {
+				"MySQL connection settings"
+			};
+			databaseConfig.set("MySQL.Hostname", "localhost", comment);
+			databaseConfig.set("MySQL.Port", 3306);
+			databaseConfig.set("MySQL.Username", "root");
+			databaseConfig.set("MySQL.Password", "minecraft");
+			databaseConfig.set("MySQL.Database", "minecraft");
+		}
+		{
+			final String[] comment = new String[] {
+				"###################################################################################################",
+				"######################################## Transfer settings ########################################",
+				"###################################################################################################",
+				"Here you can set if you want to transfer a database from SQLite to MySQL or vice versa. Only one "
+			  + "of these options can be true.",
+				"",
+				"Transfer from SQLite to MySQL",
+				"If you set this to true, the data currently in the Data.db file will be written to the MySQL "
+			  + "database as set above."
+			};
+			databaseConfig.set("TransferDBFromSQLiteToMySQL", false, comment);
+		}
+		
+		{
+			final String[] comment = new String[] {
+				"Transfer from MySQL to SQLite",
+				"If you set this to true, the data currently in the MySQL database as set above will be written "
+			  + "into a SQLite database file named Data.db."
+			};
+			databaseConfig.set("TransferDBFromMySQLToSQLite", false, comment);
+		}
+		
+		databaseConfig.saveConfig();
+	}
+
+	public static void genEEPatch(){
+		EEPatchConfig.saveDefaultConfig();
+	}
+	
+	public static void genGeneral(){
+		generalConfig = manager.getNewConfig("General.yml", header, 93);
+		if (!generalConfig.isNewConfig()) return;
+		{
+			final String[] comment = new String[] {
+				"Add Tekkit Material names (to get the name of the block/item, used by logging plugins, "
+			  + "Essentials, LWC, etc.) to Bukkit.",
+			  	"Default: true"
+			};
+			generalConfig.set("AddTekkitMaterialNames", true, comment);
+		}
+		{
+			final String[] comment = new String[] {
+				"Add Equivalent Exchange items names to the Essentials Item Database",
+				"(used for /i, /give, /itemdb, etc.)",
+				"Default: true"
+			};
+			generalConfig.set("AddEEItemsToEssentials", true, comment);
+		}
+		{
+			final String[] comment = new String[] {
+				"Patch ComputerCraft once to prevent some server crashes with ComputerCraft computers.",
+				"Default: true"
+			};
+			generalConfig.set("PatchComputerCraft", true, comment);
+		}
+		{
+			final String[] comment = new String[] {
+				"If KickFromConsole is true, the console will execute the /kick command instead of the default "
+			  + "Bukkit kick when a player gets kicked by TekkitRestrict (e.g. for hacking).",
+				"Useful if you want to log kicks or use a different bansystem.",
+				"Default: false"
+			};
+			generalConfig.set("KickFromConsole", false, comment);
+		}
+		{
+			final String[] comment = new String[] {
+				"###################################################################################################",
+				"############################################# Updater #############################################",
+				"###################################################################################################",
+				"Should TekkitRestrict check for an update when the server starts?",
+				"Default: true"
+			};
+			generalConfig.set("CheckForUpdateOnStartup", true, comment);
+		}
+		{
+			final String[] comment = new String[] {
+				"Should the update be downloaded automatically if there is one?",
+				"Default: true"
+			};
+			generalConfig.set("Auto-Update", true, comment);
+		}
+		{
+			final String[] comment = new String[] {
+				"Should TekkitRestrict update to beta versions?",
+				"If you are currently running a beta version, this option is ignored.",
+				"Default: false"
+			};
+			generalConfig.set("UpdateToBetaVersions", false, comment);
+		}
+		{
+			final String[] comment = new String[] {
+				"Should TekkitRestrict update to development versions?",
+				"If you are currently running a dev version, this option is ignored.",
+				"Default: false"
+			};
+			generalConfig.set("UpdateToDevelopmentVersions", false, comment);
+		}
+		{
+			final String[] comment = new String[] {
+				"###################################################################################################",
+				"############################################# TMetrics ############################################",
+				"###################################################################################################",
+				"Lately Metrics by Hidendra hasn't been very reliable. The graphs show things that are "
+			  + "impossible. I would like to know how many servers actually use TekkitRestrict, what systems "
+			  + "they are running on and how much memory is dedicated to those servers.",
+				"",
+				"For this reason I decided to make my own metrics system called TMetrics.",
+				"",
+				"TMetrics sends the data to http://metrics.taico.nl/, my own website, where the data will be "
+			  + "stored. Every server will get a unique ID that makes sure there will be few to no duplicates in "
+			  + "the database. This UID is stored in a file in the tekkitrestrict plugin directory, and I ask you "
+			  + "to never delete it.",
+				"",
+				"TMetrics will send the following information:",
+				"- The version of TekkitRestrict you are using",
+				"- The version of Minecraft you are using",
+				"- If onlinemode is on or off",
+				"- The amount of players online",
+				"- The system you are running the server on",
+				"- If that system is 32 or 64 bit",
+				"- The amount of cores your system has.",
+				"- The amount of memory allocated to your Minecraft server",
+				"- The version of Java you are using",
+				"",
+				"When the server starts, TMetrics will send system data to let the server know if something has "
+			  + "changed (Memory allocated, Operating system, Java version, etc.).",
+				"After that, TMetrics will ping my server every 15 minutes. On these pings it will only send the "
+			  + "amount of players online.",
+				"",
+				"If you don't want to send these metrics, you can set UseTMetrics to false."
+			};
+			generalConfig.set("UseTMetrics", true, comment);
+		}
+		{
+			final String[] comment = new String[] {
+				"Should TMetrics give warnings in the console when submitting the statistics failed?",
+				"Default: true"
+			};
+			generalConfig.set("ShowTMetricsWarnings", true, comment);
+		}
+		{
+			final String[] comment = new String[] {
+				"###################################################################################################",
+				"###################################################################################################",
+				"Do NOT change this setting. It will reset the config files if you do."
+			};
+			generalConfig.set("ConfigVersion", 3.0d, comment);
+		}
+		generalConfig.saveConfig();
+	}
+	
 	public static void genGroupPerms(){
 		groupPermsConfig = manager.getNewConfig("GroupPermissions.yml", header, 93);
+		if (!groupPermsConfig.isNewConfig()) return;
 		{
 			final String[] comment = {
 					"###################################################################################################",
@@ -274,130 +651,10 @@ public class SettingsStorage {
 		}
 		groupPermsConfig.saveConfig();
 	}
-	
-	public static void genSafeZones(){
-		safeZoneConfig = manager.getNewConfig("SafeZones.yml", header, 93);
-		{
-			final String[] comment = {
-				"###################################################################################################",
-				"##################################### SafeZone Configuration ######################################",
-				"###################################################################################################",
-				"Should TekkitRestrict use SafeZones?",
-				"Default: true"
-			};
-			safeZoneConfig.set("UseSafeZones", true, comment);
-		}
-		{
-			//safeZoneConfig.set("InSafeZones.Null", true);
-			final String[] comment = {
-				"# Note: This will only apply to Native, WorldGuard and GriefPrevention SafeZones, and",
-				"#       NOT to Towny, Factions or PreciousStones SafeZones.",
-				"If you turn DisableEntities on, then",
-				"- No mobs will spawn in SafeZones.",
-				"- If a mob enters a SafeZone, it is removed.",
-				"Default: true"
-			};
-			safeZoneConfig.set("InSafeZones DisableEntities", true, comment);
-			//safeZoneConfig.set("InSafeZones.Null", null);
-		}
-		{
-			final String[] comment = {
-				"This is a feature that allows tekkitrestrict to run the entities disabler thread with less lag and "
-			  + "problems. Entities can get removed at range blocks from the corner of the safezone.",
-				"",
-				"Increase this value if you have problems with the entity remover or if you want to increase "
-			  + "performance.",
-				"Default: 10"
-			};
-			safeZoneConfig.set("InSafeZones DisableEntitiesRange", 10, comment);
-		}
-		{
-			final String[] comment = {
-				"WARNING: Case Sensitive!",
-				"Tries to exclude org.bukkit.entity.[name] entities from SafeZone entity removal.",
-				"Examples:",
-				"\"Arrow\", \"Animals\", \"EnderDragon\", \"EnderPearl\", \"Fish\", \"IronGolem\", \"Pig\",",
-				"\"Projectile\", \"ThrownPotion\", \"TNTPrimed\", \"Snowball\""
-			};
-			safeZoneConfig.set("InSafeZones ExemptEntityTypes", new ArrayList<String>(), comment);
-		}
-		{
-			final String[] comment = {
-				"If you turn DechargeEE on, then",
-				"- All EE items specified in the ModModifications config will be decharged in SafeZones",
-				"Default: true"
-			};
-			safeZoneConfig.set("InSafeZones DechargeEE", true, comment);
-		}
-		{
-			final String[] comment = {
-				"If you turn DisableRingOfArcana on, then",
-				"- When someone is in a SafeZone with a ring of arcana, it will always be set to \"Earth\" mode and "
-			  + "it will be turned off.",
-				"Default: true"
-			};
-			safeZoneConfig.set("InSafeZones DisableRingOfArcana", true, comment);
-		}
-		{
-			final String[] comment = {
-				"The plugins TekkitRestrict should use to make safezones.",
-				"",
-				"It is recommended to use tekkitrestrict native safezones, to minimize the strain safezones put on "
-			  + "the server.",
-				"You can add these safezones with /tr admin safezone addnative <x1> <z1> <x2> <z2> <name>",
-				"",
-				"There is only basic support for Factions, Towny and PreciousStones.",
-				"This means that all land claimed by a faction, a town, etcetera is a safezone.",
-				"Players with the build/destroy permission for that land will bypass it.",
-				"",
-				"For GriefPrevention, you can choose different modes (See below).",
-				"For WorldGuard, you can specify per region if it should be a safezone. You can",
-				"compare this mode with the \"Specific\" mode of GriefPrevention.",
-				"Default: true for all"
-			};
-			safeZoneConfig.set("SSEnabledPlugins.TekkitRestrict", true, comment);
-			safeZoneConfig.set("SSEnabledPlugins.GriefPrevention", true);
-			safeZoneConfig.set("SSEnabledPlugins.WorldGuard", true);
-			safeZoneConfig.set("SSEnabledPlugins.Factions", true);
-			safeZoneConfig.set("SSEnabledPlugins.Towny", true);
-			safeZoneConfig.set("SSEnabledPlugins.PreciousStones", true);
-		}
-		{
-			final String[] comment = {
-				"###################################################################################################",
-				"################################ GriefPrevention Specific settings ################################",
-				"###################################################################################################",
-				"If someone is a manager in a claim, the SafeZone will not apply for him.",
-				"(If you would like a setting to turn this on or off, please make a feature request",
-				"ticket on the Bukkit Dev TekkitRestrict page.)",
-				"",
-				"GriefPrevention SafeZone Method",
-				"Can be All, Admin, Specific or SpecificAdmin",
-				"All: All GriefPrevention claims are SafeZones.",
-				"Admin: All GriefPrevention admin claims are SafeZones. (Default)",
-				"Specific: You can specify per claim if you want it to be a SafeZone.",
-				"SpecificAdmin: Only admin claims can be SafeZones, but you can specify it per claim."
-			};
-			safeZoneConfig.set("GriefPreventionSafeZoneMethod", "Admin", comment);
-		}
-		{
-			final String[] comment = {
-				"##########################################################################################",
-				"############################## WorldGuard Specific settings ##############################",
-				"##########################################################################################",
-				"WorldGuard SafeZone Method",
-				"Can be All or Specific",
-				"All: All WorldGuard regions are SafeZones.",
-				"Specific: You can specify per region if you want it to be a SafeZone. (Default)"
-			};
-			safeZoneConfig.set("WorldGuardSafeZoneMethod", "Specific", comment);
-		}
-		
-		safeZoneConfig.saveConfig();
-	}
-	
+
 	public static void genHackDupe(){
 		hackDupeConfig = manager.getNewConfig("HackDupe.yml", header, 93);
+		if (!hackDupeConfig.isNewConfig()) return;
 		{
 			final String[] comment = {
 				"###################################################################################################",
@@ -591,237 +848,25 @@ public class SettingsStorage {
 		hackDupeConfig.saveConfig();
 	}
 	
-	public static void genDatabase(){
-		databaseConfig = manager.getNewConfig("Database.yml", header, 93);
-		
-		{
-			final String[] comment = new String[] {
-				"###################################################################################################",
-				"###################################### Database Configuration #####################################",
-				"###################################################################################################",
-				"Set the type of database tekkitrestrict should use.",
-				"Possible: SQLite, MySQL",
-				"Default: SQLite"
-			};
-			databaseConfig.set("DatabaseType", "SQLite", comment);
-		}
-		{
-			final String[] comment = new String[] {
-				"MySQL connection settings"
-			};
-			databaseConfig.set("MySQL.Hostname", "localhost", comment);
-			databaseConfig.set("MySQL.Port", 3306);
-			databaseConfig.set("MySQL.Username", "root");
-			databaseConfig.set("MySQL.Password", "minecraft");
-			databaseConfig.set("MySQL.Database", "minecraft");
-		}
-		{
-			final String[] comment = new String[] {
-				"###################################################################################################",
-				"######################################## Transfer settings ########################################",
-				"###################################################################################################",
-				"Here you can set if you want to transfer a database from SQLite to MySQL or vice versa. Only one "
-			  + "of these options can be true.",
-				"",
-				"Transfer from SQLite to MySQL",
-				"If you set this to true, the data currently in the Data.db file will be written to the MySQL "
-			  + "database as set above."
-			};
-			databaseConfig.set("TransferDBFromSQLiteToMySQL", false, comment);
-		}
-		
-		{
-			final String[] comment = new String[] {
-				"Transfer from MySQL to SQLite",
-				"If you set this to true, the data currently in the MySQL database as set above will be written "
-			  + "into a SQLite database file named Data.db."
-			};
-			databaseConfig.set("TransferDBFromMySQLToSQLite", false, comment);
-		}
-		
-		databaseConfig.saveConfig();
-	}
-
-	public static void genPerformance(){
-		performanceConfig = manager.getNewConfig("Performance.yml", header, 93);
-		
-		{
-			final String[] comment = new String[] {
-				"###################################################################################################",
-				"#################################### Performance Configuration ####################################",
-				"###################################################################################################",
-				"Should TekkitRestrict favor server performance over memory usage?",
-				"Default: false"
-			};
-			performanceConfig.set("FavorPerformanceOverMemory", false, comment);
-		}
-		
-		{
-			final String[] comment = new String[] {
-				"###################################################################################################",
-				"##################################### Threading Configuration #####################################",
-				"###################################################################################################",
-				"Do not edit these values unless you know what you are doing.",
-				"These numbers are in Milliseconds. (1000 milliseconds = 1 second)",
-				"Lower values = more server strain (more lag)",
-				"",
-				"The amount of time the thread that disables GemArmor powers (see ModModifications config) sleeps "
-			  + "for.",
-				"If you set this too high, players might be able to use their powers by spamming.",
-				"If you set this too low, it might lag the server.",
-				"",
-				"Recommended: [100-200]",
-				"Default: 120"
-			};
-			performanceConfig.set("GemArmorDThread", 120, comment);
-		}
-		
-		{
-			final String[] comment = new String[] {
-				"The amount of time the thread that removes entities in SafeZones powers (see SafeZones config) "
-			  + "sleeps for.",
-				"If removing entities from a SafeZones is not something that is very important for your server, you "
-			  + "can raise this to 1000-2000 (1-2 seconds)",
-				"",
-				"Recommended: [350-2000]",
-				"Default: 500"
-			};
-			performanceConfig.set("SSEntityRemoverThread", 500, comment);
-		}
-		
-		{
-			final String[] comment = new String[] {
-				"The amount of time the inventory thread sleeps for.",
-				"The inventory thread takes care of removing DisabledItems, Decharging EE Tools and Applying the "
-			  + "Max EU values.",
-				"",
-				"Recommended: [250-500]",
-				"Default: 400"
-			};
-			performanceConfig.set("InventoryThread", 400, comment);
-		}
-		
-		{
-			final String[] comment = new String[] {
-				"The amount of time the WorldCleanerThread sleeps for.",
-				"This thread takes care of the Removal of Banned blocks from the world.",
-				"",
-				"Recommended: [60000-120000] (1-2 minutes)",
-				"Default: 60000",
-			};
-			performanceConfig.set("WorldCleanerThread", 60000, comment);
-		}
-		
-		{
-			final String[] comment = new String[] {
-				"The time between checking for unloading chunks. If the amount of chunks loaded is to high, chunks will be unloaded shortly after the check.",
-				"",
-				"Recommended: [60000-120000] (1-2 minutes)",
-				"Default: 90000",
-			};
-			performanceConfig.set("ChunkUnloader", 90000, comment);
-		}
-		
-		{
-			final String[] comment = new String[] {
-				"The amount of time the AutoSave Thread sleeps for.",
-				"This thread makes sure that all information is correctly saved to the database.",
-				"In case of a crash, you will only lose any data that has been modified within the sleep time of "
-			  + "this thread. (e.g. if you set this to 11000, you will only lose data changed within 11 seconds "
-			  + "before the crash)",
-				"",
-				"Recommended: [10000-30000]",
-				"Default: 11000"
-			};
-			performanceConfig.set("AutoSaveThreadSpeed", 11000, comment);
-		}
-		
-		performanceConfig.saveConfig();
-	}
-	
-	public static void genCreative(){
-		limitedCreativeConfig = manager.getNewConfig("LimitedCreative.yml", header, 93);
-		
-		{
-			final String[] comment = new String[] {
-				"###################################################################################################",
-				"################################# Limited Creative Configuration ##################################",
-				"###################################################################################################",
-				"Limited creative is a function of TekkitRestrict where you can disallow items for players in "
-			  + "creative mode. This way, you can give creative mode to people without having to worry about them "
-			  + "making tons of Collectors, Solar panels, Red Matter Blocks and so on. You only have to set the "
-			  + "items you don't want people to use in creative mode here, and TekkitRestrict will do the rest.",
-				"",
-				"Limited creative will also prevent players in creative mode from dropping items on the ground.",
-				"This makes sure they don't give items to players in survival mode.",
-				"",
-				"Disable (false) or enable (true) Limited creative.",
-				"Default: false"
-			};
-			limitedCreativeConfig.set("UseLimitedCreative", false, comment);
-		}
-		
-		{
-			final String[] comment = new String[] {
-				"If you set this option to true, it will prevent the use of ANY container while a player is in "
-			  + "creative mode. This means that he cannot place his creative diamond blocks in a chest and then "
-			  + "use them in survival. ",
-				"If this is enabled, it prevents the use of ANY container while in creative mode. This is "
-			  + "everything you can interact with, with the exception of your own inventory.",
-				"Default: true"
-			};
-			limitedCreativeConfig.set("LimitedCreativeNoContainer", true, comment);
-		}
-		
-		{
-			final String[] comment = new String[] {
-				"Here you can set the items you don't want creative players to use. You can enter mods, id's, item "
-			  + "names, and more.",
-				"Examples:",
-				"- \"EE {&cYou are not allowed to use Equivalent Exchange when you are in creative mode!}\"",
-				"- \"1 {&cStone is banned for creative players!}\"",
-				"- \"35:15 {&cWe just hate black wool, so don't build with it!}\"",
-				"- 50",
-				"- \"NetherGoldOre {&6Nether ores are explosive, so you are not allowed to build with them!}\"",
-				"",
-				"For a full list of mods, usable item names and more examples, see Info.yml"
-			};
-			final List<String> content = new ArrayList<String>();
-			content.add("RedPowerControl");
-			content.add("RedPowerLogic");
-			content.add("RedPowerMachine");
-			content.add("WirelessRedstone");
-			content.add("BuildCraft");
-			content.add("AdditionalPipes");
-			content.add("AdvancedMachines");
-			content.add("IndustrialCraft");
-			content.add("NuclearControl");
-			content.add("CompactSolars");
-			content.add("ChargingBench");
-			content.add("PowerConverters");
-			content.add("Mffs");
-			content.add("RailCraft");
-			content.add("TubeStuffs");
-			content.add("IronChests");
-			content.add("BalkonWeaponMod");
-			content.add("EnderChest");
-			content.add("ChunkLoaders");
-			
-			limitedCreativeConfig.set("LimitedCreative", content, comment);
-		}
-		
-		limitedCreativeConfig.saveConfig();
-	}
-
 	public static void genLimiter(){
 		limiterConfig = manager.getNewConfig("Limiter.yml", header, 93);
+		if (!limiterConfig.isNewConfig()) return;
 		{
 			final String[] comment = new String[] {
 				"###################################################################################################",
 				"###################################### Limiter Configuration ######################################",
 				"###################################################################################################",
-				"Limits the number of blocks a player can place. (Global)",
-				"Please note that these cannot be changed in-game.",
+				"With the limiter, you can set how many of a certain block a player may have placed at a time.",
+				"For example, you could limit the amount of collectors Mk. 3 someone can have by adding \"126:2 1\" "
+			  + "to the list below.",
+				"",
+				"UseLimiter: Should the limiter be enabled?",
+				"Default: true"
+			};
+			limiterConfig.set("UseLimiter", true, comment);
+		}
+		{
+			final String[] comment = new String[] {
 				"Item Limit (Please use ONE space between the Item and the limit to separate them)",
 				"- \"153 1\"",
 				"- \"100-200 1\"",
@@ -836,8 +881,9 @@ public class SettingsStorage {
 		limiterConfig.saveConfig();
 	}
 	
-	public static void getLogging(){
+	public static void genLogging(){
 		loggingConfig = manager.getNewConfig("Logging.yml", header, 93);
+		if (!loggingConfig.isNewConfig()) return;
 		{
 			final String[] comment = new String[] {
 				"###################################################################################################",
@@ -1178,8 +1224,348 @@ public class SettingsStorage {
 		loggingConfig.saveConfig();
 	}
 	
+	public static void genModifications(){
+		modModificationsConfig = manager.getNewConfig("ModModifications.yml", header, 93);
+		if (!modModificationsConfig.isNewConfig()) return;
+		{
+			final String[] comment = new String[]{
+				"####################################################################################################",
+				"##################################### Mod Modifications Config #####################################",
+				"####################################################################################################",
+				"GemArmor settings. NOTE: the GemArmor settings are obsolete to the ones in EEPatch.yml",
+				"AllowOffensive: Should offensive powers of gemarmor be allowed? (explosion, lightning)",
+				"Default: false",
+				"AllowDefensive: Should the defensive powers of gemarmor be allowed? (flying, automatic running)",
+				"Default: true"
+			};
+			
+			modModificationsConfig.set("GemArmor.AllowOffensive", false, comment);
+			modModificationsConfig.set("GemArmor.AllowDefensive", true);
+		}
+		{
+			final String[] comment = new String[]{
+				"Set the minimal time of Redpower timers to the value here.",
+				"Default: true, 1.0"
+			};
+
+			modModificationsConfig.set("RPTimer.SetMinimalTime", true, comment);
+			modModificationsConfig.set("RPTimer.MinTime", 1.0);
+		}
+
+		{
+			final String[] comment = new String[]{
+				"####################################################################################################",
+				"############################################## Set EMC #############################################",
+				"####################################################################################################",
+				"",
+				"Set or change EMC Values for ANY item, block or tool, even the ones that usually dont have EMC values.",
+				"",
+				"Example: HARD Mode -> DarkMatter, DM Blocks, RedMatter, RMBlocks EMC*2.",
+				"- \"27541 300000\"",
+				"- \"126:8 800000\"",
+				"- \"27563 900000\"",
+				"- \"126:9 1300000\"",
+				"",
+				"DEFAULT: EMC farm removal [Milk, Blaze Rod, Bonemeal]"
+			};
+			
+			modModificationsConfig.set("SetEMC", filledList("335 768", "377 308", "351:15 29"), comment);
+		}
+		{
+			final String[] comment = new String[]{
+				"##########################################################################################",
+				"####################################### Item Max EU ######################################",
+				"##########################################################################################",
+				"",
+				"Set the Max EU storable in an IC2 Item (Check out IC2 Wiki for MaxEU details)",
+				"",
+				"Some default EU values:",
+				"- \"30148 40000\" #Nano saber",
+				"- \"30234 10000\" #Diamond Drill",
+				"- \"30177 100000\" #ANY piece Nano Armor",
+				"- \"30173 1000000\" #ANY piece Quantum Armor",
+				"",
+				"Examples:",
+				"Charge Quantum armor set 2x slower",
+				"- \"30171-30174 1000000 500\"",
+				"Charge Quantum armor set 4x slower",
+				"- \"30171-30174 1000000 250\""
+			};
+			modModificationsConfig.set("MaxEU", new ArrayList<String>(), comment);
+		}
+		{
+			final String[] comment = new String[]{
+				"##########################################################################################",
+				"################################### Max EE Tool Charge ###################################",
+				"##########################################################################################",
+				"MaxCharge limits the maximum EE charge of an item. (0-100%)",
+				"- \"27573 30\" (This will set the max charge of a morning star to 30%)",
+				"- \"27564-27573 50\" (This will Gimp ALL Red Matter Tools down to only 50% charge capacity)"
+			};
+
+			modModificationsConfig.set("MaxCharge", new ArrayList<String>(), comment);
+		}
+		{
+			final String[] comment = new String[]{
+				"This will automatically decharge set EE items when a player enters a safezone.",
+				"NOTE: Requires DechargeEE in SafeZones.config to be true"
+			};
+			
+			final List<String> content = new ArrayList<String>();
+			content.add("27526");
+			content.add("27527");
+			content.add("27530");
+			content.add("27531");
+			content.add("27533");
+			content.add("27534");
+			content.add("27535");
+			content.add("27583");
+			content.add("27593");
+			content.add("27543");
+			content.add("27544");
+			content.add("27545");
+			content.add("27546");
+			content.add("27547");
+			content.add("27548");
+			content.add("27564");
+			content.add("27565");
+			content.add("27566");
+			content.add("27567");
+			content.add("27568");
+			content.add("27569");
+			content.add("27570");
+			content.add("27572");
+			content.add("27573");
+			content.add("27574");
+			
+			modModificationsConfig.set("DechargeInSS", content, comment);
+		}
+		
+		modModificationsConfig.saveConfig();
+	}
+	
+	public static void genPerformance(){
+		performanceConfig = manager.getNewConfig("Performance.yml", header, 93);
+		if (!performanceConfig.isNewConfig()) return;
+		{
+			final String[] comment = new String[] {
+				"###################################################################################################",
+				"#################################### Performance Configuration ####################################",
+				"###################################################################################################",
+				"Should TekkitRestrict favor server performance over memory usage?",
+				"Default: false"
+			};
+			performanceConfig.set("FavorPerformanceOverMemory", false, comment);
+		}
+		
+		{
+			final String[] comment = new String[] {
+				"###################################################################################################",
+				"##################################### Threading Configuration #####################################",
+				"###################################################################################################",
+				"Do not edit these values unless you know what you are doing.",
+				"These numbers are in Milliseconds. (1000 milliseconds = 1 second)",
+				"Lower values = more server strain (more lag)",
+				"",
+				"The amount of time the thread that disables GemArmor powers (see ModModifications config) sleeps "
+			  + "for.",
+				"If you set this too high, players might be able to use their powers by spamming.",
+				"If you set this too low, it might lag the server.",
+				"",
+				"Recommended: [100-200]",
+				"Default: 120"
+			};
+			performanceConfig.set("GemArmorDThread", 120, comment);
+		}
+		
+		{
+			final String[] comment = new String[] {
+				"The amount of time the thread that removes entities in SafeZones powers (see SafeZones config) "
+			  + "sleeps for.",
+				"If removing entities from a SafeZones is not something that is very important for your server, you "
+			  + "can raise this to 1000-2000 (1-2 seconds)",
+				"",
+				"Recommended: [350-2000]",
+				"Default: 500"
+			};
+			performanceConfig.set("SSEntityRemoverThread", 500, comment);
+		}
+		
+		{
+			final String[] comment = new String[] {
+				"The amount of time the inventory thread sleeps for.",
+				"The inventory thread takes care of removing DisabledItems, Decharging EE Tools and Applying the "
+			  + "Max EU values.",
+				"",
+				"Recommended: [250-500]",
+				"Default: 400"
+			};
+			performanceConfig.set("InventoryThread", 400, comment);
+		}
+		
+		{
+			final String[] comment = new String[] {
+				"The amount of time the WorldCleanerThread sleeps for.",
+				"This thread takes care of the Removal of Banned blocks from the world.",
+				"",
+				"Recommended: [60000-120000] (1-2 minutes)",
+				"Default: 60000",
+			};
+			performanceConfig.set("WorldCleanerThread", 60000, comment);
+		}
+		
+		{
+			final String[] comment = new String[] {
+				"The time between checking for unloading chunks. If the amount of chunks loaded is to high, chunks will be unloaded shortly after the check.",
+				"",
+				"Recommended: [60000-120000] (1-2 minutes)",
+				"Default: 90000",
+			};
+			performanceConfig.set("ChunkUnloader", 90000, comment);
+		}
+		
+		{
+			final String[] comment = new String[] {
+				"The amount of time the AutoSave Thread sleeps for.",
+				"This thread makes sure that all information is correctly saved to the database.",
+				"In case of a crash, you will only lose any data that has been modified within the sleep time of "
+			  + "this thread. (e.g. if you set this to 11000, you will only lose data changed within 11 seconds "
+			  + "before the crash)",
+				"",
+				"Recommended: [10000-30000]",
+				"Default: 11000"
+			};
+			performanceConfig.set("AutoSaveThreadSpeed", 11000, comment);
+		}
+		
+		performanceConfig.saveConfig();
+	}
+	
+	public static void genSafeZones(){
+		safeZoneConfig = manager.getNewConfig("SafeZones.yml", header, 93);
+		if (!safeZoneConfig.isNewConfig()) return;
+		{
+			final String[] comment = {
+				"###################################################################################################",
+				"##################################### SafeZone Configuration ######################################",
+				"###################################################################################################",
+				"Should TekkitRestrict use SafeZones?",
+				"Default: true"
+			};
+			safeZoneConfig.set("UseSafeZones", true, comment);
+		}
+		{
+			//safeZoneConfig.set("InSafeZones.Null", true);
+			final String[] comment = {
+				"# Note: This will only apply to Native, WorldGuard and GriefPrevention SafeZones, and",
+				"#       NOT to Towny, Factions or PreciousStones SafeZones.",
+				"If you turn DisableEntities on, then",
+				"- No mobs will spawn in SafeZones.",
+				"- If a mob enters a SafeZone, it is removed.",
+				"Default: true"
+			};
+			safeZoneConfig.set("InSafeZones DisableEntities", true, comment);
+			//safeZoneConfig.set("InSafeZones.Null", null);
+		}
+		{
+			final String[] comment = {
+				"This is a feature that allows tekkitrestrict to run the entities disabler thread with less lag and "
+			  + "problems. Entities can get removed at range blocks from the corner of the safezone.",
+				"",
+				"Increase this value if you have problems with the entity remover or if you want to increase "
+			  + "performance.",
+				"Default: 10"
+			};
+			safeZoneConfig.set("InSafeZones DisableEntitiesRange", 10, comment);
+		}
+		{
+			final String[] comment = {
+				"WARNING: Case Sensitive!",
+				"Tries to exclude org.bukkit.entity.[name] entities from SafeZone entity removal.",
+				"Examples:",
+				"\"Arrow\", \"Animals\", \"EnderDragon\", \"EnderPearl\", \"Fish\", \"IronGolem\", \"Pig\",",
+				"\"Projectile\", \"ThrownPotion\", \"TNTPrimed\", \"Snowball\""
+			};
+			safeZoneConfig.set("InSafeZones ExemptEntityTypes", new ArrayList<String>(), comment);
+		}
+		{
+			final String[] comment = {
+				"If you turn DechargeEE on, then",
+				"- All EE items specified in the ModModifications config will be decharged in SafeZones",
+				"Default: true"
+			};
+			safeZoneConfig.set("InSafeZones DechargeEE", true, comment);
+		}
+		{
+			final String[] comment = {
+				"If you turn DisableRingOfArcana on, then",
+				"- When someone is in a SafeZone with a ring of arcana, it will always be set to \"Earth\" mode and "
+			  + "it will be turned off.",
+				"Default: true"
+			};
+			safeZoneConfig.set("InSafeZones DisableRingOfArcana", true, comment);
+		}
+		{
+			final String[] comment = {
+				"The plugins TekkitRestrict should use to make safezones.",
+				"",
+				"It is recommended to use tekkitrestrict native safezones, to minimize the strain safezones put on "
+			  + "the server.",
+				"You can add these safezones with /tr admin safezone addnative <x1> <z1> <x2> <z2> <name>",
+				"",
+				"There is only basic support for Factions, Towny and PreciousStones.",
+				"This means that all land claimed by a faction, a town, etcetera is a safezone.",
+				"Players with the build/destroy permission for that land will bypass it.",
+				"",
+				"For GriefPrevention, you can choose different modes (See below).",
+				"For WorldGuard, you can specify per region if it should be a safezone. You can",
+				"compare this mode with the \"Specific\" mode of GriefPrevention.",
+				"Default: true for all"
+			};
+			safeZoneConfig.set("SSEnabledPlugins.TekkitRestrict", true, comment);
+			safeZoneConfig.set("SSEnabledPlugins.GriefPrevention", true);
+			safeZoneConfig.set("SSEnabledPlugins.WorldGuard", true);
+			safeZoneConfig.set("SSEnabledPlugins.Factions", true);
+			safeZoneConfig.set("SSEnabledPlugins.Towny", true);
+			safeZoneConfig.set("SSEnabledPlugins.PreciousStones", true);
+		}
+		{
+			final String[] comment = {
+				"###################################################################################################",
+				"################################ GriefPrevention Specific settings ################################",
+				"###################################################################################################",
+				"If someone is a manager in a claim, the SafeZone will not apply for him.",
+				"(If you would like a setting to turn this on or off, please make a feature request",
+				"ticket on the Bukkit Dev TekkitRestrict page.)",
+				"",
+				"GriefPrevention SafeZone Method",
+				"Can be All, Admin, Specific or SpecificAdmin",
+				"All: All GriefPrevention claims are SafeZones.",
+				"Admin: All GriefPrevention admin claims are SafeZones. (Default)",
+				"Specific: You can specify per claim if you want it to be a SafeZone.",
+				"SpecificAdmin: Only admin claims can be SafeZones, but you can specify it per claim."
+			};
+			safeZoneConfig.set("GriefPreventionSafeZoneMethod", "Admin", comment);
+		}
+		{
+			final String[] comment = {
+				"##########################################################################################",
+				"############################## WorldGuard Specific settings ##############################",
+				"##########################################################################################",
+				"WorldGuard SafeZone Method",
+				"Can be All or Specific",
+				"All: All WorldGuard regions are SafeZones.",
+				"Specific: You can specify per region if you want it to be a SafeZone. (Default)"
+			};
+			safeZoneConfig.set("WorldGuardSafeZoneMethod", "Specific", comment);
+		}
+		
+		safeZoneConfig.saveConfig();
+	}
+	
 	public static void genUnload(){
 		unloadConfig = manager.getNewConfig("ChunkUnloader.yml", header, 93);
+		if (!unloadConfig.isNewConfig()) return;
 		{
 			final String[] comment = new String[]{
 				"###################################################################################################",
@@ -1274,34 +1660,5 @@ public class SettingsStorage {
 		}
 		
 		unloadConfig.saveConfig();
-	}
-	
-	public static void genModifications(){
-		modModificationsConfig = manager.getNewConfig("ModModifications.yml", header, 93);
-		{
-			final String[] comment = new String[] {
-				"###################################################################################################",
-				"###################################### Limiter Configuration ######################################",
-				"###################################################################################################",
-				"Limits the number of blocks a player can place. (Global)",
-				"Please note that these cannot be changed in-game.",
-				"Item Limit (Please use ONE space between the Item and the limit to separate them)",
-				"- \"153 1\"",
-				"- \"100-200 1\"",
-				"- \"52:55 1\"",
-				"- \"227-228:10 3\"",
-				"- \"ee 5 {&cYou can only have &a5 &cee blocks!}\"",
-				"- \"Wool 10 {&cOnly &a10 &cWool per player, sorry :P}\""
-			};
-			modModificationsConfig.set("LimitBlocks", new ArrayList<String>(), comment);
-		}
-		
-		modModificationsConfig.saveConfig();
-	}
-	
-	private static List<String> filledList(String... strings){
-		final List<String> tbr = new ArrayList<String>();
-		for (final String s : strings) tbr.add(s);
-		return tbr;
 	}
 }

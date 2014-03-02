@@ -15,8 +15,8 @@ import nl.taico.tekkitrestrict.TRException;
 import nl.taico.tekkitrestrict.TRItemProcessor2;
 import nl.taico.tekkitrestrict.tekkitrestrict;
 import nl.taico.tekkitrestrict.Log.Warning;
+import nl.taico.tekkitrestrict.config.SettingsStorage;
 import nl.taico.tekkitrestrict.objects.TRItem;
-import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 
 import com.griefcraft.lwc.LWC;
 import com.griefcraft.model.Permission;
@@ -28,7 +28,7 @@ public class TRLWCProtect {
 	public static boolean init = false;
 	public static void reload(){
 		init = false;
-		final List<String> blockedList = tekkitrestrict.config.getStringList(ConfigFile.Advanced, "LWCPreventNearLocked");
+		final List<String> blockedList = SettingsStorage.advancedConfig.getStringList("LWCPreventNearLocked");
 		final ArrayList<TRItem> temp = new ArrayList<TRItem>();
 		for (final String str : blockedList){
 			try {

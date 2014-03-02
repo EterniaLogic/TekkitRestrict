@@ -11,16 +11,16 @@ import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.tekkitrestrict;
 import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.TRConfigCache.Threads;
-import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
+import nl.taico.tekkitrestrict.config.EEPatchConfig;
 
 import ee.EEBase;
 
 public class TRGemArmorThread extends Thread {
 	@Override
 	public void run() {
-		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Armor.Movement.Activate", true) && !Threads.GAMovement)
+		if (!EEPatchConfig.getConfig().getBoolean("Actions.Armor.Movement.Activate", true) && !Threads.GAMovement)
 			Threads.GAMovement = true;
-		if (!tekkitrestrict.config.getBoolean(ConfigFile.EEPatch, "Actions.Armor.Offensive.Activate", true) && !Threads.GAOffensive)
+		if (!EEPatchConfig.getConfig().getBoolean("Actions.Armor.Offensive.Activate", true) && !Threads.GAOffensive)
 			Threads.GAOffensive = true;
 		
 		int errors = 0;
@@ -46,7 +46,7 @@ public class TRGemArmorThread extends Thread {
 			
 			try {
 				if (!Threads.GAMovement && !Threads.GAOffensive)
-					Thread.sleep(Threads.gemArmorSpeed*25);
+					Thread.sleep(Threads.gemArmorSpeed*25l);
 				else
 					Thread.sleep(Threads.gemArmorSpeed);
 			} catch (InterruptedException e) {
