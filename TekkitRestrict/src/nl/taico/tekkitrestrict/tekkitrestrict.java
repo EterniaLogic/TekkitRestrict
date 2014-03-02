@@ -32,6 +32,7 @@ import nl.taico.tekkitrestrict.functions.TRChunkUnloader2;
 import nl.taico.tekkitrestrict.functions.TREMCSet;
 import nl.taico.tekkitrestrict.functions.TRLWCProtect;
 import nl.taico.tekkitrestrict.functions.TRLimiter;
+import nl.taico.tekkitrestrict.functions.TRNoClick;
 import nl.taico.tekkitrestrict.functions.TRNoInteract;
 import nl.taico.tekkitrestrict.functions.TRNoItem;
 import nl.taico.tekkitrestrict.functions.TRRecipeBlock;
@@ -326,9 +327,11 @@ public class tekkitrestrict extends JavaPlugin {
 		}
 		//#######################################################################################################################
 		
+		
 		TRItemProcessor2.load();
 		TRNoItem.reload(); //Banned items and limited creative.
 		TRNoInteract.reload();
+		TRNoClick.load();
 		TRLimiter.reload();
 		TRRecipeBlock.reload();
 		TREMCSet.reload();

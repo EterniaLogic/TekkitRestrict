@@ -1,7 +1,7 @@
 Hacks:
-FlyHack - Working perfectly - 1.22D1
-SpeedHack - Influenced by lag, will not fix it at this moment - 1.22D1
-ForcefieldHack - Testing required
+FlyHack - Working perfectly - 2.0
+SpeedHack - Influenced by lag, will not fix it at this moment - 2.0
+ForcefieldHack - Testing required - Blocks hack - 2.0
 
 Dupes:
 Anti-Dupes - Testing required

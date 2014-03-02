@@ -117,6 +117,7 @@ public class TRNoClick {
 	}
 	
 	public static void load(){
+		ArrayList<TRNoClick> tempclicks = new ArrayList<TRNoClick>();
 		List<String> it = SettingsStorage.bannedConfig.getStringList("BannedClicks");
 		for (String s : it){
 			int in = s.indexOf("{");
@@ -138,17 +139,19 @@ public class TRNoClick {
 			if (temp.length == 1){//only item
 				nc.left = nc.right = nc.shift = true;
 				nc.inventory = null;
-				noclicks.add(nc);
+				tempclicks.add(nc);
 			} else {
 				boolean b = false;
 				for (int i = 1;i<temp.length;i++){
 					if (!loadType(s, temp[i], nc)) b = true;
 				}
-				if (!b) noclicks.add(nc);
+				if (!b) tempclicks.add(nc);
 			}
 			
 			//new TRNoClick(TRItemProcessor.processItemString(temp[0]+msg);
 		}
+		
+		noclicks = tempclicks;
 	}
 	
 	private static boolean loadType(String line, String type, TRNoClick nc){
