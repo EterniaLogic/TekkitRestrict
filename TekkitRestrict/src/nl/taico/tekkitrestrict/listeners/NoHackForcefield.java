@@ -24,6 +24,8 @@ public class NoHackForcefield implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR)
 	private void onEntityDamage(EntityDamageByEntityEvent e) {
 		if (!(e.getDamager() instanceof Player)) return;
+		if (e.getDamage() == 0) return;
+		
 		//if (e.getCause() == DamageCause.PROJECTILE || e.getCause() == DamageCause.MAGIC || e.getCause() == DamageCause.BLOCK_EXPLOSION ||
 		//	e.getCause() == DamageCause.POISON || e.getCause() == DamageCause.FIRE_TICK) return;
 		
@@ -31,7 +33,7 @@ public class NoHackForcefield implements Listener {
 		
 		if (e.getEntity() == e.getDamager()) return;
 		final Player damager = (Player) e.getDamager();
-		
+
 		if (damager.hasPermission("tekkitrestrict.bypass.hack.forcefield")) return;
 		
 		//Ignore rm sword and katar.
