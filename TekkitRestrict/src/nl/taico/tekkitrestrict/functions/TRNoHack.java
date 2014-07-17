@@ -1,16 +1,14 @@
 package nl.taico.tekkitrestrict.functions;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Matcher;
+import java.util.HashMap;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.eclipse.jdt.annotation.NonNull;
 
 import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.Util;
+import nl.taico.tekkitrestrict.tekkitrestrict;
 import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.TRConfigCache.Hacks;
 import nl.taico.tekkitrestrict.listeners.NoHackFly;
@@ -20,33 +18,20 @@ import nl.taico.tekkitrestrict.objects.TREnums.HackType;
 
 public class TRNoHack {
 	//public static int hacks = 0;
-	public static ConcurrentHashMap<String, Integer> cmdFly = new ConcurrentHashMap<String, Integer>();
-	public static ConcurrentHashMap<String, Integer> cmdForcefield = new ConcurrentHashMap<String, Integer>();
-	public static ConcurrentHashMap<String, Integer> cmdSpeed = new ConcurrentHashMap<String, Integer>();
+	public static HashMap<String, Integer> cmdFly = new HashMap<String, Integer>();
+	public static HashMap<String, Integer> cmdForcefield = new HashMap<String, Integer>();
+	public static HashMap<String, Integer> cmdSpeed = new HashMap<String, Integer>();
+	
+	public static void handleHackAsync(final Player player, final HackType type){
+		Bukkit.getScheduler().scheduleSyncDelayedTask(tekkitrestrict.instance, new Runnable(){
+			public void run(){
+				TRNoHack.handleHack(player, type);
+			}
+		});
+	}
+
+	//sync
 	public static void handleHack(@NonNull Player player, HackType type) {
-		//int x = player.getLocation().getBlockX();
-		//int y = player.getLocation().getBlockY();
-		//int z = player.getLocation().getBlockZ();
-		//Entity veh = player.getVehicle();
-		//List<Entity> nent = player.getNearbyEntities(16, 16, 16);
-		//int npl = 0, nmob = 0;
-		//for (Entity gx : nent) {
-		//	if (gx instanceof EntityPlayer) {
-		//		npl++;
-		//	} else {
-		//		nmob++;
-		//	}
-		//}
-		//Vector velo = player.getVelocity();
-		//DecimalFormat myFormatter = new DecimalFormat("#.##");
-		//String additional = "Loc: [" + player.getWorld().getName() + "," + x
-		//		+ "," + y + "," + z + "] " + "Velo: ["
-		//		+ myFormatter.format(velo.getX()) + " m/s,"
-		//		+ myFormatter.format(velo.getY()) + " m/s,"
-		//		+ myFormatter.format(velo.getZ()) + " m/s]  "
-		//		+"Vehicle: ["
-		//		+(veh != null ? veh.getClass().getName() : "none") + "] "
-		//		+"Entity#: [player: " + npl + ", mob: " + nmob + "]";
 		String message = "";
 		
 		if (type == HackType.fly){
@@ -119,21 +104,12 @@ public class TRNoHack {
 	
 	@NonNull private static String convert(@NonNull String str, @NonNull String type, @NonNull Player player){
 		return Log.replaceColors(str)
-				.replaceAll("(?i)\\{PLAYER\\}", Matcher.quoteReplacement(player.getName()))
-				.replaceAll("(?i)\\{TYPE\\}", Matcher.quoteReplacement(type))
-				.replaceAll("(?i)\\{ID\\}","")
-				.replaceAll("(?i)\\{DATA\\}", "")
-				.replaceAll("(?i)\\{ITEM\\}", "")
+				.replace("{PLAYER}", player.getName())
+				.replace("{TYPE}", type)
+				.replace("{ID}","")
+				.replace("{DATA}", "")
+				.replace("{ITEM}", "")
 				.replace("  ", " ");
-	}
-	
-	/** Teleport the player to the highest block at his position. Will not teleport players above their current position. */
-	public static void groundPlayer(@NonNull Player player) {
-		Location ploc = player.getLocation();
-		Block highest = player.getWorld().getHighestBlockAt(ploc);
-		int yblock = highest.getY();
-		int yplayer = ploc.getBlockY();
-		if (yplayer < yblock) player.teleport(highest.getLocation());
 	}
 
 	public static void clearMaps() {
@@ -142,6 +118,7 @@ public class TRNoHack {
 		NoHackForcefield.clearMaps();
 	}
 
+	//sync
 	public static void playerLogout(@NonNull Player player) {
 		// clears ALL lists for said player
 		String n = player.getName();

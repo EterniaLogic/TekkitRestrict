@@ -23,15 +23,14 @@ public class NoHackForcefield implements Listener {
 	
 	@EventHandler(priority = EventPriority.MONITOR)
 	private void onEntityDamage(EntityDamageByEntityEvent e) {
-		if (!(e.getDamager() instanceof Player)) return;
-		if (e.getDamage() == 0) return;
-		
-		//if (e.getCause() == DamageCause.PROJECTILE || e.getCause() == DamageCause.MAGIC || e.getCause() == DamageCause.BLOCK_EXPLOSION ||
-		//	e.getCause() == DamageCause.POISON || e.getCause() == DamageCause.FIRE_TICK) return;
+		//If not player or no damage
+		if (!(e.getDamager() instanceof Player) || e.getDamage() == 0) return;
 		
 		if (e.getCause() != DamageCause.ENTITY_ATTACK && e.getCause() != DamageCause.CUSTOM) return;
 		
+		//Self harm
 		if (e.getEntity() == e.getDamager()) return;
+		
 		final Player damager = (Player) e.getDamager();
 
 		if (damager.hasPermission("tekkitrestrict.bypass.hack.forcefield")) return;
@@ -104,7 +103,7 @@ public class NoHackForcefield implements Listener {
 					if (oldValue == null) tickTolerance.put(name, 1);//If not exist yet, make one
 					else {//Otherwise, check if it exeeds the limit.
 						if ((oldValue+1) > Hacks.forcefield.tolerance) {
-							TRNoHack.handleHack(damager, HackType.forcefield);
+							TRNoHack.handleHackAsync(damager, HackType.forcefield);
 							tickTolerance.remove(name);
 						} else
 							tickTolerance.put(name, oldValue + 1);

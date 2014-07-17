@@ -1,7 +1,6 @@
 package nl.taico.tekkitrestrict.listeners;
 
-import java.util.ArrayList;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
 
 import net.minecraft.server.EntityPlayer;
 
@@ -15,6 +14,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
@@ -22,15 +22,16 @@ import nl.taico.tekkitrestrict.TRConfigCache.Hacks;
 import nl.taico.tekkitrestrict.functions.TRNoHack;
 import nl.taico.tekkitrestrict.objects.TREnums.HackType;
 import nl.taico.tekkitrestrict.objects.TRItemStack;
+import nl.taico.tekkitrestrict.util.ArrayUtil;
 
 public class NoHackFly implements Listener {
-	private static ConcurrentHashMap<String, Integer> tickTolerance = new ConcurrentHashMap<String, Integer>();
-	private static ConcurrentHashMap<String, Double> tickLastLoc = new ConcurrentHashMap<String, Double>();
+	private static HashMap<String, Integer> tickTolerance = new HashMap<String, Integer>();
+	private static HashMap<String, Double> tickLastLoc = new HashMap<String, Double>();
 
-	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	private void handleFly(PlayerMoveEvent event) {
 		Player player = event.getPlayer();
-		if (player.hasPermission("tekkitrestrict.bypass.hack.fly")) return;
+		if (player == null || player.getName().contains("[ComputerCraft]") || player.hasPermission("tekkitrestrict.bypass.hack.fly")) return;
 		if (player.getGameMode() == GameMode.CREATIVE) return;
 		if (!isFlying(player)) return;
 		//if (Util.hasHackBypass(player, "fly")) return;
@@ -39,23 +40,30 @@ public class NoHackFly implements Listener {
 		TRNoHack.handleHack(player, HackType.fly);
 	}
 
-	private static ArrayList<Integer> nearBlocks = new ArrayList<Integer>();
-	static {
-		nearBlocks.add(220);//Scaffold
-		nearBlocks.add(235);//Iron scaffold
-		nearBlocks.add(212);//Ladder rail
-		nearBlocks.add(106);//Vine
-		nearBlocks.add(65);//Ladder
-	}
+	private static int[] nearBlocks = new int[] {
+		65,//Ladder
+		8,//Water
+		9,//Water
+		106,//Vine
+		10,//Lava
+		11,//Lava
+		220,//Scaffold
+		235,//Iron scaffold
+		212 //Ladder rail
+	};
 	
 	/**
 	 * @return If the player is flying.
 	 */
 	public static boolean isFlying(Player player) {
+		if (player.getName().contains("[ComputerCraft]")) return false;
+		
 		int flyTolerance = Hacks.fly.tolerance;
+		int minHeight = (int) Hacks.fly.value;
+		
 		final PlayerInventory inventory = player.getInventory();
 		final ItemStack boots = inventory.getBoots();
-		int minHeight = (int) Hacks.fly.value;
+		
 		if (boots != null){
 			//checks if the player is wearing boots before deciding whether or not they are flyhacking
 			if (boots.getTypeId() == 30171 && (inventory.getBoots().getDurability() < 27)) { //wearing quantum boots. checks for charge
@@ -132,7 +140,7 @@ public class NoHackFly implements Listener {
 					if (velo >= 0) {
 						Block cb = loc.getBlock();
 						for (BlockFace bf : BlockFace.values()) {
-							if (!nearBlocks.contains(cb.getRelative(bf).getTypeId())) continue;
+							if (!ArrayUtil.contains(nearBlocks, cb.getRelative(bf).getTypeId())) continue;
 							lowerScore(name, 1);
 							return false;
 						}
@@ -179,6 +187,7 @@ public class NoHackFly implements Listener {
 		}
 	}
 	
+	//sync
 	private static void lowerScore(String name, int amount){
 		Integer ticks = tickTolerance.get(name);
 		if (ticks == null) ticks = 0;
@@ -189,16 +198,19 @@ public class NoHackFly implements Listener {
 		tickTolerance.put(name, ticks);
 	}
 	
+	//sync
 	private static void resetScore(String name){
 		tickTolerance.remove(name);
 		tickLastLoc.remove(name);
 	}
 
+	//async
 	public static void clearMaps() {
-		tickTolerance.clear();
-		tickLastLoc.clear();
+		tickTolerance = new HashMap<String, Integer>();
+		tickLastLoc = new HashMap<String, Double>();
 	}
 
+	//sync
 	public static void playerLogout(String playerName) {
 		tickTolerance.remove(playerName);
 		tickLastLoc.remove(playerName);
@@ -209,6 +221,6 @@ public class NoHackFly implements Listener {
 	 */
 	private static void groundPlayer(Player player) {
 		Block highest = player.getWorld().getHighestBlockAt(player.getLocation());
-		player.teleport(highest.getLocation());
+		player.teleport(highest.getLocation(), TeleportCause.COMMAND);
 	}
 }
