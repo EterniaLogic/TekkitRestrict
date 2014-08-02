@@ -13,7 +13,7 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 
 import nl.taico.tekkitrestrict.TRException;
-import nl.taico.tekkitrestrict.tekkitrestrict;
+import nl.taico.tekkitrestrict.TekkitRestrict;
 
 public class ConfigManager {
 	/**
@@ -51,12 +51,12 @@ public class ConfigManager {
 
 		if (file.contains("/")) {
 			if (file.startsWith("/")) {
-				configFile = new File(tekkitrestrict.getInstance().getDataFolder() + file.replace("/", File.separator));
+				configFile = new File(TekkitRestrict.getInstance().getDataFolder() + file.replace("/", File.separator));
 			} else {
-				configFile = new File(tekkitrestrict.getInstance().getDataFolder() + File.separator + file.replace("/", File.separator));
+				configFile = new File(TekkitRestrict.getInstance().getDataFolder() + File.separator + file.replace("/", File.separator));
 			}
 		} else {
-			configFile = new File(tekkitrestrict.getInstance().getDataFolder(), file);
+			configFile = new File(TekkitRestrict.getInstance().getDataFolder(), file);
 		}
 
 		return configFile;
@@ -78,7 +78,7 @@ public class ConfigManager {
 			file.createNewFile();
 
 			if (resource != null && !resource.isEmpty()) {
-				this.copyResource(tekkitrestrict.getInstance().getResource(resource), file);
+				this.copyResource(TekkitRestrict.getInstance().getResource(resource), file);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -35,12 +35,12 @@ public class TRLogger {
 	public static void Log(@NonNull final String type, @NonNull final String info) {
 		final String msg = convertTime(TRConfigCache.LogFilter.logFormat).replace("{INFO}", info);
 
-		final ArrayList<String> old = logMessages.get(type);
+		ArrayList<String> old = logMessages.get(type);
 		
 		if (old == null){
-			final ArrayList<String> msgs = new ArrayList<String>();
-			msgs.add(msg);
-			logMessages.put(type, msgs);
+			old = new ArrayList<String>();
+			old.add(msg);
+			logMessages.put(type, old);
 		} else {
 			old.add(msg);
 			logMessages.put(type, old);
@@ -51,7 +51,7 @@ public class TRLogger {
 		final Iterator<Entry<String, ArrayList<String>>> entries = logMessages.entrySet().iterator();
 		while (entries.hasNext()){
 			final Entry<String, ArrayList<String>> e = entries.next();
-			final TRFileLog filelog = TRFileLog.getLogOrMake(e.getKey(), true, false);
+			final TRFileLog filelog = TRFileLog.getLogOrMake(e.getKey(), false);
 			final ArrayList<String> msgs = e.getValue();
 			if (msgs == null) continue;
 			for (final String msg : msgs) filelog.log(msg);

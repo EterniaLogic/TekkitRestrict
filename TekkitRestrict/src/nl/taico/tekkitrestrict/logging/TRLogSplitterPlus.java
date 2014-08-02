@@ -11,9 +11,9 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.bukkit.configuration.ConfigurationSection;
-
+import nl.taico.taeirlib.config.interfaces.ISection;
 import nl.taico.tekkitrestrict.FileLog;
+import nl.taico.tekkitrestrict.logging.TRFilter.Priority;
 import nl.taico.tekkitrestrict.objects.TREnums.TRMatchMethod;
 import nl.taico.tekkitrestrict.objects.TREnums.TRSplitLevel;
 
@@ -24,13 +24,24 @@ public class TRLogSplitterPlus {
 	
 	public static void assignSplitter(){
 		for (Handler h : Logger.getLogger("Minecraft").getHandlers()){
-			if (h instanceof FileHandler) h.setFilter(splitFilter);
+			if (h instanceof FileHandler){
+				if (h.getFilter() instanceof TRFilter){
+					((TRFilter) h.getFilter()).addFilter(splitFilter, Priority.HIGH);
+				} else {
+					TRFilter trf = new TRFilter(h.getFilter());
+					trf.addFilter(splitFilter, Priority.HIGH);
+					h.setFilter(trf);
+				}
+			}
 		}
 	}
 	
 	public static void disable(){
 		for (Handler h : Logger.getLogger("Minecraft").getHandlers()){
-			if (h.getFilter() == splitFilter) h.setFilter(null);
+			Filter f = h.getFilter();
+			if (f instanceof TRFilter){
+				((TRFilter) f).removeAndConvert(h, splitFilter);
+			} else if (f == splitFilter) h.setFilter(null);
 		}
 	}
 	
@@ -42,7 +53,7 @@ public class TRLogSplitterPlus {
 	public static ArrayList<TRLogSplitterPlus> allSplitters = new ArrayList<TRLogSplitterPlus>();
 	public static ArrayList<TRLogSplitterPlus> cmdSplitters = new ArrayList<TRLogSplitterPlus>();
 	
-	public static void loadSplitters(ConfigurationSection cs, ConfigurationSection cs2){
+	public static void loadSplitters(ISection cs, ISection cs2){
 		allSplitters.clear();
 		for (String key : cs.getKeys(false)){
 			TRMatchMethod method = null;
@@ -184,6 +195,7 @@ public class TRLogSplitterPlus {
 		log.log(input);
 	}
 	
+	private static FileLog info;
 	public static void split(String input, Level level){
 		boolean found = false;
 		final String output = "["+level.getName()+"] "+input;
@@ -193,7 +205,8 @@ public class TRLogSplitterPlus {
 			found = true;
 		}
 		if (!found){
-			FileLog.getLogOrMake("Info", true).log(output);
+			if (info == null) info = FileLog.getLogOrMake("Info", true);
+			info.log(output);
 		}
 	}
 	

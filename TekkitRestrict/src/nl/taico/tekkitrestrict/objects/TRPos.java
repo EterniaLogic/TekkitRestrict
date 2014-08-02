@@ -146,5 +146,25 @@ public class TRPos {
 		return ""+x1+","+y1+","+z1+","+x2+","+y2+","+z2;
 	}
 	
+	public int hashCode(){
+		//int result = 17 + y1;
+		//result = 17 * result + y2;
+		//result = 17 * result + z1;
+		//result = 17 * result + x2;
+		//result = 17 * result + z2;
+		//return 17 * result + x1;
+		
+		return 17 * (17 * (17 * (17 * (17 * (17 + y1) + y2) + z1) + x2) + z2) + x1;
+	}
 	
+	public boolean equals(Object obj){
+		if (this == obj) return true;
+		
+		if (!(obj instanceof TRPos)) return false;
+		TRPos other = (TRPos) obj;
+		
+		return x1 == other.x1 && z1 == other.z1 &&
+			   x2 == other.x2 && z2 == other.z2 &&
+			   y1 == other.y1 && y2 == other.y2;
+	}
 }

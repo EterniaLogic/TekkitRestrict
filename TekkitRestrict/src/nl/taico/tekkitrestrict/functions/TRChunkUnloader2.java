@@ -19,7 +19,7 @@ import net.minecraft.server.EntityHuman;
 import net.minecraft.server.WorldServer;
 
 import nl.taico.tekkitrestrict.Log;
-import nl.taico.tekkitrestrict.tekkitrestrict;
+import nl.taico.tekkitrestrict.TekkitRestrict;
 import nl.taico.tekkitrestrict.TRConfigCache.ChunkUnloader;
 import nl.taico.tekkitrestrict.objects.TRChunkIndex;
 import nl.taico.tekkitrestrict.objects.TREnums.ChunkUnloadMethod;
@@ -104,7 +104,7 @@ public class TRChunkUnloader2 {
 		//} else {
 			
 		//}
-		Bukkit.getScheduler().scheduleSyncDelayedTask(tekkitrestrict.getInstance(), new Runnable(){
+		Bukkit.getScheduler().scheduleSyncDelayedTask(TekkitRestrict.getInstance(), new Runnable(){
 			public void run(){
 				int i = 0;
 				boolean forced = method.isForced();
@@ -162,7 +162,7 @@ public class TRChunkUnloader2 {
 			}
 		}
 		
-		Bukkit.getScheduler().scheduleSyncDelayedTask(tekkitrestrict.getInstance(), new Runnable(){
+		Bukkit.getScheduler().scheduleSyncDelayedTask(TekkitRestrict.getInstance(), new Runnable(){
 			public void run(){
 				int i = 0;
 				for (Chunk chunk : toUnload){

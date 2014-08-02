@@ -334,7 +334,7 @@ public class Metrics {
         PluginDescriptionFile description = plugin.getDescription();
         String pluginName = description.getName();
         boolean onlineMode = Bukkit.getServer().getOnlineMode(); // TRUE if online mode is enabled
-        String pluginVersion = tekkitrestrict.version.toMetricsVersion();
+        String pluginVersion = TekkitRestrict.version.toMetricsVersion();
         String serverVersion = Bukkit.getVersion();
         int playersOnline = Bukkit.getServer().getOnlinePlayers().length;
 

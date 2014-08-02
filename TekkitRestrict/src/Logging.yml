@@ -1,0 +1,247 @@
+###################################################################################################
+## Configuration file for TekkitRestrict                                                         ##
+## Authors: Taeir, DreadEnd (aka DreadSlicer)                                                    ##
+## BukkitDev: http://dev.bukkit.org/server-mods/tekkit-restrict/                                 ##
+## Please ask questions/report issues on the BukkitDev page.                                     ##
+###################################################################################################
+# 
+###################################################################################################
+############################################# Logging #############################################
+###################################################################################################
+# 
+# The format of the name of the logfile.
+# Default: "{TYPE}-{DAY}-{MONTH}-{YEAR}.log"
+FilenameFormat: "{TYPE}-{DAY}-{MONTH}-{YEAR}.log"
+# 
+# The format to log a string.
+# Default: "[{HOUR}:{MINUTE}:{SECOND}] {INFO}"
+LogStringFormat: "[{HOUR}:{MINUTE}:{SECOND}] {INFO}"
+# 
+# Should debug messages be logged?
+# Default: false
+LogDebug: false
+# 
+###################################################################################################
+############################################ Split Logs ###########################################
+###################################################################################################
+# 
+# Should tekkitrestrict split the logs into many parts?
+# (e.g. Chat, Commands, Login/Logout, Warnings, etc.)
+# Default: true
+SplitLogs: true
+# 
+# The folder where TekkitRestrict should place the split logs.
+# NOTE: The path can be absolute (/root/folder or C:\folder) or relative (log --> server_root/log)
+# Example file: server_root/log/chat/chat-23-10-13.log
+# Default: "log"
+SplitLogsLocation: log
+# 
+# There are 9 different levels:
+# Severe, Warning
+# Errorlevels (= Severe and Warning)
+# Info
+# Fine, Finer, Finest
+# Finelevels (= Fine, Finer and Finest)
+# All (= All levels)
+Splitters:
+    Option1:
+        Description: For the login and logout
+        File: Login
+        Level: Info
+        CaseSensitive: true
+        Method: Contains
+        Messages:
+        - " lost connection: disconnect."
+        - " logged in with entity id "
+        - " lost connection: user was kicked."
+    Chat:
+        Description: "Set this to your own chatformat. <Rank> <Name>: <message> = <.*> <.*>: .*"
+        File: Chat
+        Level: Info
+        CaseSensitive: true
+        Method: Regex
+        Messages:
+        - "\[.*\] .*: .*"
+    Errors:
+        Description: Logs all errors to a separate file.
+        File: Errors
+        Level: ErrorLevels
+        CaseSensitive: true
+        Method: Regex
+        Messages:
+        - ".*"
+# 
+# Should all commands be logged to a file?
+# Default: Commands
+# Possible: a filename or false
+LogAllCommandsToFile: Command
+# 
+# Should NEI Item giving be logged to a file?
+# Default: SpawnItem
+# Possible: a filename or false
+LogNEIGiveToFile: SpawnItem
+# 
+# EndsWith is special here, in that it does not look at the arguments, like the other methods do
+# /fakecommand kick will not match "kick" with endswith
+CommandSplitters:
+    Private:
+        File: PrivateChat
+        Method: Regex
+        Commands:
+        - "e?m(sg)? .*"
+        - "e?tell .*"
+        - "e?r(eply)? .*"
+        - "e?mail .*"
+        - "e?whisper .*"
+    Punishments:
+        Description: Should include punishment commands from most plugins automatically
+        File: Punishment
+        Method: EndsWith
+        Commands:
+        - "kick"
+        - "ban"
+        - "jail"
+        - "mute"
+        - "pardon"
+        - "banip"
+        - "pardonip"
+    SpawnItems:
+        File: SpawnItem
+        Method: Regex
+        Commands:
+        - "i .*"
+        - "e?item .*"
+        - "e?give .*"
+        - "e?more .*"
+        - "e?un(l(imited)?)? .*"
+# 
+###################################################################################################
+########################################### Filter Logs ###########################################
+###################################################################################################
+# 
+# Should TekkitRestrict filter out certain things from the logs?
+# Default: true
+FilterLogs: true
+# 
+# Here you can define the filters.
+# There are 5 different methods:
+# Contains - If a logmessage contains ...
+# StartsWith - If a logmessage starts with ...
+# EndsWith - If a logmessage ends with ...
+# Equals - If a logmessage is identical to ...
+# RegEx - If a logmessage matches ... (please do not use (?i))
+# 
+# There are multiple types
+# Console - Filter messages only from the console, NOT the logs
+# ServerLog - Filter messages only from the server logs
+# ForgeServerLog - Filter messages only from the forge logs
+# All - Filter messages everywhere
+# Console_ServerLog - Filter messages from the console and server logs
+# Forge_ServerLog - Filter messages from forge logs and the server logs
+# 
+# Please make sure every groupname is unique
+Filters:
+    MovedWrongly:
+        Description: Filters incorrect moving warnings from the console.
+        Method: regex
+        CaseSensitive: true
+        Type: console
+        Messages:
+        - "Got position \-?\d+\.\d+, \-?\d+\.\d+, \-?\d+\.\d+"
+        - "Expected \-?\d+\.\d+, \-?\d+\.\d+, \-?\d+\.\d+"
+    Join1:
+        Method: startswith
+        CaseSensitive: true
+        Type: console_serverlog
+        Messages:
+        - "Sending serverside check to: "
+    Join2:
+        Description: Filters out the listing of mods a player has when joining
+        Method: contains
+        CaseSensitive: true
+        Type: console_serverlog
+        Messages:
+        - " joined with: ["
+    ConnectionErrors:
+        Description: Filters out Connection reset and End of stream messages.
+        Method: equals
+        CaseSensitive: true
+        Type: console_serverlog
+        Messages:
+        - "Connection reset"
+        - "Reached end of stream"
+        - "[WARNING] Can't keep up! Did the system time change, or is the server overloaded?"
+# 
+#    IPLostConnection:
+#        Description: Filters out xxx.xxx.xxx.xxx:xxxx lost connection
+#        Method: regex
+#        CaseSensitive: true
+#        Type: console_serverlog
+#        Messages:
+#        - "/\d+\.\d+\.\d+\.\d+:\d+ lost connection"
+# 
+###################################################################################################
+######################################## Console Enhancer #########################################
+###################################################################################################
+UseLogEnchancer: true
+EnchanceEssentialsCmd: true
+ChangeGive: true
+ShortenErrors: false
+EnhanceEssentialsCmdDeny: true
+# 
+# RemovePlayerTags: false
+# 
+# Reformat:
+#    Option1:
+#        Message: "\[(.*)\] \[(.*)\] (.*): (.*)"
+#        Replacement: "\[$2\] $3: $4"
+# 
+###################################################################################################
+######################################### Log Hacks/Dupes #########################################
+###################################################################################################
+# NOTE: These will be logged at plugins/tekkitrestrict/log/
+# 
+# When a user is FlyHacking, should it be logged?
+# Default: true
+LogFlyHack: true
+# 
+# When a user is SpeedHacking, should it be logged?
+# Default: true
+LogMovementSpeedHack: true
+# 
+# When a user is ForcefieldHacking, should it be logged?
+# Default: true
+LogForcefieldHack: true
+# 
+# When a player (tries to) dupe, should it be logged?
+# Default: true
+LogDupes: true
+# 
+###################################################################################################
+########################################## Log EE Items ###########################################
+###################################################################################################
+# NOTE: These will be logged at plugins/tekkitrestrict/log/
+# 
+# When a player uses an amulet, should it be logged?
+# Default: false
+LogAmulets: false
+# 
+# When a player uses a ring, should it be logged?
+# Default: false
+LogRings: false
+# 
+# When a player uses a Dark Matter Tool, should it be logged?
+# Default: false
+LogDMTools: false
+# 
+# When a player uses a Red Matter Tool, should it be logged?
+# Default: false
+LogRMTools: false
+# 
+# When a player uses certain EE items, should it be logged?
+# Default: false
+LogEEMisc: false
+# 
+# When a player uses a Destructive EE item, should it be logged?
+# Default: false
+LogEEDestructive: false

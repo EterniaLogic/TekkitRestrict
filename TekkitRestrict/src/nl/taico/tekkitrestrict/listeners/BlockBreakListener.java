@@ -1,6 +1,7 @@
 package nl.taico.tekkitrestrict.listeners;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.entity.HumanEntity;
@@ -12,7 +13,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 
 import nl.taico.tekkitrestrict.Log;
-import nl.taico.tekkitrestrict.tekkitrestrict;
+import nl.taico.tekkitrestrict.TekkitRestrict;
 import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.functions.TRLimiter;
 
@@ -29,6 +30,7 @@ public class BlockBreakListener implements Listener{
 	public void onBlockBreak(BlockBreakEvent event) {
 		final int id = event.getBlock().getTypeId();
 		if (exempt(id)) return;
+		
 		final Block block = event.getBlock();
 		final byte data = block.getData();
 		final Player player = event.getPlayer();
@@ -40,27 +42,6 @@ public class BlockBreakListener implements Listener{
 					h.closeInventory();
 				}
 			}
-			/*
-			event.setCancelled(true);
-			
-			if (!(entity instanceof TileAlchChest)) return;
-			TileAlchChest chest = (TileAlchChest) entity;
-			
-			ItemStack[] items = new ItemStack[chest.getSize()];
-			for (int i =0; i<chest.getSize(); i++){
-				items[i] = chest.getItem(i);
-				chest.setItem(i, null);
-			}
-			
-			block.setType(Material.AIR);
-			for (ItemStack i : items){
-				if (i != null && i.id != 0){
-					block.getWorld().dropItemNaturally(block.getLocation(), new CraftItemStack(i));
-				}
-			}
-			
-			block.getWorld().dropItemNaturally(block.getLocation(), new org.bukkit.inventory.ItemStack(128, 1, (short) 0));
-			*/
 		} else if (id == 194){
 			if (event.getPlayer() == null){
 				event.setCancelled(true);
@@ -91,13 +72,14 @@ public class BlockBreakListener implements Listener{
 		final ItemStack used = player.getItemInHand();
 		if (used != null && (used.getTypeId() == 30183 || used.getTypeId() == 30140)) return;
 
-		Bukkit.getScheduler().scheduleAsyncDelayedTask(tekkitrestrict.getInstance(), new Runnable(){
+		final Location bloc = block.getLocation();
+		Bukkit.getScheduler().scheduleAsyncDelayedTask(TekkitRestrict.getInstance(), new Runnable(){
 			public void run(){
 				try {
-					final String blockPlayerName = TRLimiter.getPlayerAt(block);
+					final String blockPlayerName = TRLimiter.getPlayerAt(bloc);
 					if (blockPlayerName != null) {
 						final TRLimiter il = TRLimiter.getLimiter(blockPlayerName);
-						il.checkBreakLimit(id, data, block.getLocation());
+						il.checkBreakLimit(id, data, bloc);
 					}
 				} catch(Exception ex){
 					Warning.other("Exception in BlockBreakListener.onBlockBreak!", false);

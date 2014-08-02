@@ -13,6 +13,7 @@ import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.TRConfigCache.Dupes;
 import nl.taico.tekkitrestrict.TRConfigCache.Listeners;
+import nl.taico.tekkitrestrict.functions.TRNoClick;
 import nl.taico.tekkitrestrict.functions.TRNoDupe;
 import nl.taico.tekkitrestrict.functions.TRNoItem;
 import nl.taico.tekkitrestrict.objects.TRItem;
@@ -23,7 +24,18 @@ public class InventoryClickListener implements Listener {
 	boolean logged = false;
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	private void onInventoryClick(InventoryClickEvent event){
+		if (event.getWhoClicked() == null) return;
+		
 		final Player player = (Player) event.getWhoClicked();
+		
+		String blocked = TRNoClick.blockClick(event);
+		if (blocked != null){
+			event.setCancelled(true);
+			player.sendMessage(ChatColor.RED + "[NoClick] Not allowed: " + (blocked.isEmpty() ? "you are not allowed to do this!" : blocked));
+			return;
+		}
+		
+		
 		final ItemStack currentItem;
 		
 		try {
@@ -43,29 +55,36 @@ public class InventoryClickListener implements Listener {
 			if (currentItem != null){
 				id1 = currentItem.getTypeId();
 				data1 = currentItem.getDurability();
-	
-				String banned = null;
 				
 				if (player.getGameMode() == GameMode.CREATIVE){
-					if (Listeners.UseLimitedCreative && Listeners.BlockCreativeContainer && !player.hasPermission("tekkitrestrict.bypass.creative")){
-						if (!"container.inventory".equals(event.getView().getTopInventory().getName())){
+					String banned = null;
+					if (Listeners.UseLimitedCreative && !player.hasPermission("tekkitrestrict.bypass.creative")){
+						if (Listeners.BlockCreativeContainer && !"container.inventory".equals(event.getView().getTopInventory().getName())){
 							player.sendMessage(ChatColor.RED + "You may not interact with other inventories in creative mode.");
 							event.setCancelled(true);
 							return;
 						}
+						
+						banned = TRNoItem.isItemBannedInCreative(player, id1, data1, false);
 					}
 					
-					banned = TRNoItem.isItemBannedInCreative(player, id1, data1, false);
 					if (banned == null) banned = TRNoItem.isItemBanned(player, id1, data1, true);
+					
+					if (banned != null){
+						final String msg = ChatColor.RED + "This item is banned!" + (banned.isEmpty() ? "" : " Reason: "+ChatColor.RESET+banned);
+						TRItem.sendBannedMessage(player, msg);
+						if (event.getRawSlot() == -1) event.setResult(null);
+						else 						  event.setCancelled(true);
+						return;
+					}
 				} else {
-					banned = TRNoItem.isItemBanned(player, id1, data1, true);
-				}
-				
-				if (banned != null){
-					final String msg = ChatColor.RED + "This item is banned!" + (banned.isEmpty() ? "" : " Reason: "+ChatColor.RESET+banned);
-					TRItem.sendBannedMessage(player, msg);
-					event.setCancelled(true);
-					return;
+					String banned = TRNoItem.isItemBanned(player, id1, data1, true);
+					if (banned != null){
+						final String msg = ChatColor.RED + "This item is banned!" + (banned.isEmpty() ? "" : " Reason: "+ChatColor.RESET+banned);
+						TRItem.sendBannedMessage(player, msg);
+						event.setCancelled(true);
+						return;
+					}
 				}
 			} else {
 				id1 = 0;

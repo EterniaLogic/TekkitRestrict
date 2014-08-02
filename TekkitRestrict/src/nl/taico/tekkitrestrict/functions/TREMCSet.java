@@ -4,10 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.bukkit.Bukkit;
-
 import nl.taico.tekkitrestrict.Log;
-import nl.taico.tekkitrestrict.tekkitrestrict;
 import nl.taico.tekkitrestrict.config.SettingsStorage;
 
 public class TREMCSet {
@@ -21,6 +18,7 @@ public class TREMCSet {
 	 * @see #removeEMC(int, int)
 	 */
 	public static void setEMC(final int id, final int data, final int EMC){
+		Log.trace("Setting EMC of "+id+":"+data+" to "+EMC);
 		if (EMC == 0)
 			removeEMC(id, data);
 		else
@@ -38,20 +36,7 @@ public class TREMCSet {
 		ee.EEMaps.alchemicalValues.put(id, old);
 	}
 
-	private static boolean delayed = false;
 	private static void loadConfigEMC() {
-		if (!tekkitrestrict.EEEnabled){
-			if (!delayed){
-				Bukkit.getScheduler().scheduleAsyncDelayedTask(tekkitrestrict.getInstance(), new Runnable(){
-					public void run(){
-						delayed = true;
-						loadConfigEMC();
-					}
-				}, 1);
-			}
-			return;
-		}
-		
 		final List<String> configEMC = SettingsStorage.modModificationsConfig.getStringList("SetEMC");
 		
 		for (final String current : configEMC){
@@ -98,22 +83,6 @@ public class TREMCSet {
 				setEMC(id, currentdata, EMC);
 			}
 		}
-		delayed = false;
-		/*for (int i = 0; i < configEMC.size(); i++) {
-			String ic = configEMC.get(i);
-			if (ic.contains(" ")) {
-				String[] pc = ic.split(" ");
-				String emc = pc[1];
-				int EMC = Integer.valueOf(emc);
-				List<TRCacheItem> iss = TRCacheItem.processItemString("",
-						pc[0], -1);
-				for (TRCacheItem cr : iss) {
-					int id = cr.id;
-					int data = cr.getData() == -10 ? 0 : cr.getData();
-					ee.EEMaps.addEMC(id, data, EMC);
-				}
-			}
-		}*/
 	}
 	
 	/**

@@ -5,17 +5,18 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
 
 import nl.taico.tekkitrestrict.Log;
+import nl.taico.tekkitrestrict.PatchesAPI;
 import nl.taico.tekkitrestrict.TRListener;
-import nl.taico.tekkitrestrict.tekkitrestrict;
+import nl.taico.tekkitrestrict.TekkitRestrict;
 import nl.taico.tekkitrestrict.TRConfigCache.LogFilter;
 import nl.taico.tekkitrestrict.TRConfigCache.Logger;
 import nl.taico.tekkitrestrict.TRConfigCache.Dupes;
 import nl.taico.tekkitrestrict.TRConfigCache.Hacks;
 import nl.taico.tekkitrestrict.TRConfigCache.Listeners;
-import nl.taico.tekkitrestrict.config.EEPatchConfig;
 import nl.taico.tekkitrestrict.config.SettingsStorage;
 import nl.taico.tekkitrestrict.eepatch.*;
 import nl.taico.tekkitrestrict.eepatch.amuletlisteners.EEAmuletListener;
+import nl.taico.tekkitrestrict.eepatch.armorlistener.EEArmorListener;
 import nl.taico.tekkitrestrict.eepatch.destlisteners.EEDestructionListener;
 import nl.taico.tekkitrestrict.eepatch.otherlisteners.*;
 import nl.taico.tekkitrestrict.eepatch.ringlisteners.EERingListener;
@@ -29,10 +30,11 @@ public class Assigner {
 	 * *Note*: Not everything in tekkitrestrict has been moved to this assigner, i'm still working on that.
 	 */
 	public static void assign(){
-		final tekkitrestrict plugin = tekkitrestrict.getInstance();
+		Log.trace("Registering Listeners...");
+		final TekkitRestrict plugin = TekkitRestrict.getInstance();
 		final PluginManager PM = plugin.getServer().getPluginManager();
 		register("Main", new TRListener(), PM, plugin);
-		register("Quit", new TRListener(), PM, plugin);
+		register("Quit", new QuitListener(), PM, plugin);
 		register("Inventory Click/Anti Dupe", new InventoryClickListener(), PM, plugin);
 		
 		if (Listeners.UseNoItem)
@@ -75,11 +77,22 @@ public class Assigner {
 		if (SettingsStorage.loggingConfig.getBoolean("SplitLogs", true))
 			register("SplitLogs Command", new TRCmdListener(), PM, plugin);
 		
-		if (LogFilter.logNEIGive)
-			register("NEI ItemSpawn", new TRNeiListener(), PM, plugin);
+		if (LogFilter.logNEIGive){
+			if (PatchesAPI.getNEIVer() == -1D){
+				Log.Warning.config("NEI Give can only be logged if you have installed the NEI patch in the fixpack.", false);
+			} else if (PatchesAPI.getNEIVer() < 2.0D){
+				Log.Warning.config("NEI Give can only be logged if you update FixPack to the latest version.", false);
+			} else {
+				register("NEI ItemSpawn", new TRNeiListener(), PM, plugin);
+			}
+		}
+		
+		if (Listeners.UseWrenchFixer){
+			register("Wrench fixer", new WrenchFixer(), PM, plugin);
+		}
 	}
 	
-	private static final void register(String name, Listener listener, PluginManager PM, tekkitrestrict plugin){
+	private static final void register(String name, Listener listener, PluginManager PM, TekkitRestrict plugin){
 		try {
 			PM.registerEvents(listener, plugin);
 		} catch (Exception ex){
@@ -89,13 +102,14 @@ public class Assigner {
 	}
 	
 	public static void register(Listener listener){
-		tekkitrestrict plugin = tekkitrestrict.getInstance();
+		TekkitRestrict plugin = TekkitRestrict.getInstance();
 		PluginManager PM = plugin.getServer().getPluginManager();
 		PM.registerEvents(listener, plugin);
 	}
 	
 	public static void assignEEPatch(){
-		final tekkitrestrict tr = tekkitrestrict.getInstance();
+		Log.trace("Registering EEPatch Listeners...");
+		final TekkitRestrict tr = TekkitRestrict.getInstance();
 		final PluginManager PM = tr.getServer().getPluginManager();
 		if (!EEPSettings.arcanering.isEmpty() || !EEPSettings.blackholeband.isEmpty() || !EEPSettings.harvestring.isEmpty() || !EEPSettings.firering.isEmpty() || !EEPSettings.flyring.isEmpty() || !EEPSettings.voidring.isEmpty() || !EEPSettings.zeroring.isEmpty())
 			register("EERings", new EERingListener(), PM, tr);
@@ -114,7 +128,7 @@ public class Assigner {
 			!EEPSettings.rmhammer.isEmpty() || !EEPSettings.rmshears.isEmpty() || !EEPSettings.rmsword.isEmpty() || !EEPSettings.katar.isEmpty() || !EEPSettings.morningstar.isEmpty())
 			register("EERMTools", new EERMToolListener(), PM, tr);
 		
-		if (!EEPatchConfig.getConfig().getBoolean("AllowRMFurnaceOreDuplication", true))
+		if (!SettingsStorage.eepatchConfig.getBoolean("AllowRMFurnaceOreDuplication", true))
 			register("EEDuplication", new EEDuplicateListener(), PM, tr);
 		
 		if (!EEPSettings.MaxCharge.isEmpty())
@@ -131,9 +145,13 @@ public class Assigner {
 		
 		if (!EEPSettings.watch.isEmpty())
 			register("EEWatch", new EEWatchListener(), PM, tr);
+		
+		if (!EEPSettings.armor.isEmpty())
+			register("EEArmor", new EEArmorListener(), PM, tr);
 	}
 	
 	public static void unregisterAll(){
-		HandlerList.unregisterAll(tekkitrestrict.getInstance());
+		Log.trace("Unregistering all Listeners...");
+		HandlerList.unregisterAll(TekkitRestrict.getInstance());
 	}
 }

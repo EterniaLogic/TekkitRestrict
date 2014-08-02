@@ -2,13 +2,14 @@ package nl.taico.tekkitrestrict.threads;
 
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
 import nl.taico.tekkitrestrict.Log;
-import nl.taico.tekkitrestrict.tekkitrestrict;
+import nl.taico.tekkitrestrict.TekkitRestrict;
 import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.TRConfigCache.Threads;
 import nl.taico.tekkitrestrict.functions.TRNoItem;
@@ -19,7 +20,7 @@ public class TRWorldScrubberThread extends Thread {
 		try {
 			Thread.sleep(Threads.worldCleanerSpeed);//Don't trigger immediately, but sleep first.
 		} catch (InterruptedException ex) {
-			if (tekkitrestrict.disable) return; //If plugin is disabling, then stop the thread. The WorldScrubber thread shouldn't trigger again.
+			if (TekkitRestrict.disable) return; //If plugin is disabling, then stop the thread. The WorldScrubber thread shouldn't trigger again.
 		}
 		while (true) {
 			doWScrub();
@@ -27,8 +28,10 @@ public class TRWorldScrubberThread extends Thread {
 			try {
 				Thread.sleep(Threads.worldCleanerSpeed);
 			} catch (InterruptedException ex) {
-				if (tekkitrestrict.disable) break; //If plugin is disabling, then stop the thread. The WorldScrubber thread shouldn't trigger again.
+				if (TekkitRestrict.disable) break; //If plugin is disabling, then stop the thread. The WorldScrubber thread shouldn't trigger again.
 			}
+			
+			if (TekkitRestrict.disable) break;
 		}
 	}
 
@@ -41,7 +44,7 @@ public class TRWorldScrubberThread extends Thread {
 		if (!Threads.RMDB) return;
 		
 		try {
-			final Server server = tekkitrestrict.getInstance().getServer();
+			final Server server = Bukkit.getServer();
 			
 			final List<World> worlds = server.getWorlds();
 			for (final World bukkitWorld : worlds) { //For each world

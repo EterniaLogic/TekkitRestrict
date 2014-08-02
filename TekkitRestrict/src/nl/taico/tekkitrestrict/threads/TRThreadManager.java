@@ -53,7 +53,7 @@ public class TRThreadManager {
 		
 		//ttt.limitFlyThread.interrupt();
 		try {
-			instance.saveThread.join(10000);
+			instance.saveThread.join(15000);
 		} catch (InterruptedException ex) {
 			ex.printStackTrace();
 		}

@@ -8,11 +8,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import org.eclipse.jdt.annotation.NonNull;
 
 import nl.taico.tekkitrestrict.FileLog;
 import nl.taico.tekkitrestrict.NameProcessor;
-import nl.taico.tekkitrestrict.tekkitrestrict;
+import nl.taico.tekkitrestrict.TekkitRestrict;
 import nl.taico.tekkitrestrict.TRConfigCache.Logger;
 
 public class InteractListener implements Listener {
@@ -20,7 +19,7 @@ public class InteractListener implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
 	public void onInteract_Logger(PlayerInteractEvent event){
-		if (!tekkitrestrict.EEEnabled) return;
+		if (!TekkitRestrict.EEEnabled) return;
 		if (event.getPlayer() == null) return;
 
 		itemLogUse(event.getPlayer(), event.getItem(), event.getAction(), event.isCancelled());
@@ -35,40 +34,36 @@ public class InteractListener implements Listener {
 		
 		int id = a.getTypeId();
 		
-		if (id == 27530 || id == 27531)
-			logUse("EEAmulet", player, id, cancelled);
-		else if (id == 27532 || id == 27534 || id == 27536 || id == 27537 || id == 27574 || id == 27584 || id == 27593)
-			logUse("EERing", player, id, cancelled);
-		else if (inRange(id, 27543, 27548) || id == 27555){
+		if (id == 27530 || id == 27531){
+			if (!Logger.LogAmulets) return;
+			logUse(EEAmulet == null ? (EEAmulet = FileLog.getLogOrMake("EEAmulet", false)) : EEAmulet, player, id, cancelled);
+		} else if (id == 27532 || id == 27534 || id == 27536 || id == 27537 || id == 27574 || id == 27584 || id == 27593) {
+			if (!Logger.LogRings) return;
+			logUse(EERing == null ? (EERing = FileLog.getLogOrMake("EERing", false)) : EERing, player, id, cancelled);
+		} else if (inRange(id, 27543, 27548) || id == 27555){
+			if (!Logger.LogDMTools) return;
 			if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)
-				logUse("EEDmTool", player, id, cancelled);
+				logUse(EEDmTool == null ? (EEDmTool = FileLog.getLogOrMake("EEDmTool", false)) : EEDmTool, player, id, cancelled);
 		} else if (inRange(id, 27564, 27573)){
+			if (!Logger.LogRMTools) return;
 			if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)
-				logUse("EERmTool", player, id, cancelled);
-		} else if (id == 27527 || id == 27556 || id == 27535)
-			logUse("EEDestructive", player, id, cancelled);
-		else if (id == 27538 || id == 27553 || id == 27562 || id == 27583 || id == 27585 || id == 27592)
-			logUse("EEMisc", player, id, cancelled);
+				logUse(EERmTool == null ? (EERmTool = FileLog.getLogOrMake("EERmTool", false)) : EERmTool, player, id, cancelled);
+		} else if (id == 27527 || id == 27556 || id == 27535){
+			if (!Logger.LogEEDestructive) return;
+			logUse(EEDestructive == null ? (EEDestructive = FileLog.getLogOrMake("EEDestructive", false)) : EEDestructive, player, id, cancelled);
+		} else if (id == 27538 || id == 27553 || id == 27562 || id == 27583 || id == 27585 || id == 27592){
+			if (!Logger.LogEEMisc) return;
+			logUse(EEMisc == null ? (EEMisc = FileLog.getLogOrMake("EEMisc", false)) : EEMisc, player, id, cancelled);
+		}
 	}
 	
-	private void logUse(String logname, Player player, int id, boolean cancelled){
-		if (!isLoggable(logname)) return;
-		final FileLog filelog = FileLog.getLogOrMake(logname, true, false);
+	private static FileLog EEAmulet, EERing, EEDmTool, EERmTool, EEDestructive, EEMisc;
+
+	private void logUse(FileLog fl, Player player, int id, boolean cancelled){
 		final Location loc = player.getLocation();
 		
-		filelog.log("[" + player.getName() + "][" + player.getWorld().getName() +
+		fl.log("[" + player.getName() + "][" + player.getWorld().getName() +
 				" - " + loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ() + "] used (" + id + ") `" + NameProcessor.getEEName(id) + "`" + (cancelled ? " (Action was cancelled)":""));
-	}
-	
-	private boolean isLoggable(@NonNull String type) {
-		if (type.equals("EERing")) return Logger.LogRings;
-		if (type.equals("EEDmTool")) return Logger.LogDMTools;
-		if (type.equals("EERmTool")) return Logger.LogRMTools;
-		if (type.equals("EEAmulet")) return Logger.LogAmulets;
-		if (type.equals("EEMisc")) return Logger.LogEEMisc;
-		if (type.equals("EEDestructive")) return Logger.LogEEDestructive;
-
-		return false;
 	}
 
 	private boolean inRange(int stack, int from, int to) {

@@ -36,13 +36,10 @@
 #                     does NOT include Katar and Morning Star)
 # - "ZeroRing 3"    - Makes the Zero Ring charge to level 3 at max.
 # - "Rings 2"       - Makes the Zero Ring and the Ring of Ignition charge to level 2 max.
-
-EEMaxCharge:
-- "DMTools 2"
-- "RMTools 3"
-- "Katar 4"
-- "MORNINGstar 4"
-- "CatalyticLens 7"
+# - "CatalyticLens 7" - Makes Catalytic Lens charge to max level 7 (default)
+# - "MORNINGstar 4" - Makes Morning Star charge to max level 4 (default)
+# - "Katar 4"       - Makes the Katar charge to max level 4 (default)
+EEMaxCharge: []
 
 ############################################################################################
 ###################################### Disable Actions #####################################

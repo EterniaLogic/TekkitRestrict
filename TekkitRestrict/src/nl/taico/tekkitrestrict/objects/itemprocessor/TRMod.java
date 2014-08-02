@@ -36,7 +36,9 @@ public class TRMod {
 	}
 	
 	public boolean is(String mod){
-		for (String name : names) if (name.equalsIgnoreCase(mod)) return true;
+		for (String name : names){
+			if (name.equalsIgnoreCase(mod)) return true;
+		}
 		
 		return false;
 	}

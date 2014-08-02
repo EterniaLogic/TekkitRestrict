@@ -424,7 +424,7 @@ public class Updater {
 			this.result = Updater.UpdateResult.FAIL_NOVERSION;
 			return false;
 		}
-		if (!tekkitrestrict.version.shouldUpdate(ver2)){
+		if (!TekkitRestrict.version.shouldUpdate(ver2)){
 			this.result = Updater.UpdateResult.NO_UPDATE;
 			return false;
 		}

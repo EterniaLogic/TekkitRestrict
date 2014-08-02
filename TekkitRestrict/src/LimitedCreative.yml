@@ -1,0 +1,41 @@
+###################################################################################################
+## Configuration file for TekkitRestrict                                                         ##
+## Authors: Taeir, DreadEnd (aka DreadSlicer)                                                    ##
+## BukkitDev: http://dev.bukkit.org/server-mods/tekkit-restrict/                                 ##
+## Please ask questions/report issues on the BukkitDev page.                                     ##
+###################################################################################################
+# 
+###################################################################################################
+################################# Limited Creative Configuration ##################################
+###################################################################################################
+# Limited creative is a function of TekkitRestrict where you can disallow items for players in
+# creative mode. This way, you can give creative mode to people without having to worry about them
+# making tons of Collectors, Solar panels, Red Matter Blocks and so on. You only have to set the
+# items you don't want people to use in creative mode here, and TekkitRestrict will do the rest.
+# 
+# Limited creative will also prevent players in creative mode from dropping items on the ground.
+# This makes sure they don't give items to players in survival mode.
+# 
+# Disable (false) or enable (true) Limited creative.
+# Default: false
+UseLimitedCreative: false
+# 
+# If you set this option to true, it will prevent the use of ANY container while a player is in
+# creative mode. This means that he cannot place his creative diamond blocks in a chest and then
+# use them in survival.
+# If this is enabled, it prevents the use of ANY container while in creative mode. This is
+# everything you can interact with, with the exception of your own inventory.
+# Default: true
+LimitedCreativeNoContainer: true
+# 
+# Here you can set the items you don't want creative players to use. You can enter mods, id's,
+# item names, and more.
+# Examples:
+# - "EE {&cYou are not allowed to use Equivalent Exchange when you are in creative mode!}"
+# - "1 {&cStone is banned for creative players!}"
+# - "35:15 {&cWe just hate black wool, so don't build with it!}"
+# - 50
+# - "NetherGoldOre {&6Nether ores are explosive, so you are not allowed to build with them!}"
+# 
+# For a full list of mods, usable item names and more examples, see Info.yml
+LimitedCreative: []

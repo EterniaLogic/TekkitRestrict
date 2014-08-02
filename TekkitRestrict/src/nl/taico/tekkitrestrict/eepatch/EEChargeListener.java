@@ -10,7 +10,7 @@ import ee.events.EEChargeEvent;
 public class EEChargeListener implements Listener {
 	@EventHandler
 	public void onCharge(EEChargeEvent event){
-		Player player = (Player) event.getHuman().getBukkitEntity();
+		Player player = event.getPlayer();
 		if (player.hasPermission("tekkitrestrict.bypass.maxcharge")) return;
 		
 		int old = event.getOldChargeLevel();

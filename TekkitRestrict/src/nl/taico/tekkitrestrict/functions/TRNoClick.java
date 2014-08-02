@@ -133,7 +133,7 @@ public class TRNoClick {
 			try {
 				nc.items = TRItemProcessor2.processString(temp[0]+msg);
 			} catch (TRException e) {
-				Warning.config("You have an error in your Banned.yml: "+e.getMessage(), false);
+				Warning.config("You have an error in your Banned.yml in BannedClicks: "+e.getMessage(), false);
 				continue;
 			}
 			if (temp.length == 1){//only item
@@ -183,13 +183,19 @@ public class TRNoClick {
 		return true;
 	}
 
-	public static boolean blockClick(InventoryClickEvent event){
-		if (event.getWhoClicked() == null) return false;
-		final Player player = (Player) event.getWhoClicked();
-		if (player.hasPermission("tekkitrestrict.bypass.noclick")) return false;
+	public static String blockClick(InventoryClickEvent event){
+		ItemStack item;
+		try {
+			item = event.getCurrentItem();
+		} catch (Exception ex){
+			return null;
+		}
 		
-		ItemStack item = event.getCurrentItem();
-		if (item == null) return false;
+		if (item == null) return null;
+		
+		final Player player = (Player) event.getWhoClicked();
+		if (player.hasPermission("tekkitrestrict.bypass.noclick")) return null;
+		
 		final int id = item.getTypeId();
 		final int data = item.getDurability();
 		final String title = event.getView().getTitle();
@@ -201,10 +207,13 @@ public class TRNoClick {
 			if (nc.inventory != null && !nc.inventory.equalsIgnoreCase(title)) continue;
 			if ((left && nc.left) || (right && nc.right) || (shift && nc.shift)){
 				for (TRItem tritem : nc.items){
-					if (tritem.compare(id, data)) return true;
+					if (tritem.compare(id, data)){
+						return tritem.msg == null ? "" : tritem.msg;
+					}
+					
 				}
 			}
 		}
-		return false;
+		return null;
 	}
 }

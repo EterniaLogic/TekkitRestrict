@@ -21,6 +21,7 @@ public class RandomString {
 	public String nextString() {
 		for (int idx = 0; idx < buf.length; ++idx){
 			buf[idx] = symbols[random.nextInt(symbols.length)];
+			if (buf[idx] == '\0') idx--;
 		}
 		return new String(buf);
 	}

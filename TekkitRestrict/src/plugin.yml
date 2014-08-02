@@ -1,8 +1,8 @@
 name: TekkitRestrict
-main: nl.taico.tekkitrestrict.tekkitrestrict
+main: nl.taico.tekkitrestrict.TekkitRestrict
 authors: [Taeir, DreadSlicer]
 prefix: TekkitRestrict
-version: 2.0 Beta 1
+version: 2.0
 description: TekkitRestrict gives server owners a lot of features to prevent and block unwanted Tekkit features.
 softdepend: [mod_EE, GriefPrevention, PreciousStones, WorldGuard, Essentials]
 
@@ -15,6 +15,7 @@ permissions:
             tekkitrestrict.bypass.dupe: true
             tekkitrestrict.bypass.noitem: true
             tekkitrestrict.bypass.limiter: true
+            tekkitrestrict.bypass.nointeract: true
             tekkitrestrict.bypass.noclick: true
             tekkitrestrict.bypass.hack: true
             tekkitrestrict.bypass.lwc: true
@@ -35,7 +36,7 @@ permissions:
         default: false
         children:
             tekkitrestrict.creative.blockall: true
-    tekkitrestrict.noclick.*:
+    tekkitrestrict.nointeract.*:
         description: Disables the left/rightclicking with certain items. See the bukkitdev for more info.
         default: false
     tekkitrestrict.openalc:
@@ -54,7 +55,11 @@ permissions:
     tekkitrestrict.bypass.safezone:
         description: Enables somebody to bypass all safezone.
     tekkitrestrict.bypass.noitem:
-        description: Allows the use of all items as described in noitem.
+        description: Allows the use of all items as described in noitem (Banned.yml).
+    tekkitrestrict.bypass.nointeract:
+        description: Banned interacts dont apply to this person (Banned.yml).
+    tekkitrestrict.bypass.noclick:
+        description: Allows the use of all (In inventory) clicks as described in NoClick (Banned.yml).
     tekkitrestrict.bypass.hack:
         description: Enables somebody to bypass no oil derrick preventers.
     tekkitrestrict.bypass.hack.fly:

@@ -4,8 +4,6 @@ import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.Command;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -14,14 +12,15 @@ import nl.taico.tekkitrestrict.TRConfigCache.Global;
 public class Log {
 	public static Level dupe;
 	public static Level hack;
+	public static Level cmd;
 	/**
 	 * Creates 2 custom levels and assigns the loggers.
 	 */
 	public static void init(){
 		Log.mcLogger = Logger.getLogger("Minecraft");
-		Log.trLogger = tekkitrestrict.getInstance().getLogger();
+		Log.trLogger = TekkitRestrict.getInstance().getLogger();
 		new CustomLevel("Notice", 801);
-		new CustomLevel("Command", 802);
+		cmd = new CustomLevel("Command", 802);
 		dupe = new CustomLevel("TRDupe", 803);
 		hack = new CustomLevel("TRHack", 804);
 	}
@@ -30,12 +29,6 @@ public class Log {
 	}
 	
 	public static Logger mcLogger, trLogger;
-	public static void Command(@NonNull Command cmd, @NonNull CommandSender sender, @NonNull String allArgs) {
-		mcLogger.log(Level.parse("Command"), sender.getName()+": /"+cmd.getName()+" "+allArgs);
-	}
-	public static void Command(@NonNull String cmd, @NonNull CommandSender sender, @NonNull String allArgs) {
-		mcLogger.log(Level.parse("Command"), sender.getName()+": /"+cmd+" "+allArgs);
-	}
 	
 	public static class Load {
 		public static void Blocked(final String type, final int count){
@@ -67,10 +60,20 @@ public class Log {
 		}
 	}
 	
-	public static void Debug(@NonNull final String msg){
+	private static FileLog debug;
+	public static void debug(String msg){
 		if (!Global.debug) return;
-		FileLog.getLogOrMake("Debug", true, false).log(msg);
+		if (debug == null) debug = FileLog.getLogOrMake("Debug", false);
+		debug.log(msg);
 	}
+	public static void debug(String msg, Object... args){
+		if (!Global.debug) return;
+		for (int i = 0; i < args.length; i++) msg = msg.replace("$1", String.valueOf(args[i]));
+		
+		if (debug == null) debug = FileLog.getLogOrMake("Debug", false);
+		debug.log(msg);
+	}
+	
 	public static void Dupe(final String message){
 		mcLogger.log(Level.parse("TRDupe"), message);
 	}
@@ -83,9 +86,10 @@ public class Log {
 	/** For each stackTrace element, it will write it to the debug log. */
 	public static void debugEx(@NonNull final Exception ex){
 		if (!Global.debug) return;
-		final FileLog log = FileLog.getLogOrMake("Debug", true, false);
+		if (debug == null) debug = FileLog.getLogOrMake("Debug", false);
+		
 		for (final StackTraceElement element : ex.getStackTrace()) {
-			log.log("     " + element.toString());
+			debug.log("     " + element.toString());
 		}
 	}
 	/** For each stackTrace element, log to console and to debug log*/
@@ -93,12 +97,12 @@ public class Log {
 		if (severe){
 			for (final StackTraceElement element : ex.getStackTrace()){
 				trLogger.severe(element.toString());
-				Debug("[SEVERE]     "+element.toString());
+				debug("[SEVERE]     "+element.toString());
 			}
 		} else {
 			for (final StackTraceElement element : ex.getStackTrace()){
 				trLogger.warning(element.toString());
-				Debug("[WARNING]     "+element.toString());
+				debug("[WARNING]     "+element.toString());
 			}
 		}
 		
@@ -124,43 +128,52 @@ public class Log {
 			if (severe) trLogger.severe("[Config] " + message);
 			else trLogger.warning("[Config] " + message);
 			configWarnings.add(message);
-			Debug("[Config] " + message);
+			debug("[Config] " + message);
 		}
 		public static void load(final String message, final boolean severe){
 			if (severe) trLogger.severe(message);
 			else trLogger.warning(message);
 			loadWarnings.add(message);
-			Debug(message);
+			debug(message);
 		}
 		public static void other(final String message, boolean severe){
 			if (severe) trLogger.severe(message);
 			else trLogger.warning(message);
 			otherWarnings.add(message);
-			Debug(message);
+			debug(message);
 		}
 		public static void dbAndLoad(final String message, boolean severe) {
 			if (severe) trLogger.severe(message);
 			else trLogger.warning(message);
 			dbWarnings.add(message);
 			loadWarnings.add(message);
-			Debug(message);
+			debug(message);
 		}
 		public static void db(final String message, final boolean severe){
 			if (severe) trLogger.severe(message);
 			else trLogger.warning(message);
 			dbWarnings.add(message);
-			Debug(message);
+			debug(message);
 		}
 	}
 
 	public static void info(String message){
 		trLogger.info(message);
 	}
+	public static void info(String message, Exception ex){
+		trLogger.log(Level.INFO, message, ex);
+	}
 	public static void warning(String message){
 		trLogger.warning(message);
 	}
+	public static void warning(String message, Exception ex){
+		trLogger.log(Level.WARNING, message, ex);
+	}
 	public static void severe(String message){
 		trLogger.severe(message);
+	}
+	public static void severe(String message, Exception ex){
+		trLogger.log(Level.SEVERE, message, ex);
 	}
 	public static void log(Level level, String message){
 		trLogger.log(level, message);
@@ -170,6 +183,10 @@ public class Log {
 	}
 	public static void fine(String message) {
 		trLogger.fine(message);
+	}
+	public static void trace(String message){
+		trLogger.fine(message);
+		if (Global.debug) debug(message);
 	}
 }
 

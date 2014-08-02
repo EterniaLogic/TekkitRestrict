@@ -17,7 +17,7 @@ import org.bukkit.entity.Vehicle;
 
 import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.TRConfigCache;
-import nl.taico.tekkitrestrict.tekkitrestrict;
+import nl.taico.tekkitrestrict.TekkitRestrict;
 import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.TRConfigCache.Threads;
 import nl.taico.tekkitrestrict.functions.TRSafeZone;
@@ -28,7 +28,7 @@ public class TREntityRemoverThread extends Thread {
 		try {
 			Thread.sleep(Threads.SSEntityRemoverSpeed);
 		} catch (InterruptedException e) {
-			if (tekkitrestrict.disable) return; //If plugin is disabling, then stop the thread. The EntityRemoveThread shouldn't trigger again.
+			if (TekkitRestrict.disable) return; //If plugin is disabling, then stop the thread. The EntityRemoveThread shouldn't trigger again.
 		}
 		while (true) {
 			try {
@@ -41,7 +41,7 @@ public class TREntityRemoverThread extends Thread {
 			try {
 				Thread.sleep(Threads.SSEntityRemoverSpeed);
 			} catch (InterruptedException e) {
-				if (tekkitrestrict.disable) break; //If plugin is disabling, then stop the thread. The EntityRemoveThread shouldn't trigger again.
+				if (TekkitRestrict.disable) break; //If plugin is disabling, then stop the thread. The EntityRemoveThread shouldn't trigger again.
 			}
 		}
 	}
@@ -52,7 +52,7 @@ public class TREntityRemoverThread extends Thread {
 	private void disableEntities() {
 		if (!Threads.SSDisableEntities) return;
 
-		List<World> worlds = tekkitrestrict.getInstance().getServer().getWorlds();
+		List<World> worlds = TekkitRestrict.getInstance().getServer().getWorlds();
 		
 		//int range = Threads.SSDisableEntitiesRange;
 		//if (range > 15) range = 15;
@@ -78,7 +78,7 @@ public class TREntityRemoverThread extends Thread {
 								}
 						} catch (Exception ex){}
 						
-						Bukkit.getScheduler().scheduleSyncDelayedTask(tekkitrestrict.getInstance(), new Runnable(){
+						Bukkit.getScheduler().scheduleSyncDelayedTask(TekkitRestrict.getInstance(), new Runnable(){
 							public void run(){
 								try {
 									Iterator<Entity> it = tbr.iterator();

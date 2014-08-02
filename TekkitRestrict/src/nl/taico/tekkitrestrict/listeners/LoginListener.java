@@ -8,7 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 import nl.taico.tekkitrestrict.Log;
-import nl.taico.tekkitrestrict.tekkitrestrict;
+import nl.taico.tekkitrestrict.TekkitRestrict;
 import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.functions.TRLimiter;
 
@@ -16,7 +16,7 @@ public class LoginListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerLogin(PlayerJoinEvent e) {
 		final Player p = e.getPlayer();
-		Bukkit.getScheduler().scheduleAsyncDelayedTask(tekkitrestrict.getInstance(), new Runnable(){
+		Bukkit.getScheduler().scheduleAsyncDelayedTask(TekkitRestrict.instance, new Runnable(){
 			public void run(){
 				try {
 					TRLimiter.removeExpire(p.getName());

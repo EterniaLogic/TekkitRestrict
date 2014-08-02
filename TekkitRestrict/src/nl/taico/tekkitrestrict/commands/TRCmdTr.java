@@ -3,15 +3,11 @@ package nl.taico.tekkitrestrict.commands;
 import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Handler;
-import java.util.logging.LogManager;
-import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -24,14 +20,13 @@ import org.eclipse.jdt.annotation.NonNull;
 
 import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.NameProcessor;
-import nl.taico.tekkitrestrict.TR;
-import nl.taico.tekkitrestrict.TR.FixPack;
+import nl.taico.tekkitrestrict.PatchesAPI;
 import nl.taico.tekkitrestrict.TRConfigCache;
 import nl.taico.tekkitrestrict.TRDB;
 import nl.taico.tekkitrestrict.TRException;
 import nl.taico.tekkitrestrict.TRItemProcessor2;
 import nl.taico.tekkitrestrict.TRPerformance;
-import nl.taico.tekkitrestrict.tekkitrestrict;
+import nl.taico.tekkitrestrict.TekkitRestrict;
 import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.Updater.UpdateResult;
 import nl.taico.tekkitrestrict.api.SafeZones.SafeZoneCreate;
@@ -110,77 +105,11 @@ public class TRCmdTr implements CommandExecutor {
 		return true;
 	}
 	private void debugTesting(CommandSender sender, String args[]){
-		SettingsStorage.genAdvanced();
-		SettingsStorage.genBanned();
-		SettingsStorage.genCreative();
-		SettingsStorage.genDatabase();
-		SettingsStorage.genEEPatch();
-		SettingsStorage.genGeneral();
-		SettingsStorage.genGroupPerms();
-		SettingsStorage.genHackDupe();
-		SettingsStorage.genLimiter();
-		SettingsStorage.genLogging();
-		SettingsStorage.genModifications();
-		SettingsStorage.genPerformance();
-		SettingsStorage.genSafeZones();
-		SettingsStorage.genUnload();
-		
-		
-		
-		if (0 == Integer.parseInt("0")) return;
-		
-		final Enumeration<String> cc = LogManager.getLogManager().getLoggerNames();
-		HashMap<Logger, Handler[]> handlers = new HashMap<Logger, Handler[]>();
-		while (cc.hasMoreElements()){
-			final String s = cc.nextElement();
-			final Logger l = Logger.getLogger(s);
-			if (l == null) continue;
-			
-			sender.sendMessage("LoggerName : "+l.getName()+";");
-			sender.sendMessage("ManagerName: "+s);
-			
-			if (handlers.put(l, l.getHandlers()) != null) sender.sendMessage("Double logger found!");
-			
-			for (Handler h : l.getHandlers()){
-				sender.sendMessage("    Handler: "+h.toString()+"; Filter: "+h.getFilter()+"; Formatter: "+h.getFormatter());
-			}
-		}
-		
-		/*
-		HashSet<Handler> handlers2 = new HashSet<Handler>();
-		for (Handler[] val : handlers.values()){
-			for (Handler h : val){
-				if (!handlers2.add(h)) sender.sendMessage("    Duplicate Handler: "+h.toString());
-			}
-		}*/
-		/*
-		msg(sender, "-------------------------------------------");
-		Handler[] mchandlers = Logger.getLogger("Minecraft").getHandlers();
-		for (Handler h : mchandlers){
-			if (h instanceof org.bukkit.craftbukkit.util.TerminalConsoleHandler){
-				h.publish(new LogRecord(Level.INFO, "Console only message."));
-			} else {
-				h.publish(new LogRecord(Level.INFO, "Log file only message."));
-			}
-		}*/
-		/*
-		Handler forgehandler = Logger.getLogger("ForgeModLoader").getHandlers()[0];
-		forgehandler.publish(new LogRecord(Level.INFO, "Forge Log file only message."));
-		msg(sender, "-------------------------------------------");
-		for (Plugin plugin : Bukkit.getPluginManager().getPlugins()){
-			msg(sender, "Plugin name="+plugin.getName()+"; Logger="+plugin.getLogger().getName());
-		}*/
-		
-		Logger mc = Logger.getLogger("Minecraft");
-		mc.warning("MCWarning");
-		Log.warning("Test warning");
-		Log.severe("Severe warning");
-		System.out.println(Log.trLogger.getUseParentHandlers());
-		System.out.println(Log.trLogger.getParent().getName());
+		return;
 	}
 
 	private void help(CommandSender sender){
-		msgy(sender, "[TekkitRestrict v" + tekkitrestrict.version.fullVer + " Commands]");
+		msgy(sender, "[TekkitRestrict v" + TekkitRestrict.version.fullVer + " Commands]");
 		msg(sender, "Aliases: /tr, /tekkitrestrict");
 		if (sender.hasPermission("tekkitrestrict.emc")) msg(sender, "/tr EMC", "List EMC commands.");
 		if (sender.hasPermission("tekkitrestrict.admin")) msg(sender, "/tr admin", "list admin commands");
@@ -304,35 +233,23 @@ public class TRCmdTr implements CommandExecutor {
 		msgb(sender, "Former author and creator: " + ChatColor.GREEN + "DreadSlicer/EterniaLogic");
 		msgb(sender, "Current author: " + ChatColor.GREEN + "Taeir");
 		msg(sender, "");
-		msgb(sender, "Version: " + ChatColor.GREEN + tekkitrestrict.version.toMetricsVersion());
-		if (tekkitrestrict.useTMetrics){
-			msgb(sender, "Server UID: " + ChatColor.GREEN + tekkitrestrict.getInstance().tmetrics.uid);
+		msgb(sender, "Version: " + ChatColor.GREEN + TekkitRestrict.version.toMetricsVersion());
+		if (TekkitRestrict.useTMetrics){
+			msgb(sender, "Server UID: " + ChatColor.GREEN + TekkitRestrict.getInstance().tmetrics.uid);
 		}
 		
 		if (!sender.hasPermission("tekkitrestrict.admin")) return;
 		
-		if (TR.getEEPatchVersion() != -1d) msgb(sender, "EEPatch version: " + ChatColor.GREEN+(TR.getEEPatchVersion()==0d?"< 1.4":TR.getEEPatchVersion()));
-		else msgb(sender, "EEPatch: "+ChatColor.RED+"not installed");
+		for (String s : PatchesAPI.getOverview()) sender.sendMessage(s);
 		
-		if (FixPack.getNEIVer() != -1d) msgb(sender, "FixPack NEI: " + ChatColor.GREEN + (FixPack.getNEIVer()==0d?"<1.7":FixPack.getNEIVer()));
-		else msgb(sender, "FixPack NEI: " + ChatColor.RED + "No");
-		if (FixPack.getRailcraftVer() != -1d) msgb(sender, "FixPack RailCraft: " + ChatColor.GREEN + FixPack.getRailcraftVer());
-		if (FixPack.getRedPowerVer() != -1d) msgb(sender, "FixPack RedPower: " + ChatColor.GREEN + FixPack.getRedPowerVer());
-		if (FixPack.getWRVer() != -1d) msgb(sender, "FixPack WirelessRedstone: " + ChatColor.GREEN + FixPack.getWRVer());
-		if (FixPack.getMFFSVer() != -1d) msgb(sender, "FixPack MFFS: " + ChatColor.GREEN + (FixPack.getMFFSVer()==0d?"<1.4":FixPack.getMFFSVer()));
-		else msgb(sender, "FixPack MFFS: " + ChatColor.RED + "No");
-		if (FixPack.getWMVer() != -1d) msgb(sender, "FixPack WeaponsMod: " + ChatColor.GREEN + (FixPack.getWMVer()==0d?"<1.9":FixPack.getWMVer()));
-		else msgb(sender, "FixPack WeaponsMod: " + ChatColor.RED + "No");
+		msgb(sender, "Database version: " + ChatColor.GREEN + TekkitRestrict.dbversion);
 		
-		
-		msgb(sender, "Database version: " + ChatColor.GREEN + tekkitrestrict.dbversion);
-		
-		if (tekkitrestrict.dbtype == DBType.MySQL)
+		if (TekkitRestrict.dbtype == DBType.MySQL)
 			msgb(sender, "Database type: "+ChatColor.GREEN+"MySQL");
-		else if (tekkitrestrict.dbtype == DBType.SQLite)
+		else if (TekkitRestrict.dbtype == DBType.SQLite)
 			msgb(sender, "Database type: "+ChatColor.GREEN+"SQLite");
 		
-		switch (tekkitrestrict.dbworking){
+		switch (TekkitRestrict.dbworking){
 			case 0: msgb(sender, "DB working: " + ChatColor.GREEN + "Yes"); break;
 			case 2:	msgb(sender, "DB working: " + ChatColor.RED + "Partially; Safezones will not be saved."); break;
 			case 4:	msgb(sender, "DB working: " + ChatColor.RED + "Partially; Limits will not be saved."); break;
@@ -340,7 +257,7 @@ public class TRCmdTr implements CommandExecutor {
 			default: msgb(sender, "DB working: " + ChatColor.RED + "No; Database will reset upon next startup."); break;
 		}
 		
-		if (!tekkitrestrict.useTMetrics)
+		if (!TekkitRestrict.useTMetrics)
 			msgb(sender, "TMetrics: "+ChatColor.RED+"false");
 	}
 	private void debugInfo(CommandSender sender){
@@ -360,7 +277,7 @@ public class TRCmdTr implements CommandExecutor {
 	private void emcMain(CommandSender sender, String largs[]){
 		if (noPerm(sender, "emc")) return;
 		
-		if (!tekkitrestrict.EEEnabled){
+		if (!TekkitRestrict.EEEnabled){
 			msgr(sender, "EquivalentExchange is not enabled!");
 			return;
 		}
@@ -385,7 +302,7 @@ public class TRCmdTr implements CommandExecutor {
 		
 	}
 	private void emcHelp(CommandSender sender){
-		msgy(sender, "[TekkitRestrict v" + tekkitrestrict.version.fullVer + " EMC Commands]");
+		msgy(sender, "[TekkitRestrict v" + TekkitRestrict.version.fullVer + " EMC Commands]");
 		msg(sender, "/tr emc tempset <id[:data]> <EMC>", "Set an emc value till the next restart.");
 		msg(sender, "/tr emc lookup <id[:data]>", "Check the emc value of an item.");
 	}
@@ -475,7 +392,7 @@ public class TRCmdTr implements CommandExecutor {
 						msg(sender, "[" + isr.id + ":" + dat + "] EMC: " + emc);
 					}
 				} else {
-					final int datax = isr.data == -10 ? 0 : isr.data;
+					final int datax = isr.data;// == -10 ? 0 : isr.data; TODO change -10
 					final Integer emc = hm.get(datax);
 					if (emc == null) continue;
 					found = true;
@@ -608,14 +525,14 @@ public class TRCmdTr implements CommandExecutor {
 			return;
 		}
 
-		tekkitrestrict.getInstance().reload(true, false);
+		TekkitRestrict.getInstance().reload(true, false);
 		msg(sender, "Tekkit Restrict Reloaded!");
 		return;
 	}
 	private void adminUpdate(CommandSender sender, String largs[]){
 		if (noPerm(sender, "admin.update")) return;
 		
-		if (tekkitrestrict.updater == null){
+		if (TekkitRestrict.updater == null){
 			msgr(sender, "The update check is disabled in the config.");
 			return;
 		}
@@ -633,20 +550,20 @@ public class TRCmdTr implements CommandExecutor {
 			return;
 		}
 		
-		final UpdateResult result = tekkitrestrict.updater.getResult();
+		final UpdateResult result = TekkitRestrict.updater.getResult();
 		if (result == UpdateResult.DISABLED){
 			msgr(sender, "The update check is disabled in the global Updater config.");
 			return;
 		} else if (result == UpdateResult.SUCCESS){
-			msgg(sender, "The update " + ChatColor.YELLOW + tekkitrestrict.updater.getLatestName() + ChatColor.GREEN + " is available, and has already been downloaded.");
+			msgg(sender, "The update " + ChatColor.YELLOW + TekkitRestrict.updater.getLatestName() + ChatColor.GREEN + " is available, and has already been downloaded.");
 			msgg(sender, "This update will be installed on the next server start.");
 		} else if (result == UpdateResult.UPDATE_AVAILABLE){
 			if (check){
-				msgg(sender, "The update " + ChatColor.YELLOW + tekkitrestrict.updater.getLatestName() + ChatColor.GREEN + " is available.");
+				msgg(sender, "The update " + ChatColor.YELLOW + TekkitRestrict.updater.getLatestName() + ChatColor.GREEN + " is available.");
 				msgy(sender, "Use /tr admin update download to start downloading.");
 			} else {
-				msgg(sender, "TekkitRestrict will now start downloading " + ChatColor.YELLOW + tekkitrestrict.updater.getLatestName() + ChatColor.GREEN + ".");
-				tekkitrestrict.getInstance().Update();
+				msgg(sender, "TekkitRestrict will now start downloading " + ChatColor.YELLOW + TekkitRestrict.updater.getLatestName() + ChatColor.GREEN + ".");
+				TekkitRestrict.getInstance().Update();
 			}
 		} else if (result == UpdateResult.NO_UPDATE){
 			msgy(sender, "There is no update available for TekkitRestrict.");
@@ -684,7 +601,7 @@ public class TRCmdTr implements CommandExecutor {
 		//Console should always be able to use this, even though permission default is false in plugin.yml
 		
 		msgr(sender, "Reinitializing server.");
-		tekkitrestrict.getInstance().getServer().reload();
+		TekkitRestrict.getInstance().getServer().reload();
 	}
 	private void adminTest(CommandSender sender, String largs[]){
 		if (noPerm(sender, "admin.testsettings")) return;
@@ -774,7 +691,7 @@ public class TRCmdTr implements CommandExecutor {
 	}
 	private void adminHelp(CommandSender sender, int page) {
 		if (page == 1) {
-			msgy(sender, "[TekkitRestrict " + tekkitrestrict.version.fullVer + " Admin Commands] Page 1 / 3");
+			msgy(sender, "[TekkitRestrict " + TekkitRestrict.version.fullVer + " Admin Commands] Page 1 / 3");
 			msg(sender, "/tr admin help <page>", "Show this help.");
 			msg(sender, "/tr admin safezone list [page]", "List safezones.");
 			msg(sender, "/tr admin safezone check [player]", "Check if a player is in a safezone.");
@@ -782,7 +699,7 @@ public class TRCmdTr implements CommandExecutor {
 			msg(sender, "/tr admin safezone addgp <name>", "Add a safezone using GriefPrevention.");
 			msg(sender, "/tr admin safezone rem <name>", "Remove a safezone.");
 		} else if (page == 2) {
-			msgy(sender, "[TekkitRestrict " + tekkitrestrict.version.fullVer + " Admin Commands] Page 2 / 3");
+			msgy(sender, "[TekkitRestrict " + TekkitRestrict.version.fullVer + " Admin Commands] Page 2 / 3");
 			msg(sender, "/tr admin limit clear <player>", "Clear a players limits.");
 			msg(sender, "/tr admin limit clear <player> <id[:data]>", "Clear a players limits for a specific item.");
 			msg(sender, "/tr admin limit list <player> [id]", "List a players limits.");
@@ -791,7 +708,7 @@ public class TRCmdTr implements CommandExecutor {
 			msg(sender, "/tr admin unloadchunks high", "Unload all chunks not loaded by players.");
 			msg(sender, "/tr admin unloadchunks extreme", "Unload all chunks no matter what. (WARNING: Can crash server)");
 		} else if (page >= 3){
-			msgy(sender, "[TekkitRestrict " + tekkitrestrict.version.fullVer + " Admin Commands] Page 3 / 3");
+			msgy(sender, "[TekkitRestrict " + TekkitRestrict.version.fullVer + " Admin Commands] Page 3 / 3");
 			msg(sender, "/tr admin reload", "Reload TekkitRestrict");
 			msg(sender, "/tr admin reload help", "View Reload subcommands");
 			msg(sender, "/tr admin update <check|download>", "Check for or download updates.");
@@ -806,7 +723,7 @@ public class TRCmdTr implements CommandExecutor {
 	private void adminUnloadChunks(CommandSender sender, String largs[]){
 		if (noPerm(sender, "admin.forceunload")) return;
 		if (largs.length < 2){
-			msgy(sender, "[TekkitRestrict " + tekkitrestrict.version.fullVer + "UnloadChunks help]");
+			msgy(sender, "[TekkitRestrict " + TekkitRestrict.version.fullVer + "UnloadChunks help]");
 			msg(sender, "/tr admin unloadchunks low", "Only unload chunks not loaded for a reason, default radius.");
 			msg(sender, "/tr admin unloadchunks normal", "Unload normally and unload chunks that are kept loaded by ChunkLoaders.");
 			msg(sender, "/tr admin unloadchunks high", "Unload all chunks not loaded by players.");
@@ -879,7 +796,7 @@ public class TRCmdTr implements CommandExecutor {
 		ssHelp(sender);
 	}
 	private void ssHelp(CommandSender sender){
-		msgy(sender, "[TekkitRestrict v" + tekkitrestrict.version.fullVer + " Safezone Commands]");
+		msgy(sender, "[TekkitRestrict v" + TekkitRestrict.version.fullVer + " Safezone Commands]");
 		msg(sender, "/tr admin safezone check [player]", "Check if a player is in a safezone.");
 		msg(sender, "/tr admin safezone list [page]", "List safezones");
 		msg(sender, "/tr admin safezone addwg <name>", "Add a WorldGuard safezone");
@@ -1003,7 +920,7 @@ public class TRCmdTr implements CommandExecutor {
 		}
 		
 		try {
-			tekkitrestrict.db.query("DELETE FROM `tr_saferegion` WHERE `name` = '"
+			TekkitRestrict.db.query("DELETE FROM `tr_saferegion` WHERE `name` = '"
 							+ TRDB.antisqlinject((name == null ? largs[3] : name)) + "' COLLATE NOCASE");
 		} catch (SQLException ex) {}
 	}
@@ -1176,7 +1093,7 @@ public class TRCmdTr implements CommandExecutor {
 		limitHelp(sender);
 	}
 	private void limitHelp(CommandSender sender){
-		msgy(sender, "[TekkitRestrict v" + tekkitrestrict.version.fullVer + " Limit Commands]");
+		msgy(sender, "[TekkitRestrict v" + TekkitRestrict.version.fullVer + " Limit Commands]");
 		msg(sender, "/tr admin limit list <player>", "View a players limits");
 		msg(sender, "/tr admin limit list <player> <id>", "View a specific limit.");
 		msg(sender, "/tr admin limit clear <player>", "Clear a players limits.");

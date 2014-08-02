@@ -23,22 +23,22 @@ public class TRConsoleFilter implements Filter {
 	@Override
 	public boolean isLoggable(LogRecord record) {
 		try {
-			if (filters == null){
-				filters = new ArrayList<TRLogFilterPlus>();
-				for (TRLogFilterPlus f : TRLogFilterPlus.allFilters){
-					if (f.getType().isConsole()) filters.add(f);
-				}
+			if (filters == null) reload();
+		} catch (Exception ex){
+			Log.debug("Exception in TRConsoleFilter reload: ");
+			Log.debugEx(ex);
+		}
+		
+		try {
+			final String msg = record.getMessage();
+			for (TRLogFilterPlus filter: filters){
+				if (filter.matches(msg)) return false;
 			}
-			
-			try {
-				final String msg = record.getMessage();
-				for (TRLogFilterPlus filter: filters){
-					if (filter.matches(msg)) return false;
-				}
-			} catch (Exception ex){
-				Log.debugEx(ex);
-			}
-		} catch (Exception ex){}
+		} catch (Exception ex){
+			Log.debug("Exception in TRConsoleFilter reload: ");
+			Log.debugEx(ex);
+		}
+		
 		return true;
 	}
 

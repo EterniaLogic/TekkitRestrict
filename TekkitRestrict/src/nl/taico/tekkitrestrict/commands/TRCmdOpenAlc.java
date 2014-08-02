@@ -16,7 +16,7 @@ import net.minecraft.server.mod_EE;
 
 import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.Log.Warning;
-import nl.taico.tekkitrestrict.tekkitrestrict;
+import nl.taico.tekkitrestrict.TekkitRestrict;
 import nl.taico.tekkitrestrict.objects.OpenAlcObj;
 
 import static nl.taico.tekkitrestrict.commands.TRCmdHelper.*;
@@ -36,7 +36,7 @@ public class TRCmdOpenAlc implements CommandExecutor {
 			return false;
 		}
 		
-		if (!tekkitrestrict.EEEnabled) {
+		if (!TekkitRestrict.EEEnabled) {
 			msgr(sender, "EE is not enabled!");
 			return true;
 		}

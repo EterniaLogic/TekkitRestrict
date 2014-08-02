@@ -19,7 +19,7 @@ import com.earth2me.essentials.Essentials;
 import com.earth2me.essentials.ItemDb;
 
 public class NameProcessor {
-	private static final LinkedHashMap<Integer, String> EEItems = new LinkedHashMap<Integer, String>(73);
+	private static final LinkedHashMap<Integer, String> EEItems = new LinkedHashMap<Integer, String>(128);
 	static {
 		EEItems.put(27526,"Philosopher Stone");
 		EEItems.put(27527,"Destruction Catalyst");
@@ -141,7 +141,7 @@ public class NameProcessor {
 	}
 	*/
 	
-	private static final LinkedHashMap<TRItem, String> All = new LinkedHashMap<TRItem, String>(1500);
+	private static final LinkedHashMap<TRItem, String> All = new LinkedHashMap<TRItem, String>(2048);
 	static {
 		All.put(TRItem.parseItem(1,-1),"Stone");
 		All.put(TRItem.parseItem(2,-1),"Grass Block");
@@ -2193,6 +2193,7 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(136,16950),"Ruby Block Jacketed Bluewire");
 		All.put(TRItem.parseItem(136,16951),"Emerald Block Jacketed Bluewire");
 		All.put(TRItem.parseItem(136,16952),"Sapphire Block Jacketed Bluewire");
+		//2195-351=
 		*/
 		All.put(TRItem.parseItem(136,-1),"RedPower Microblocks and Wires");
 		//IMPORTANT Marker at the end of Redpower
@@ -3378,16 +3379,14 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(31264,-1),"Energy Array Location Card");
 	}
 	
-	private static final LinkedHashMap<String, TRItem> AllNames = new LinkedHashMap<String, TRItem>();
+	private static final LinkedHashMap<String, TRItem> AllNames = new LinkedHashMap<String, TRItem>(2048);
 	static {
-		final Iterator<Entry<TRItem, String>> all = All.entrySet().iterator();
-		while (all.hasNext()){
-			final Entry<TRItem, String> entry = all.next(); 
+		for (Entry<TRItem, String> entry : All.entrySet()){
 			AllNames.put(entry.getValue().replace(" ", "").toLowerCase(), entry.getKey());
 		}
 	}
 	
-	private static final ArrayList<String> mods = new ArrayList<String>();
+	private static final ArrayList<String> mods = new ArrayList<String>(32);
 	static {
 		mods.add("Equivalent Exchange");
 		mods.add("Buildcraft");
@@ -3412,24 +3411,17 @@ public class NameProcessor {
 		mods.add("Chunk Loaders");
 	}
 	public static LinkedHashMap<String, TRItem> getAllItems(){
-		final LinkedHashMap<String, TRItem> items = new LinkedHashMap<String, TRItem>();
-		final Iterator<Entry<TRItem, String>> all = All.entrySet().iterator();
-		while (all.hasNext()){
-			final Entry<TRItem, String> entry = all.next(); 
-			items.put(entry.getValue(), entry.getKey());
-		}
-		return items;
-	}
-	
-	public static LinkedHashMap<String, TRItem> getAllItemsAndMods(){
-		final LinkedHashMap<String, TRItem> items = new LinkedHashMap<String, TRItem>();
-		final Iterator<Entry<TRItem, String>> all = All.entrySet().iterator();
-		while (all.hasNext()){
-			final Entry<TRItem, String> entry = all.next(); 
+		final LinkedHashMap<String, TRItem> items = new LinkedHashMap<String, TRItem>(2048);
+		
+		for (Entry<TRItem, String> entry : All.entrySet()){
 			items.put(entry.getValue(), entry.getKey());
 		}
 		
 		return items;
+	}
+	
+	public static ArrayList<String> getAllMods(){
+		return new ArrayList<String>(mods);
 	}
 	
 	/** 
@@ -3454,8 +3446,8 @@ public class NameProcessor {
 		return it == null ? null : it.clone();
 	}
 	
-	@NonNull public static LinkedHashMap<TRItem, String> getDefaultBlocks(@Nullable LinkedHashMap<TRItem, String> map){
-		if (map == null) map = new LinkedHashMap<TRItem, String>();
+	public static LinkedHashMap<TRItem, String> getDefaultBlocks(@Nullable LinkedHashMap<TRItem, String> map){
+		if (map == null) map = new LinkedHashMap<TRItem, String>(256);
 		final Iterator<Entry<TRItem, String>> all = All.entrySet().iterator();
 		while (all.hasNext()){
 			final Entry<TRItem, String> entry = all.next(); 
@@ -3465,8 +3457,8 @@ public class NameProcessor {
 		return map;
 	}
 	
-	@NonNull public static LinkedHashMap<TRItem, String> getEEBlocks(@Nullable LinkedHashMap<TRItem, String> map){
-		if (map == null) map = new LinkedHashMap<TRItem, String>();
+	public static LinkedHashMap<TRItem, String> getEEBlocks(@Nullable LinkedHashMap<TRItem, String> map){
+		if (map == null) map = new LinkedHashMap<TRItem, String>(32);
 		
 		final Iterator<Entry<TRItem, String>> all = All.entrySet().iterator();
 		while (all.hasNext()){
@@ -3480,6 +3472,7 @@ public class NameProcessor {
 	}
 
 	public static void addTekkitMaterials(){
+		Log.trace("Adding Tekkit Material Names...");
 		for (int i = 126; i < 255; i++){
 			final String name = getName(TRItem.parseItem(i, -1));
 			if (name == null) continue;

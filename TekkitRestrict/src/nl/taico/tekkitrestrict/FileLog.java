@@ -4,11 +4,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.regex.Matcher;
 
 import org.bukkit.ChatColor;
 import org.eclipse.jdt.annotation.NonNull;
@@ -21,59 +19,31 @@ public class FileLog {
 	protected String type = "";
 	protected int day = 0;
 	protected int counter = 0;
-	protected static HashMap<String, FileLog> Logs = new HashMap<String, FileLog>();
-	protected final boolean alternate;
+	protected static HashMap<String, FileLog> Logs = new HashMap<>();
 	protected final boolean consoleLog;
 	protected static final String sep = File.separator;
-	protected static final String base = "plugins"+sep+"tekkitrestrict"+sep+"log"+sep;
-	
-	@SuppressWarnings("deprecation")
-	public FileLog(@NonNull final String type, final boolean alternate, final boolean consoleLog){
-		this.alternate = alternate;
-		this.consoleLog = consoleLog;
-		this.type = type;
-		final Date curdate = new Date(System.currentTimeMillis());
-		this.day = curdate.getDay();
-		
-		final File log;
-		final File folder;
-		if (!alternate){
-			log = new File("."+sep+TRConfigCache.LogFilter.logLocation+sep+type+sep+formatName(type));
-			folder = new File("."+sep+TRConfigCache.LogFilter.logLocation+sep+type+sep);
-		} else {
-			log = new File(base+type+sep+formatName(type));
-			folder = new File(base+type+sep);
-		}
-
-		if (!folder.exists()) folder.mkdirs();
-		
-		if (!log.exists()){
-			try {
-				log.createNewFile();
-			} catch (final IOException e) {
-				e.printStackTrace();
-			}
-		}
-		try {
-			out = new BufferedWriter(new FileWriter(log, true));
-		} catch (final IOException e) {
-			e.printStackTrace();
-		}
-		
-		Logs.put(type, this);
-	}
 	
 	@SuppressWarnings("deprecation")
 	public FileLog(@NonNull final String type, final boolean consoleLog){
-		this.alternate = false;
 		this.type = type;
 		this.consoleLog = consoleLog;
-		final Date curdate = new Date(System.currentTimeMillis());
-		this.day = curdate.getDay();
+		this.day = new Date(System.currentTimeMillis()).getDay();
 		
-		final File log = new File("."+sep+TRConfigCache.LogFilter.logLocation+sep+type+sep+formatName(type));
-		final File folder = new File("."+sep+TRConfigCache.LogFilter.logLocation+sep+type+sep);
-		if (!folder.exists()) folder.mkdirs();
+		final File log;
+		final File folder;
+		if (TRConfigCache.LogFilter.logLocation.matches("[a-zA-Z]:"+sep+".*")
+				|| TRConfigCache.LogFilter.logLocation.startsWith("."+sep)
+				|| TRConfigCache.LogFilter.logLocation.startsWith(sep)){
+			folder = new File(TRConfigCache.LogFilter.logLocation+sep+type);
+			if (!folder.exists()) folder.mkdirs();
+			
+			log = new File(folder, formatName(type));
+		} else {
+			folder = new File("."+sep+TRConfigCache.LogFilter.logLocation+sep+type);
+			if (!folder.exists()) folder.mkdirs();
+			
+			log = new File(folder, formatName(type));
+		}
 		
 		if (!log.exists()){
 			try {
@@ -99,12 +69,6 @@ public class FileLog {
 		if (type == null) type = "null";
 		final FileLog tbr = Logs.get(type);
 		return tbr == null ? new FileLog(type, consoleLog) : tbr;
-	}
-	
-	@NonNull public static FileLog getLogOrMake(@Nullable String type, final boolean alternate, final boolean consoleLog){
-		if (type == null) type = "null";
-		final FileLog tbr = Logs.get(type);
-		return tbr == null ? new FileLog(type, alternate, consoleLog) : tbr;
 	}
 	
 	public void log(@Nullable final String msg, final long time){
@@ -183,12 +147,17 @@ public class FileLog {
 		
 		final File log;
 		final File folder;
-		if (!alternate){
-			log = new File("."+sep+TRConfigCache.LogFilter.logLocation+sep+type+sep+formatName(type));
-			folder = new File("."+sep+TRConfigCache.LogFilter.logLocation+sep+type+sep);
+		if (TRConfigCache.LogFilter.logLocation.matches("[a-zA-Z]:"+sep+".*")
+				|| TRConfigCache.LogFilter.logLocation.startsWith("."+sep)){
+			folder = new File(TRConfigCache.LogFilter.logLocation, "type");
+			if (!folder.exists()) folder.mkdirs();
+			
+			log = new File(folder, formatName(type));
 		} else {
-			log = new File(base+type+sep+formatName(type));
-			folder = new File(base+type+sep);
+			folder = new File("."+sep+TRConfigCache.LogFilter.logLocation, type);
+			if (!folder.exists()) folder.mkdirs();
+			
+			log = new File(folder, formatName(type));
 		}
 		
 		if (!folder.exists()){
@@ -276,12 +245,11 @@ public class FileLog {
 		return input.replace("\033[m", "");
 	}
 	
+	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yy");
 	protected boolean logged = false;
 	protected boolean logged2 = false;
 	@NonNull protected String formatName(@NonNull String type){
-		final Date curdate = new Date(System.currentTimeMillis());
-		final DateFormat formatter = new SimpleDateFormat("dd-MM-yy");
-		final String data = formatter.format(curdate);
+		final String data = dateFormat.format(new Date(System.currentTimeMillis()));
 		final String date[] = data.split("-");
 		
 		String name = TRConfigCache.LogFilter.fileFormat;
@@ -294,10 +262,10 @@ public class FileLog {
 			name = type + "-" + data + ".log";
 		}
 		
-		return name.replaceAll("(?i)\\{DAY\\}", Matcher.quoteReplacement(date[0]))
-					.replaceAll("(?i)\\{MONTH\\}", Matcher.quoteReplacement(date[1]))
-					.replaceAll("(?i)\\{YEAR\\}", Matcher.quoteReplacement(date[2]))
-					.replaceAll("(?i)\\{TYPE\\}", Matcher.quoteReplacement(type))
+		return name.replace("{DAY}", date[0])
+					.replace("{MONTH}", date[1])
+					.replace("{YEAR}", date[2])
+					.replace("{TYPE}", type)
 					.replace("\\", "")
 					.replace("/", "");
 	}
@@ -306,10 +274,11 @@ public class FileLog {
 		return formatMsg(msg, System.currentTimeMillis());
 	}
 	
+	private static final SimpleDateFormat timeFormat = new SimpleDateFormat("kk:mm:ss");
 	@NonNull protected String formatMsg(@Nullable String msg, final long time){
 		if (msg == null) msg = "null";
-		final DateFormat formatter = new SimpleDateFormat("kk:mm:ss");
-		final String times = formatter.format(new Date(time));
+		
+		final String times = timeFormat.format(new Date(time));
 		
 		final String format = TRConfigCache.LogFilter.logFormat;
 		if (format == null || format.isEmpty()){
@@ -321,10 +290,15 @@ public class FileLog {
 			return new StringBuilder("[").append(times).append("] ").append(msg).toString();
 		} else {
 			final String timestr[] = times.split(":");
-			return format.replaceAll("(?i)\\{HOUR\\}", Matcher.quoteReplacement(timestr[0]))
-						 .replaceAll("(?i)\\{MINUTE\\}", Matcher.quoteReplacement(timestr[1]))
-						 .replaceAll("(?i)\\{SECOND\\}", Matcher.quoteReplacement(timestr[2]))
-						 .replaceAll("(?i)\\{INFO\\}", Matcher.quoteReplacement(msg));
+			return format.replace("{HOUR}", timestr[0])
+						 .replace("{MINUTE}", timestr[1])
+						 .replace("{SECOND}", timestr[2])
+						 .replace("{INFO}", msg);
 		}
+	}
+
+	@Override
+	public int hashCode(){
+		return type.hashCode() + (consoleLog ? 1 : 0);
 	}
 }

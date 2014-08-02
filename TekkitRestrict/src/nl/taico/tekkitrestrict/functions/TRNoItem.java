@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
+import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.TRException;
 import nl.taico.tekkitrestrict.TRItemProcessor2;
 import nl.taico.tekkitrestrict.Log.Warning;
@@ -50,6 +51,7 @@ public class TRNoItem {
 	 * Loads the Disabled Items from the config.
 	 */
 	private static void allocateDisabledItems() {
+		Log.trace("Loading Banned Items...");
 		final List<String> di = SettingsStorage.bannedConfig.getStringList("BannedItems");
 		final LinkedList<TRItem> temp1 = new LinkedList<TRItem>();
 		
@@ -72,6 +74,7 @@ public class TRNoItem {
 		DisabledItems = temp1;
 	}
 	private static void allocateDisabledCreativeItems() {
+		Log.trace("Loading Limited Creative Banned Items...");
 		final List<String> di = SettingsStorage.limitedCreativeConfig.getStringList("LimitedCreative");
 		final LinkedList<TRItem> temp1 = new LinkedList<TRItem>();
 		
@@ -324,10 +327,10 @@ public class TRNoItem {
 		return DisabledItems;
 	}
 	
-	/** @return True if: id1 == id2 and (data1 = 0 or data1 == data2 or (data1 = -10 and data2 = 0)) */
+	/** @return True if: id1 == id2 and (data1 = -1 or data1 == data2 or (data1 = -10 and data2 = 0)) */
 	public static boolean equalSet(int id1, int data1, int id2, int data2) {
 		if (id1 != id2) return false;
-		if (data1 == -1 || data1 == data2 || (data1 == -10 && data2 == 0)) {
+		if (data1 == -1 || data1 == data2){// || (data1 == -10 && data2 == 0)) { TODO change -10
 			return true;
 		}
 		return false;

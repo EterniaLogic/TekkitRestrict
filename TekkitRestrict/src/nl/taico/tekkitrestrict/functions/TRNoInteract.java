@@ -45,14 +45,14 @@ public class TRNoInteract {
 			} else if (trample){
 				if (action == Action.PHYSICAL) return true;
 			} else {
-				Warning.other("An error occurred in TRNoClick: Unknown action " + action.toString(), true);
+				Warning.other("An error occurred in TRNoInteract: Unknown action " + action.toString(), true);
 			}
 		}
 
 		return false;
 	}
 
-	private static LinkedList<TRNoInteract> disableClickItemActions = new LinkedList<TRNoInteract>();
+	private static LinkedList<TRNoInteract> bannedInteractItemActions = new LinkedList<TRNoInteract>();
 	
 	public static void reload(){
 		final LinkedList<TRNoInteract> temp = new LinkedList<TRNoInteract>();
@@ -67,7 +67,7 @@ public class TRNoInteract {
 			final String tempe[] = disableClick.split(" ");
 			if (tempe[0].equalsIgnoreCase("block")){
 				if (tempe.length == 1){
-					Warning.config("You have an error in your DisableInteract config: \"block\" is not a valid itemstring", false);
+					Warning.config("You have an error in your Banned.yml at BannedInteracts: \"block\" is not a valid itemstring", false);
 					continue;
 				}
 				
@@ -75,18 +75,18 @@ public class TRNoInteract {
 				try {
 					iss = TRItemProcessor2.processString(tempe[1]);
 				} catch (TRException ex) {
-					Warning.config("You have an error in your DisableInteract.config.yml in DisableClick:", false);
+					Warning.config("You have an error in your Banned.yml in BannedInteracts:", false);
 					Warning.config(ex.getMessage(), false);
 					continue;
 				}
 				for (final TRItem item : iss) {
-					final TRNoInteract noclick = new TRNoInteract();
-					noclick.id = item.id;
-					noclick.data = item.data;
-					if (msg != null) noclick.msg = msg;
-					else noclick.msg = ChatColor.RED + "You may not interact with this block in your hand.";
-					noclick.useB = true;
-					temp.add(noclick);
+					final TRNoInteract noint = new TRNoInteract();
+					noint.id = item.id;
+					noint.data = item.data;
+					if (msg != null) noint.msg = msg;
+					else noint.msg = ChatColor.RED + "You may not interact with this block in your hand.";
+					noint.useB = true;
+					temp.add(noint);
 				}
 			} else {
 				//###########################################################################
@@ -95,47 +95,47 @@ public class TRNoInteract {
 				try {
 					iss = TRItemProcessor2.processString(tempe[0]);
 				} catch (TRException ex) {
-					Warning.config("You have an error in your DisableInteract.config.yml in DisableClick:", false);
+					Warning.config("You have an error in your Banned.yml in BannedInteracts:", false);
 					Warning.config(ex.getMessage(), false);
 					continue;
 				}
 				
 				for (final TRItem item : iss){
-					final TRNoInteract noclick = new TRNoInteract();
+					final TRNoInteract noint = new TRNoInteract();
 					
-					noclick.id = item.id;
-					noclick.data = item.data;
+					noint.id = item.id;
+					noint.data = item.data;
 					
 					if (tempe.length > 1){
 						for (int i = 1; i<tempe.length; i++){
 							final String current = tempe[i].toLowerCase();
 							switch (current){
 								case "left":
-									noclick.left = true;
+									noint.left = true;
 									break;
 								case "right":
-									noclick.right = true;
+									noint.right = true;
 									break;
 								case "both":
-									noclick.left = true;
-									noclick.right = true;
+									noint.left = true;
+									noint.right = true;
 									break;
 								case "all":
-									noclick.left = true;
-									noclick.right = true;
-									noclick.trample = true;
+									noint.left = true;
+									noint.right = true;
+									noint.trample = true;
 									break;
 								case "trample":
-									noclick.trample = true;
+									noint.trample = true;
 									break;
 								case "air":
-									noclick.air = true;
+									noint.air = true;
 									break;
 								case "block":
-									noclick.block = true;
+									noint.block = true;
 									break;
 								case "safezone":
-									noclick.safezone = true;
+									noint.safezone = true;
 									break;
 								default:
 									Log.Warning.config("You have an error in your DisableInteract config: Invalid clicktype \""+current+"\"", false);
@@ -144,53 +144,53 @@ public class TRNoInteract {
 							}
 						}
 					}
-					if (!noclick.trample && !noclick.air && !noclick.block){
-						noclick.air = true;
-						noclick.block = true;
+					if (!noint.trample && !noint.air && !noint.block){
+						noint.air = true;
+						noint.block = true;
 					}
 					
 					if (msg != null){
-						noclick.msg = msg;
+						noint.msg = msg;
 					} else {
 						final String a;
-						if (noclick.air){
-							if (noclick.block) a = "";
+						if (noint.air){
+							if (noint.block) a = "";
 							else a = " in the air";
 						} else {
 							a = " on blocks";
 						}
 						
-						final String s = noclick.safezone ? " inside a safezone." : ".";
+						final String s = noint.safezone ? " inside a safezone." : ".";
 						
-						if (noclick.left){
-							if (noclick.right) noclick.msg = ChatColor.RED + "Sorry, but clicking with this item"+a+" is not allowed" + s;
-							else noclick.msg = ChatColor.RED + "Sorry, but left-clicking with this item"+a+" is not allowed" + s;
-						} else if (noclick.right){
-							noclick.msg = ChatColor.RED + "Sorry, but right-clicking with this item"+a+" is not allowed" + s;
-						} else if (noclick.trample){
-							noclick.msg = ChatColor.RED + "Sorry, but trampling with this item in your hand is not allowed" + s;
+						if (noint.left){
+							if (noint.right) noint.msg = ChatColor.RED + "Sorry, but clicking with this item"+a+" is not allowed" + s;
+							else noint.msg = ChatColor.RED + "Sorry, but left-clicking with this item"+a+" is not allowed" + s;
+						} else if (noint.right){
+							noint.msg = ChatColor.RED + "Sorry, but right-clicking with this item"+a+" is not allowed" + s;
+						} else if (noint.trample){
+							noint.msg = ChatColor.RED + "Sorry, but trampling with this item in your hand is not allowed" + s;
 						}
 					}
 					
-					temp.add(noclick);
+					temp.add(noint);
 				}
 				//###########################################################################
 				
 			}
 		}
-		disableClickItemActions = temp;
+		bannedInteractItemActions = temp;
 	}
 
 	public static boolean errorLogged = false;
-	public static boolean isDisabled(@NonNull PlayerInteractEvent event) {
+	public static boolean isDisabled(PlayerInteractEvent event) {
 		final ItemStack item = event.getItem();
 		if (item == null) return false;
 		
 		final Player player = event.getPlayer();
-		if (player.hasPermission("tekkitrestrict.bypass.noclick")) return false;
+		if (player.hasPermission("tekkitrestrict.bypass.nointeract")) return false;
 		
 		final Action action = event.getAction();
-		if (Listeners.useNoCLickPerms && hasPerm(player, item, action)){
+		if (Listeners.useNoInteractPerms && hasPerm(player, item, action)){
 			final String lr, extra;
 			if (action == Action.LEFT_CLICK_AIR){
 				lr = "left-clicking";
@@ -210,13 +210,13 @@ public class TRNoInteract {
 			} else {
 				lr = "";
 				extra = "";
-				Warning.other("An error occurred in TRNoClick: Unknown action: " + action.toString(), true);
+				Warning.other("An error occurred in TRNoInteract: Unknown action: " + action.toString(), true);
 			}
 			player.sendMessage(ChatColor.RED + "Sorry, but "+lr+" with this item"+extra+" is not allowed.");
 			return true;
 		}
 		try {
-			for (final TRNoInteract cia : disableClickItemActions) {
+			for (final TRNoInteract cia : bannedInteractItemActions) {
 				if (cia.compare(player, event.getClickedBlock(), item, action)) {
 					if (!cia.msg.isEmpty()) {
 						TRItem.sendBannedMessage(player, cia.msg);
@@ -241,7 +241,7 @@ public class TRNoInteract {
 			}
 		} catch (Exception ex){
 			if (!errorLogged){
-				Warning.other("An error occurred in TRNoClick.isDisabled!", false);
+				Warning.other("An error occurred in TRNoInteract.isDisabled!", false);
 				Warning.other("This error will only be logged once.", false);
 				Log.Exception(ex, false);
 				errorLogged = true;
@@ -263,10 +263,10 @@ public class TRNoInteract {
 	}
 	
 	private static boolean hasPerm(@NonNull Player player, @NonNull ItemStack item, @NonNull Action action){
-		final String base2 = new StringBuilder(34).append("tekkitrestrict.noclick.").append(item.getTypeId()).append(".").append(item.getDurability()).toString();
+		final String base2 = new StringBuilder(38).append("tekkitrestrict.nointeract.").append(item.getTypeId()).append(".").append(item.getDurability()).toString();
 		if (player.hasPermission(base2)) return true;
 		
-		final StringBuilder p1 = new StringBuilder(42).append(base2);
+		final StringBuilder p1 = new StringBuilder(46).append(base2);
 		if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK){
 			p1.append(".left");
 		} else if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK){

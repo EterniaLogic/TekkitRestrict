@@ -5,9 +5,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.bukkit.configuration.ConfigurationSection;
 import org.eclipse.jdt.annotation.NonNull;
 
+import nl.taico.taeirlib.config.interfaces.ISection;
 import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.objects.TRItem;
 import nl.taico.tekkitrestrict.objects.itemprocessor.TRMod;
@@ -134,37 +134,41 @@ public class TRItemProcessor2 {
 	}
 	
 	public static void load(){
-		final ConfigurationSection cs = groupPermsConfig.getConfigurationSection("PermissionGroups");
-		if (cs != null) {
-			ArrayList<TRMod> temp = new ArrayList<TRMod>();
-			
-			final Set<String> keys = cs.getKeys(false);
-			final Iterator<String> it = keys.iterator();
-			while (it.hasNext()) {
-				try {
-					final String groupName = it.next();
-					final String value = cs.getString(groupName);
-
-					if (value == null || value.isEmpty()) continue;
-					
-					if (value.contains(" ")) {
-						Log.Warning.config("Invalid value in PermissionGroups: Invalid value \""+value+"\"!", false);
-						continue;
-					}
-					
-					List<TRItem> items = new ArrayList<TRItem>();
-					for (String item : value.split(";")) items.addAll(processString(item));
-					
-					temp.add(new TRMod(groupName, items));
-				} catch (Exception ex) {
-					Warning.other("Error in PermissionGroups: " + ex.toString(), false);
-					Log.Exception(ex, false);
-				}
-			}
-			groups = temp;
-		} else {
+		
+		final ISection cs = groupPermsConfig.getSection("PermissionGroups");
+		final Set<String> keys;
+		if (cs == null || (keys = cs.getKeys(false)).isEmpty()){
 			groups = new ArrayList<TRMod>(0);
+			return;
 		}
+		
+		Log.trace("Loading Permission Groups...");
+		ArrayList<TRMod> temp = new ArrayList<TRMod>();
+		
+		final Iterator<String> it = keys.iterator();
+		while (it.hasNext()) {
+			try {
+				final String groupName = it.next();
+				final String value = cs.getString(groupName);
+
+				if (value == null || value.isEmpty()) continue;
+				
+				if (value.contains(" ")) {
+					Log.Warning.config("Invalid value in PermissionGroups: Invalid value \""+value+"\"!", false);
+					continue;
+				}
+				
+				List<TRItem> items = new ArrayList<TRItem>();
+				for (String item : value.split(";")) items.addAll(processString(item));
+				
+				temp.add(new TRMod(groupName, items));
+			} catch (Exception ex) {
+				Warning.other("Error in PermissionGroups: " + ex.toString(), false);
+				Log.Exception(ex, false);
+			}
+		}
+		groups = temp;
+			
 	}
 	
 	public static List<TRItem> processModString(String mod){
@@ -224,7 +228,7 @@ public class TRItemProcessor2 {
 			else {
 				try {
 					data = Integer.parseInt(dataStr);
-					if (data == 0) data = -10;
+					//if (data == 0) data = -10; TODO convert -10
 				} catch (Exception ex){
 					throw new TRException("Invalid data value: \"" + dataStr + "\" in \"" + range + "\"!");//Throw exception
 				}
@@ -259,7 +263,7 @@ public class TRItemProcessor2 {
 		else {
 			try {
 				data = Integer.parseInt(dataStr);
-				if (data == 0) data = -10;
+				//if (data == 0) data = -10; TODO Convert -10
 			} catch (Exception ex){
 				throw new TRException("Invalid data value: \"" + dataStr + "\" in \"" + item + "\"!");//Throw exception
 			}
@@ -350,7 +354,7 @@ public class TRItemProcessor2 {
 				else {
 					try {
 						data2 = Integer.parseInt(dataString.replace("=", "-"));
-						if (data2 == 0) data2 = -10;
+						//if (data2 == 0) data2 = -10; TODO convert -10
 					} catch (NumberFormatException ex){
 						Warning.other("You have set an invalid limiter permission \""+perm+"\":", false);
 						Warning.other("Invalid data value: \"" + dataString.replace("=", "-") + "\"!", false);
@@ -363,7 +367,7 @@ public class TRItemProcessor2 {
 				data2 = -1;
 			}
 			
-			if (data2 != -1 && data2 != data && !(data2 == -10 && data == 0)) return false;
+			if (data2 != -1 && data2 != data) return false;// && !(data2 == -10 && data == 0)) return false; TODO change -10
 			
 			final String[] t = itemx.split("-");
 			final int fromId, toId;
@@ -388,14 +392,14 @@ public class TRItemProcessor2 {
 				if (t[1].equals("*")) data2 = -1;
 				else data2 = Integer.parseInt(t[1].replace('=', '-'));
 				
-				if (data2 == 0) data2 = -10;
+				//if (data2 == 0) data2 = -10; TODO convert -10
 			} catch (NumberFormatException ex){
 				Warning.other("You have set an invalid limiter permission \""+perm+"\":", false);
 				Warning.other("Invalid data value in \""+itemx+"\"!", false);
 				return false;
 			}
 			
-			if (data2 != -1 && data2 != data && !(data2 == -10 && data == 0)) return false;
+			if (data2 != -1 && data2 != data) return false;// && !(data2 == -10 && data == 0)) return false; TODO convert -10
 			
 			if (t[0].matches("\\d+")){//ID
 				try {

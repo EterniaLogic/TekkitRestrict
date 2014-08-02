@@ -22,6 +22,7 @@ import net.minecraft.server.RedPowerMachine;
 
 public class TRPatches {
 	public static boolean patchMiningLaser(){
+		Log.trace("TRPatches - Patching Mining Laser...");
 		try {
 			final ArrayList<Block> miningLaser = new ArrayList<Block>();
 			for (final Block block : EntityMiningLaser.unmineableBlocks) miningLaser.add(block);
@@ -36,6 +37,7 @@ public class TRPatches {
 	}
 	
 	public static boolean patchDeployer(){
+		Log.trace("TRPatches - Patching Deployer...");
 		try {			
 			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(6362));//REP
 			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(6359));//Wireless sniffer
@@ -55,6 +57,7 @@ public class TRPatches {
 	}
 	
 	public static boolean patchBlockBreaker(){
+		Log.trace("TRPatches - Patching Block Breaker...");
 		try {
 			//.add(dmg << 15 | id)
 			RedPowerMachine.breakerBlacklist.add(Integer.valueOf(-1 << 15 | 194));
@@ -66,6 +69,7 @@ public class TRPatches {
 	}
 	
 	public static boolean addNetherOresRecipes(){
+		Log.trace("TRPatches - Adding Nether Ore Macerator Recipes...");
 		try {
 			Ic2Recipes.addMaceratorRecipe(new ItemStack(135, 1, 2), new ItemStack(30254, 4, 0));
 			Ic2Recipes.addMaceratorRecipe(new ItemStack(135, 1, 3), new ItemStack(30255, 4, 0));
@@ -82,6 +86,8 @@ public class TRPatches {
 		final String path = "mods"+s+"ComputerCraft"+s+"lua"+s+"rom"+s;
 		final File patched = new File(path+"patched3"+s);
 		if (patched.exists()) return;
+		
+		Log.trace("TRPatches - Patching ComputerCraft...");
 		
 		BufferedReader input = null;
 		final File file = new File(path+"startup"+s);

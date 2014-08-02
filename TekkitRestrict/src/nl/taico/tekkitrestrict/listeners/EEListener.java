@@ -5,7 +5,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.eclipse.jdt.annotation.NonNull;
 
 import nl.taico.tekkitrestrict.NameProcessor;
 import nl.taico.tekkitrestrict.TRLogger;
@@ -23,40 +22,34 @@ public class EEListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onEEEvent(EEEvent e){
 		if (e instanceof EEAmuletEvent){
+			if (!Logger.LogAmulets) return;
 			EEAmuletEvent j = (EEAmuletEvent) e;
 			logUse("EEAmulet", j.getPlayer(), j.getAmulet().id);
 		} else if (e instanceof EERMToolEvent){
+			if (!Logger.LogRMTools) return;
 			EERMToolEvent j = (EERMToolEvent) e;
 			logUse("EERmTool", j.getPlayer(), j.getTool().id);
 		} else if (e instanceof EEDMToolEvent){
+			if (!Logger.LogDMTools) return;
 			EEDMToolEvent j = (EEDMToolEvent) e;
 			logUse("EEDmTool", j.getPlayer(), j.getTool().id);
 		} else if (e instanceof EEDestructionToolEvent){
+			if (!Logger.LogEEDestructive) return;
 			EEDestructionToolEvent j = (EEDestructionToolEvent) e;
 			logUse("EEDmTool", j.getPlayer(), j.getTool().id);
 		} else if (e instanceof EERingEvent){
+			if (!Logger.LogRings) return;
 			EERingEvent j = (EERingEvent) e;
 			logUse("EERing", j.getPlayer(), j.getRing().id);
 		} else {
+			if (!Logger.LogEEMisc) return;
 			//IMPORTANT TODO continue this
 		}
 	}
 	
 	private void logUse(String logname, Player player, int id){
-		if (!isLoggable(logname)) return;
 		Location loc = player.getLocation();
 		TRLogger.Log(logname, "[" + player.getName() + "][" + player.getWorld().getName() +
 				" - " + loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ() + "] used (" + id + ") `" + NameProcessor.getEEName(id) + "`");
-	}
-	
-	private boolean isLoggable(@NonNull String type) {
-		if (type.equals("EERing")) return Logger.LogRings;
-		if (type.equals("EEDmTool")) return Logger.LogDMTools;
-		if (type.equals("EERmTool")) return Logger.LogRMTools;
-		if (type.equals("EEAmulet")) return Logger.LogAmulets;
-		if (type.equals("EEMisc")) return Logger.LogEEMisc;
-		if (type.equals("EEDestructive")) return Logger.LogEEDestructive;
-
-		return false;
 	}
 }

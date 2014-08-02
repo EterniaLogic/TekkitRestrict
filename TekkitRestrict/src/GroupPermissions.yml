@@ -1,0 +1,33 @@
+###################################################################################################
+## Configuration file for TekkitRestrict                                                         ##
+## Authors: Taeir, DreadEnd (aka DreadSlicer)                                                    ##
+## BukkitDev: http://dev.bukkit.org/server-mods/tekkit-restrict/                                 ##
+## Please ask questions/report issues on the BukkitDev page.                                     ##
+###################################################################################################
+# 
+###################################################################################################
+################################# Group Permissions Configuration #################################
+###################################################################################################
+# PermissionGroups
+# For more information, see: 
+# http://dev.bukkit.org/bukkit-plugins/tekkit-restrict/pages/configuration/group-permisisons/
+# 
+# Here you can add permission groups!
+# 
+# You can reference items like:
+# "10" (Simple ID) 
+# "10:0" (ID with the only block that corresponds to data type "0") 
+# "10-20" (Range of IDs that can be any number in between 10 and 20)
+# 
+# The permissions will be:
+# tekkitrestrict.noitem.name or tekkitrestrict.creative.name
+# 
+# Example:
+#   groupname: "12;10:1;13;15-17"
+# 
+# If you now give the permission tekkitrestrict.noitem.groupname, the items
+# 12, 10:1, 13, 15, 16 and 17 will be banned items for that player.
+# If you give the permission tekkitrestrict.creative.groupname, those items will only be
+# banned if the player is in creative mode.
+PermissionGroups:
+    default: ''

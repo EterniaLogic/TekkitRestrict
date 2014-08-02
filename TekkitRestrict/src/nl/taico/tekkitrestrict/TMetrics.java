@@ -37,7 +37,7 @@ public class TMetrics {
 	private boolean showWarnings;
 
 	public boolean start(){
-		if (!tekkitrestrict.useTMetrics){
+		if (!TekkitRestrict.useTMetrics){
 			stop();
 			return false;
 		}
@@ -45,6 +45,8 @@ public class TMetrics {
 		if (taskId >= 0) {
             return true;
         }
+		
+		Log.trace("Starting TMetrics...");
 		plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable(){
 			public void run() {
 				taskId = plugin.getServer().getScheduler().scheduleAsyncRepeatingTask(plugin, new Runnable() {
@@ -67,6 +69,7 @@ public class TMetrics {
 	
 	public void stop(){
 		if (taskId > 0) {
+			Log.trace("Stopping TMetrics...");
             plugin.getServer().getScheduler().cancelTask(taskId);
             taskId = -1;
         }
@@ -84,7 +87,7 @@ public class TMetrics {
 		String shortparams = "";
 		if (uid == 0 || first){
 			int onlineMode = Bukkit.getServer().getOnlineMode() ? 1 : 0;
-			String pluginVersion = tekkitrestrict.version.fullVer;
+			String pluginVersion = TekkitRestrict.version.fullVer;
 			String serverVersion = Bukkit.getVersion();
 	
 			String osname = System.getProperty("os.name");
@@ -101,7 +104,7 @@ public class TMetrics {
 			
 			int arch = 0;
 			if (osarch.equals("x86_64")) arch = 1;
-			int eepatch = tekkitrestrict.hasEEPatch()?1:0;
+			int eepatch = PatchesAPI.hasFix(PatchesAPI.getEEPatchVer())?1:0;
 	
 			/*
 			params =  "id="+uid+"&"

@@ -11,11 +11,15 @@ import java.util.logging.Filter;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 
-import org.bukkit.configuration.ConfigurationSection;
+import lombok.ToString;
 
+import nl.taico.taeirlib.config.interfaces.ISection;
+import nl.taico.tekkitrestrict.Log;
+import nl.taico.tekkitrestrict.logging.TRFilter.Priority;
 import nl.taico.tekkitrestrict.objects.TREnums.TRFilterType;
 import nl.taico.tekkitrestrict.objects.TREnums.TRMatchMethod;
 
+@ToString
 public class TRLogFilterPlus {
 	public static Filter consoleFilter = new TRConsoleFilter();
 	public static Filter forgeFilter = new TRForgeFilter();
@@ -27,30 +31,65 @@ public class TRLogFilterPlus {
 	public static ArrayList<TRLogFilterPlus> allFilters = new ArrayList<TRLogFilterPlus>();
 	
 	public static void assignFilters(){
+		Log.debug("TRLogFilterPlus - Assigning filters");
 		for (final Handler h : Logger.getLogger("Minecraft").getHandlers()){
-			if (h instanceof ConsoleHandler)
-				h.setFilter(consoleFilter);
-			else if (h instanceof FileHandler)
-				h.setFilter(logFilter);
+			if (h instanceof ConsoleHandler){
+				if (h.getFilter() instanceof TRFilter){
+					((TRFilter) h.getFilter()).addFilter(consoleFilter, Priority.LOW);
+				} else {
+					TRFilter trf = new TRFilter(h.getFilter());
+					trf.addFilter(consoleFilter, Priority.LOW);
+					h.setFilter(trf);
+				}
+				Log.debug("TRLogFilterPlus - Added ConsoleFilter");
+			}
+			else if (h instanceof FileHandler) {
+				if (h.getFilter() instanceof TRFilter){
+					((TRFilter) h.getFilter()).addFilter(logFilter, Priority.LOW);
+				} else {
+					TRFilter trf = new TRFilter(h.getFilter());
+					trf.addFilter(logFilter, Priority.LOW);
+					h.setFilter(trf);
+				}
+				Log.debug("TRLogFilterPlus - Added FileFilter");
+			}
 		}
 
 		for (final Handler h : Logger.getLogger("ForgeModLoader").getHandlers()){
-			if (h instanceof FileHandler) h.setFilter(forgeFilter);
+			if (h instanceof FileHandler){
+				if (h.getFilter() instanceof TRFilter){
+					((TRFilter) h.getFilter()).addFilter(forgeFilter, Priority.LOW);
+				} else {
+					TRFilter trf = new TRFilter(h.getFilter());
+					trf.addFilter(forgeFilter, Priority.LOW);
+					h.setFilter(trf);
+				}
+				Log.debug("TRLogFilterPlus - Added FileFilter for forge");
+			}
 		}
 	}
 	
 	public static void disable(){
+		Log.debug("TRLogFilterPlus - Disabling filters");
 		for (final Handler h : Logger.getLogger("Minecraft").getHandlers()){
-			if (h.getFilter() == consoleFilter || h.getFilter() == logFilter) h.setFilter(null);
+			Filter f = h.getFilter();
+			if (f instanceof TRFilter){
+				((TRFilter) f).removeAndConvert(h, consoleFilter, logFilter);
+			} else if (f == consoleFilter || f == logFilter) h.setFilter(null);
 		}
 
 		for (final Handler h : Logger.getLogger("ForgeModLoader").getHandlers()){
-			if (h.getFilter() == forgeFilter) h.setFilter(null);
+			Filter f = h.getFilter();
+			if (f instanceof TRFilter){
+				((TRFilter) f).removeAndConvert(h, forgeFilter);
+			} else if (f == forgeFilter) h.setFilter(null);
 		}
 	}
 	
-	public static void loadFilters(ConfigurationSection cs){
+	public static void loadFilters(ISection cs){
 		allFilters.clear();
+		Log.debug("TRLogFilterPlus - Loading filters from config");
+		Log.debug("TRLogFilterPlus - Config Filters: ", cs.getKeys(false));
 		for (String key : cs.getKeys(false)){
 			TRMatchMethod method = null;
 			final String cmethod = cs.getString(key+".Method", "contains").replace("_", "").toUpperCase();
@@ -82,12 +121,9 @@ public class TRLogFilterPlus {
 	public TRLogFilterPlus(TRMatchMethod method, TRFilterType type, Collection<String> filters){
 		this.method = method;
 		this.type = type;
-		for (String filter : filters) addFilter(filter);
+		for (String filter : filters) filters.add(method.isCS() ? filter : filter.toLowerCase(Locale.ENGLISH));
 		allFilters.add(this);
-	}
-	
-	public void addFilter(String filter){
-		filters.add(method.isCS() ? filter : filter.toLowerCase(Locale.ENGLISH));
+		Log.debug("TRLogFilterPlus - Added Filter: ", this);
 	}
 	
 	public boolean matches(String input){

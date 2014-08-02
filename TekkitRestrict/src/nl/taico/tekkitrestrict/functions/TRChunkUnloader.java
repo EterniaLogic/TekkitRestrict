@@ -122,7 +122,7 @@ public class TRChunkUnloader {
 					//mcWorld.chunkProviderServer.chunks.remove(x, z);
 					//mcWorld.chunkProviderServer.chunkList.remove(mcChunk);
 				} catch (Exception ex){
-					Log.Debug("Unable to unload chunk at ["+x+","+z+"] in world " + chunk.getWorld().getName());
+					Log.debug("Unable to unload chunk at ["+x+","+z+"] in world " + chunk.getWorld().getName());
 					amount++;
 				}
 			}
@@ -187,7 +187,7 @@ public class TRChunkUnloader {
 					//mcWorld.chunkProviderServer.chunks.remove(x, z);
 					//mcWorld.chunkProviderServer.chunkList.remove(mcChunk);
 				} catch (Exception ex){
-					Log.Debug("Unable to unload chunk at ["+x+","+z+"] in world " + chunk.getWorld().getName());
+					Log.debug("Unable to unload chunk at ["+x+","+z+"] in world " + chunk.getWorld().getName());
 					amount++;
 				}
 			}
@@ -251,7 +251,7 @@ public class TRChunkUnloader {
 					//mcWorld.chunkProviderServer.chunks.remove(x, z);
 					//mcWorld.chunkProviderServer.chunkList.remove(mcChunk);
 				} catch (Exception ex){
-					Log.Debug("Unable to unload chunk at ["+x+","+z+"] in world " + chunk.getWorld().getName());
+					Log.debug("Unable to unload chunk at ["+x+","+z+"] in world " + chunk.getWorld().getName());
 					amount++;
 				}
 			}

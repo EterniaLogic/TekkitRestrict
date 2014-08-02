@@ -11,7 +11,6 @@ import nl.taico.tekkitrestrict.objects.TREnums.SSMode;
 import static nl.taico.tekkitrestrict.config.SettingsStorage.*;
 
 public class TRConfigCache {
-	@SuppressWarnings("rawtypes")
 	public static void loadConfigCache(){
 		Hacks.fly = new TRHackSettings();
 		Hacks.fly.enable = hackDupeConfig.getBoolean("Anti-Hacks.Fly.Enabled", true);
@@ -39,6 +38,7 @@ public class TRConfigCache {
 		Hacks.speed.broadcast = hackDupeConfig.getBoolean("Anti-Hacks.MoveSpeed.Broadcast", true);
 		Hacks.speed.tolerance = hackDupeConfig.getInt("Anti-Hacks.MoveSpeed.Tolerance", 30);
 		Hacks.speed.value = hackDupeConfig.getDouble("Anti-Hacks.MoveSpeed.MaxMoveSpeed", 2.5d);
+		Hacks.speed.value *= Hacks.speed.value; //This gets rid of a Math.sqrt and thus saves cpu
 		Hacks.speed.useCommand = hackDupeConfig.getBoolean("Anti-Hacks.MoveSpeed.ExecuteCommand.Enabled", false);
 		Hacks.speed.command = hackDupeConfig.getString("Anti-Hacks.MoveSpeed.ExecuteCommand.Command", "");
 		Hacks.speed.triggerAfter = hackDupeConfig.getInt("Anti-Hacks.MoveSpeed.ExecuteCommand.TriggerAfter", 1);
@@ -114,12 +114,14 @@ public class TRConfigCache {
 		Global.debug = loggingConfig.getBoolean("LogDebug", false);
 		Global.favorPerformanceOverMemory = performanceConfig.getBoolean("FavorPerformanceOverMemory", false);
 		Global.kickFromConsole = generalConfig.getBoolean("KickFromConsole", false);
+		Global.fixTileEntityErrors = generalConfig.getBoolean("TryFixTileEntityErrors", true);
 		
 		Listeners.UseBlockLimit = limiterConfig.getBoolean("UseLimiter", true);
 		Listeners.BlockCreativeContainer = limitedCreativeConfig.getBoolean("LimitedCreativeNoContainer", true);
 		Listeners.UseNoItem = bannedConfig.getBoolean("UseItemBanner", true);
 		Listeners.UseLimitedCreative = limitedCreativeConfig.getBoolean("UseLimitedCreative", true);
-		Listeners.useNoCLickPerms = bannedConfig.getBoolean("UseNoClickPermissions", false);
+		Listeners.useNoInteractPerms = bannedConfig.getBoolean("UseNoInteractPermissions", false);
+		Listeners.UseWrenchFixer = generalConfig.getBoolean("UseWrenchFix", true);
 		
 		LogFilter.logLocation = loggingConfig.getString("SplitLogsLocation", "log");
 		LogFilter.fileFormat = loggingConfig.getString("FilenameFormat", "{TYPE}-{DAY}-{MONTH}-{YEAR}.log");
@@ -144,18 +146,18 @@ public class TRConfigCache {
 		Threads.GAOffensive = modModificationsConfig.getBoolean("GemArmor.AllowOffensive", false);
 		
 		Threads.SSDisableEntities = safeZoneConfig.getBoolean("InSafeZones DisableEntities", false);
-		Threads.SSDisableEntitiesRange = safeZoneConfig.getInt("InSafeZones DisableEntitiesRange", 3);
 		Threads.SSDechargeEE = safeZoneConfig.getBoolean("InSafeZones DechargeEE", true);
 		Threads.SSDisableArcane = safeZoneConfig.getBoolean("InSafeZones DisableRingOfArcana", true);
 		List<String> exempt = safeZoneConfig.getStringList("InSafeZones ExemptEntityTypes");
-		Threads.SSClassBypasses = new ArrayList<Class>();
+		Threads.SSClassBypasses = new ArrayList<Class<?>>();
 		for (String s : exempt){
+			if (s.isEmpty()) continue;
 			try {
-				Class cl = Class.forName("org.bukkit.entity."+s);
+				Class<?> cl = Class.forName("org.bukkit.entity."+s);
 				Threads.SSClassBypasses.add(cl);
 			} catch (Exception ex){
 				try {
-					Class cl = Class.forName("org.bukkit.entity."+Character.toUpperCase(s.charAt(0)) + s.substring(1));
+					Class<?> cl = Class.forName("org.bukkit.entity."+Character.toUpperCase(s.charAt(0)) + s.substring(1));
 					Threads.SSClassBypasses.add(cl);
 				} catch (Exception ex2){
 					Warning.config("Invalid value in ExemptEntityTypes in SafeZones.config: cannot find class org.bukkit.entity."+ s + "!", false);
@@ -197,6 +199,7 @@ public class TRConfigCache {
 	public static class Global {
 		public static boolean kickFromConsole, debug;
 		public static boolean favorPerformanceOverMemory;
+		public static boolean fixTileEntityErrors;
 	}
 	
 	public static class Logger {
@@ -225,7 +228,8 @@ public class TRConfigCache {
 	
 	public static class Listeners {
 		public static boolean UseBlockLimit, BlockCreativeContainer;
-		public static boolean UseNoItem, UseLimitedCreative, useNoCLickPerms;
+		public static boolean UseNoItem, UseLimitedCreative, useNoInteractPerms;
+		public static boolean UseWrenchFixer;
 	}
 	
 	public static class LogFilter {
@@ -245,9 +249,7 @@ public class TRConfigCache {
 		public static int ChangeDisabledItemsIntoId;
 		//public static int RPTickTime;
 		
-		@SuppressWarnings("rawtypes")
-		public static ArrayList<Class> SSClassBypasses = new ArrayList<Class>();
-		public static int SSDisableEntitiesRange;
+		public static ArrayList<Class<?>> SSClassBypasses = new ArrayList<Class<?>>();
 	}
 	
 	public static class LWC {

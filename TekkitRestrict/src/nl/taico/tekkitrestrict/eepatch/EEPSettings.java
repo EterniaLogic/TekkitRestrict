@@ -4,11 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
-
+import nl.taico.taeirlib.config.interfaces.ISection;
 import nl.taico.tekkitrestrict.Log;
-import nl.taico.tekkitrestrict.config.EEPatchConfig;
+import nl.taico.tekkitrestrict.config.SettingsStorage;
 
 import ee.events.EEEnums.EEAction2;
 import ee.events.EEEnums.EEAmuletAction;
@@ -19,10 +17,10 @@ import ee.events.EEEnums.EETransmuteAction;
 import ee.events.EEEnums.EEWatchAction;
 
 public class EEPSettings {
-	public static HashMap<Integer, Integer> MaxCharge = new HashMap<Integer, Integer>();
+	public static HashMap<Integer, Integer> MaxCharge = new HashMap<>();
 	
-	public static HashMap<String, ArrayList<Integer>> Groups = new HashMap<String, ArrayList<Integer>>();
-	public static HashMap<String, Integer> EENames = new HashMap<String, Integer>();
+	public static HashMap<String, ArrayList<Integer>> Groups = new HashMap<>();
+	public static HashMap<String, Integer> EENames = new HashMap<>();
 	static {
 		EENames.put("dmpickaxe", 27543);
 		EENames.put("dmspade", 27544);
@@ -140,7 +138,7 @@ public class EEPSettings {
 		EENames.put("kleinstar6", 27591);
 		EENames.put("alchemybag", 27562);
 		
-		ArrayList<Integer> dmtools = new ArrayList<Integer>();
+		ArrayList<Integer> dmtools = new ArrayList<Integer>(8);
 		dmtools.add(27543);
 		dmtools.add(27544);
 		dmtools.add(27545);
@@ -150,7 +148,7 @@ public class EEPSettings {
 		dmtools.add(27555);
 		Groups.put("dmtools", dmtools);
 		
-		ArrayList<Integer> rmtools = new ArrayList<Integer>();
+		ArrayList<Integer> rmtools = new ArrayList<Integer>(8);
 		rmtools.add(27564);
 		rmtools.add(27565);
 		rmtools.add(27566);
@@ -160,12 +158,12 @@ public class EEPSettings {
 		rmtools.add(27570);
 		Groups.put("rmtools", rmtools);
 		
-		ArrayList<Integer> amulets = new ArrayList<Integer>();
+		ArrayList<Integer> amulets = new ArrayList<Integer>(2);
 		amulets.add(27530);
 		amulets.add(27531);
 		Groups.put("amulets", amulets);
 		
-		ArrayList<Integer> rings = new ArrayList<Integer>();
+		ArrayList<Integer> rings = new ArrayList<Integer>(2);
 		rings.add(27574);
 		rings.add(27533);
 		Groups.put("rings", rings);
@@ -176,9 +174,10 @@ public class EEPSettings {
 	}
 	
 	public static void loadMaxCharge(){
+		Log.trace("EEPatch - Loading MaxCharges...");
 		MaxCharge.clear();
 		
-		List<String> mc = EEPatchConfig.getConfig().getStringList("EEMaxCharge");
+		List<String> mc = SettingsStorage.eepatchConfig.getStringList("EEMaxCharge");
 		for (String current : mc){
 			if (current == null) continue;
 			if (!current.contains(" ")){
@@ -215,15 +214,14 @@ public class EEPSettings {
 	}
 	
 	public static void loadAllDisabledActions(){
-		final FileConfiguration config = EEPatchConfig.getConfig();
-		loadDisabledRingActions(config.getConfigurationSection("Actions.Rings"));
-		loadDisabledDestActions(config.getConfigurationSection("Actions.Tools.Destruction"));
-		loadDisabledAmuletActions(config.getConfigurationSection("Actions.Amulets"));
-		loadDMToolActions(config.getConfigurationSection("Actions.Tools.DarkMatter"));
-		loadRMToolActions(config.getConfigurationSection("Actions.Tools.RedMatter"));
-		loadRedToolActions(config.getConfigurationSection("Actions.Tools"));
-		loadArmorActions(config.getConfigurationSection("Actions.Armor"));
-		loadOtherActions(config.getConfigurationSection("Actions.Other"));
+		loadDisabledRingActions(SettingsStorage.eepatchConfig.getSection("Actions.Rings"));
+		loadDisabledDestActions(SettingsStorage.eepatchConfig.getSection("Actions.Tools.Destruction"));
+		loadDisabledAmuletActions(SettingsStorage.eepatchConfig.getSection("Actions.Amulets"));
+		loadDMToolActions(SettingsStorage.eepatchConfig.getSection("Actions.Tools.DarkMatter"));
+		loadRMToolActions(SettingsStorage.eepatchConfig.getSection("Actions.Tools.RedMatter"));
+		loadRedToolActions(SettingsStorage.eepatchConfig.getSection("Actions.Tools"));
+		loadArmorActions(SettingsStorage.eepatchConfig.getSection("Actions.Armor"));
+		loadOtherActions(SettingsStorage.eepatchConfig.getSection("Actions.Other"));
 	}
 	
 	public static ArrayList<EERingAction> zeroring = new ArrayList<EERingAction>();
@@ -235,7 +233,8 @@ public class EEPSettings {
 	public static ArrayList<EERingAction> blackholeband = new ArrayList<EERingAction>();
 	public static ArrayList<EERingAction> voidring = new ArrayList<EERingAction>();
 	public static ArrayList<EERingAction> archangelring = new ArrayList<EERingAction>();
-	public static void loadDisabledRingActions(ConfigurationSection config){
+	public static void loadDisabledRingActions(ISection config){
+		Log.trace("EEPatch - Loading Disabled Ring Actions...");
 		zeroring.clear();
 		firering.clear();
 		harvestring.clear();
@@ -325,7 +324,8 @@ public class EEPSettings {
 	public static ArrayList<EEAction2> dest1 = new ArrayList<EEAction2>();
 	public static ArrayList<EEAction2> dest2 = new ArrayList<EEAction2>();
 	public static ArrayList<EEAction2> dest3 = new ArrayList<EEAction2>();
-	public static void loadDisabledDestActions(ConfigurationSection config){
+	public static void loadDisabledDestActions(ISection config){
+		Log.trace("EEPatch - Loading Disabled Destruction Actions...");
 		dest1.clear();
 		dest2.clear();
 		dest3.clear();
@@ -341,7 +341,8 @@ public class EEPSettings {
 	public static ArrayList<EEAmuletAction> evertide = new ArrayList<EEAmuletAction>();
 	public static ArrayList<EEAmuletAction> volcanite = new ArrayList<EEAmuletAction>();
 	
-	public static void loadDisabledAmuletActions(ConfigurationSection config){
+	public static void loadDisabledAmuletActions(ISection config){
+		Log.trace("EEPatch - Loading Disabled Amulet Actions...");
 		evertide.clear();
 		volcanite.clear();
 		
@@ -370,7 +371,8 @@ public class EEPSettings {
 	public static ArrayList<EEAction2> dmhammer = new ArrayList<EEAction2>();
 	public static ArrayList<EEAction2> dmsword = new ArrayList<EEAction2>();
 
-	public static void loadDMToolActions(ConfigurationSection config){
+	public static void loadDMToolActions(ISection config){
+		Log.trace("EEPatch - Loading Disabled DM Tool Actions...");
 		dmaxe.clear();
 		dmpick.clear();
 		dmshovel.clear();
@@ -425,7 +427,8 @@ public class EEPSettings {
 	public static ArrayList<EEAction2> rmhammer = new ArrayList<EEAction2>();
 	public static ArrayList<EEAction2> rmsword = new ArrayList<EEAction2>();
 
-	public static void loadRMToolActions(ConfigurationSection config){
+	public static void loadRMToolActions(ISection config){
+		Log.trace("EEPatch - Loading Disabled RM Tool Actions...");
 		rmaxe.clear();
 		rmpick.clear();
 		rmshovel.clear();
@@ -475,7 +478,8 @@ public class EEPSettings {
 	public static ArrayList<EEAction2> katar = new ArrayList<EEAction2>();
 	public static ArrayList<EEAction2> morningstar = new ArrayList<EEAction2>();
 	
-	public static void loadRedToolActions(ConfigurationSection config){
+	public static void loadRedToolActions(ISection config){
+		Log.trace("EEPatch - Loading Disabled Red Tool (Katar and Morning Star) Actions...");
 		katar.clear();
 		morningstar.clear();
 		
@@ -501,7 +505,8 @@ public class EEPSettings {
 	}
 	
 	public static ArrayList<EEArmorAction> armor = new ArrayList<EEArmorAction>();
-	public static void loadArmorActions(ConfigurationSection config){
+	public static void loadArmorActions(ISection config){
+		Log.trace("EEPatch - Loading Disabled Gem Armor Actions...");
 		armor.clear();
 		
 		if (!config.getBoolean("Offensive.Activate", true))
@@ -519,7 +524,8 @@ public class EEPSettings {
 	public static ArrayList<EETransmuteAction> trans = new ArrayList<EETransmuteAction>();
 	public static ArrayList<EEPedestalAction> pedestal = new ArrayList<EEPedestalAction>();
 	public static ArrayList<EEWatchAction> watch = new ArrayList<EEWatchAction>();
-	public static void loadOtherActions(ConfigurationSection config){
+	public static void loadOtherActions(ISection config){
+		Log.trace("EEPatch - Loading Disabled Other Actions (PhilosopherStone, Transmution Tablet, Pedestal, WatchOfFlowingTime)...");
 		phil.clear();
 		trans.clear();
 		pedestal.clear();

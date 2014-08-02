@@ -1,0 +1,99 @@
+###################################################################################################
+## Configuration file for TekkitRestrict                                                         ##
+## Authors: Taeir, DreadEnd (aka DreadSlicer)                                                    ##
+## BukkitDev: http://dev.bukkit.org/server-mods/tekkit-restrict/                                 ##
+## Please ask questions/report issues on the BukkitDev page.                                     ##
+###################################################################################################
+# 
+####################################################################################################
+##################################### Mod Modifications Config #####################################
+####################################################################################################
+# GemArmor settings. NOTE: the GemArmor settings are obsolete to the ones in EEPatch.yml
+# AllowOffensive: Should offensive powers of gemarmor be allowed? (explosion, lightning)
+# Default: false
+# AllowDefensive: Should the defensive powers of gemarmor be allowed? (flying, automatic running)
+# Default: true
+GemArmor:
+    AllowOffensive: false
+    AllowDefensive: true
+# 
+# Set the minimal time of Redpower timers to the value here.
+# Default: true, 1.0
+RPTimer:
+    SetMinimalTime: true
+    MinTime: 1.0
+# 
+####################################################################################################
+############################################## Set EMC #############################################
+####################################################################################################
+# 
+# Set or change EMC Values for ANY item, block or tool, even the ones that usually dont have EMC
+# values.
+# 
+# Example: HARD Mode -> DarkMatter, DM Blocks, RedMatter, RMBlocks EMC*2.
+# - "27541 300000"
+# - "126:8 800000"
+# - "27563 900000"
+# - "126:9 1300000"
+# 
+# DEFAULT: EMC farm removal [Milk, Blaze Rod, Bonemeal]
+SetEMC:
+- 335 768
+- 377 308
+- 351:15 29
+# 
+##########################################################################################
+####################################### Item Max EU ######################################
+##########################################################################################
+# 
+# Set the Max EU storable in an IC2 Item (Check out IC2 Wiki for MaxEU details)
+# 
+# Some default EU values:
+# - "30148 40000" #Nano saber
+# - "30234 10000" #Diamond Drill
+# - "30177 100000" #ANY piece Nano Armor
+# - "30173 1000000" #ANY piece Quantum Armor
+# 
+# Examples:
+# Charge Quantum armor set 2x slower
+# - "30171-30174 1000000 500"
+# Charge Quantum armor set 4x slower
+# - "30171-30174 1000000 250"
+MaxEU: []
+# 
+##########################################################################################
+################################### Max EE Tool Charge ###################################
+##########################################################################################
+# MaxCharge limits the maximum EE charge of an item. (0-100%)
+# - "27573 30" (This will set the max charge of a morning star to 30%)
+# - "27564-27573 50" (This will Gimp ALL Red Matter Tools down to only 50% charge capacity)
+MaxCharge: []
+# 
+# This will automatically decharge set EE items when a player enters a safezone.
+# NOTE: Requires DechargeEE in SafeZones.config to be true
+DechargeInSS:
+- 27526
+- 27527
+- 27530
+- 27531
+- 27533
+- 27534
+- 27535
+- 27583
+- 27593
+- 27543
+- 27544
+- 27545
+- 27546
+- 27547
+- 27548
+- 27564
+- 27565
+- 27566
+- 27567
+- 27568
+- 27569
+- 27570
+- 27572
+- 27573
+- 27574

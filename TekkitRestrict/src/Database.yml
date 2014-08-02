@@ -1,0 +1,38 @@
+###################################################################################################
+## Configuration file for TekkitRestrict                                                         ##
+## Authors: Taeir, DreadEnd (aka DreadSlicer)                                                    ##
+## BukkitDev: http://dev.bukkit.org/server-mods/tekkit-restrict/                                 ##
+## Please ask questions/report issues on the BukkitDev page.                                     ##
+###################################################################################################
+# 
+###################################################################################################
+###################################### Database Configuration #####################################
+###################################################################################################
+# Set the type of database tekkitrestrict should use.
+# Possible: SQLite, MySQL
+# Default: SQLite
+DatabaseType: SQLite
+# 
+# MySQL connection settings
+MySQL:
+    Hostname: localhost
+    Port: 3306
+    Username: root
+    Password: minecraft
+    Database: minecraft
+# 
+###################################################################################################
+######################################## Transfer settings ########################################
+###################################################################################################
+# Here you can set if you want to transfer a database from SQLite to MySQL or vice versa. Only one
+# of these options can be true.
+# 
+# Transfer from SQLite to MySQL
+# If you set this to true, the data currently in the Data.db file will be written to the MySQL
+# database as set above.
+TransferDBFromSQLiteToMySQL: false
+# 
+# Transfer from MySQL to SQLite
+# If you set this to true, the data currently in the MySQL database as set above will be written
+# into a SQLite database file named Data.db.
+TransferDBFromMySQLToSQLite: false

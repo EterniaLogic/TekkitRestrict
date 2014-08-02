@@ -42,15 +42,17 @@ public class TRListener implements Listener {
 	}
 	
 	public static boolean errorBlockPlace = false;
+	
+	//for covers, the event is called twice.
+	//first one is 136:itemdata
+	//second one is 136:0
+	
 	@EventHandler(priority=EventPriority.HIGH, ignoreCancelled = true)
 	public void onBlockPlace(BlockPlaceEvent event) {
-		//for covers, the event is called twice.
-		//first one is 136:itemdata
-		//second one is 136:0
 		final Block block = event.getBlock();
 		final int id = block.getTypeId();
 		if (exempt(id)) return;
-
+		
 		final Player player;
 		if ((player = event.getPlayer()) == null) return;
 		
@@ -61,70 +63,25 @@ public class TRListener implements Listener {
 			
 			final int data = block.getData();
 			
-			if (!pname.equals("[BuildCraft]") && !pname.equals("[RedPower]")){
-				if (Listeners.UseBlockLimit && !player.hasPermission("tekkitrestrict.bypass.limiter")) {
+			if (Listeners.UseBlockLimit && !pname.equals("[BuildCraft]") && !pname.equals("[RedPower]")){
+				if (!player.hasPermission("tekkitrestrict.bypass.limiter")) {
 					final TRLimiter il = TRLimiter.getOnlineLimiter(player);
 					String limited = il.checkLimit(event, false);
 					if (limited != null) {
 						if (limited.isEmpty()) limited = ChatColor.RED + "[TRItemLimiter] You cannot place down any more of that block!";
 						TRItem.sendBannedMessage(player, limited);
 						event.setCancelled(true);
-						
-						/*
-						if (id == 136){
-							final WorldServer ws = ((CraftWorld) block.getWorld()).getHandle();
-							final TileEntity te1 = ws.getTileEntity(block.getX(), block.getY(), block.getZ());
-							if (te1 instanceof TileCovered) {
-								final TileCovered tc = (TileCovered) te1;
-								for (int i = 0; i < 6; i++) {
-									int cover;
-									if ((cover = tc.getCover(i)) != -1 && cover == data) {
-										tc.tryRemoveCover(i);
-									}
-								}
-								tc.updateBlockChange();
-							}
-						}
-						*/
 					}
 				}
-				
-				/*
-				if (id == 136 && data == 0){
-					final WorldServer ws = ((CraftWorld) block.getWorld()).getHandle();
-					final TileEntity te1 = ws.getTileEntity(block.getX(), block.getY(), block.getZ());
-					if (te1 != null && te1 instanceof TileCovered) {
-						data = lastdata;
-					}
-				}
-				*/
 			}
 			
 			String msg = TRNoItem.isItemBanned(player, id, data, true);
 			
 			if (msg != null) {
-				// tekkitrestrict.log.info(cc.id+":"+cc.getData());
 				if (msg.isEmpty()) msg = ChatColor.RED + "[TRItemDisabler] You are not allowed to place down this type of block!";
 				TRItem.sendBannedMessage(player, msg);
 				event.setCancelled(true);
-				
-				/*
-				if (id == 136){
-					final WorldServer ws = ((CraftWorld) block.getWorld()).getHandle();
-					final TileEntity te1 = ws.getTileEntity(block.getX(), block.getY(), block.getZ());
-					if (te1 instanceof TileCovered) {
-						final TileCovered tc = (TileCovered) te1;
-						for (int i = 0; i < 6; i++) {
-							if (tc.getCover(i) != -1 && tc.getCover(i) == data) {
-								tc.tryRemoveCover(i);
-							}
-						}
-						tc.updateBlockChange();
-					}
-				}
-				*/
 			}
-			//lastdata = block.getData();
 		} catch(Exception ex){
 			if (!errorBlockPlace){
 				Warning.other("An error occurred in the BlockPlace Listener! Please inform the author (This error will only be logged once).", false);

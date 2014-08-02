@@ -13,7 +13,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import nl.taico.tekkitrestrict.TRConfigCache;
 import nl.taico.tekkitrestrict.TRException;
 import nl.taico.tekkitrestrict.TRItemProcessor2;
-import nl.taico.tekkitrestrict.tekkitrestrict;
+import nl.taico.tekkitrestrict.TekkitRestrict;
 import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.config.SettingsStorage;
 import nl.taico.tekkitrestrict.objects.TRItem;
@@ -45,7 +45,7 @@ public class TRLWCProtect {
 	private static void init(){
 		if (init) return;
 		
-		if (tekkitrestrict.getInstance().getServer().getPluginManager().getPlugin("LWC") != null){
+		if (TekkitRestrict.getInstance().getServer().getPluginManager().getPlugin("LWC") != null){
 			TRConfigCache.LWC.lwc = true;
 		} else {
 			TRConfigCache.LWC.lwc = false;

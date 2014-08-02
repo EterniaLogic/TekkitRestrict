@@ -19,8 +19,9 @@ import org.bukkit.plugin.PluginManager;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
+import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.TRDB;
-import nl.taico.tekkitrestrict.tekkitrestrict;
+import nl.taico.tekkitrestrict.TekkitRestrict;
 import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.TRConfigCache.SafeZones;
 import nl.taico.tekkitrestrict.api.SafeZones.SafeZoneCreate;
@@ -85,13 +86,14 @@ public class TRSafeZone {
 	}
 	
 	public static void init(Plugin wg, Plugin gp, Plugin ps) {
+		Log.trace("SafeZones - Initializing...");
 		if (SafeZones.UseWG) worldGuard = wg;
 		if (SafeZones.UseGP) griefPrevention = gp;
 		if (SafeZones.UsePS) preciousStones = ps;
 		
 		ResultSet rs = null;
 		try {
-			rs = tekkitrestrict.db.query("SELECT * FROM `tr_saferegion`;");
+			rs = TekkitRestrict.db.query("SELECT * FROM `tr_saferegion`;");
 			if (rs == null){
 				Warning.other("Unable to get SafeZones from database!", true);
 				return;
@@ -154,6 +156,7 @@ public class TRSafeZone {
 					sz.pluginRegion = null;
 				}
 				zones.add(sz);
+				Log.trace("SafeZones - Loaded Safezone: "+sz.name);
 			}
 			rs.close();
 		} catch (SQLException e) {
@@ -290,7 +293,7 @@ public class TRSafeZone {
 			if (!z.loadedFromSql) {
 				// insert the new rows!
 				try {
-					tekkitrestrict.db.query("INSERT OR REPLACE INTO `tr_saferegion` (`id`,`name`,`mode`,`data`,`world`) VALUES ('"
+					TekkitRestrict.db.query("INSERT OR REPLACE INTO `tr_saferegion` (`id`,`name`,`mode`,`data`,`world`) VALUES ('"
 									+ z.getID() +"','"
 									+ TRDB.antisqlinject(z.name)
 									+ "'," + z.mode + ",'" + z.getData() + "','"
@@ -308,7 +311,7 @@ public class TRSafeZone {
 	
 	private static void delete(@NonNull TRSafeZone zone){
 		try {
-			tekkitrestrict.db.query("DELETE FROM `tr_saferegion` WHERE name='" + zone.name +"');");
+			TekkitRestrict.db.query("DELETE FROM `tr_saferegion` WHERE name='" + zone.name +"');");
 		} catch (Exception ex) {
 		}
 	}

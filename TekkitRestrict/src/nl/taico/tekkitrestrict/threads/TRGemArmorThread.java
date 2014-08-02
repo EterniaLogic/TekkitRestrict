@@ -8,25 +8,25 @@ import org.bukkit.entity.Player;
 import net.minecraft.server.EntityHuman;
 
 import nl.taico.tekkitrestrict.Log;
-import nl.taico.tekkitrestrict.tekkitrestrict;
+import nl.taico.tekkitrestrict.TekkitRestrict;
 import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.TRConfigCache.Threads;
-import nl.taico.tekkitrestrict.config.EEPatchConfig;
+import nl.taico.tekkitrestrict.config.SettingsStorage;
 
 import ee.EEBase;
 
 public class TRGemArmorThread extends Thread {
 	@Override
 	public void run() {
-		if (!EEPatchConfig.getConfig().getBoolean("Actions.Armor.Movement.Activate", true) && !Threads.GAMovement)
+		if (!SettingsStorage.eepatchConfig.getBoolean("Actions.Armor.Movement.Activate", true) && !Threads.GAMovement)
 			Threads.GAMovement = true;
-		if (!EEPatchConfig.getConfig().getBoolean("Actions.Armor.Offensive.Activate", true) && !Threads.GAOffensive)
+		if (!SettingsStorage.eepatchConfig.getBoolean("Actions.Armor.Offensive.Activate", true) && !Threads.GAOffensive)
 			Threads.GAOffensive = true;
 		
 		int errors = 0;
 		while (true) {
 			try {
-				if (!tekkitrestrict.EEEnabled){
+				if (!TekkitRestrict.EEEnabled){
 					Warning.other("The GemArmorDisabler thread has stopped because EE is disabled.", false);
 					break; //If ee is disabled, stop the thread.
 				}
@@ -50,7 +50,7 @@ public class TRGemArmorThread extends Thread {
 				else
 					Thread.sleep(Threads.gemArmorSpeed);
 			} catch (InterruptedException e) {
-				if (tekkitrestrict.disable) break; //If plugin is disabling, then stop the thread. The gemarmor thread shouldn't trigger again.
+				if (TekkitRestrict.disable) break; //If plugin is disabling, then stop the thread. The gemarmor thread shouldn't trigger again.
 			}
 		}
 	}

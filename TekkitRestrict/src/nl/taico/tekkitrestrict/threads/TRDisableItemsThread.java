@@ -23,7 +23,7 @@ import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.NameProcessor;
 import nl.taico.tekkitrestrict.TRException;
 import nl.taico.tekkitrestrict.TRItemProcessor2;
-import nl.taico.tekkitrestrict.tekkitrestrict;
+import nl.taico.tekkitrestrict.TekkitRestrict;
 import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.TRConfigCache.Listeners;
 import nl.taico.tekkitrestrict.TRConfigCache.SafeZones;
@@ -70,7 +70,7 @@ public class TRDisableItemsThread extends Thread {
 			try {
 				Thread.sleep(Threads.inventorySpeed);
 			} catch (InterruptedException e) {
-				if (tekkitrestrict.disable) break; //If plugin is disabling, then stop the thread. The disableItemsThread should not trigger again. (As all players will be gone on shutdown)
+				if (TekkitRestrict.disable) break; //If plugin is disabling, then stop the thread. The disableItemsThread should not trigger again. (As all players will be gone on shutdown)
 			}
 		}
 	}
@@ -229,7 +229,7 @@ public class TRDisableItemsThread extends Thread {
 		final net.minecraft.server.ItemStack mcStack = TRItemStack.getMCStack(is);
 
 		final Item si = mcStack.getItem();
-		if (tekkitrestrict.EEEnabled){
+		if (TekkitRestrict.EEEnabled){
 			if (si instanceof ItemEECharged){
 				final TRCharge g = mCharges.get(id);
 				if (g == null) return false;
@@ -248,7 +248,7 @@ public class TRDisableItemsThread extends Thread {
 						return true;
 					}
 				} catch (final Exception ex) {
-					Log.Debug("Error: [EECharge thread] " + ex.getMessage());
+					Log.debug("Error: [EECharge thread] " + ex.getMessage());
 					Log.debugEx(ex);
 				}
 				return false;
@@ -357,7 +357,7 @@ public class TRDisableItemsThread extends Thread {
 				return false;
 			}
 		} catch (final Exception ex) {
-			Log.Debug("Error: [IC2 Decharger[7] thread] " + ex.toString());
+			Log.debug("Error: [IC2 Decharger[7] thread] " + ex.toString());
 			Log.debugEx(ex);
 		}
 		return false;
@@ -479,12 +479,14 @@ public class TRDisableItemsThread extends Thread {
 		//		i++;
 		//	} catch (Exception ex){}
 		//}
-		if (!SafeZones.UseSafeZones || !tekkitrestrict.EEEnabled || (!Threads.SSDechargeEE && !Threads.SSDisableArcane)) checkSS = false;
+		Log.trace("Loading Disabled Items Thread...");
+		if (!SafeZones.UseSafeZones || !TekkitRestrict.EEEnabled || (!Threads.SSDechargeEE && !Threads.SSDisableArcane)) checkSS = false;
 		else checkSS = true;
 		
 		{
 			final ArrayList<Integer> temp = new ArrayList<Integer>();
 			final List<String> dechargeSS = SettingsStorage.modModificationsConfig.getStringList("DechargeInSS");
+			Log.trace("DisabledItemsThread - Loading DechargeInSS...");
 			for (final String s : dechargeSS) {
 				final List<TRItem> iss;
 				try {
@@ -505,6 +507,7 @@ public class TRDisableItemsThread extends Thread {
 		{
 			final HashMap<Integer, TRCharge> temp = new HashMap<Integer, TRCharge>();
 			final List<String> meu = SettingsStorage.modModificationsConfig.getStringList("MaxEU");
+			Log.trace("DisabledItemsThread - Loading MaxEU...");
 			for (final String s : meu) {
 				if (!s.contains(" ")){
 					Warning.config("You have an error in your ModModifications.config in MaxEU!", false);
@@ -561,6 +564,7 @@ public class TRDisableItemsThread extends Thread {
 			final HashMap<Integer, TRCharge> temp = new HashMap<Integer, TRCharge>();
 			
 			final List<String> MaxCharges = SettingsStorage.modModificationsConfig.getStringList("MaxCharge");
+			Log.trace("DisabledItemsThread - Loading MaxCharge...");
 			for (final String charge : MaxCharges) {
 				if (!charge.contains(" ")) {
 					Log.Warning.config("You have an error in your maxchare list in ModModifications.config: \""+charge+"\" does not follow the format: \"itemstr percentage\"", false);

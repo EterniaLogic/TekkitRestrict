@@ -15,7 +15,8 @@ import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.TRConfigCache.SafeZones;
 import nl.taico.tekkitrestrict.TRDB;
 import nl.taico.tekkitrestrict.TRException;
-import nl.taico.tekkitrestrict.tekkitrestrict;
+import nl.taico.tekkitrestrict.TekkitRestrict;
+import nl.taico.tekkitrestrict.annotations.Async;
 import nl.taico.tekkitrestrict.objects.TRPos;
 import nl.taico.tekkitrestrict.objects.TRWorldPos;
 
@@ -109,10 +110,12 @@ public abstract class TRSafezone {
 	/**
 	 * @async Should be called asynchronously or at least not from the main thread.
 	 */
+	@Async
 	protected abstract void remove();
 	/**
 	 * @async Should be called asynchronously or at least not from the main thread.
 	 */
+	@Async
 	public final void removeZone(){
 		synchronized (zonesToBeRemoved){
 			zonesToBeRemoved.add(this);
@@ -129,6 +132,7 @@ public abstract class TRSafezone {
 	 * @throws TRException
 	 * @async Should be called asynchronously or at least not from the main thread.
 	 */
+	@Async
 	public static TRSafezone convertToNative(final TRSafezone zone) throws TRException{
 		if (zone.location == null || zone.location.isEmpty) throw new TRException("Cannot convert safezone! Reason: the safezone has no location set!");
 		if (zone instanceof NativeSafezone) throw new TRException("This safezone is already a Native Safezone.");
@@ -148,6 +152,7 @@ public abstract class TRSafezone {
 	 * @return A clone of the list of all zones
 	 * @async Should be called asynchronously or at least not from the main thread.
 	 */
+	@Async
 	public static ArrayList<TRSafezone> getAllZones(){
 		synchronized (allzones){
 			return new ArrayList<TRSafezone>(allzones);
@@ -158,10 +163,11 @@ public abstract class TRSafezone {
 	 * @throws TRException
 	 * @async Should be called asynchronously or at least not from the main thread.
 	 */
+	@Async
 	public static void loadFromDB() throws TRException {
 		ResultSet rs = null;
 		try {
-			rs = tekkitrestrict.db.query("SELECT * FROM `tr_safezones`;");
+			rs = TekkitRestrict.db.query("SELECT * FROM `tr_safezones`;");
 			if (rs == null) throw new TRException("Unable to get Safezones from database!");
 			while (rs.next()){
 				final int type = rs.getInt("type");
@@ -197,6 +203,7 @@ public abstract class TRSafezone {
 	/**
 	 * @async Should be called asynchronously or at least not from the main thread.
 	 */
+	@Async
 	private static ArrayList<TRSafezone> getZonesToBeRemoved(){
 		synchronized (zonesToBeRemoved){
 			return new ArrayList<TRSafezone>(zonesToBeRemoved);
@@ -206,10 +213,11 @@ public abstract class TRSafezone {
 	/**
 	 * @async Should be called asynchronously or at least not from the main thread.
 	 */
+	@Async
 	public static void saveToDB(){
 		for (final TRSafezone zone : getZonesToBeRemoved()){
 			try {
-				tekkitrestrict.db.query("DELETE FROM `tr_safezones` WHERE `name`=='"+zone.name+"';");
+				TekkitRestrict.db.query("DELETE FROM `tr_safezones` WHERE `name`=='"+zone.name+"';");
 			} catch (SQLException e) {
 				Log.Warning.db("Unable to remove zone '" + zone.name + "' from the database!", false);
 			}
@@ -220,7 +228,7 @@ public abstract class TRSafezone {
 		for (final TRSafezone zone : getAllZones()){
 			if (zone == null) continue;
 			try {
-				tekkitrestrict.db.query("INSERT OR REPLACE INTO `tr_safezones` (`name`,`type`,`world`,`x1`,`y1`,`z1`,`x2`,`y2`,`z2`) VALUES ('"
+				TekkitRestrict.db.query("INSERT OR REPLACE INTO `tr_safezones` (`name`,`type`,`world`,`x1`,`y1`,`z1`,`x2`,`y2`,`z2`) VALUES ('"
 								+ TRDB.antisqlinject(zone.name) + "',"
 								+ zone.type + ",'"
 								+ zone.world + "',"

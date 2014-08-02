@@ -18,11 +18,17 @@ public class TRCharge extends TRItem {
 	 */
 	@Override
 	public boolean equals(Object obj){
-		if (obj == null) return false;
+		if (obj == this) return true;
+		
 		if (!(obj instanceof TRCharge)) return false;
+		
 		final TRCharge tri = (TRCharge) obj;
-		if (tri.id == id && tri.data == data && tri.maxcharge == maxcharge && tri.chargerate == chargerate) return true;
-		return false;
+		return tri.id == id && tri.data == data && tri.maxcharge == maxcharge && tri.chargerate == chargerate;
+	}
+	
+	@Override
+	public int hashCode(){
+		return 17 * super.hashCode() + maxcharge;
 	}
 	
 	@Override

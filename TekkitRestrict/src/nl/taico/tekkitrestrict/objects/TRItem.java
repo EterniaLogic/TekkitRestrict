@@ -8,18 +8,22 @@ import org.eclipse.jdt.annotation.Nullable;
 public class TRItem {
 	public int id;
 	public int data;
-	public String msg = "";
+	public String msg;
 	
-	public TRItem(){}
+	public TRItem(){
+		this.msg = "";
+	}
 	
 	public TRItem(final int id){
 		this.id = id;
 		this.data = -1;
+		this.msg = "";
 	}
 	
 	public TRItem(final int id, final int data){
 		this.id = id;
 		this.data = data;
+		this.msg = "";
 	}
 	
 	public TRItem(final int id, final int data, final String msg){
@@ -36,19 +40,29 @@ public class TRItem {
 		return new TRItem(id, data);
 	}
 	
+	//Two TRItems equal if their id's and data values are equal.
+	//Their message is ignored in this comparison.
 	@Override
 	public boolean equals(Object obj){
-		if (obj == null) return false;
+		if (obj == this) return false;
 		if (!(obj instanceof TRItem)) return false;
 		final TRItem tri = (TRItem) obj;
-		if (tri.id == id && tri.data == data) return true;
-		return false;
+		
+		return tri.id == id && tri.data == data;
+	}
+	
+	//This hashcode is best suited for blocks, as they have a max data value of 15.
+	//This means that the chance that 2 different id:data combinations give the same
+	//hashcode result, is smaller.
+	@Override
+	public int hashCode(){
+		return 17 * (17 + id) + data;
 	}
 	
 	/** @return A string representation of this Cache Item: "id:data" */
 	@Override
 	public String toString() {
-		return new StringBuilder(12).append(id).append(":").append(data).toString();
+		return new StringBuilder(12).append(id).append(':').append(data).toString();
 	}
 	
 	/*
@@ -70,13 +84,10 @@ public class TRItem {
 		return new TRItem(this.id, this.data, msg);
 	}
 	
-	public static boolean compareNP(@NonNull final TRItem item, @NonNull final TRItem np){
+	public static boolean compareNP(final TRItem item, final TRItem np){
 		if (item.id != np.id) return false;
 		
-		if (item.data == np.data || (item.data == -10 && np.data == 0)) return true;//:0 = :0, :-1 = :-1.
-		if (np.data == -1) return true;
-		
-		return false;
+		return item.data == np.data || (item.data == -10 && np.data == 0) || np.data == -1;//:0 = :0, :-1 = :-1.
 	}
 	
 	/**
@@ -89,19 +100,20 @@ public class TRItem {
 	 * </ul>
 	 */
 	public boolean compare(final int id, final int data) {
-		return this.id == id && (this.data == data || this.data == -1 || (data == 0 && this.data == -10));
+		return this.id == id && (this.data == data || this.data == -1);// || (data == 0 && this.data == -10)); TODO change -10
 	}
 	//IMPORTANT does not check messages!
 	public static boolean compare(final int id, final int data, @NonNull final TRItem mainItem){
-		return id == mainItem.id && (data == mainItem.data || mainItem.data == -1 || (data == 0 && mainItem.data == -10));
+		return id == mainItem.id && (data == mainItem.data || mainItem.data == -1);// || (data == 0 && mainItem.data == -10)); TODO change -10
 	}
 	//IMPORTANT does not check messages!
 	public static boolean compare(final int id, final int data, final int mainId, final int mainData){
-		return id == mainId && (data == mainData || mainData == -1 || (data == 0 && mainData == -10));
+		return id == mainId && (data == mainData || mainData == -1);// || (data == 0 && mainData == -10)); TODO change -10
 	}
 	
-	@NonNull public static String defaultMessage(){
-		return ChatColor.RED + "You are not allowed to modify/obtain this item!";
+	private static String DEFAULT = ChatColor.RED +  "You are not allowed to modify/obtain this item!";
+	public static String defaultMessage(){
+		return DEFAULT;
 	}
 	
 	public static void sendBannedMessage(@NonNull final Player player, @NonNull final String message){
