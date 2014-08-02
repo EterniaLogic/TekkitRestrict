@@ -31,7 +31,7 @@ public class TRLogFilterPlus {
 	public static ArrayList<TRLogFilterPlus> allFilters = new ArrayList<TRLogFilterPlus>();
 	
 	public static void assignFilters(){
-		Log.debug("TRLogFilterPlus - Assigning filters");
+		Log.trace("TRLogFilterPlus - Assigning filters");
 		for (final Handler h : Logger.getLogger("Minecraft").getHandlers()){
 			if (h instanceof ConsoleHandler){
 				if (h.getFilter() instanceof TRFilter){
@@ -41,7 +41,7 @@ public class TRLogFilterPlus {
 					trf.addFilter(consoleFilter, Priority.LOW);
 					h.setFilter(trf);
 				}
-				Log.debug("TRLogFilterPlus - Added ConsoleFilter");
+				Log.trace("TRLogFilterPlus - Added ConsoleFilter");
 			}
 			else if (h instanceof FileHandler) {
 				if (h.getFilter() instanceof TRFilter){
@@ -51,7 +51,7 @@ public class TRLogFilterPlus {
 					trf.addFilter(logFilter, Priority.LOW);
 					h.setFilter(trf);
 				}
-				Log.debug("TRLogFilterPlus - Added FileFilter");
+				Log.trace("TRLogFilterPlus - Added FileFilter");
 			}
 		}
 
@@ -64,13 +64,13 @@ public class TRLogFilterPlus {
 					trf.addFilter(forgeFilter, Priority.LOW);
 					h.setFilter(trf);
 				}
-				Log.debug("TRLogFilterPlus - Added FileFilter for forge");
+				Log.trace("TRLogFilterPlus - Added FileFilter for forge");
 			}
 		}
 	}
 	
 	public static void disable(){
-		Log.debug("TRLogFilterPlus - Disabling filters");
+		Log.trace("TRLogFilterPlus - Disabling filters");
 		for (final Handler h : Logger.getLogger("Minecraft").getHandlers()){
 			Filter f = h.getFilter();
 			if (f instanceof TRFilter){
@@ -88,8 +88,8 @@ public class TRLogFilterPlus {
 	
 	public static void loadFilters(ISection cs){
 		allFilters.clear();
-		Log.debug("TRLogFilterPlus - Loading filters from config");
-		Log.debug("TRLogFilterPlus - Config Filters: ", cs.getKeys(false));
+		Log.trace("TRLogFilterPlus - Loading filters from config");
+		Log.trace("TRLogFilterPlus - Config Filters: " + cs.getKeys(false));
 		for (String key : cs.getKeys(false)){
 			TRMatchMethod method = null;
 			final String cmethod = cs.getString(key+".Method", "contains").replace("_", "").toUpperCase();
@@ -121,9 +121,9 @@ public class TRLogFilterPlus {
 	public TRLogFilterPlus(TRMatchMethod method, TRFilterType type, Collection<String> filters){
 		this.method = method;
 		this.type = type;
-		for (String filter : filters) filters.add(method.isCS() ? filter : filter.toLowerCase(Locale.ENGLISH));
+		for (String filter : filters) this.filters.add(method.isCS() ? filter : filter.toLowerCase(Locale.ENGLISH));
 		allFilters.add(this);
-		Log.debug("TRLogFilterPlus - Added Filter: ", this);
+		Log.trace("TRLogFilterPlus - Added Filter: " + this);
 	}
 	
 	public boolean matches(String input){
