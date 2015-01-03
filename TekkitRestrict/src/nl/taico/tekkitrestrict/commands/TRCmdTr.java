@@ -231,7 +231,8 @@ public class TRCmdTr implements CommandExecutor {
 	private void about(CommandSender sender){
 		msgy(sender, "[TekkitRestrict About]");
 		msgb(sender, "Former author and creator: " + ChatColor.GREEN + "DreadSlicer/EterniaLogic");
-		msgb(sender, "Current author: " + ChatColor.GREEN + "Taeir");
+		msgb(sender, "Current author: " + ChatColor.GREEN + "Taeir / Taico Aerts");
+		msgb(sender, "Copyright (C) 2015 Taico Aerts")
 		msg(sender, "");
 		msgb(sender, "Version: " + ChatColor.GREEN + TekkitRestrict.version.toMetricsVersion());
 		if (TekkitRestrict.useTMetrics){
