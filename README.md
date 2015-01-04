@@ -1,6 +1,15 @@
 TekkitRestrict
 ==============
 
+TekkitRestrict is licenced under the GNU General Public License version 3 (GPLv3) (See LICENSE.txt in the src folder).
+
+Copyright (C) 2015 Taico Aerts.
+
+TekkitRestrict is a continuation of the similarily named project "TekkitRestrict" by dreadslicer@gmail.com (aliases "DreadEnd" and "DreadSlicer" are both pertaining to dreadslicer@gmail.com) with permission from the author.
+
+
+How to compile TekkitRestrict
+--
 The TekkitRestrict Source Requires the following Dependencies:
 - Bukkit 1.2.5-R5.0 OR Tekkit.jar from Tekkit 3.1.2
 - bPermissions v2.9.12
