@@ -259,7 +259,6 @@ public class Updater {
 	/**
 	 * Save an update from dev.bukkit.org into the server's update folder.
 	 */
-	@SuppressWarnings("resource")
 	private void saveFile(File folder, String file, String u) {
 		if (!folder.exists()) {
 			folder.mkdir();

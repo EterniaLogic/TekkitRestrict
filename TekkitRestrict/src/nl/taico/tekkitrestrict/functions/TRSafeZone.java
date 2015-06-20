@@ -186,7 +186,6 @@ public class TRSafeZone {
 	 * Gets a GriefPrevention SafeZone at the given location.<br>
 	 * Note: Does not actually get SafeZones from the database.
 	 */
-	@SuppressWarnings("unused")
 	@NonNull private static String getGPSafeZone(@NonNull Location loc){
 		if (griefPrevention == null) return "";
 		

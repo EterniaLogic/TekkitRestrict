@@ -90,6 +90,7 @@ public class TRRecipeBlock {
 	public static boolean blockRecipeForge(int id, int data) {
 		boolean status = false;
 		// loop through recipes...
+		@SuppressWarnings("unchecked")
 		List<Object> recipes = CraftingManager.getInstance().recipies;
 
 		for (int i = 0; i < recipes.size(); i++) {

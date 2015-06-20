@@ -319,10 +319,12 @@ public class JSuggestField extends JTextField {
 	 *
 	 * @return Vector containing Strings
 	 */
+	@SuppressWarnings("unchecked")
 	public Vector<String> getSuggestData() {
 		return (Vector<String>) data.clone();
 	}
 	
+	@SuppressWarnings("unchecked")
 	public LinkedHashMap<String, TRItem> getData2(){
 		return (LinkedHashMap<String, TRItem>) data2.clone();
 	}
