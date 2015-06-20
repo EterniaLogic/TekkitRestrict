@@ -390,8 +390,13 @@ class DisableItemThread extends Thread {
 						if (banned.equals("")) banned = ChatColor.RED + "Removed a banned item in your inventory: "+id+":"+data+".";
 						TRItem.sendBannedMessage(player, banned);
 						changedInv = true;
-						st1[i] = new ItemStack(Threads.ChangeDisabledItemsIntoId, 1);
-						continue; //Item is now dirt so continue with next one.
+						
+						ItemStack item = st1[i].clone();
+						st1[i] = null;
+						
+						player.getWorld().dropItem(player.getLocation(), item);
+						
+						continue; //Item is now dropped so continue with next one.
 					}
 					else if (checkEECharge(st1[i]) || checkCharge(st1[i])){
 						changedInv = true;
@@ -428,7 +433,12 @@ class DisableItemThread extends Thread {
 						if (banned.equals("")) banned = ChatColor.RED + "Removed banned armor from your inventory: "+id+":"+data+".";
 						TRItem.sendBannedMessage(player, banned);
 						changedArmor = true;
-						st2[i] = new ItemStack(Threads.ChangeDisabledItemsIntoId, 1); //proceed to remove it.
+						
+						ItemStack item = st2[i].clone();
+						st2[i] = null;
+						
+						player.getWorld().dropItem(player.getLocation(), item);
+
 						continue;
 					}
 					else if (checkCharge(st2[i])){
