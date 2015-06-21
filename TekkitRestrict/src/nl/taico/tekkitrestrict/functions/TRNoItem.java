@@ -1,7 +1,7 @@
 package nl.taico.tekkitrestrict.functions;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -155,9 +155,9 @@ public class TRNoItem {
 		if (player.hasPermission(idStr+"."+data)) return "";
 		else if (player.hasPermission(idStr)) return "";
 		else {
-			Iterator<String> keys = TRItemProcessor.groups.keySet().iterator();
-			while (keys.hasNext()) {
-				String key = keys.next();
+			Enumeration<String> keys = TRItemProcessor.groups.keys();
+			while (keys.hasMoreElements()) {
+				String key = keys.nextElement();
 				if (player.hasPermission("tekkitrestrict.creative."+key)) {
 					List<TRItem> mi = TRItemProcessor.groups.get(key);
 					for(TRItem c:mi){
@@ -191,9 +191,9 @@ public class TRNoItem {
 		if (player.hasPermission(idStr+"."+data)) return "";
 		else if (player.hasPermission(idStr)) return "";
 		else {
-			Iterator<String> keys = TRItemProcessor.groups.keySet().iterator();
-			while (keys.hasNext()) {
-				String key = keys.next();
+			Enumeration<String> keys = TRItemProcessor.groups.keys();
+			while (keys.hasMoreElements()) {
+				String key = keys.nextElement();
 				if (player.hasPermission("tekkitrestrict.noitem."+key)) {
 					List<TRItem> mi = TRItemProcessor.groups.get(key);
 					for(TRItem c:mi){
