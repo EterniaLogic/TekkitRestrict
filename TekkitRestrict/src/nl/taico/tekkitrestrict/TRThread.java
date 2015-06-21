@@ -391,10 +391,8 @@ class DisableItemThread extends Thread {
 						TRItem.sendBannedMessage(player, banned);
 						changedInv = true;
 						
-						ItemStack item = st1[i].clone();
+						player.getWorld().dropItem(player.getLocation(), st1[i]);
 						st1[i] = null;
-						
-						player.getWorld().dropItem(player.getLocation(), item);
 						
 						continue; //Item is now dropped so continue with next one.
 					}
@@ -434,11 +432,9 @@ class DisableItemThread extends Thread {
 						TRItem.sendBannedMessage(player, banned);
 						changedArmor = true;
 						
-						ItemStack item = st2[i].clone();
+						player.getWorld().dropItem(player.getLocation(), st2[i]);
 						st2[i] = null;
 						
-						player.getWorld().dropItem(player.getLocation(), item);
-
 						continue;
 					}
 					else if (checkCharge(st2[i])){
