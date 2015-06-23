@@ -6,9 +6,23 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Permission Plugins for Tekkit Classic"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Protection Plugins for Tekkit Classic"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Tekkit Classic Bukkit"/>
-	<classpathentry kind="lib" path="C:/Program Files/eclipse_Kepler/lib/Tekkit_Classic/Essentials 2.9.2 for 1.2.5.jar"/>
-	<classpathentry kind="lib" path="C:/Program Files/eclipse_Kepler/lib/Tekkit_Classic/EEPatch.zip"/>
-	<classpathentry kind="lib" path="org.eclipse.jdt.annotation_1.1.0.v20130513-1648.jar"/>
-	<classpathentry kind="lib" path="C:/Program Files/eclipse_Kepler/lib/Swing/jSuggestField.jar"/>
+	<classpathentry kind="lib" path="D:/Users/Robin/Downloads/Tekkit_Server_3.1.2/_/Factions.src/TekkitRestrict/lib/eepatch.zip"/>
+	<classpathentry kind="lib" path="D:/Users/Robin/Downloads/Tekkit_Server_3.1.2/_/Factions.src/TekkitRestrict/lib/Essentials.jar"/>
+	<classpathentry kind="lib" path="D:/Users/Robin/Downloads/Tekkit_Server_3.1.2/_/Factions.src/TekkitRestrict/lib/PermissionsEx.jar"/>
+	<classpathentry kind="lib" path="D:/Users/Robin/Downloads/Tekkit_Server_3.1.2/_/Tekkit.jar"/>
+	<classpathentry kind="lib" path="D:/Users/Robin/Downloads/Tekkit_Server_3.1.2/_/Factions.src/TekkitRestrict/lib/industrialcraft2-1.97-mcpc1.2.5-r7.zip"/>
+	<classpathentry kind="lib" path="D:/Users/Robin/Downloads/Tekkit_Server_3.1.2/_/Factions.src/TekkitRestrict/lib/redpower-all-2.0p5b2-mcpc1.2.5-r15.zip"/>
+	<classpathentry kind="lib" path="D:/Users/Robin/Downloads/Tekkit_Server_3.1.2/_/Factions.src/TekkitRestrict/TekkitRestrict/org.eclipse.jdt.annotation_1.1.0.v20130513-1648.jar"/>
+	<classpathentry kind="lib" path="D:/Users/Robin/Downloads/Tekkit_Server_3.1.2/_/Factions.src/TekkitRestrict/lib/EE2ServerV1.4.6.5-bukkit-mcpc-1.2.5-r5.zip"/>
+	<classpathentry kind="lib" path="D:/Users/Robin/Downloads/Tekkit_Server_3.1.2/_/Factions.src/TekkitRestrict/lib/LWC.jar"/>
+	<classpathentry kind="lib" path="D:/Users/Robin/Downloads/Tekkit_Server_3.1.2/_/Factions.src/TekkitRestrict/lib/bpermissions.jar"/>
+	<classpathentry kind="lib" path="D:/Users/Robin/Downloads/Tekkit_Server_3.1.2/_/Factions.src/TekkitRestrict/lib/EssentialsGroupManager.jar"/>
+	<classpathentry kind="lib" path="D:/Users/Robin/Downloads/Tekkit_Server_3.1.2/_/Factions.src/TekkitRestrict/lib/Vault.jar"/>
+	<classpathentry kind="lib" path="D:/Users/Robin/Downloads/Tekkit_Server_3.1.2/_/Factions.src/TekkitRestrict/lib/WorldEdit.jar"/>
+	<classpathentry kind="lib" path="D:/Users/Robin/Downloads/Tekkit_Server_3.1.2/_/Factions.src/TekkitRestrict/lib/WorldGuard.jar"/>
+	<classpathentry kind="lib" path="D:/Users/Robin/Downloads/Tekkit_Server_3.1.2/_/Factions.src/TekkitRestrict/lib/PreciousStones.jar"/>
+	<classpathentry kind="lib" path="D:/Users/Robin/Downloads/Tekkit_Server_3.1.2/_/Factions.src/TekkitRestrict/lib/Towny 0.82.0.0.jar"/>
+	<classpathentry kind="lib" path="D:/Users/Robin/Downloads/Tekkit_Server_3.1.2/_/Factions.src/TekkitRestrict/lib/Factions.jar"/>
+	<classpathentry kind="lib" path="D:/Users/Robin/Downloads/Tekkit_Server_3.1.2/_/Factions.src/TekkitRestrict/lib/GriefPrevention.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

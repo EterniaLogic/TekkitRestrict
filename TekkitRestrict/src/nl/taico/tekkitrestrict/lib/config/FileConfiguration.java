@@ -118,7 +118,6 @@ public abstract class FileConfiguration extends MemoryConfiguration {
 	 * @throws IllegalArgumentException
 	 *             Thrown when file is null.
 	 */
-	@SuppressWarnings("resource")
 	public void load(File file) throws FileNotFoundException, IOException, InvalidConfigurationException {
 		Validate.notNull(file, "File cannot be null");
 

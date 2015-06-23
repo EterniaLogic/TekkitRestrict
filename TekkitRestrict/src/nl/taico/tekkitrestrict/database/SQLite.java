@@ -14,7 +14,6 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import nl.taico.tekkitrestrict.tekkitrestrict;
 
-@SuppressWarnings("resource")
 public class SQLite extends Database {
 	public String location;
 	public String name;

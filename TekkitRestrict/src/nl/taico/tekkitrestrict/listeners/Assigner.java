@@ -24,8 +24,10 @@ public class Assigner {
 		
 		PM.registerEvents(new InventoryClickListener(), plugin);
 		
-		if (Listeners.UseNoItem)
+		if (Listeners.UseNoItem) {
 			CraftingListener.setupCraftHook();
+			PM.registerEvents(new ItemPickupListener(), plugin);
+		}
 		
 		if (Dupes.alcBags.prevent ||
 			Dupes.pedestals.prevent ||

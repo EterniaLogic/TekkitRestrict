@@ -20,7 +20,6 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import nl.taico.tekkitrestrict.tekkitrestrict;
 
-@SuppressWarnings("resource")
 public class MySQL extends Database {
 	private String hostname = "localhost";
 	private String port = "3306";
