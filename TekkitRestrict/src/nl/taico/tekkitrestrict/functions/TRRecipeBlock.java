@@ -1,126 +1,136 @@
 package nl.taico.tekkitrestrict.functions;
 
+import java.lang.reflect.Field;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import net.minecraft.server.CraftingManager;
+import net.minecraft.server.CraftingRecipe;
 import net.minecraft.server.FurnaceRecipes;
+import net.minecraft.server.ItemStack;
 
-import org.bukkit.Bukkit;
-import org.bukkit.inventory.Recipe;
-import org.bukkit.inventory.ShapedRecipe;
-import org.bukkit.inventory.ShapelessRecipe;
-
+import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.TRException;
-import nl.taico.tekkitrestrict.TRItemProcessor;
-import nl.taico.tekkitrestrict.tekkitrestrict;
+import nl.taico.tekkitrestrict.TRItemProcessor2;
 import nl.taico.tekkitrestrict.Log.Warning;
+import nl.taico.tekkitrestrict.config.SettingsStorage;
 import nl.taico.tekkitrestrict.objects.TRItem;
-import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 
 public class TRRecipeBlock {
+	public static int recipesSize, furnaceSize;
 	public static void reload() {
 		blockConfigRecipes();
 	}
 
 	public static void blockConfigRecipes() {
-		List<String> ssr = tekkitrestrict.config.getStringList(ConfigFile.Advanced, "RecipeBlock");
-		for (String s : ssr) {
-			List<TRItem> iss;
+		recipesSize = 0;
+		List<String> ssr = SettingsStorage.advancedConfig.getStringList("RecipeBlock");
+		Log.trace("Loading Disabled Recipes...");
+		for (final String s : ssr) {
+			final List<TRItem> iss;
 			try {
-				iss = TRItemProcessor.processItemString(s);
+				iss = TRItemProcessor2.processString(s);
 			} catch (TRException ex) {
 				Warning.config("You have an error in your Advanced.config.yml in RecipeBlock:", false);
 				Warning.config(ex.getMessage(), false);
 				continue;
 			}
-			for (TRItem ir : iss) {
+			for (final TRItem ir : iss) {
+				recipesSize++;
 				try {
-					blockRecipeVanilla(ir.id, ir.data);
+					if (!blockCraftingRecipe(ir.id, ir.data)) Warning.other("Unable to block crafting recipe for "+ir+": There is no recipe for this item.", false);
 				} catch (Exception ex) {
-					Warning.other("Exception in '+TRRecipeBLock.blockRecipeVanilla(id:int, data:int):boolean'! Error: " + ex.toString(), false);
-				}
-				try {
-					blockRecipeForge(ir.id, ir.data);
-				} catch (Exception ex) {
-					Warning.other("Exception in '+TRRecipeBLock.blockRecipeForge(id:int, data:int):boolean'! Error: " + ex.toString(), false);
+					Warning.other("Unable to block crafting recipe for "+ir+": Exception: " + ex.toString(), false);
 				}
 			}
 		}
 
-		ssr = tekkitrestrict.config.getStringList(ConfigFile.Advanced, "RecipeFurnaceBlock");
-		for (String s : ssr) {
-			List<TRItem> iss;
+		ssr = SettingsStorage.advancedConfig.getStringList("RecipeFurnaceBlock");
+		Log.trace("Loading Disabled Furnace Recipes...");
+		for (final String s : ssr) {
+			final List<TRItem> iss;
 			try {
-				iss = TRItemProcessor.processItemString(s);
+				iss = TRItemProcessor2.processString(s);
 			} catch (TRException ex) {
 				Warning.config("You have an error in your Advanced.config.yml in RecipeFurnaceBlock:", false);
 				Warning.config(ex.getMessage(), false);
 				continue;
 			}
-			for (TRItem ir : iss) {
+			for (final TRItem ir : iss) {
+				furnaceSize++;
 				try {
-					blockFurnaceRecipe(ir.id, ir.data);
+					if (!blockFurnaceRecipe(ir.id, ir.data)) Warning.other("Unable to block furnace recipe for "+ir+": There is no smelting recipe for this item.", false);
 				} catch (Exception ex) {
-					Warning.other("Exception in '+TRRecipeBLock.blockFurnaceRecipe(id:int, data:int):boolean'! Error: " + ex.toString(), false);
+					Warning.other("Exception in TRRecipeBlock.blockFurnaceRecipe! Error: " + ex.toString(), false);
 				}
 			}
 		}
 	}
 
-	public static boolean blockRecipeVanilla(int id, int data) {
-		boolean status = false;
-		Iterator<Recipe> recipes = Bukkit.recipeIterator();
-		Recipe recipe;
-
-		while (recipes.hasNext()) {
-			if ((recipe = recipes.next()) != null) {
-				int tid = recipe.getResult().getTypeId();//was .getData().getItemTypeId();
-				int tdata = recipe.getResult().getDurability();
-				if (tid == id && (tdata == data || data == 0)) {
-					recipes.remove();
-					status = true;
-				}
-			}
-		}
-
-		return status;
-	}
-
-	public static boolean blockRecipeForge(int id, int data) {
+	public static boolean blockCraftingRecipe(int id, int data) {
+		Log.trace("Disabling recipes for "+id+":"+data+"...");
 		boolean status = false;
 		// loop through recipes...
-		List<Object> recipes = CraftingManager.getInstance().recipies;
+		final Iterator<CraftingRecipe> recipes = CraftingManager.getInstance().getRecipies().iterator();
 
-		for (int i = 0; i < recipes.size(); i++) {
-			Object r = recipes.get(i);
-			if (r instanceof ShapedRecipe) {
-				ShapedRecipe recipe = (ShapedRecipe) r;
-				int tid = recipe.getResult().getTypeId();
-				int tdata = recipe.getResult().getDurability();
-				if (tid == id && (tdata == data || data == 0)) {
-					recipes.remove(i);
-					i--;
-					status = true;
-				}
-			}
-			if (r instanceof ShapelessRecipe) {
-				ShapelessRecipe recipe = (ShapelessRecipe) r;
-				int tid = recipe.getResult().getTypeId();
-				int tdata = recipe.getResult().getDurability();
-				if (tid == id && (tdata == data || data == 0)) {
-					recipes.remove(i--);
-					status = true;
-				}
+		while (recipes.hasNext()) {
+			final CraftingRecipe recipe = recipes.next();
+			if (recipe == null) continue;
+			final net.minecraft.server.ItemStack result = recipe.b();
+			if (result == null) continue;
+			if (result.id == id && (data == -1 || result.getData() == data)){// || (data == -10 && result.getData() == 0))) { TODO change -10
+				recipes.remove();
+				status = true;
 			}
 		}
 		return status;
 	}
-
+	private static Field meta;
+	
+	@SuppressWarnings("rawtypes")
 	public static boolean blockFurnaceRecipe(int id, int data) {
-		boolean status = false;
-		FurnaceRecipes.getInstance().addSmelting(id, data, null);
-		FurnaceRecipes.getInstance().recipies.remove(id);
-		return status;
+		Log.trace("Disabling furnace recipes for "+id+":"+data+"...");
+		if (meta == null){
+			try {
+				meta = FurnaceRecipes.class.getField("metaSmeltingList");
+				if (meta == null) return false;
+				
+				if (!meta.isAccessible()) meta.setAccessible(true);
+			} catch (NoSuchFieldException | SecurityException ex) {
+				return false;
+			}
+		}
+		
+		boolean a = FurnaceRecipes.getInstance().getRecipies().containsKey(id);
+		boolean b = false;
+		
+		try {
+			Object obj = meta.get(FurnaceRecipes.getInstance());
+			if (obj instanceof Map){
+				final Iterator<Entry<List<Integer>, net.minecraft.server.ItemStack>> it = ((Map) obj).entrySet().iterator();
+				while (it.hasNext()){
+					final Entry<List<Integer>, ItemStack> e = it.next();
+					if (id != e.getKey().get(0).intValue()) continue;
+					
+					if (data == -1 || data == e.getKey().get(1)) {
+						it.remove();
+						b = true;
+					}
+				}
+				
+				if ((!b || data == -1) && a){
+					FurnaceRecipes.getInstance().getRecipies().remove(id);
+					b = true;
+				}
+				
+				return b;
+			} else {
+				return false;
+			}
+		} catch (SecurityException | IllegalArgumentException | IllegalAccessException ex) {
+			return false;
+		}
 	}
 }

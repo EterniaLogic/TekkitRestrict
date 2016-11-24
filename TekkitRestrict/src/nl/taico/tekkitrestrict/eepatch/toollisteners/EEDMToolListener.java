@@ -22,9 +22,9 @@ import ee.events.dm.EEDMToolEvent;
 public class EEDMToolListener implements Listener {
 	@EventHandler
 	public void onEvent(EEDMToolEvent event){
-		Player player = event.getPlayer();
-		ArrayList<EEAction2> toSearch = null;
-		String name = null;
+		final Player player = event.getPlayer();
+		final ArrayList<EEAction2> toSearch;
+		final String name;
 		
 		if (event instanceof EEDMPickaxeEvent){
 			if (player.hasPermission("tekkitrestrict.bypass.blockactions.dmpickaxe")) return;
@@ -58,14 +58,9 @@ public class EEDMToolListener implements Listener {
 			return;
 		}
 		
-		EEAction2 action = event.getExtraInfo();
-		for (EEAction2 blocked : toSearch){
-			if (blocked == null) continue;
-			if (blocked == action){
-				event.setCancelled(true);
-				player.sendMessage(ChatColor.RED + "You are not allowed to do this with the "+name+"!");
-				return;
-			}
+		if (toSearch.contains(event.getExtraInfo())){
+			event.setCancelled(true);
+			player.sendMessage(ChatColor.RED + "You are not allowed to do this with the "+name+"!");
 		}
 	}
 }

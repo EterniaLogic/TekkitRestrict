@@ -1,0 +1,76 @@
+###################################################################################################
+## Configuration file for TekkitRestrict                                                         ##
+## Authors: Taeir, DreadEnd (aka DreadSlicer)                                                    ##
+## BukkitDev: http://dev.bukkit.org/server-mods/tekkit-restrict/                                 ##
+## Please ask questions/report issues on the BukkitDev page.                                     ##
+###################################################################################################
+# 
+###################################################################################################
+########################################## ChunkUnloader ##########################################
+###################################################################################################
+# WARNING: On LARGE servers, chunk unloaders are known to cause problems that make the server
+# CRASH! This will happen with an error about tile entities. If you see this error, you may want
+# to consider turning the chunk unloader OFF!
+# 
+# NOTE: If you are using MCPCSpout, you will not have this problem, and you can leave the Chunk
+# Unloader OFF.
+# 
+# This will be very useful for preventing your server from getting over 30,000 chunks.
+# 
+# There is a bug with the Normal Tekkit server in which the server gains "Trash" in the memory
+# from disposing of chunks. I recommend keeping your MaxChunks around 3000-4000 to prevent this
+# from disabling your server over time.
+# 
+# If you lower it below 1000, you have a chance of lagging your server by player movements.
+UseChunkUnloader: false
+# 
+# The maximal amount of chunks loaded at a time. If this amount is exceeded, chunks will be
+# forcefully unloaded (even if they have chunk loaders) to clear RAM.
+# The more players you have on the server, the higher you should set this to.
+# 
+# Max number of chunks for the End.
+# Recommended: 100-400 (the End is usually not a often visited place)
+# Default: 200
+MaxChunks TheEnd: 200
+# 
+# Max number of chunks for the Nether.
+# Recommended: 300-600 (depends on how many players live in the Nether)
+# Default: 400
+MaxChunks Nether: 400
+# 
+# Max number of chunks for normal type worlds.
+# Recommended: (Server RAM in GB)*700 to (Server RAM in GB)*900
+# Default: 4000
+MaxChunks Normal: 4000
+# 
+# Max number of chunks loaded in total (all worlds)
+# If this number is exceeded, the UnloadOrder will come in effect.
+# Recommended: (Server RAM in GB)*700 to (Server RAM in GB)*900
+# Default: 4000
+MaxChunks Total: 4000
+# 
+# UnloadOrder
+# The order in which chunks from worlds will be unloaded when the total number of chunks is
+# exceeded.
+# 0 - The End, Nether, Normal worlds    (default)
+# 1 - Nether, The End, Normal worlds
+# 
+# 2 - Normal worlds, The End, Nether    (not recommended)
+# 3 - The End, Normal worlds, Nether    (not recommended)
+# 
+# 4 - Nether, Normal worlds, The End    (not recommended)
+# 5 - Normal worlds, Nether, The End    (not recommended)
+# 
+# 2 and 3 are not recommended unless your main world is a Nether world.
+# 4 and 5 are not recommended unless your main world is an End world.
+# 
+# It is recommended to put the least used world first.
+UnloadOrder: 0
+# 
+# The radius of blocks that should stay loaded around a player.
+# The ChunkUnloader will not unload chunks that are within this radius to a player.
+# Minecraft's default is 256 blocks (16 chunks).
+# 
+# Recommended: 128-256
+# Default: 256
+MaxRadii: 256

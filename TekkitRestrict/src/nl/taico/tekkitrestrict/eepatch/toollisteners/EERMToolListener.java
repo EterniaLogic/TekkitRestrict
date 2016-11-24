@@ -24,9 +24,9 @@ import ee.events.rm.EERedMorningStarEvent;
 public class EERMToolListener implements Listener {
 	@EventHandler
 	public void onEvent(EERMToolEvent event){
-		Player player = event.getPlayer();
-		ArrayList<EEAction2> toSearch = null;
-		String name = null;
+		final Player player = event.getPlayer();
+		final ArrayList<EEAction2> toSearch;
+		final String name;
 
 		if (event instanceof EERMPickaxeEvent){
 			if (player.hasPermission("tekkitrestrict.bypass.blockactions.rmpickaxe")) return;
@@ -68,14 +68,9 @@ public class EERMToolListener implements Listener {
 			return;
 		}
 		
-		EEAction2 action = event.getExtraInfo();
-		for (EEAction2 blocked : toSearch){
-			if (blocked == null) continue;
-			if (blocked == action){
-				event.setCancelled(true);
-				player.sendMessage(ChatColor.RED + "You are not allowed to do this with the "+name+"!");
-				return;
-			}
+		if (toSearch.contains(event.getExtraInfo())){
+			event.setCancelled(true);
+			player.sendMessage(ChatColor.RED + "You are not allowed to do this with the "+name+"!");
 		}
 	}
 }

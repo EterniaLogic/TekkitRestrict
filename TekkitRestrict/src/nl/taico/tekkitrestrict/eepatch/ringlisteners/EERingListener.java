@@ -42,10 +42,10 @@ public class EERingListener implements Listener {
 	}
 	
 	public void zeroRing(EEZeroRingEvent event){
-		Player player = event.getPlayer();
+		final Player player = event.getPlayer();
 		if (player.hasPermission("tekkitrestrict.bypass.blockactions.zeroring")) return;
 		
-		EERingAction action = event.getExtraInfo();
+		final EERingAction action = event.getExtraInfo();
 		
 		if (EEPSettings.zeroring.contains(action)){
 			event.setCancelled(true);
@@ -55,10 +55,10 @@ public class EERingListener implements Listener {
 	}
 	
 	public void voidRing(EEVoidRingEvent event){
-		Player player = event.getPlayer();
+		final Player player = event.getPlayer();
 		if (player.hasPermission("tekkitrestrict.bypass.blockactions.voidring")) return;
 		
-		EERingAction action = event.getExtraInfo();
+		final EERingAction action = event.getExtraInfo();
 		
 		if (EEPSettings.voidring.contains(action)){
 			event.setCancelled(true);
@@ -70,20 +70,22 @@ public class EERingListener implements Listener {
 	private ArrayList<String> swrgNegate = new ArrayList<String>();
 	
 	public void swrgRing(EESWRingEvent event){
-		Player player = event.getPlayer();
+		final Player player = event.getPlayer();
 		if (player.hasPermission("tekkitrestrict.bypass.blockactions.swiftwolfring")) return;
 		
-		EERingAction action = event.getExtraInfo();
-		String name = event.getExtraInfo().getName();
+		final EERingAction action = event.getExtraInfo();
 		
 		if (EEPSettings.flyring.contains(action)){
 			event.setCancelled(true);
-			if (!name.equals("negatefalldamage"))
+			final String name = event.getExtraInfo().getName();
+			if (!name.equalsIgnoreCase("negatefalldamage"))
 				player.sendMessage(ChatColor.RED + "You are not allowed to " + name + " Swiftwolf's Rending Gale.");
 			else {
 				if (!swrgNegate.contains(player.getName())){
 					player.sendMessage(ChatColor.RED + "You cannot use Swiftwolf's Rending Gale to negate fall damage.");
 					swrgNegate.add(player.getName());
+				} else {
+					player.sendMessage(ChatColor.RED + "You cannot use Swiftwolf's Rending Gale to negate fall damage.");
 				}
 			}
 			return;
@@ -91,10 +93,10 @@ public class EERingListener implements Listener {
 	}
 	
 	public void ignitionRing(EEIgnitionRingEvent event){
-		Player player = event.getPlayer();
+		final Player player = event.getPlayer();
 		if (player.hasPermission("tekkitrestrict.bypass.blockactions.ignitionring")) return;
 		
-		EERingAction action = event.getExtraInfo();
+		final EERingAction action = event.getExtraInfo();
 		
 		if (EEPSettings.firering.contains(action)){
 			event.setCancelled(true);
@@ -104,10 +106,10 @@ public class EERingListener implements Listener {
 	}
 	
 	public void harvestRing(EEHarvestRingEvent event){
-		Player player = event.getPlayer();
+		final Player player = event.getPlayer();
 		if (player.hasPermission("tekkitrestrict.bypass.blockactions.harvestring")) return;
 		
-		EERingAction action = event.getExtraInfo();
+		final EERingAction action = event.getExtraInfo();
 		
 		if (EEPSettings.harvestring.contains(action)){
 			event.setCancelled(true);
@@ -130,10 +132,10 @@ public class EERingListener implements Listener {
 	}
 	
 	public void archangelRing(EEArchangelRingEvent event){
-		Player player = event.getPlayer();
+		final Player player = event.getPlayer();
 		if (player.hasPermission("tekkitrestrict.bypass.blockactions.archangelring")) return;
 		
-		EERingAction action = event.getExtraInfo();
+		final EERingAction action = event.getExtraInfo();
 		
 		if (EEPSettings.archangelring.contains(action)){
 			event.setCancelled(true);
@@ -143,19 +145,22 @@ public class EERingListener implements Listener {
 	}
 	
 	public void arcaneRing(EEArcaneRingEvent event){
-		Player player = event.getPlayer();
+		final Player player = event.getPlayer();
 		if (player.hasPermission("tekkitrestrict.bypass.blockactions.arcanering")) return;
 		
-		EERingAction action = event.getExtraInfo();
-		String name = event.getExtraInfo().getName();
+		final EERingAction action = event.getExtraInfo();
+		
 		if (EEPSettings.arcanering.contains(action)){
 			event.setCancelled(true);
-			if (!name.equals("negatefalldamage"))
+			final String name = event.getExtraInfo().getName();
+			if (!name.equalsIgnoreCase("negatefalldamage"))
 				player.sendMessage(ChatColor.RED + "You are not allowed to " + name + " the Ring of Arcana.");
 			else {
 				if (!arcaneNegate.contains(player.getName())){
 					player.sendMessage(ChatColor.RED + "You cannot use the Ring of Arcana to negate fall damage.");
 					arcaneNegate.add(player.getName());
+				} else {
+					player.sendMessage(ChatColor.RED + "You cannot use the Ring of Arcana to negate fall damage.");
 				}
 			}
 			return;

@@ -1,12 +1,9 @@
 package nl.taico.tekkitrestrict.listeners;
 
-import java.util.ArrayList;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
 
 import net.minecraft.server.EntityPlayer;
-import net.minecraft.server.TileEntity;
 
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -17,22 +14,24 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import nl.taico.tekkitrestrict.tekkitrestrict;
 import nl.taico.tekkitrestrict.TRConfigCache.Hacks;
 import nl.taico.tekkitrestrict.functions.TRNoHack;
 import nl.taico.tekkitrestrict.objects.TREnums.HackType;
+import nl.taico.tekkitrestrict.objects.TRItemStack;
+import nl.taico.tekkitrestrict.util.ArrayUtil;
 
 public class NoHackFly implements Listener {
-	private static ConcurrentHashMap<String, Integer> tickTolerance = new ConcurrentHashMap<String, Integer>();
-	private static ConcurrentHashMap<String, Double> tickLastLoc = new ConcurrentHashMap<String, Double>();
+	private static HashMap<String, Integer> tickTolerance = new HashMap<String, Integer>();
+	private static HashMap<String, Double> tickLastLoc = new HashMap<String, Double>();
 
-	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	private void handleFly(PlayerMoveEvent event) {
 		Player player = event.getPlayer();
-		if (player.hasPermission("tekkitrestrict.bypass.hack.fly")) return;
+		if (player == null || player.getName().contains("[ComputerCraft]") || player.hasPermission("tekkitrestrict.bypass.hack.fly")) return;
 		if (player.getGameMode() == GameMode.CREATIVE) return;
 		if (!isFlying(player)) return;
 		//if (Util.hasHackBypass(player, "fly")) return;
@@ -41,63 +40,73 @@ public class NoHackFly implements Listener {
 		TRNoHack.handleHack(player, HackType.fly);
 	}
 
-	private static ArrayList<Integer> nearBlocks = new ArrayList<Integer>();
-	static {
-		nearBlocks.add(220);//Scaffold
-		nearBlocks.add(235);//Iron scaffold
-		nearBlocks.add(212);//Ladder rail
-		nearBlocks.add(106);//Vine
-		nearBlocks.add(65);//Ladder
-	}
+	private static int[] nearBlocks = new int[] {
+		65,//Ladder
+		8,//Water
+		9,//Water
+		106,//Vine
+		10,//Lava
+		11,//Lava
+		220,//Scaffold
+		235,//Iron scaffold
+		212 //Ladder rail
+	};
 	
 	/**
 	 * @return If the player is flying.
 	 */
 	public static boolean isFlying(Player player) {
-		int flyTolerance = Hacks.flys.tolerance;
-		PlayerInventory inventory = player.getInventory();
-		ItemStack boots = inventory.getBoots();
+		if (player.getName().contains("[ComputerCraft]")) return false;
+		
+		int flyTolerance = Hacks.fly.tolerance;
+		int minHeight = (int) Hacks.fly.value;
+		
+		final PlayerInventory inventory = player.getInventory();
+		final ItemStack boots = inventory.getBoots();
+		
 		if (boots != null){
 			//checks if the player is wearing boots before deciding whether or not they are flyhacking
 			if (boots.getTypeId() == 30171 && (inventory.getBoots().getDurability() < 27)) { //wearing quantum boots. checks for charge
-		    	//if charged boots, increase fly tolerance. *10 is just an example
-				flyTolerance *= 5;
-		    } else if (boots.getTypeId() == 27582) { //checks for hurricane boots
+				minHeight += 12;//10 is required for this to work
+		    } else if (boots.getTypeId() == 27582) { //hurricane boots
 		    	return false; //has flyItem
 		    }
 		}
 		
-		ItemStack chest = inventory.getChestplate();
+		final ItemStack chest = inventory.getChestplate();
 		if (chest != null){
 			//jetpack check
-			if (chest.getTypeId() == 30209) {
-				int data = chest.getDurability();
-				if (data <= 25 && data != 0) return false; //Fuel check
-				
-			} else if (chest.getTypeId() == 30210) {
-				int data = chest.getDurability();
-				if (data < 18000 && data != 0) return false; //Fuel check
-				
+			if (chest.getTypeId() == 30209 || chest.getTypeId() == 30210) {
+				if (TRItemStack.getJetpackCharge(chest)>0) return false;
 			}
 		}
 		
 		for (int i = 0; i<=8; i++){ //Ring on hotbar check
-			ItemStack item = inventory.getItem(i);
-			if (item == null) continue;
-			int id = item.getTypeId();
-			short data = item.getDurability();
-			if (id == 27536 && (data == 1 || data == 3)) return false;
-			if (id == 27584) return false;
+			final ItemStack itemStack = inventory.getItem(i);
+			if (itemStack == null) continue;
+			int id = itemStack.getTypeId();
+			
+			if (id == 27536 || id == 27584) return false;
+			
+			/*
+			if (id == 27536){
+				NBTTagCompound tag = ((CraftItemStack)itemStack).getHandle().tag;
+				if (tag == null){
+					if ((itemStack.getData().getData() & 1) == 1) return false;
+				} else {
+					if (tag.getBoolean("active")) return false;
+					if ((itemStack.getData().getData() & 1) == 1) return false;
+				}
+			}
+			else if (id == 27584) return false;
+			*/
 		}
 		
-		EntityPlayer Eplayer = ((CraftPlayer) player).getHandle();
+		
 		if (player.isInsideVehicle()) return false;
-		if (Eplayer.vehicle != null) {
-			tekkitrestrict.log.info("[DEBUG] "+ChatColor.RED + "player.isInsideVehicle()==false, but Eplayer.vehicle != null!");
-			return false;
-		}
 		
-		String name = player.getName();
+		final String name = player.getName();
+		EntityPlayer Eplayer = ((CraftPlayer) player).getHandle();
 		if (!Eplayer.abilities.isFlying) {
 			if (!player.isSneaking()) {
 				Location loc = player.getLocation();
@@ -106,16 +115,10 @@ public class NoHackFly implements Listener {
 				int y = loc.getBlockY();
 				// checks min height...
 				boolean flight = true;
-				for (int j = 0; j < Hacks.flys.value + 1; j++) {
+				for (int j = 0; j <= minHeight; j++) {
 					Block b1 = player.getWorld().getBlockAt(x, y, z);//Get the block at the players position.
 					if (!b1.isEmpty()){
 						flight = false; //If there is a block, flight = false.
-						break;
-					}
-					
-					TileEntity te1 = Eplayer.world.getTileEntity(x, y, z);
-					if (te1 != null){
-						flight = false;
 						break;
 					}
 					
@@ -132,14 +135,12 @@ public class NoHackFly implements Listener {
 						velo = playery - oldY;
 					
 					tickLastLoc.put(name, playery);
-					
-					//if (velo != 0) tekkitrestrict.log.info("[DEBUG] velo: " + velo);
 
 					// they are constant 0 or are going upwards
 					if (velo >= 0) {
-						Block cb = player.getLocation().getBlock();
+						Block cb = loc.getBlock();
 						for (BlockFace bf : BlockFace.values()) {
-							if (!nearBlocks.contains(cb.getRelative(bf).getTypeId())) continue;
+							if (!ArrayUtil.contains(nearBlocks, cb.getRelative(bf).getTypeId())) continue;
 							lowerScore(name, 1);
 							return false;
 						}
@@ -186,6 +187,7 @@ public class NoHackFly implements Listener {
 		}
 	}
 	
+	//sync
 	private static void lowerScore(String name, int amount){
 		Integer ticks = tickTolerance.get(name);
 		if (ticks == null) ticks = 0;
@@ -196,16 +198,19 @@ public class NoHackFly implements Listener {
 		tickTolerance.put(name, ticks);
 	}
 	
+	//sync
 	private static void resetScore(String name){
 		tickTolerance.remove(name);
 		tickLastLoc.remove(name);
 	}
 
+	//async
 	public static void clearMaps() {
-		tickTolerance.clear();
-		tickLastLoc.clear();
+		tickTolerance = new HashMap<String, Integer>();
+		tickLastLoc = new HashMap<String, Double>();
 	}
 
+	//sync
 	public static void playerLogout(String playerName) {
 		tickTolerance.remove(playerName);
 		tickLastLoc.remove(playerName);
@@ -216,6 +221,6 @@ public class NoHackFly implements Listener {
 	 */
 	private static void groundPlayer(Player player) {
 		Block highest = player.getWorld().getHighestBlockAt(player.getLocation());
-		player.teleport(highest.getLocation());
+		player.teleport(highest.getLocation(), TeleportCause.COMMAND);
 	}
 }

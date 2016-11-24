@@ -2,10 +2,8 @@ package nl.taico.tekkitrestrict;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -17,106 +15,74 @@ import org.eclipse.jdt.annotation.Nullable;
 import nl.taico.tekkitrestrict.Log.Warning;
 
 public class FileLog {
-	private BufferedWriter out;
-	private String type = "";
-	private int day = 0;
-	private int counter = 0;
-	private static HashMap<String, FileLog> Logs = new HashMap<String, FileLog>();
-	private boolean alternate;
-	private static final String sep = File.separator;
+	protected BufferedWriter out;
+	protected String type = "";
+	protected int day = 0;
+	protected int counter = 0;
+	protected static HashMap<String, FileLog> Logs = new HashMap<>();
+	protected final boolean consoleLog;
+	protected static final String sep = File.separator;
 	
 	@SuppressWarnings("deprecation")
-	public FileLog(@NonNull String type, boolean alternate){
-		this.alternate = alternate;
+	public FileLog(@NonNull final String type, final boolean consoleLog){
 		this.type = type;
-		Date curdate = new Date(System.currentTimeMillis());
-		this.day = curdate.getDay();
+		this.consoleLog = consoleLog;
+		this.day = new Date(System.currentTimeMillis()).getDay();
 		
-		File log;
-		File folder;
-		if (!alternate){
-			log = new File("."+sep+TRConfigCache.LogFilter.logLocation+sep+type+sep+formatName(type));
-			folder = new File("."+sep+TRConfigCache.LogFilter.logLocation+sep+type+sep);
+		final File log;
+		final File folder;
+		if (TRConfigCache.LogFilter.logLocation.matches("[a-zA-Z]:"+sep+".*")
+				|| TRConfigCache.LogFilter.logLocation.startsWith("."+sep)
+				|| TRConfigCache.LogFilter.logLocation.startsWith(sep)){
+			folder = new File(TRConfigCache.LogFilter.logLocation+sep+type);
+			if (!folder.exists()) folder.mkdirs();
+			
+			log = new File(folder, formatName(type));
 		} else {
-			log = new File("plugins"+sep+"tekkitrestrict"+sep+"log"+sep+type+sep+formatName(type));
-			folder = new File("plugins"+sep+"tekkitrestrict"+sep+"log"+sep+type+sep);
+			folder = new File("."+sep+TRConfigCache.LogFilter.logLocation+sep+type);
+			if (!folder.exists()) folder.mkdirs();
+			
+			log = new File(folder, formatName(type));
 		}
-
-		if (!folder.exists()) folder.mkdirs();
 		
 		if (!log.exists()){
 			try {
 				log.createNewFile();
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				e.printStackTrace();
 			}
 		}
 		try {
 			out = new BufferedWriter(new FileWriter(log, true));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 		
 		Logs.put(type, this);
 	}
 	
-	@SuppressWarnings("deprecation")
-	public FileLog(@NonNull String type){
-		this.alternate = false;
-		this.type = type;
-		Date curdate = new Date(System.currentTimeMillis());
-		this.day = curdate.getDay();
-		
-		File log = new File("."+sep+TRConfigCache.LogFilter.logLocation+sep+type+sep+formatName(type));
-		File folder = new File("."+sep+TRConfigCache.LogFilter.logLocation+sep+type+sep);
-		if (!folder.exists()) folder.mkdirs();
-		
-		if (!log.exists()){
-			try {
-				log.createNewFile();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		try {
-			out = new BufferedWriter(new FileWriter(log, true));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		Logs.put(type, this);
-	}
-	
-	@NonNull public static FileLog getLog(@NonNull String type){
+	@NonNull public static FileLog getLog(@NonNull final String type){
 		return Logs.get(type);
 	}
 	
-	@NonNull public static FileLog getLogOrMake(@Nullable String type){
+	@NonNull public static FileLog getLogOrMake(@Nullable String type, final boolean consoleLog){
 		if (type == null) type = "null";
-		FileLog tbr = Logs.get(type);
-		if (tbr == null) return new FileLog(type);
-		return tbr;
+		final FileLog tbr = Logs.get(type);
+		return tbr == null ? new FileLog(type, consoleLog) : tbr;
 	}
 	
-	@NonNull public static FileLog getLogOrMake(@Nullable String type, boolean alternate){
-		if (type == null) type = "null";
-		FileLog tbr = Logs.get(type);
-		if (tbr == null) return new FileLog(type, alternate);
-		return tbr;
-	}
-	
-	public void log(@Nullable String msg){
+	public void log(@Nullable final String msg, final long time){
 		try {
-			if (type.equals("Chat"))
-				out.write(replacecolors(formatMsg(msg)));
-			else
-				out.write(replaceshort(formatMsg(msg)));
+			if (consoleLog){
+				if (type.equals("Chat"))
+					out.write(replacecolors(formatMsg(msg, time)));
+				else
+					out.write(replaceshort(formatMsg(msg, time)));
+			} else {
+				out.write(Util.replaceColors(formatMsg(msg, time)));
+			}
 			out.newLine();
-		} catch (IOException ex) {}
+		} catch (final IOException ex) {}
 		
 		counter++;
 
@@ -124,17 +90,21 @@ public class FileLog {
 			counter = 0;
 			try {
 				out.flush();
-			} catch (IOException ex) {
+			} catch (final IOException ex) {
 				ex.printStackTrace();
 			}
 			changeDate();
 		}
 	}
 	
+	public void log(@Nullable final String msg){
+		log(msg, System.currentTimeMillis());
+	}
+	
 	public boolean close(){
 		try {
 			out.close();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 			Logs.remove(type);
 			return false;
@@ -146,7 +116,7 @@ public class FileLog {
 	private boolean closeNoRemove(){
 		try {
 			out.close();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 			Logs.remove(type);
 			return false;
@@ -155,7 +125,7 @@ public class FileLog {
 	}
 	
 	public static void closeAll(){
-		for (FileLog filelog : Logs.values()){
+		for (final FileLog filelog : Logs.values()){
 			if (!filelog.closeNoRemove()){
 				Warning.other("Unable to close all logs. Some might not save properly.", false);
 			}
@@ -165,8 +135,8 @@ public class FileLog {
 	
 	@SuppressWarnings("deprecation")
 	public void changeDate(){
-		Date curdate = new Date(System.currentTimeMillis());
-		int day = curdate.getDay();
+		final Date curdate = new Date(System.currentTimeMillis());
+		final int day = curdate.getDay();
 		if (day == this.day) return;
 		
 		if (!close()){
@@ -175,14 +145,19 @@ public class FileLog {
 		}
 		this.day = day;
 		
-		File log;
-		File folder;
-		if (!alternate){
-			log = new File("."+sep+TRConfigCache.LogFilter.logLocation+sep+type+sep+formatName(type));
-			folder = new File("."+sep+TRConfigCache.LogFilter.logLocation+sep+type+sep);
+		final File log;
+		final File folder;
+		if (TRConfigCache.LogFilter.logLocation.matches("[a-zA-Z]:"+sep+".*")
+				|| TRConfigCache.LogFilter.logLocation.startsWith("."+sep)){
+			folder = new File(TRConfigCache.LogFilter.logLocation, "type");
+			if (!folder.exists()) folder.mkdirs();
+			
+			log = new File(folder, formatName(type));
 		} else {
-			log = new File("plugins"+sep+"tekkitrestrict"+sep+"log"+sep+type+sep+formatName(type));
-			folder = new File("plugins"+sep+"tekkitrestrict"+sep+"log"+sep+type+sep);
+			folder = new File("."+sep+TRConfigCache.LogFilter.logLocation, type);
+			if (!folder.exists()) folder.mkdirs();
+			
+			log = new File(folder, formatName(type));
 		}
 		
 		if (!folder.exists()){
@@ -191,21 +166,19 @@ public class FileLog {
 		if (!log.exists()){
 			try {
 				log.createNewFile();
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				e.printStackTrace();
 			}
 		}
 		try {
 			out = new BufferedWriter(new FileWriter(log, true));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 		Logs.put(type, this);
 	}
 	
-	@NonNull private String replacecolors(@NonNull String input){
+	@NonNull protected String replacecolors(@NonNull final String input){
 		return input.replace("\033[30;22m", "§0")
 					.replace("\033[34;22m", "§1")
 					.replace("\033[32;22m", "§2")
@@ -268,20 +241,19 @@ public class FileLog {
 					.replace("\033[m", "");
 	}
 
-	@NonNull private String replaceshort(@NonNull String input){
+	@NonNull protected String replaceshort(@NonNull final String input){
 		return input.replace("\033[m", "");
 	}
 	
-	private boolean logged = false;
-	private boolean logged2 = false;
-	@NonNull private String formatName(@NonNull String type){
-		Date curdate = new Date(System.currentTimeMillis());
-		DateFormat formatter = new SimpleDateFormat("dd-MM-yy");
-		String data = formatter.format(curdate);
-		String date[] = data.split("-");
+	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yy");
+	protected boolean logged = false;
+	protected boolean logged2 = false;
+	@NonNull protected String formatName(@NonNull String type){
+		final String data = dateFormat.format(new Date(System.currentTimeMillis()));
+		final String date[] = data.split("-");
 		
 		String name = TRConfigCache.LogFilter.fileFormat;
-		if (name == null || name.equals("") || name.contains("*") || name.endsWith(".")){
+		if (name == null || name.isEmpty() || name.contains("*") || name.endsWith(".")){
 			if (!logged){
 				Warning.other(ChatColor.RED + "The filename format set in the Logging config is invalid!", false);
 				logged = true;
@@ -298,26 +270,35 @@ public class FileLog {
 					.replace("/", "");
 	}
 
-	@NonNull private String formatMsg(@Nullable String msg){
+	@NonNull protected String formatMsg(@Nullable final String msg){
+		return formatMsg(msg, System.currentTimeMillis());
+	}
+	
+	private static final SimpleDateFormat timeFormat = new SimpleDateFormat("kk:mm:ss");
+	@NonNull protected String formatMsg(@Nullable String msg, final long time){
 		if (msg == null) msg = "null";
-		DateFormat formatter = new SimpleDateFormat("kk:mm:ss");
-		String times = formatter.format(new Date(System.currentTimeMillis()));
 		
-		String format = TRConfigCache.LogFilter.logFormat;
-		if (format == null || format.equals("")){
+		final String times = timeFormat.format(new Date(time));
+		
+		final String format = TRConfigCache.LogFilter.logFormat;
+		if (format == null || format.isEmpty()){
 			if (!logged2){
 				Warning.other(ChatColor.RED + "The log format set in the Logging config is invalid!", false);
 				logged2 = true;
 			}
 			
-			format = new StringBuilder("[").append(times).append("] ").append(msg).toString();
+			return new StringBuilder("[").append(times).append("] ").append(msg).toString();
 		} else {
-			String time[] = times.split(":");
-			format = format.replace("{HOUR}", time[0])
-							.replace("{MINUTE}", time[1])
-							.replace("{SECOND}", time[2])
-							.replace("{INFO}", msg);
+			final String timestr[] = times.split(":");
+			return format.replace("{HOUR}", timestr[0])
+						 .replace("{MINUTE}", timestr[1])
+						 .replace("{SECOND}", timestr[2])
+						 .replace("{INFO}", msg);
 		}
-		return format;
+	}
+
+	@Override
+	public int hashCode(){
+		return type.hashCode() + (consoleLog ? 1 : 0);
 	}
 }

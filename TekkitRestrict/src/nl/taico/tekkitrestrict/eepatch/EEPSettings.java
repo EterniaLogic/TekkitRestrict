@@ -4,21 +4,23 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import nl.taico.taeirlib.config.interfaces.ISection;
 import nl.taico.tekkitrestrict.Log;
-import nl.taico.tekkitrestrict.tekkitrestrict;
-import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
+import nl.taico.tekkitrestrict.config.SettingsStorage;
 
 import ee.events.EEEnums.EEAction2;
 import ee.events.EEEnums.EEAmuletAction;
+import ee.events.EEEnums.EEPedestalAction;
 import ee.events.EEEnums.EERingAction;
 import ee.events.EEEnums.EEArmorAction;
 import ee.events.EEEnums.EETransmuteAction;
+import ee.events.EEEnums.EEWatchAction;
 
 public class EEPSettings {
-	public static HashMap<Integer, Integer> MaxCharge = new HashMap<Integer, Integer>();
+	public static HashMap<Integer, Integer> MaxCharge = new HashMap<>();
 	
-	public static HashMap<String, ArrayList<Integer>> Groups = new HashMap<String, ArrayList<Integer>>();
-	public static HashMap<String, Integer> EENames = new HashMap<String, Integer>();
+	public static HashMap<String, ArrayList<Integer>> Groups = new HashMap<>();
+	public static HashMap<String, Integer> EENames = new HashMap<>();
 	static {
 		EENames.put("dmpickaxe", 27543);
 		EENames.put("dmspade", 27544);
@@ -136,7 +138,7 @@ public class EEPSettings {
 		EENames.put("kleinstar6", 27591);
 		EENames.put("alchemybag", 27562);
 		
-		ArrayList<Integer> dmtools = new ArrayList<Integer>();
+		ArrayList<Integer> dmtools = new ArrayList<Integer>(8);
 		dmtools.add(27543);
 		dmtools.add(27544);
 		dmtools.add(27545);
@@ -146,7 +148,7 @@ public class EEPSettings {
 		dmtools.add(27555);
 		Groups.put("dmtools", dmtools);
 		
-		ArrayList<Integer> rmtools = new ArrayList<Integer>();
+		ArrayList<Integer> rmtools = new ArrayList<Integer>(8);
 		rmtools.add(27564);
 		rmtools.add(27565);
 		rmtools.add(27566);
@@ -156,12 +158,12 @@ public class EEPSettings {
 		rmtools.add(27570);
 		Groups.put("rmtools", rmtools);
 		
-		ArrayList<Integer> amulets = new ArrayList<Integer>();
+		ArrayList<Integer> amulets = new ArrayList<Integer>(2);
 		amulets.add(27530);
 		amulets.add(27531);
 		Groups.put("amulets", amulets);
 		
-		ArrayList<Integer> rings = new ArrayList<Integer>();
+		ArrayList<Integer> rings = new ArrayList<Integer>(2);
 		rings.add(27574);
 		rings.add(27533);
 		Groups.put("rings", rings);
@@ -172,9 +174,10 @@ public class EEPSettings {
 	}
 	
 	public static void loadMaxCharge(){
+		Log.trace("EEPatch - Loading MaxCharges...");
 		MaxCharge.clear();
 		
-		List<String> mc = tekkitrestrict.config.getStringList(ConfigFile.EEPatch, "EEMaxCharge");
+		List<String> mc = SettingsStorage.eepatchConfig.getStringList("EEMaxCharge");
 		for (String current : mc){
 			if (current == null) continue;
 			if (!current.contains(" ")){
@@ -211,14 +214,14 @@ public class EEPSettings {
 	}
 	
 	public static void loadAllDisabledActions(){
-		loadDisabledRingActions();
-		loadDisabledDestActions();
-		loadDisabledAmuletActions();
-		loadDMToolActions();
-		loadRMToolActions();
-		loadRedToolActions();
-		loadArmorActions();
-		loadOtherActions();
+		loadDisabledRingActions(SettingsStorage.eepatchConfig.getSection("Actions.Rings"));
+		loadDisabledDestActions(SettingsStorage.eepatchConfig.getSection("Actions.Tools.Destruction"));
+		loadDisabledAmuletActions(SettingsStorage.eepatchConfig.getSection("Actions.Amulets"));
+		loadDMToolActions(SettingsStorage.eepatchConfig.getSection("Actions.Tools.DarkMatter"));
+		loadRMToolActions(SettingsStorage.eepatchConfig.getSection("Actions.Tools.RedMatter"));
+		loadRedToolActions(SettingsStorage.eepatchConfig.getSection("Actions.Tools"));
+		loadArmorActions(SettingsStorage.eepatchConfig.getSection("Actions.Armor"));
+		loadOtherActions(SettingsStorage.eepatchConfig.getSection("Actions.Other"));
 	}
 	
 	public static ArrayList<EERingAction> zeroring = new ArrayList<EERingAction>();
@@ -230,7 +233,8 @@ public class EEPSettings {
 	public static ArrayList<EERingAction> blackholeband = new ArrayList<EERingAction>();
 	public static ArrayList<EERingAction> voidring = new ArrayList<EERingAction>();
 	public static ArrayList<EERingAction> archangelring = new ArrayList<EERingAction>();
-	public static void loadDisabledRingActions(){
+	public static void loadDisabledRingActions(ISection config){
+		Log.trace("EEPatch - Loading Disabled Ring Actions...");
 		zeroring.clear();
 		firering.clear();
 		harvestring.clear();
@@ -240,121 +244,122 @@ public class EEPSettings {
 		voidring.clear();
 		archangelring.clear();
 		
-		//tekkitrestrict.config.getConfigurationSection("Actions.Rings");
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Rings.ZeroRing.FreezeRadius", true))
+		if (!config.getBoolean("ZeroRing.FreezeRadius", true))
 			zeroring.add(EERingAction.Freeze);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Rings.ZeroRing.ThrowSnowball", true))
+		if (!config.getBoolean("ZeroRing.ThrowSnowball", true))
 			zeroring.add(EERingAction.ThrowSnowball);
 		
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Rings.RingOfIgnition.BurnRadius", true))
+		if (!config.getBoolean("RingOfIgnition.BurnRadius", true))
 			firering.add(EERingAction.Burn);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Rings.RingOfIgnition.PassiveExtinguishNearPlayer", true))
+		if (!config.getBoolean("RingOfIgnition.PassiveExtinguishNearPlayer", true))
 			firering.add(EERingAction.Extinguish);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Rings.RingOfIgnition.ThrowPyrokinesis", true))
+		if (!config.getBoolean("RingOfIgnition.ThrowPyrokinesis", true))
 			firering.add(EERingAction.ThrowPyrokinesis);
 		
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Rings.HarvestGodessBand.Fertilize", true))
+		if (!config.getBoolean("HarvestGodessBand.Fertilize", true))
 			harvestring.add(EERingAction.Fertilize);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Rings.HarvestGodessBand.PlantRadius", true))
+		if (!config.getBoolean("HarvestGodessBand.PlantRadius", true))
 			harvestring.add(EERingAction.PlantRadius);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Rings.HarvestGodessBand.HarvestRadius", true))
+		if (!config.getBoolean("HarvestGodessBand.HarvestRadius", true))
 			harvestring.add(EERingAction.Harvest);
 		
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Rings.SwiftwolfsRendingGale.NegateFallDamage", true))
+		if (!config.getBoolean("SwiftwolfsRendingGale.NegateFallDamage", true))
 			flyring.add(EERingAction.NegateFallDamage);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Rings.SwiftwolfsRendingGale.Interdict", true))
+		if (!config.getBoolean("SwiftwolfsRendingGale.Interdict", true))
 			flyring.add(EERingAction.Interdict);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Rings.SwiftwolfsRendingGale.Gust", true))
+		if (!config.getBoolean("SwiftwolfsRendingGale.Gust", true))
 			flyring.add(EERingAction.Gust);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Rings.SwiftwolfsRendingGale.ActivateInterdict", true))
+		if (!config.getBoolean("SwiftwolfsRendingGale.ActivateInterdict", true))
 			flyring.add(EERingAction.ActivateInterdict);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Rings.SwiftwolfsRendingGale.ActivateFlight", true))
+		if (!config.getBoolean("SwiftwolfsRendingGale.ActivateFlight", true))
 			flyring.add(EERingAction.Activate);
 		
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Rings.RingOfArcana.StrikeLightning", true))
+		if (!config.getBoolean("RingOfArcana.StrikeLightning", true))
 			arcanering.add(EERingAction.StrikeLightning);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Rings.RingOfArcana.Fertilize", true))
+		if (!config.getBoolean("RingOfArcana.Fertilize", true))
 			arcanering.add(EERingAction.Fertilize);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Rings.RingOfArcana.Interdict", true))
+		if (!config.getBoolean("RingOfArcana.Interdict", true))
 			arcanering.add(EERingAction.Interdict);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Rings.RingOfArcana.FreezeRadius", true))
+		if (!config.getBoolean("RingOfArcana.FreezeRadius", true))
 			arcanering.add(EERingAction.Freeze);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Rings.RingOfArcana.BurnRadius", true))
+		if (!config.getBoolean("RingOfArcana.BurnRadius", true))
 			arcanering.add(EERingAction.Burn);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Rings.RingOfArcana.HarvestRadius", true))
+		if (!config.getBoolean("RingOfArcana.HarvestRadius", true))
 			arcanering.add(EERingAction.Harvest);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Rings.RingOfArcana.Gust", true))
+		if (!config.getBoolean("RingOfArcana.Gust", true))
 			arcanering.add(EERingAction.Gust);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Rings.RingOfArcana.ThrowSnowball", true))
+		if (!config.getBoolean("RingOfArcana.ThrowSnowball", true))
 			arcanering.add(EERingAction.ThrowSnowball);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Rings.RingOfArcana.ThrowPyrokinesis", true))
+		if (!config.getBoolean("RingOfArcana.ThrowPyrokinesis", true))
 			arcanering.add(EERingAction.ThrowPyrokinesis);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Rings.RingOfArcana.NegateFallDamage", true))
+		if (!config.getBoolean("RingOfArcana.NegateFallDamage", true))
 			arcanering.add(EERingAction.NegateFallDamage);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Rings.RingOfArcana.Activate", true))
+		if (!config.getBoolean("RingOfArcana.Activate", true))
 			arcanering.add(EERingAction.Activate);
 		
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Rings.BlackHoleBand.AttractItems", true))
+		if (!config.getBoolean("BlackHoleBand.AttractItems", true))
 			blackholeband.add(EERingAction.AttractItems);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Rings.BlackHoleBand.DeleteLiquid", true))
+		if (!config.getBoolean("BlackHoleBand.DeleteLiquid", true))
 			blackholeband.add(EERingAction.DeleteLiquid);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Rings.BlackHoleBand.Activate", true))
+		if (!config.getBoolean("BlackHoleBand.Activate", true))
 			blackholeband.add(EERingAction.Activate);
 		
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Rings.VoidRing.AttractItems", true))
+		if (!config.getBoolean("VoidRing.AttractItems", true))
 			voidring.add(EERingAction.AttractItems);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Rings.VoidRing.DeleteLiquid", true))
+		if (!config.getBoolean("VoidRing.DeleteLiquid", true))
 			voidring.add(EERingAction.DeleteLiquid);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Rings.VoidRing.Teleport", true))
+		if (!config.getBoolean("VoidRing.Teleport", true))
 			voidring.add(EERingAction.Teleport);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Rings.VoidRing.Condense", true))
+		if (!config.getBoolean("VoidRing.Condense", true))
 			voidring.add(EERingAction.Condense);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Rings.VoidRing.Activate", true))
+		if (!config.getBoolean("VoidRing.Activate", true))
 			voidring.add(EERingAction.Activate);
 		
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Rings.ArchangelsSmite.ShootArrows", true))
+		if (!config.getBoolean("ArchangelsSmite.ShootArrows", true))
 			archangelring.add(EERingAction.ShootArrows);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Rings.ArchangelsSmite.Activate", true))
+		if (!config.getBoolean("ArchangelsSmite.Activate", true))
 			archangelring.add(EERingAction.Activate);
 	}
 
 	public static ArrayList<EEAction2> dest1 = new ArrayList<EEAction2>();
 	public static ArrayList<EEAction2> dest2 = new ArrayList<EEAction2>();
 	public static ArrayList<EEAction2> dest3 = new ArrayList<EEAction2>();
-	public static void loadDisabledDestActions(){
+	public static void loadDisabledDestActions(ISection config){
+		Log.trace("EEPatch - Loading Disabled Destruction Actions...");
 		dest1.clear();
 		dest2.clear();
 		dest3.clear();
 		
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.Destruction.DestructionCatalyst.BreakRadius", true))
+		if (!config.getBoolean("DestructionCatalyst.BreakRadius", true))
 			dest1.add(EEAction2.BreakRadius);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.Destruction.HyperKineticLens.BreakRadius", true))
+		if (!config.getBoolean("HyperKineticLens.BreakRadius", true))
 			dest2.add(EEAction2.BreakRadius);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.Destruction.CatalyticLens.BreakRadius", true))
+		if (!config.getBoolean("CatalyticLens.BreakRadius", true))
 			dest3.add(EEAction2.BreakRadius);
 	}
 	
 	public static ArrayList<EEAmuletAction> evertide = new ArrayList<EEAmuletAction>();
 	public static ArrayList<EEAmuletAction> volcanite = new ArrayList<EEAmuletAction>();
 	
-	public static void loadDisabledAmuletActions(){
+	public static void loadDisabledAmuletActions(ISection config){
+		Log.trace("EEPatch - Loading Disabled Amulet Actions...");
 		evertide.clear();
 		volcanite.clear();
 		
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Amulets.Evertide.CreateWater", true))
+		if (!config.getBoolean("Evertide.CreateWater", true))
 			evertide.add(EEAmuletAction.CreateWater);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Amulets.Evertide.CreateWaterBall", true))
+		if (!config.getBoolean("Evertide.CreateWaterBall", true))
 			evertide.add(EEAmuletAction.CreateWaterBall);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Amulets.Evertide.PreventDrowning", true))
+		if (!config.getBoolean("Evertide.PreventDrowning", true))
 			evertide.add(EEAmuletAction.StopDrowning);
 		
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Amulets.Volcanite.CreateLava", true))
+		if (!config.getBoolean("Volcanite.CreateLava", true))
 			volcanite.add(EEAmuletAction.CreateLava);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Amulets.Volcanite.CreateLavaBall", true))
+		if (!config.getBoolean("Volcanite.CreateLavaBall", true))
 			volcanite.add(EEAmuletAction.CreateLavaBall);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Amulets.Volcanite.Vaporize", true))
+		if (!config.getBoolean("Volcanite.Vaporize", true))
 			volcanite.add(EEAmuletAction.Vaporize);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Amulets.Volcanite.FireImmune", true))
+		if (!config.getBoolean("Volcanite.FireImmune", true))
 			volcanite.add(EEAmuletAction.FireImmune);
 	}
 
@@ -366,7 +371,8 @@ public class EEPSettings {
 	public static ArrayList<EEAction2> dmhammer = new ArrayList<EEAction2>();
 	public static ArrayList<EEAction2> dmsword = new ArrayList<EEAction2>();
 
-	public static void loadDMToolActions(){
+	public static void loadDMToolActions(ISection config){
+		Log.trace("EEPatch - Loading Disabled DM Tool Actions...");
 		dmaxe.clear();
 		dmpick.clear();
 		dmshovel.clear();
@@ -375,41 +381,41 @@ public class EEPSettings {
 		dmhammer.clear();
 		dmsword.clear();
 		
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.DarkMatter.Pickaxe.Break-3.Tall", true))
+		if (!config.getBoolean("Pickaxe.Break-3.Tall", true))
 			dmpick.add(EEAction2.TallBreak);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.DarkMatter.Pickaxe.Break-3.Wide", true))
+		if (!config.getBoolean("Pickaxe.Break-3.Wide", true))
 			dmpick.add(EEAction2.WideBreak);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.DarkMatter.Pickaxe.Break-3.Long", true))
+		if (!config.getBoolean("Pickaxe.Break-3.Long", true))
 			dmpick.add(EEAction2.LongBreak);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.DarkMatter.Pickaxe.BreakOreVein", true))
+		if (!config.getBoolean("Pickaxe.BreakOreVein", true))
 			dmpick.add(EEAction2.BreakRadius);
 		
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.DarkMatter.Axe.BreakRadius", true))
+		if (!config.getBoolean("Axe.BreakRadius", true))
 			dmaxe.add(EEAction2.BreakRadius);
 		
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.DarkMatter.Shovel.Break-3.Tall", true))
+		if (!config.getBoolean("Shovel.Break-3.Tall", true))
 			dmshovel.add(EEAction2.TallBreak);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.DarkMatter.Shovel.Break-3.Wide", true))
+		if (!config.getBoolean("Shovel.Break-3.Wide", true))
 			dmshovel.add(EEAction2.WideBreak);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.DarkMatter.Shovel.Break-3.Long", true))
+		if (!config.getBoolean("Shovel.Break-3.Long", true))
 			dmshovel.add(EEAction2.LongBreak);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.DarkMatter.Shovel.BreakRadius", true))
+		if (!config.getBoolean("Shovel.BreakRadius", true))
 			dmshovel.add(EEAction2.BreakRadius);
 		
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.DarkMatter.Hoe.TillRadius", true))
+		if (!config.getBoolean("Hoe.TillRadius", true))
 			dmhoe.add(EEAction2.TillRadius);
 		
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.DarkMatter.Shears.BreakRadius", true))
+		if (!config.getBoolean("Shears.BreakRadius", true))
 			dmshears.add(EEAction2.BreakRadius);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.DarkMatter.Shears.Shear", true))
+		if (!config.getBoolean("Shears.Shear", true))
 			dmshears.add(EEAction2.Shear);
 		
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.DarkMatter.Hammer.MegaBreak", true))
+		if (!config.getBoolean("Hammer.MegaBreak", true))
 			dmhammer.add(EEAction2.MegaBreak);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.DarkMatter.Hammer.BreakRadius", true))
+		if (!config.getBoolean("Hammer.BreakRadius", true))
 			dmhammer.add(EEAction2.BreakRadius);
 		
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.DarkMatter.Sword.AttackRadius", true))
+		if (!config.getBoolean("Sword.AttackRadius", true))
 			dmsword.add(EEAction2.AttackRadius);
 	}
 	
@@ -421,7 +427,8 @@ public class EEPSettings {
 	public static ArrayList<EEAction2> rmhammer = new ArrayList<EEAction2>();
 	public static ArrayList<EEAction2> rmsword = new ArrayList<EEAction2>();
 
-	public static void loadRMToolActions(){
+	public static void loadRMToolActions(ISection config){
+		Log.trace("EEPatch - Loading Disabled RM Tool Actions...");
 		rmaxe.clear();
 		rmpick.clear();
 		rmshovel.clear();
@@ -430,102 +437,139 @@ public class EEPSettings {
 		rmhammer.clear();
 		rmsword.clear();
 		
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.RedMatter.Pickaxe.Break-3.Tall", true))
+		if (!config.getBoolean("Pickaxe.Break-3.Tall", true))
 			rmpick.add(EEAction2.TallBreak);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.RedMatter.Pickaxe.Break-3.Wide", true))
+		if (!config.getBoolean("Pickaxe.Break-3.Wide", true))
 			rmpick.add(EEAction2.WideBreak);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.RedMatter.Pickaxe.Break-3.Long", true))
+		if (!config.getBoolean("Pickaxe.Break-3.Long", true))
 			rmpick.add(EEAction2.LongBreak);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.RedMatter.Pickaxe.BreakOreVein", true))
+		if (!config.getBoolean("Pickaxe.BreakOreVein", true))
 			rmpick.add(EEAction2.BreakRadius);
 		
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.RedMatter.Axe.BreakRadius", true))
+		if (!config.getBoolean("Axe.BreakRadius", true))
 			rmaxe.add(EEAction2.BreakRadius);
 		
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.RedMatter.Shovel.Break-3.Tall", true))
+		if (!config.getBoolean("Shovel.Break-3.Tall", true))
 			rmshovel.add(EEAction2.TallBreak);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.RedMatter.Shovel.Break-3.Wide", true))
+		if (!config.getBoolean("Shovel.Break-3.Wide", true))
 			rmshovel.add(EEAction2.WideBreak);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.RedMatter.Shovel.Break-3.Long", true))
+		if (!config.getBoolean("Shovel.Break-3.Long", true))
 			rmshovel.add(EEAction2.LongBreak);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.RedMatter.Shovel.BreakRadius", true))
+		if (!config.getBoolean("Shovel.BreakRadius", true))
 			rmshovel.add(EEAction2.BreakRadius);
 		
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.RedMatter.Hoe.TillRadius", true))
+		if (!config.getBoolean("Hoe.TillRadius", true))
 			rmhoe.add(EEAction2.TillRadius);
 		
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.RedMatter.Shears.BreakRadius", true))
+		if (!config.getBoolean("Shears.BreakRadius", true))
 			rmshears.add(EEAction2.BreakRadius);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.RedMatter.Shears.Shear", true))
+		if (!config.getBoolean("Shears.Shear", true))
 			rmshears.add(EEAction2.Shear);
 		
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.RedMatter.Hammer.MegaBreak", true))
+		if (!config.getBoolean("Hammer.MegaBreak", true))
 			rmhammer.add(EEAction2.MegaBreak);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.RedMatter.Hammer.BreakRadius", true))
+		if (!config.getBoolean("Hammer.BreakRadius", true))
 			rmhammer.add(EEAction2.BreakRadius);
 		
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.RedMatter.Sword.AttackRadius", true))
+		if (!config.getBoolean("Sword.AttackRadius", true))
 			rmsword.add(EEAction2.AttackRadius);
 	}
 	
 	public static ArrayList<EEAction2> katar = new ArrayList<EEAction2>();
 	public static ArrayList<EEAction2> morningstar = new ArrayList<EEAction2>();
 	
-	public static void loadRedToolActions(){
+	public static void loadRedToolActions(ISection config){
+		Log.trace("EEPatch - Loading Disabled Red Tool (Katar and Morning Star) Actions...");
 		katar.clear();
 		morningstar.clear();
 		
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.Katar.BreakRadius", true))
+		if (!config.getBoolean("Katar.BreakRadius", true))
 			katar.add(EEAction2.BreakRadius);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.Katar.TillRadius", true))
+		if (!config.getBoolean("Katar.TillRadius", true))
 			katar.add(EEAction2.TillRadius);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.Katar.AttackRadius", true))
+		if (!config.getBoolean("Katar.AttackRadius", true))
 			katar.add(EEAction2.AttackRadius);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.Katar.Shear", true))
+		if (!config.getBoolean("Katar.Shear", true))
 			katar.add(EEAction2.Shear);
 		
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.MorningStar.Break-3.Tall", true))
+		if (!config.getBoolean("MorningStar.Break-3.Tall", true))
 			morningstar.add(EEAction2.TallBreak);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.MorningStar.Break-3.Wide", true))
+		if (!config.getBoolean("MorningStar.Break-3.Wide", true))
 			morningstar.add(EEAction2.WideBreak);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.MorningStar.Break-3.Long", true))
+		if (!config.getBoolean("MorningStar.Break-3.Long", true))
 			morningstar.add(EEAction2.LongBreak);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.MorningStar.MegaBreak", true))
+		if (!config.getBoolean("MorningStar.MegaBreak", true))
 			morningstar.add(EEAction2.MegaBreak);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Tools.MorningStar.BreakRadius", true))
+		if (!config.getBoolean("MorningStar.BreakRadius", true))
 			morningstar.add(EEAction2.BreakRadius);
 	}
 	
 	public static ArrayList<EEArmorAction> armor = new ArrayList<EEArmorAction>();
-	public static void loadArmorActions(){
+	public static void loadArmorActions(ISection config){
+		Log.trace("EEPatch - Loading Disabled Gem Armor Actions...");
 		armor.clear();
 		
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Armor.Offensive.Activate", true))
+		if (!config.getBoolean("Offensive.Activate", true))
 			armor.add(EEArmorAction.OffensiveActivate);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Armor.Offensive.Explode", true))
+		if (!config.getBoolean("Offensive.Explode", true))
 			armor.add(EEArmorAction.OffensiveExplode);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Armor.Offensive.Strike", true))
+		if (!config.getBoolean("Offensive.Strike", true))
 			armor.add(EEArmorAction.OffensiveStrike);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Armor.Movement.Activate", true))
+		if (!config.getBoolean("Movement.Activate", true))
 			armor.add(EEArmorAction.MovementActivate);
 	}
 
 	
 	public static ArrayList<EETransmuteAction> phil = new ArrayList<EETransmuteAction>();
 	public static ArrayList<EETransmuteAction> trans = new ArrayList<EETransmuteAction>();
-	public static void loadOtherActions(){
+	public static ArrayList<EEPedestalAction> pedestal = new ArrayList<EEPedestalAction>();
+	public static ArrayList<EEWatchAction> watch = new ArrayList<EEWatchAction>();
+	public static void loadOtherActions(ISection config){
+		Log.trace("EEPatch - Loading Disabled Other Actions (PhilosopherStone, Transmution Tablet, Pedestal, WatchOfFlowingTime)...");
 		phil.clear();
 		trans.clear();
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Other.PhilosopherStone.ChangeMob", true))
+		pedestal.clear();
+		watch.clear();
+		if (!config.getBoolean("PhilosopherStone.ChangeMob", true))
 			phil.add(EETransmuteAction.ChangeMob);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Other.PhilosopherStone.PortableCrafting", true))
+		if (!config.getBoolean("PhilosopherStone.PortableCrafting", true))
 			phil.add(EETransmuteAction.PortableCrafting);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Other.PhilosopherStone.Transmute", true))
+		if (!config.getBoolean("PhilosopherStone.Transmute", true))
 			phil.add(EETransmuteAction.Transmute);
 		
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Other.TransmutionTablet.ChangeMob", true))
+		if (!config.getBoolean("TransmutionTablet.ChangeMob", true))
 			trans.add(EETransmuteAction.ChangeMob);
-		if (!tekkitrestrict.config.getBoolean2(ConfigFile.EEPatch, "Actions.Other.TransmutionTablet.PortableTable", true))
+		if (!config.getBoolean("TransmutionTablet.PortableTable", true))
 			trans.add(EETransmuteAction.PortableTable);
+		
+		if (!config.getBoolean("Pedestal.Activate", true))
+			pedestal.add(EEPedestalAction.Activate);
+		if (!config.getBoolean("Pedestal.Attract", true))
+			pedestal.add(EEPedestalAction.Attract);
+		if (!config.getBoolean("Pedestal.Harvest", true))
+			pedestal.add(EEPedestalAction.Harvest);
+		if (!config.getBoolean("Pedestal.Heal", true))
+			pedestal.add(EEPedestalAction.Heal);
+		if (!config.getBoolean("Pedestal.Ignition", true))
+			pedestal.add(EEPedestalAction.Ignition);
+		if (!config.getBoolean("Pedestal.Interdict", true))
+			pedestal.add(EEPedestalAction.Interdict);
+		if (!config.getBoolean("Pedestal.Repair", true))
+			pedestal.add(EEPedestalAction.Repair);
+		if (!config.getBoolean("Pedestal.ShootArrow", true))
+			pedestal.add(EEPedestalAction.ShootArrow);
+		if (!config.getBoolean("Pedestal.StopStorm", true))
+			pedestal.add(EEPedestalAction.StopStorm);
+		if (!config.getBoolean("Pedestal.Storm", true))
+			pedestal.add(EEPedestalAction.Storm);
+		if (!config.getBoolean("Pedestal.StrikeLightning", true))
+			pedestal.add(EEPedestalAction.StrikeLightning);
+		if (!config.getBoolean("Pedestal.Time", true))
+			pedestal.add(EEPedestalAction.Time);
+		
+		if (!config.getBoolean("WatchOfFlowingTime.ScrollTimeForwards", true))
+			watch.add(EEWatchAction.TimeForward);
+		if (!config.getBoolean("WatchOfFlowingTime.ScrollTimeBackwards", true))
+			watch.add(EEWatchAction.TimeBackward);
 	}
 }

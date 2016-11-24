@@ -5,8 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import nl.taico.tekkitrestrict.Log;
-import nl.taico.tekkitrestrict.tekkitrestrict;
-import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
+import nl.taico.tekkitrestrict.config.SettingsStorage;
 
 public class TREMCSet {
 	public static void reload() {
@@ -18,7 +17,8 @@ public class TREMCSet {
 	 * If EMC = 0, it will remove the EMC value of that item.
 	 * @see #removeEMC(int, int)
 	 */
-	public static void setEMC(int id, int data, int EMC){
+	public static void setEMC(final int id, final int data, final int EMC){
+		Log.trace("Setting EMC of "+id+":"+data+" to "+EMC);
 		if (EMC == 0)
 			removeEMC(id, data);
 		else
@@ -29,27 +29,25 @@ public class TREMCSet {
 	 * Remove the EMC value of an item.
 	 * WARNING: If that item is also used as fuel, unexpected behavior may occur.
 	 * */
-	public static void removeEMC(int id, int data){
-		HashMap<Integer, Integer> old = (HashMap<Integer, Integer>) ee.EEMaps.alchemicalValues.get(id);
+	public static void removeEMC(final int id, final int data){
+		final HashMap<Integer, Integer> old = (HashMap<Integer, Integer>) ee.EEMaps.alchemicalValues.get(id);
 		if (old == null) return;
 		old.remove(data);
 		ee.EEMaps.alchemicalValues.put(id, old);
 	}
 
 	private static void loadConfigEMC() {
-		if (!tekkitrestrict.EEEnabled) return;
+		final List<String> configEMC = SettingsStorage.modModificationsConfig.getStringList("SetEMC");
 		
-		List<String> configEMC = tekkitrestrict.config.getStringList(ConfigFile.ModModifications, "SetEMC");
-		
-		for (String current : configEMC){
+		for (final String current : configEMC){
 			if (!current.contains(" ")){
 				Log.Warning.config("You have an invalid value in SetEMC in ModModifications.config: \""+current+"\"", false);
 				continue;
 			}
 			
-			String values[] = current.split(" ");
+			final String values[] = current.split(" ");
 			int EMC = 0, id = 0;
-			ArrayList<Integer> data;
+			final ArrayList<Integer> data;
 			
 			try {
 				EMC = Integer.parseInt(values[1]);
@@ -59,7 +57,7 @@ public class TREMCSet {
 			}
 			
 			if (values[0].contains(":")){
-				String temp[] = values[0].split(":");
+				final String temp[] = values[0].split(":");
 				
 				data = handleData(temp[1], current);
 				
@@ -81,34 +79,18 @@ public class TREMCSet {
 				}
 			}
 			
-			for (int currentdata : data){
+			for (final int currentdata : data){
 				setEMC(id, currentdata, EMC);
 			}
 		}
-		
-		/*for (int i = 0; i < configEMC.size(); i++) {
-			String ic = configEMC.get(i);
-			if (ic.contains(" ")) {
-				String[] pc = ic.split(" ");
-				String emc = pc[1];
-				int EMC = Integer.valueOf(emc);
-				List<TRCacheItem> iss = TRCacheItem.processItemString("",
-						pc[0], -1);
-				for (TRCacheItem cr : iss) {
-					int id = cr.id;
-					int data = cr.getData() == -10 ? 0 : cr.getData();
-					ee.EEMaps.addEMC(id, data, EMC);
-				}
-			}
-		}*/
 	}
 	
 	/**
 	 * Get a list of Integers from a String range.
 	 * @return An ArrayList of Integers with the values specified by the given range.
 	 */
-	private static ArrayList<Integer> handleData(String data, String key){
-		ArrayList<Integer> allData = new ArrayList<Integer>();
+	private static ArrayList<Integer> handleData(final String data, final String key){
+		final ArrayList<Integer> allData = new ArrayList<Integer>();
 		if (data == null){
 			allData.add(0);
 		}
@@ -119,16 +101,16 @@ public class TREMCSet {
 			}
 		}
 		else if (data.contains(",")){
-			String temp[] = data.split(",");
+			final String temp[] = data.split(",");
 			for (String current : temp){
 				if (current.contains("-")){
-					String temp2[] = current.split("-");
+					final String temp2[] = current.split("-");
 					if (!temp2[0].matches("\\d+") || !temp2[1].matches("\\d+")){
 						Log.Warning.config("The data value of '"+key+"' in SetEMC (ModModifications.config) is invalid!", false);
 						allData.clear();
 						allData.add(0);
 					} else {
-						int end = Integer.parseInt(temp2[1]);
+						final int end = Integer.parseInt(temp2[1]);
 						for (int i = Integer.parseInt(temp2[0]); i<=end; i++){
 							allData.add(i);
 						}
@@ -144,13 +126,13 @@ public class TREMCSet {
 				}
 			}
 		} else if (data.contains("-")){//No comma's, only a - so just 1 split needed.
-			String temp[] = data.split("-");
+			final String temp[] = data.split("-");
 			if (!temp[0].matches("\\d+") || !temp[1].matches("\\d+")){
 				Log.Warning.config("The data value of '"+key+"' in SetEMC (ModModifications.config) is invalid!", false);
 				allData.clear();
 				allData.add(0);
 			} else {
-				int end = Integer.parseInt(temp[1]);
+				final int end = Integer.parseInt(temp[1]);
 				for (int i = Integer.parseInt(temp[0]); i<=end; i++){
 					allData.add(i);
 				}

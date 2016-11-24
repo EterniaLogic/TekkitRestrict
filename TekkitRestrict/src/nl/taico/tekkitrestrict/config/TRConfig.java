@@ -1,232 +1,459 @@
 package nl.taico.tekkitrestrict.config;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import nl.taico.tekkitrestrict.tekkitrestrict;
-import nl.taico.tekkitrestrict.Log.Warning;
+import org.bukkit.configuration.ConfigurationSection;
 
-public abstract class TRConfig {
-	protected static String s = File.separator;
-	protected static boolean isPrimitive(Object input) {
-	    return input instanceof Integer || input instanceof Boolean ||
-	            input instanceof Character || input instanceof Byte ||
-	            input instanceof Short || input instanceof Double ||
-	            input instanceof Long || input instanceof Float;
+public class TRConfig {
+	private int comments;
+	private ConfigManager manager;
+
+	private File file;
+	private FileConfiguration config;
+	private int linelength;
+	private boolean existed;
+
+	public File getFile(){
+		return this.file;
 	}
 	
-	protected static int toInt(Object object) {
-	    if (object instanceof Number) {
-	        return ((Number) object).intValue();
-	    }
+	public TRConfig(InputStream configStream, File configFile, int comments, int linelength) {
+		this.comments = comments;
+		this.manager = new ConfigManager();
 
-	    try {
-	        return Integer.valueOf(object.toString());
-	    } catch (NumberFormatException e) {
-	    } catch (NullPointerException e) {
-	    }
-	    return 0;
+		this.file = configFile;
+		this.config = YamlConfiguration.loadConfiguration(configStream);
+		this.linelength = linelength+3;
 	}
 	
-	protected static double toDouble(Object object) {
-	    if (object instanceof Number) {
-	        return ((Number) object).doubleValue();
-	    }
+	public TRConfig(InputStream configStream, File configFile, int comments, int linelength, boolean existed) {
+		this.comments = comments;
+		this.manager = new ConfigManager();
 
-	    try {
-	        return Double.valueOf(object.toString());
-	    } catch (NumberFormatException e) {
-	    } catch (NullPointerException e) {
-	    }
-	    return 0;
+		this.file = configFile;
+		this.config = YamlConfiguration.loadConfiguration(configStream);
+		this.linelength = linelength+3;
+		this.existed = existed;
 	}
 	
-	protected static void upgradeFile(String name, ArrayList<String> content){
-		tekkitrestrict.log.info("Upgrading "+name+".config.yml file.");
-		File configFile = new File("plugins"+s+"tekkitrestrict"+s+name+".config.yml");
-		if (configFile.exists()){
-			File backupfile = new File("plugins"+s+"tekkitrestrict"+s+name+".config_backup.yml");
-			if (backupfile.exists()) backupfile.delete();
-			configFile.renameTo(backupfile);
-			configFile = new File("plugins"+s+"tekkitrestrict"+s+name+".config.yml");
-			try {
-				configFile.createNewFile();
-			} catch (IOException e) {
-				e.printStackTrace();
+	public boolean isNewConfig(){
+		return !existed;
+	}
+
+	public Object get(String path) {
+		return this.config.get(path);
+	}
+
+	public Object get(String path, Object def) {
+		return this.config.get(path, def);
+	}
+
+	public String getString(String path) {
+		return this.config.getString(path);
+	}
+
+	public String getString(String path, String def) {
+		return this.config.getString(path, def);
+	}
+
+	public int getInt(String path) {
+		return this.config.getInt(path);
+	}
+
+	public int getInt(String path, int def) {
+		return this.config.getInt(path, def);
+	}
+
+	public boolean getBoolean(String path) {
+		return this.config.getBoolean(path);
+	}
+
+	public boolean getBoolean(String path, boolean def) {
+		return this.config.getBoolean(path, def);
+	}
+
+	public void createSection(String path) {
+		this.config.createSection(path);
+	}
+
+	public ConfigurationSection getConfigurationSection(String path) {
+		return this.config.getConfigurationSection(path);
+	}
+
+	public double getDouble(String path) {
+		return this.config.getDouble(path);
+	}
+
+	public double getDouble(String path, double def) {
+		return this.config.getDouble(path, def);
+	}
+
+	public List<?> getList(String path) {
+		return this.config.getList(path);
+	}
+
+	public List<?> getList(String path, List<?> def) {
+		return this.config.getList(path, def);
+	}
+
+	public List<String> getStringList(String path) {
+		List<?> list = getList(path);
+		if (list == null) {
+			return new ArrayList<String>(0);
+		}
+
+		List<String> result = new ArrayList<String>();
+		for (Object object : list) {
+			if ((object instanceof String) || (isPrimitiveWrapper(object))) {
+				result.add(String.valueOf(object));
+			}
+		}
+
+		return result;
+	}
+
+	public List<Integer> getIntegerList(String path) {
+		List<?> list = getList(path);
+		if (list == null) {
+			return new ArrayList<Integer>(0);
+		}
+
+		List<Integer> result = new ArrayList<Integer>();
+		for (Object object : list) {
+			if (object instanceof Integer) {
+				result.add((Integer) object);
+			} else if (object instanceof String) {
+				try {
+					result.add(Integer.valueOf((String) object));
+				} catch (Exception ex) {
+				}
+			} else if (object instanceof Character) {
+				result.add((int) ((Character) object).charValue());
+			} else if (object instanceof Number) {
+				result.add(((Number) object).intValue());
+			}
+		}
+
+		return result;
+	}
+
+	public List<Boolean> getBooleanList(String path) {
+		List<?> list = getList(path);
+		if (list == null) {
+			return new ArrayList<Boolean>(0);
+		}
+
+		List<Boolean> result = new ArrayList<Boolean>();
+		for (Object object : list) {
+			if (object instanceof Boolean) {
+				result.add((Boolean) object);
+			} else if (object instanceof String) {
+				if (Boolean.TRUE.toString().equals(object)) {
+					result.add(true);
+				} else if (Boolean.FALSE.toString().equals(object)) {
+					result.add(false);
+				}
+			}
+		}
+
+		return result;
+	}
+
+	public List<Double> getDoubleList(String path) {
+		List<?> list = getList(path);
+
+		if (list == null) {
+			return new ArrayList<Double>(0);
+		}
+		List<Double> result = new ArrayList<Double>();
+		for (Object object : list) {
+			if (object instanceof Double) {
+				result.add((Double) object);
+			} else if (object instanceof String) {
+				try {
+					result.add(Double.valueOf((String) object));
+				} catch (Exception ex) {
+				}
+			} else if (object instanceof Character) {
+				result.add((double) ((Character) object).charValue());
+			} else if (object instanceof Number) {
+				result.add(((Number) object).doubleValue());
 			}
 		}
 		
-		BufferedWriter output = null;
-		try {
-			output = new BufferedWriter(new FileWriter(configFile));
-			for (int i = 0;i<content.size();i++){
-				if (i != 0) output.newLine();
-				output.append(content.get(i));
-			}
-			output.close();
-		} catch (IOException e) {
-			Warning.load("Unable to write changes to "+name+".config.yml!", false);
-			try {if (output != null) output.close();} catch (IOException e1) {}
-			return;
-		}
-		tekkitrestrict.log.info(name+".config.yml file was upgraded successfully!");
-		Warning.loadWarnings.add(name+".config.yml file was upgraded! Please check the new/changed config settings!");
+		return result;
 	}
-	
-	@SuppressWarnings("unchecked")
-	protected static ArrayList<String> convertDefaults(ArrayList<String> defaults){
-		int j = defaults.size();
-		for (int i = 0;i<j;i++){
-			String str = defaults.get(i);
-			if (str.contains("#:-;-:#")){
-				str = str.replace("#:-;-:# ", "");
-				String nr = null;
-				if (str.contains(" ")){
-					nr = str.split(" ")[1];
-					str = str.split(" ")[0];
-				}
-				Object obj = tekkitrestrict.config.get(str, null);
-				if (obj == null){
-					defaults.remove(i);
-					i--; j--;
-					continue;
-				}
-				
-				if (obj instanceof String){
-					String str2 = defaults.get(i-1);//Method: "1"
-					defaults.set(i-1, str2.split(":")[0] + ": \""+obj.toString().replace("\\\"", "#;~;#").replace("\"", "\\\"").replace("#;~;#", "\\\"")+"\"");
-					defaults.remove(i);//Remove posString
-					i--; j--;
-				} else if (obj instanceof Integer){
-					String str2 = defaults.get(i-1);//Method: "1"
-					defaults.set(i-1, str2.split(":")[0] + ": "+toInt(obj));
-					defaults.remove(i);//Remove posString
-					i--; j--;
-				} else if (obj instanceof Double){
-					String str2 = defaults.get(i-1);//Method: "1"
-					defaults.set(i-1, str2.split(":")[0] + ": "+toDouble(obj));
-					defaults.remove(i);//Remove posString
-					i--; j--;
-				} else if (obj instanceof Boolean){
-					String str2 = defaults.get(i-1);//Method: "1"
-					defaults.set(i-1, str2.split(":")[0] + ": "+((Boolean) obj).toString());
-					defaults.remove(i);//Remove posString
-					i--; j--;
-				} else if (obj instanceof List){
-					List<Object> l = (List<Object>) obj;
-					
-					String str2 = defaults.get(i-1);//Method: "1"
-					defaults.set(i-1, str2.split(":")[0] + ": " + (l.isEmpty() ? "[]" : ""));
-					defaults.remove(i);//Remove posString, cursor is at first element of list
-					if (nr != null){
-						int k = Integer.parseInt(nr);
-						while (k>0){
-							defaults.remove(i-1+k);
-							k--;
-							j--;
-						}
-					}
 
-					for (Object o : l){
-						if (isPrimitive(o)){
-							defaults.add(i, "- " + o.toString());//input element after posstring, default values are after this one.
-						} else if (o instanceof String){
-							defaults.add(i, "- \"" + o.toString().replace("\\\"", "#;~;#").replace("\"", "\\\"").replace("#;~;#", "\\\"") + "\"");//input element after posstring, default values are after this one.
-						} else {
-							tekkitrestrict.log.severe("Error in Upgrader: invalid config entry, not Primitive or String");
-							continue;
-						}
-						i++;//input next element after this one.
-						j++;
-					}
-					i--; j--;
+	public List<Float> getFloatList(String path) {
+		List<?> list = getList(path);
+		if (list == null) {
+			return new ArrayList<Float>(0);
+		}
+
+		List<Float> result = new ArrayList<Float>();
+		for (Object object : list) {
+			if (object instanceof Float) {
+				result.add((Float) object);
+			} else if (object instanceof String) {
+				try {
+					result.add(Float.valueOf((String) object));
+				} catch (Exception ex) {
+				}
+			} else if (object instanceof Character) {
+				result.add((float) ((Character) object).charValue());
+			} else if (object instanceof Number) {
+				result.add(((Number) object).floatValue());
+			}
+		}
+
+		return result;
+	}
+
+	public List<Long> getLongList(String path) {
+		List<?> list = getList(path);
+		if (list == null) {
+			return new ArrayList<Long>(0);
+		}
+
+		List<Long> result = new ArrayList<Long>();
+		for (Object object : list) {
+			if (object instanceof Long) {
+				result.add((Long) object);
+			} else if (object instanceof String) {
+				try {
+					result.add(Long.valueOf((String) object));
+				} catch (Exception ex) {
+				}
+			} else if (object instanceof Character) {
+				result.add((long) ((Character) object).charValue());
+			} else if (object instanceof Number) {
+				result.add(((Number) object).longValue());
+			}
+		}
+
+		return result;
+	}
+	public List<Byte> getByteList(String path) {
+		List<?> list = getList(path);
+		if (list == null) {
+			return new ArrayList<Byte>(0);
+		}
+		
+		List<Byte> result = new ArrayList<Byte>();
+		for (Object object : list) {
+			if (object instanceof Byte) {
+				result.add((Byte) object);
+			} else if (object instanceof String) {
+				try {
+					result.add(Byte.valueOf((String) object));
+				} catch (Exception ex) {
+				}
+			} else if (object instanceof Character) {
+				result.add((byte) ((Character) object).charValue());
+			} else if (object instanceof Number) {
+				result.add(((Number) object).byteValue());
+			}
+		}
+
+		return result;
+	}
+
+	public List<Character> getCharacterList(String path) {
+		List<?> list = getList(path);
+		if (list == null) {
+			return new ArrayList<Character>(0);
+		}
+
+		List<Character> result = new ArrayList<Character>();
+		for (Object object : list) {
+			if (object instanceof Character) {
+
+				result.add((Character) object);
+			} else if (object instanceof String) {
+				String str = (String) object;
+
+				if (str.length() == 1) {
+					result.add(str.charAt(0));
+				}
+			} else if (object instanceof Number) {
+				result.add((char) ((Number) object).intValue());
+			}
+		}
+
+		return result;
+	}
+
+	public List<Short> getShortList(String path) {
+		List<?> list = getList(path);
+		if (list == null) {
+			return new ArrayList<Short>(0);
+		}
+
+		List<Short> result = new ArrayList<Short>();
+		for (Object object : list) {
+			if (object instanceof Short) {
+				result.add((Short) object);
+			} else if (object instanceof String) {
+				try {
+					result.add(Short.valueOf((String) object));
+				} catch (Exception ex) {
+				}
+			} else if (object instanceof Character) {
+				result.add((short) ((Character) object).charValue());
+			} else if (object instanceof Number) {
+				result.add(((Number) object).shortValue());
+			}
+		}
+
+		return result;
+	}
+
+	public List<Map<?, ?>> getMapList(String path) {
+		List<?> list = getList(path);
+		List<Map<?, ?>> result = new ArrayList<Map<?, ?>>();
+		if (list == null) {
+			return result;
+		}
+
+		for (Object object : list) {
+			if (object instanceof Map) {
+				result.add((Map<?, ?>) object);
+			}
+		}
+
+		return result;
+	}
+
+	public boolean contains(String path) {
+		return this.config.contains(path);
+	}
+
+	public void removeKey(String path) {
+		this.config.set(path, null);
+	}
+
+	public void set(String path, Object value) {
+		existed = true;
+		this.config.set(path, value);
+	}
+
+	public void set(String path, Object value, String comment) {
+		existed = true;
+		if(!this.config.contains(path)) {
+			this.config.set("TR_COMMENT_" + comments, "# ");
+			comments++;
+			for (String s : handleComment(comment)){
+				this.config.set("TR_COMMENT_" + comments, s);
+				comments++;
+			}
+		}
+
+		this.config.set(path, value);
+	}
+	
+	@Deprecated
+	public void setComment(String... comment){
+		existed = true;
+		for(String comm : comment) {
+			for (String s : handleComment(comm)){
+				if (!s.startsWith("#")) this.config.set("TR_COMMENT_" + comments, "# "+s);
+				else this.config.set("TR_COMMENT_" + comments, s);
+				comments++;
+			}
+		}
+	}
+	
+	private String[] handleComment(String line){
+		if (line.length() <= linelength || (line.startsWith("####") && line.endsWith("####"))){//20 max
+			return new String[] {
+					line.replace("\"", "{DQUOTE}")
+						.replace("'", "{SQUOTE}")
+						.replace("\\n", "{NEWLINE}")
+						};
+		} else {
+			ArrayList<String> tbr = new ArrayList<String>();
+			final String[] temp = line.split(" ");
+			
+			StringBuilder l0 = new StringBuilder(linelength);
+			for (int i = 0; i < temp.length; i++){
+				if (temp[i].isEmpty()) continue;
+				if (l0.length()+temp[i].length() > linelength){//123_56_ + 89 > 8
+					tbr.add(l0.toString().trim());
+					
+					l0 = new StringBuilder(linelength);
+				}
+				
+				if (temp[i].length()<linelength){
+					l0.append(temp[i]).append(" ");
 				} else {
-					tekkitrestrict.log.severe("Error in Upgrader: invalid config entry, obj is unknown object! Class: " + obj.getClass().getName());
-					continue;
+					tbr.add(temp[i]);//TODO Change it so it breaks up the word instead.
+				}
+			}
+			tbr.add(l0.toString());
+			
+			for (int i = 0; i<tbr.size();i++){
+				tbr.set(i, tbr.get(i)
+							  .trim()
+							  .replace("\"", "{DQUOTE}")
+							  .replace("'", "{SQUOTE}")
+							  .replace("\\n", "{NEWLINE}"));
+			}
+			return tbr.toArray(new String[0]);
+		}
+	}
+
+	public void set(String path, Object value, String[] comment) {
+		existed = true;
+		if(!this.config.contains(path)) {
+			this.config.set("TR_COMMENT_" + comments, "# ");
+			comments++;
+			for(String comm : comment) {
+				for (String s : handleComment(comm)){
+					if (!s.startsWith("#")) this.config.set("TR_COMMENT_" + comments, "# "+s);
+					else this.config.set("TR_COMMENT_" + comments, s);
+					comments++;
 				}
 			}
 		}
-		return defaults;
+
+		this.config.set(path, value);
+	}
+
+	public void setHeader(String[] header, int length) {
+		manager.setHeader(this.file, header, length);
+		//this.comments = header.length + 2;
+		this.reloadConfig();
 	}
 	
-	@SuppressWarnings("unchecked")
-	protected static ArrayList<String> convertDefaultsShortList(ArrayList<String> defaults){
-		int j = defaults.size();
-		for (int i = 0;i<j;i++){
-			String str = defaults.get(i);
-			if (str.contains("#:-;-:#")){
-				str = str.replace("#:-;-:# ", "");
-				
-				Object obj = tekkitrestrict.config.get(str, null);
-				if (obj == null){
-					defaults.remove(i);
-					i--; j--;
-					continue;
-				}
-				
-				if (obj instanceof String){
-					String str2 = defaults.get(i-1);//Method: "1"
-					defaults.set(i-1, str2.split(":")[0] + ": \""+obj.toString().replace("\\\"", "#;~;#").replace("\"", "\\\"").replace("#;~;#", "\\\"")+"\"");
-					defaults.remove(i);//Remove posString
-					i--; j--;
-				} else if (obj instanceof Integer){
-					String str2 = defaults.get(i-1);//Method: "1"
-					defaults.set(i-1, str2.split(":")[0] + ": "+toInt(obj));
-					defaults.remove(i);//Remove posString
-					i--; j--;
-				} else if (obj instanceof Double){
-					String str2 = defaults.get(i-1);//Method: "1"
-					defaults.set(i-1, str2.split(":")[0] + ": "+toDouble(obj));
-					defaults.remove(i);//Remove posString
-					i--; j--;
-				} else if (obj instanceof Boolean){
-					String str2 = defaults.get(i-1);//Method: "1"
-					defaults.set(i-1, str2.split(":")[0] + ": "+((Boolean) obj).toString());
-					defaults.remove(i);//Remove posString
-					i--; j--;
-				} else if (obj instanceof List){
-					List<Object> l = (List<Object>) obj;
-					
-					String str2 = defaults.get(i-1);//Method: "1"
-					String toadd = "";
-					for (Object o : l){
-						if (isPrimitive(o) || o instanceof String){
-							toadd += "\""+o.toString().replace("\\\"", "#;~;#").replace("\"", "\\\"").replace("#;~;#", "\\\"")+"\", ";
-						} else {
-							tekkitrestrict.log.severe("Error in Upgrader: invalid config entry, not Primitive or String");
-							continue;
-						}
-					}
-					if (!toadd.equals("")){
-						defaults.set(i-1, str2.split(":")[0] + ": [" + toadd.substring(0, toadd.length()-2) + "]");
-					} else {
-						defaults.set(i-1, str2.split(":")[0] + ": []");
-					}
-					
-					defaults.remove(i);//Remove posString, cursor is at first element of list
-					
-					i--; j--;
-				} else {
-					tekkitrestrict.log.severe("Error in Upgrader: invalid config entry, obj is unknown object! Class: " + obj.getClass().getName());
-					defaults.remove(i);
-					i--; j--;
-					continue;
-				}
-			}
-		}
-		return defaults;
+	public void setHeader(String[] header) {
+		manager.setHeader(this.file, header, linelength);
+		//this.comments = header.length + 2;
+		this.reloadConfig();
+	}
+
+	public void reloadConfig() {
+		this.config = YamlConfiguration.loadConfiguration(manager.getConfigContent(file));
+	}
+
+	public void saveConfig() {
+		String config = this.config.saveToString();
+		manager.saveConfig(config, this.file);
+	}
+
+	public Set<String> getKeys() {
+		return this.config.getKeys(false);
 	}
 	
-	public static void upgradeAllConfig(){
-		AdvancedConfig.upgradeFile();
-		DatabaseConfig.upgradeFile();
-		DisableClickConfig.upgradeFile();
-		DisableItemsConfig.upgradeFile();
-		GeneralConfig.upgradeFile();
-		HackDupeConfig.upgradeFile();
+	protected boolean isPrimitiveWrapper(Object input) {
+		return input instanceof Integer || input instanceof Boolean ||
+				input instanceof Character || input instanceof Byte ||
+				input instanceof Short || input instanceof Double ||
+				input instanceof Long || input instanceof Float;
+
 	}
 }

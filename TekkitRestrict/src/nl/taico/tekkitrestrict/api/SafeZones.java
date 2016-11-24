@@ -33,7 +33,7 @@ public class SafeZones {
 	 * @see #isSafeZoneFor(Player, List)
 	 */
 	public static boolean isSafeZoneFor(Player player) {
-		return !getSafeZoneFor(player).equals("");
+		return !getSafeZoneFor(player).isEmpty();
 	}
 	
 	/**
@@ -43,7 +43,7 @@ public class SafeZones {
 	 * @see #isSafeZoneFor(Player)
 	 */
 	public static boolean isSafeZoneFor(Player player, List<SSPlugin> order) {
-		return !getSafeZoneFor(player, order).equals("");
+		return !getSafeZoneFor(player, order).isEmpty();
 	}
 	
 	/**
@@ -61,7 +61,7 @@ public class SafeZones {
 	 * @return The reason why the creation succeeded or failed.
 	 */
 	public static SafeZoneCreate createSafeZone(Player player, String pluginName, String zoneName){
-		return TRSafeZone.addSafeZone(player, pluginName, zoneName);
+		return TRSafeZone.addSafeZone(player, pluginName, zoneName, null);
 	}
 	
 	/**
@@ -136,7 +136,7 @@ public class SafeZones {
 		if (isGriefPreventionSafeZoneForPlayer(player)) return "GriefPrevention Safezone Claim owned by: " + TRSafeZone.GP.lastGP;
 		
 		String r = getSafeZoneByLocation(player.getLocation(), false);
-		if (!r.equals("")) return r;
+		if (!r.isEmpty()) return r;
 		
 		if (isTownySafeZoneForPlayer(player)) return "Towny Safezone";
 		if (isFactionsSafeZoneForPlayer(player)) return "Safezone Faction: " + TRSafeZone.Factions.lastFaction;
@@ -157,7 +157,7 @@ public class SafeZones {
 				if (isGriefPreventionSafeZoneForPlayer(player)) return "GriefPrevention Safezone Claim owned by: " + TRSafeZone.GP.lastGP;
 			} else if (current.WG()){
 				String r = getSafeZoneByLocation(player.getLocation(), false);
-				if (!r.equals("")) return r;
+				if (!r.isEmpty()) return r;
 			} else if (current.PS()){
 				if (isPreciousStonesSafeZoneForPlayer(player)) return "PreciousStones SafeZone Field: " + TRSafeZone.PS.lastPS;
 			} else if (current.F()){

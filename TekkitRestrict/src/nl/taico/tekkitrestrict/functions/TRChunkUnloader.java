@@ -8,13 +8,16 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
+import org.bukkit.craftbukkit.CraftChunk;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.entity.Player;
 
 import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.TRConfigCache.ChunkUnloader;
+import nl.taico.tekkitrestrict.objects.TREnums.ChunkUnloadMethod;
 
+import forge.ForgeHooks;
 import net.minecraft.server.EmptyChunk;
 
 public class TRChunkUnloader {
@@ -102,8 +105,11 @@ public class TRChunkUnloader {
 				int x = chunk.getX(), z = chunk.getZ();
 				try {
 					net.minecraft.server.WorldServer mcWorld = ((CraftWorld) chunk.getWorld()).getHandle();
-					net.minecraft.server.Chunk mcChunk = mcWorld.chunkProviderServer.getOrCreateChunk(x, z);
-
+					net.minecraft.server.Chunk mcChunk = mcWorld.chunkProviderServer.chunks.get(x, z);
+					if (mcChunk == null){
+						amount++;
+						continue;
+					}
 					if (!(mcChunk instanceof EmptyChunk)) {
 						if (!force) mcWorld.chunkProviderServer.queueUnload(x, z);
 						else mcWorld.chunkProviderServer.unloadQueue.add(x, z);
@@ -116,7 +122,7 @@ public class TRChunkUnloader {
 					//mcWorld.chunkProviderServer.chunks.remove(x, z);
 					//mcWorld.chunkProviderServer.chunkList.remove(mcChunk);
 				} catch (Exception ex){
-					Log.Debug("Unable to unload chunk at ["+x+","+z+"] in world " + chunk.getWorld().getName());
+					Log.debug("Unable to unload chunk at ["+x+","+z+"] in world " + chunk.getWorld().getName());
 					amount++;
 				}
 			}
@@ -163,7 +169,11 @@ public class TRChunkUnloader {
 				int x = chunk.getX(), z = chunk.getZ();
 				try {
 					net.minecraft.server.WorldServer mcWorld = ((CraftWorld) chunk.getWorld()).getHandle();
-					net.minecraft.server.Chunk mcChunk = mcWorld.chunkProviderServer.getOrCreateChunk(x, z);
+					net.minecraft.server.Chunk mcChunk = mcWorld.chunkProviderServer.chunks.get(x, z);
+					if (mcChunk == null){
+						amount++;
+						continue;
+					}
 
 					if (!(mcChunk instanceof EmptyChunk)) {
 						if (!force) mcWorld.chunkProviderServer.queueUnload(x, z);
@@ -177,7 +187,7 @@ public class TRChunkUnloader {
 					//mcWorld.chunkProviderServer.chunks.remove(x, z);
 					//mcWorld.chunkProviderServer.chunkList.remove(mcChunk);
 				} catch (Exception ex){
-					Log.Debug("Unable to unload chunk at ["+x+","+z+"] in world " + chunk.getWorld().getName());
+					Log.debug("Unable to unload chunk at ["+x+","+z+"] in world " + chunk.getWorld().getName());
 					amount++;
 				}
 			}
@@ -224,8 +234,11 @@ public class TRChunkUnloader {
 				int x = chunk.getX(), z = chunk.getZ();
 				try {
 					net.minecraft.server.WorldServer mcWorld = ((CraftWorld) chunk.getWorld()).getHandle();
-					net.minecraft.server.Chunk mcChunk = mcWorld.chunkProviderServer.getOrCreateChunk(x, z);
-
+					net.minecraft.server.Chunk mcChunk = mcWorld.chunkProviderServer.chunks.get(x, z);
+					if (mcChunk == null){
+						amount++;
+						continue;
+					}
 					if (!(mcChunk instanceof EmptyChunk)) {
 						if (!force) mcWorld.chunkProviderServer.queueUnload(x, z);
 						else mcWorld.chunkProviderServer.unloadQueue.add(x, z);
@@ -238,7 +251,7 @@ public class TRChunkUnloader {
 					//mcWorld.chunkProviderServer.chunks.remove(x, z);
 					//mcWorld.chunkProviderServer.chunkList.remove(mcChunk);
 				} catch (Exception ex){
-					Log.Debug("Unable to unload chunk at ["+x+","+z+"] in world " + chunk.getWorld().getName());
+					Log.debug("Unable to unload chunk at ["+x+","+z+"] in world " + chunk.getWorld().getName());
 					amount++;
 				}
 			}
@@ -268,16 +281,70 @@ public class TRChunkUnloader {
 	private static boolean isChunkInUse(World world, int x, int z, int dist) {
 		Player[] players = Bukkit.getOnlinePlayers();
 
-		for(Player player : players){
-			Location loc = player.getLocation();
-			
-			if (loc.getWorld() != world) continue;
-			
-			if (Math.abs(loc.getBlockX() - (x << 4)) <= dist && Math.abs(loc.getBlockZ() - (z << 4)) <= dist) {
-				return true;
+		try {
+			for(Player player : players){
+				try {
+					Location loc = player.getLocation();
+					
+					if (loc.getWorld() != world) continue;
+					
+					if (Math.abs(loc.getBlockX() - (x << 4)) <= dist && Math.abs(loc.getBlockZ() - (z << 4)) <= dist) {
+						return true;
+					}
+				} catch (Exception ex){
+					return true;
+				}
 			}
+		} catch (Exception ex){
+			return true;
 		}
 
 		return false;
 	}
+	
+
+	
+	private static boolean unloadChunk(Chunk chunk, boolean force){
+		net.minecraft.server.WorldServer mcWorld = ((CraftWorld) chunk.getWorld()).getHandle();
+		int x = chunk.getX();
+		int z = chunk.getZ();
+		net.minecraft.server.Chunk mcChunk = ((CraftChunk) chunk).getHandle();
+		
+		if (mcChunk == null) return false;
+
+		if (!(mcChunk instanceof EmptyChunk)) {
+			if (!force) mcWorld.chunkProviderServer.queueUnload(x, z);
+			else mcWorld.chunkProviderServer.unloadQueue.add(x, z);
+			//mcChunk.removeEntities();
+			//mcWorld.chunkProviderServer.saveChunk(mcChunk);
+			//mcWorld.chunkProviderServer.saveChunkNOP(mcChunk);
+			return true;
+		}
+		return true;
+	}
+	
+	static void unloadChunks(ChunkUnloadMethod method, World world, int amount){
+		if (method == ChunkUnloadMethod.UnloadAllChunksUnforced){
+			Chunk[] loaded = world.getLoadedChunks().clone();
+			ArrayList<Chunk> tbr = new ArrayList<Chunk>();
+			for (Chunk c : loaded){
+				if (!isChunkInUse(world, c.getX(), c.getZ(), ChunkUnloader.maxRadii) && !hasChunkLoader(c)){
+					tbr.add(c);
+				}
+			}
+			
+			for (Chunk c : tbr){
+				unloadChunk(c, false);
+			}
+		}
+	}
+	
+	private static boolean hasChunkLoader(Chunk chunk){
+		return hasChunkLoader(((CraftChunk) chunk).getHandle());
+	}
+	
+	private static boolean hasChunkLoader(net.minecraft.server.Chunk chunk){
+		return !ForgeHooks.canUnloadChunk(chunk);
+	}
+	
 }

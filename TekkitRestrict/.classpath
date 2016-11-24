@@ -1,14 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="com/github/dreadslicer/tekkitrestrict/TRNoHackForcefield.java|com/github/dreadslicer/tekkitrestrict/TRHandleFly.java|com/github/dreadslicer/tekkitrestrict/TRNoHackSpeed.java|lib/PatPeter/SQLibrary/|com/github/dreadslicer/tekkitrestrict/lib/TRChunkRunner.java|com/github/dreadslicer/tekkitrestrict/TRSafeZone_old.java|com/github/dreadslicer/tekkitrestrict/Metrics_old.java|com/github/dreadslicer/tekkitrestrict/TRBans.java|com/github/dreadslicer/tekkitrestrict/TRCacheItem2.java|com/github/dreadslicer/tekkitrestrict/TaeirMetrics.java|com/github/dreadslicer/tekkitrestrict/TRNoDupe_BagCache.java|com/github/dreadslicer/tekkitrestrict/Updater_Old.java" kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Tekkit Classic Mods Base for TekkitRestrict"/>
+	<classpathentry excluding="nl/taico/tekkitrestrict/commands/TRCmdOpenalc2.java|nl/taico/tekkitrestrict/functions/TRLogFilter.java|nl/taico/tekkitrestrict/logging/TRSplitter.java|nl/taico/tekkitrestrict/lib/config/FileConfiguration.java|nl/taico/tekkitrestrict/lib/config/FileConfigurationOptions.java|nl/taico/tekkitrestrict/lib/config/TRFileConfiguration.java|nl/taico/tekkitrestrict/lib/config/YamlConfiguration.java|nl/taico/tekkitrestrict/lib/config/YamlConfigurationOptions.java|nl/taico/tekkitrestrict/lib/config/YamlConstructor.java|nl/taico/tekkitrestrict/lib/config/YamlRepresenter.java|nl/taico/tekkitrestrict/TRItemProcessor.java|nl/taico/tekkitrestrict/config/SettingsStorage_Old.java|nl/taico/tekkitrestrict/functions/limiter/LBlock.java|nl/taico/tekkitrestrict/functions/limiter/Limiter.java|nl/taico/tekkitrestrict/functions/limiter/PlayerLimits.java|nl/taico/tekkitrestrict/functions/limiter/PlayerLimitsLoadAll.java|nl/taico/tekkitrestrict/functions/limiter/PlayerLimitsLoadOnline.java|nl/taico/tekkitrestrict/config/ConfigManager.java|nl/taico/tekkitrestrict/config/TRConfig.java|nl/taico/tekkitrestrict/config/FileConfiguration.java|nl/taico/tekkitrestrict/config/FileConfigurationOptions.java|nl/taico/tekkitrestrict/config/YamlConfiguration.java|nl/taico/tekkitrestrict/config/YamlConfigurationOptions.java|nl/taico/tekkitrestrict/config/YamlConstructor.java|nl/taico/tekkitrestrict/config/YamlRepresenter.java" kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Other"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Permission Plugins for Tekkit Classic"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Protection Plugins for Tekkit Classic"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Tekkit Classic Bukkit"/>
-	<classpathentry kind="lib" path="C:/Program Files/eclipse_Kepler/lib/Tekkit_Classic/Essentials 2.9.2 for 1.2.5.jar"/>
-	<classpathentry kind="lib" path="C:/Program Files/eclipse_Kepler/lib/Tekkit_Classic/EEPatch.zip"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Tekkit Classic Mods Base for TekkitRestrict"/>
 	<classpathentry kind="lib" path="org.eclipse.jdt.annotation_1.1.0.v20130513-1648.jar"/>
-	<classpathentry kind="lib" path="C:/Program Files/eclipse_Kepler/lib/Swing/jSuggestField.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/EEPatch_TR"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/NEIServer"/>
+	<classpathentry kind="lib" path="C:/Users/Taico/.m2/repository/org/projectlombok/lombok/1.12.6/lombok-1.12.6.jar" sourcepath="C:/Users/Taico/.m2/repository/org/projectlombok/lombok/1.12.6/lombok-1.12.6-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/C:/Users/Taico/.m2/repository/org/projectlombok/lombok/1.12.6/lombok-1.12.6-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/Taico/.m2/repository/nl/taico/TaeirLib/1.2.0/TaeirLib-1.2.0.jar" sourcepath="C:/Users/Taico/.m2/repository/nl/taico/TaeirLib/1.2.0/TaeirLib-1.2.0-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/C:/Users/Taico/.m2/repository/nl/taico/TaeirLib/1.2.0/TaeirLib-1.2.0-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/Taico/.m2/repository/org/apache/commons/commons-collections4/4.0/commons-collections4-4.0.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/C:/Users/Taico/.m2/repository/org/apache/commons/commons-collections4/4.0/commons-collections4-4.0-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/Taico/.m2/repository/nl/taico/TaeirLib/bukkitconfig/1.0.0/bukkitconfig-1.0.0.jar" sourcepath="C:/Users/Taico/.m2/repository/nl/taico/TaeirLib/bukkitconfig/1.0.0/bukkitconfig-1.0.0-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/C:/Users/Taico/.m2/repository/nl/taico/TaeirLib/bukkitconfig/1.0.0/bukkitconfig-1.0.0-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

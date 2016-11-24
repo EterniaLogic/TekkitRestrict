@@ -6,14 +6,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.Future;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -26,92 +23,116 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
+import nl.taico.taeirlib.concurrent.ConcurrentList;
 import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.TRException;
-import nl.taico.tekkitrestrict.TRItemProcessor;
+import nl.taico.tekkitrestrict.TRItemProcessor2;
 import nl.taico.tekkitrestrict.TRListener;
 import nl.taico.tekkitrestrict.TRPermHandler;
-import nl.taico.tekkitrestrict.tekkitrestrict;
+import nl.taico.tekkitrestrict.TekkitRestrict;
 import nl.taico.tekkitrestrict.Log.Warning;
-import nl.taico.tekkitrestrict.annotations.Safe;
+import nl.taico.tekkitrestrict.annotations.Async;
+import nl.taico.tekkitrestrict.config.SettingsStorage;
 import nl.taico.tekkitrestrict.objects.TRConfigLimit;
 import nl.taico.tekkitrestrict.objects.TRItem;
 import nl.taico.tekkitrestrict.objects.TRLimit;
+import nl.taico.tekkitrestrict.objects.TRLocation;
 import nl.taico.tekkitrestrict.objects.TRPermLimit;
-import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
 
 public class TRLimiter {
-	private int expire = -1;
-	public String player = "";
-	public boolean isModified = true; // default limiters will get saved.
+	protected int expire;
+	public String player;
+	public boolean isModified;
 	/** A list of different kinds of limited blocks and the locations where they are placed (For this player). */
-	public List<TRLimit> itemlimits = Collections.synchronizedList(new LinkedList<TRLimit>());
+	public List<TRLimit> itemlimits;
 	
-	private static CopyOnWriteArrayList<TRLimiter> limiters = new CopyOnWriteArrayList<TRLimiter>();
+	protected static ConcurrentList<TRLimiter> limiters = new ConcurrentList<TRLimiter>(new ArrayList<TRLimiter>());
 	//private static List<TRLimiter> limiters = Collections.synchronizedList(new LinkedList<TRLimiter>());
-	private static List<TRConfigLimit> configLimits = Collections.synchronizedList(new ArrayList<TRConfigLimit>());
-	private static Map<String, String> allBlockOwners = Collections.synchronizedMap(new HashMap<String, String>());
-	private static ConcurrentHashMap<String, List<TRPermLimit>> limiterPermCache = new ConcurrentHashMap<String, List<TRPermLimit>>();
-	private static boolean changing = false;
+	protected static ArrayList<TRConfigLimit> configLimits = new ArrayList<>();
+	protected static Map<String, String> allBlockOwners = Collections.synchronizedMap(new HashMap<String, String>());
 	
-	public static void reload() {
+//	private static ConcurrentHashMap<String, List<TRPermLimit>> limiterPermCache = new ConcurrentHashMap<>(); (No Concurrent access --> No Concurrent map)
+	protected static HashMap<String, List<TRPermLimit>> limiterPermCache = new HashMap<>();
+	
+	protected static final TRFakeLimiter turtle = new TRFakeLimiter("[ComputerCraft]"),
+										 buildcraft = new TRFakeLimiter("[BuildCraft]"),
+										 redpower = new TRFakeLimiter("[RedPower]");
+	public TRLimiter(){
+		expire = -1;
+		player = "";
+		isModified = true; // default limiters will get saved.
+		itemlimits = Collections.synchronizedList(new LinkedList<TRLimit>());
+	}
+	
+	protected TRLimiter(String fakeplayer){
+		this.expire = -1;
+		this.player = fakeplayer;
+		this.isModified = false;
+		this.itemlimits = new ArrayList<TRLimit>(0);
+		limiters.add(this);
+	}
+	
+ 	public static void reload() {
 		//for (String str : limiterPermCache.keySet()){
 		//	for (TRPermLimit t : limiterPermCache.get(str)){
 		//		tekkitrestrict.log.info("[DEBUG] limiterPermCache.get("+str+"): " + t.id + ":" + t.data + " max="+t.max);
 		//	}
 		//}
-		limiterPermCache.clear();
 		
-		List<String> limitedBlocks = tekkitrestrict.config.getStringList(ConfigFile.Advanced, "LimitBlocks");
-		configLimits.clear();
+		limiterPermCache = new HashMap<>();
+		
+		final ArrayList<TRConfigLimit> temp = new ArrayList<TRConfigLimit>();
+		final List<String> limitedBlocks = SettingsStorage.limiterConfig.getStringList("LimitBlocks");
+		Log.trace("Loading Limits...");
 		for (String limBlock : limitedBlocks) {
 			String msg = null;
 			if (limBlock.contains("{")){
-				String temp[] = limBlock.split("\\{");
-				limBlock = temp[0].trim();
-				msg = Log.replaceColors(temp[1].replace("}", ""));
+				final String tempe[] = limBlock.split("\\{");
+				limBlock = tempe[0].trim();
+				msg = Log.replaceColors(tempe[1].replace("}", ""));
 			}
 			try {
-				String[] temp = limBlock.split(" ");
-				if (temp.length!=2){
+				final String[] tempe = limBlock.split(" ");
+				if (tempe.length!=2){
 					Warning.config("You have an error in your Advanced.config.yml in LimitBlocks:", false);
 					Warning.config("\""+limBlock+"\" does not follow the syntaxis \"itemIndex limit\"!", false);
 					continue;
 				}
-				int limit = 0;
+				final int limit;
 				try {
-					limit = Integer.parseInt(temp[1]);
+					limit = Integer.parseInt(tempe[1]);
 				} catch (NumberFormatException ex){
 					Warning.config("You have an error in your Advanced.config.yml in LimitBlocks:", false);
-					Warning.config("\""+temp[1]+"\" is not a valid number!", false);
+					Warning.config("\""+tempe[1]+"\" is not a valid number!", false);
 					continue;
 				}
-				List<TRItem> items;
+				final List<TRItem> items;
 				try {
-					items = TRItemProcessor.processItemString(temp[0]);
+					items = TRItemProcessor2.processString(tempe[0]);
 				} catch (TRException ex) {
 					Warning.config("You have an error in your Advanced.config.yml in LimitBlocks:", false);
 					Warning.config(ex.getMessage(), false);
 					continue;
 				}
 				
-				for (TRItem ci : items){
-					TRConfigLimit cLimit = new TRConfigLimit();
+				for (final TRItem ci : items){
+					final TRConfigLimit cLimit = new TRConfigLimit();
 					cLimit.id = ci.id;
 					cLimit.data = ci.data;
 					cLimit.msg = (msg == null ? "" : msg);
 					cLimit.configcount = limit;
-					configLimits.add(cLimit);
+					temp.add(cLimit);
 				}
 			} catch (Exception ex) {
 				Warning.config("LimitBlocks: has an error!", false);
 			}
 		}
+		configLimits = temp;
 	}
 	
 	/** Remove all limits from this player. */
 	public void clearLimitsAndClearInDB() {
-		for (TRLimit ll : itemlimits) {
+		for (final TRLimit ll : itemlimits) {
 			ll.placedBlock.clear();
 		}
 		itemlimits.clear();
@@ -119,19 +140,19 @@ public class TRLimiter {
 	}
 	
 	public void clearLimits() {
-		for (TRLimit ll : itemlimits) {
+		for (final TRLimit ll : itemlimits) {
 			ll.placedBlock.clear();
 		}
 		itemlimits.clear();
 	}
 	
-	public int getMax(@NonNull Player player, int thisid, int thisdata){
-		int max = -1;
+	//Sync
+	public int getMax(@NonNull final Player player, final int thisid, final int thisdata){
 		try {
 			List<TRPermLimit> cached = limiterPermCache.get(player.getName());
 			if (cached != null){
 				boolean found = false;
-				for (TRPermLimit lim : cached){
+				for (final TRPermLimit lim : cached){
 					if (lim.compare(thisid, thisdata)){
 						if (lim.max == -2) return -1;
 						if (lim.max != -1) return lim.max;
@@ -142,7 +163,7 @@ public class TRLimiter {
 				if (found) return -1;
 			}
 			
-			TRPermLimit pl = TRPermHandler.getPermLimitFromPerm(player, "tekkitrestrict.limiter", thisid, thisdata);
+			final TRPermLimit pl = TRPermHandler.getPermLimitFromPerm(player, "tekkitrestrict.limiter", thisid, thisdata);
 			if (pl != null) {
 				if (cached == null) cached = new ArrayList<TRPermLimit>();
 				cached.add(pl);
@@ -150,8 +171,7 @@ public class TRLimiter {
 				if (pl.max == -2) return -1;
 				return pl.max;
 			} else {
-				for (int i = 0; i < configLimits.size(); i++) {
-					TRConfigLimit cc = configLimits.get(i);
+				for (final TRConfigLimit cc : configLimits) {
 					if (cc.compare(thisid, thisdata)) {
 						lastString = cc.msg;
 						return cc.configcount;
@@ -162,55 +182,50 @@ public class TRLimiter {
 			Warning.other("An error occurred while trying to get the maxlimit of a player ('+TRLimiter.getMax(...):int')!", false);
 			Log.Exception(ex, false);
 		}
-		return max;
+		return -1;
 	}
 	
-	private String lastString = "";
+	protected String lastString = "";
 
 	/**
 	 * If the player has not yet maxed out his limits, it will add the placed block to his limits.
 	 * @return Whether a player has already maxed out their limits.
 	 * @see TRListener#onBlockPlace(BlockPlaceEvent) Used by TRListener.onBlockPlace(BlockPlaceEvent)
 	 */
-	@Nullable public String checkLimit(BlockPlaceEvent event, boolean doBypassCheck) {
-		String r = null;
+	@Nullable public String checkLimit(final BlockPlaceEvent event, final boolean doBypassCheck) {
+		//String r = null;
 		if (doBypassCheck && event.getPlayer().hasPermission("tekkitrestrict.bypass.limiter")) return null;//true
-		Block block = event.getBlock();
-		int thisid = block.getTypeId();
-		int thisdata = block.getData();
+		final Block block = event.getBlock();
+		final int thisid = block.getTypeId();
+		final int thisdata = block.getData();
 		
-		Location bloc = block.getLocation();
-		
-		int TLimit = getMax(event.getPlayer(), thisid, thisdata);//Get the max for this player for id:data
-		
+		final int TLimit = getMax(event.getPlayer(), thisid, thisdata);//Get the max for this player for id:data
+		String tbr = lastString;
+		lastString = null;
 		if (TLimit != -1) {
-			for (TRLimit limit : itemlimits) {
+			final TRLocation bloc2 = new TRLocation(block.getLocation());
+			for (final TRLimit limit : itemlimits) {
 				if (limit.id != thisid || limit.data != thisdata) continue;
 				
-				int currentnum = limit.placedBlock.size();
+				final int currentnum = limit.placedBlock.size();
 				if (currentnum >= TLimit) {
 					// this would be at max.
-					String tbr = lastString;
-					lastString = null;
 					return tbr == null?"":tbr;//false
 				} else {
 					// loop through the placedblocks to make sure that we
 					// aren't placing the same one down twice.
 					boolean place2 = false;
-					for (Location j : limit.placedBlock) {
-						if (j.equals(bloc)) {
+					for (TRLocation j : limit.placedBlock) {
+						if (j.equals(bloc2)) {
 							place2 = true;
 							break;
 						}
 					}
 					
 					if (!place2) {
-						limit.placedBlock.add(block.getLocation());
+						limit.placedBlock.add(bloc2);
 
-						int x = bloc.getBlockX();
-						int y = bloc.getBlockY();
-						int z = bloc.getBlockZ();
-						allBlockOwners.put(bloc.getWorld().getName() + ":" + x + ":" + y + ":" + z, event.getPlayer().getName());
+						allBlockOwners.put(bloc2.world + ":" + bloc2.x + ":" + bloc2.y + ":" + bloc2.z, event.getPlayer().getName());
 						isModified = true;
 						return null;//true
 					} else {
@@ -222,75 +237,58 @@ public class TRLimiter {
 
 			// it hasn't quite gone through yet. We need to make a new limiter
 			// and add this block to it.
-			TRLimit g = new TRLimit();
+			final TRLimit g = new TRLimit();
 			g.id = thisid;
 			g.data = thisdata;
-			g.placedBlock.add(bloc);
+			g.placedBlock.add(bloc2);
 			itemlimits.add(g);
 			
-			int x = bloc.getBlockX();
-			int y = bloc.getBlockY();
-			int z = bloc.getBlockZ();
-			allBlockOwners.put(bloc.getWorld().getName() + ":" + x + ":" + y + ":" + z, event.getPlayer().getName());
+			allBlockOwners.put(bloc2.world + ":" + bloc2.x + ":" + bloc2.y + ":" + bloc2.z, event.getPlayer().getName());
 			isModified = true;
 			// Making new
 			return null;//true
 		}
 
-		return r;//true
+		return null;//true
 	}
 
-	public void checkBreakLimit(@NonNull BlockBreakEvent event) {
-		// loop through player's limits.
-		
-		int id = event.getBlock().getTypeId();
-		byte data = event.getBlock().getData();
-		for (TRLimit limit : itemlimits) {
-			if (limit.id != id || limit.data != data) continue;
-			
-			int currentnum = limit.placedBlock.size();
-			if (currentnum <= 0) {
-				// this would be at minimum
-				// (LOG) maxed out
-				return;
-			} else {
-				// add to it!
-				Location bloc = event.getBlock().getLocation();
-				limit.placedBlock.remove(bloc);
-				
-				int x = bloc.getBlockX();
-				int y = bloc.getBlockY();
-				int z = bloc.getBlockZ();
-				allBlockOwners.remove(bloc.getWorld().getName() + ":" + x + ":" + y + ":" + z);
-				isModified = true;
-				return;
-			}
-			
-		}
+	/**
+	 * Updates the breakLimits of this player.
+	 * @param event
+	 * @throws IllegalArgumentException If event == {@code null}
+	 * @see #checkBreakLimit(int, byte, Location)
+	 */
+	public void checkBreakLimit(BlockBreakEvent event) {
+		if (event == null) throw new IllegalArgumentException("Event cannot be null!");
+		checkBreakLimit(event.getBlock().getTypeId(), event.getBlock().getData(), event.getBlock().getLocation());
 	}
 	
-	public void checkBreakLimit(int id, byte data, @NonNull Location bloc) {
+	/**
+	 * @param id
+	 * @param data
+	 * @param bloc
+	 * @throws IllegalArgumentException If bloc == {@code null}
+	 */
+	public void checkBreakLimit(int id, byte data, Location bloc) {
+		if (bloc == null) throw new IllegalArgumentException("Location cannot be null!");
+		//READ itemlimits
 		// loop through player's limits.
-		for (TRLimit limit : itemlimits) {
+		for (final TRLimit limit : itemlimits) {
 			if (limit.id != id || limit.data != data) continue;
 			
-			int currentnum = limit.placedBlock.size();
+			final int currentnum = limit.placedBlock.size();
 			if (currentnum <= 0) {
 				// this would be at minimum
 				// (LOG) maxed out
 				return;
 			} else {
-				// add to it!
-				limit.placedBlock.remove(bloc);
+				final TRLocation loc = new TRLocation(bloc);
+				limit.placedBlock.remove(loc);
 				
-				int x = bloc.getBlockX();
-				int y = bloc.getBlockY();
-				int z = bloc.getBlockZ();
-				allBlockOwners.remove(bloc.getWorld().getName() + ":" + x + ":" + y + ":" + z);
+				allBlockOwners.remove(loc.world + ":" + loc.x + ":" + loc.y + ":" + loc.z);
 				isModified = true;
 				return;
 			}
-			
 		}
 	}
 
@@ -302,30 +300,35 @@ public class TRLimiter {
 	 */
 	@NonNull public static TRLimiter getLimiter(@NonNull String playerName) {
 		playerName = playerName.toLowerCase();
+		if (playerName.startsWith("[computercraft]")) return turtle;
+		if (playerName.equals("[buildcraft]")) return buildcraft;
+		if (playerName.equals("[redpower]")) return redpower;
 		// check if a previous itemlimiter exists...
 
-		for (TRLimiter il : limiters){
-			if (il.player.toLowerCase().equals(playerName)) {
-				return il;
+		try {
+			Iterator<TRLimiter> it = limiters.iteratorLOCKED(false);
+			while (it.hasNext()){
+				TRLimiter il = it.next();
+				if (il.player.equalsIgnoreCase(playerName)) return il;
 			}
+		} finally {
+			limiters.unlockIterator(false);
 		}
 		//Player is not loaded or offline.
 		
-		TRLimiter r = new TRLimiter();
+		final TRLimiter r = new TRLimiter();
 		r.player = playerName;
 		
-		changing = true;
 		limiters.add(r);
-		changing = false;
 		
 		//If player is online, check for bypass.
-		Player p = Bukkit.getPlayer(playerName);
+		final Player p = Bukkit.getPlayer(playerName);
 		if (p != null && p.hasPermission("tekkitrestrict.bypass.limiter")) return r; //return an empty limiter
 		
 		//If player is offline or isn't loaded, check the database.
 		ResultSet dbin = null;
 		try {
-			dbin = tekkitrestrict.db.query("SELECT * FROM `tr_limiter` WHERE `player` = '" + playerName + "';");
+			dbin = TekkitRestrict.db.query("SELECT * FROM `tr_limiter` WHERE `player` = '" + playerName + "';");
 			if (dbin == null){
 				Warning.other("Unknown error occured when trying to get limits from database!", false);
 				return r;
@@ -340,7 +343,7 @@ public class TRLimiter {
 				// id:data/DATA|id:data/DATA
 				if (blockdata.length() >= 3) {
 					if (blockdata.contains("%")) {
-						String[] prelimits = blockdata.split("%");
+						final String[] prelimits = blockdata.split("%");
 						for (int i = 0; i < prelimits.length; i++) {
 							r.itemlimits.add(loadLimitFromString(prelimits[i]));
 						}
@@ -349,9 +352,9 @@ public class TRLimiter {
 					}
 				}
 
-				for (TRLimit l : r.itemlimits) {
-					for (Location l1 : l.placedBlock) {
-						allBlockOwners.put(l1.getWorld().getName() + ":" + l1.getBlockX() + ":" + l1.getBlockY() + ":" + l1.getBlockZ(), r.player);
+				for (final TRLimit l : r.itemlimits) {
+					for (final TRLocation l1 : l.placedBlock) {
+						allBlockOwners.put(l1.world + ":" + l1.x + ":" + l1.y + ":" + l1.z, r.player);
 					}
 				}
 
@@ -359,38 +362,43 @@ public class TRLimiter {
 			}
 			
 			dbin.close();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			try {
 				if (dbin != null) dbin.close();
-			} catch (SQLException e1) {}
+			} catch (final SQLException e1) {}
 		}
 
 		return r; //Return an empty limiter
 	}
 
 	/** @return The limiter the given player has. If it doesn't exist, it creates one. */
-	@NonNull public static TRLimiter getOnlineLimiter(@NonNull Player player) {
-		String playerName = player.getName().toLowerCase();
+	@NonNull public static TRLimiter getOnlineLimiter(@NonNull final Player player) {
+		final String playerName = player.getName().toLowerCase();
 		// check if a previous itemlimiter exists...
 
-		for (TRLimiter il : limiters){
-			if (il.player.toLowerCase().equals(playerName)) {
-				return il;
+		try {
+			Iterator<TRLimiter> it = limiters.iteratorLOCKED(false);
+			while (it.hasNext()){
+				TRLimiter il = it.next();
+				if (il.player.equalsIgnoreCase(playerName)) {
+					return il;
+				}
 			}
+		} finally {
+			limiters.unlockIterator(false);
 		}
 		
-		TRLimiter r = new TRLimiter();
+		final TRLimiter r = new TRLimiter();
 		r.player = playerName;
-		changing = true;
+
 		limiters.add(r);
-		changing = false;
 		
 		if (player.hasPermission("tekkitrestrict.bypass.limiter")) return r; //return an empty limiter
 		
 		// check to see if this player exists in the database...
 		ResultSet dbin = null;
 		try {
-			dbin = tekkitrestrict.db.query("SELECT * FROM `tr_limiter` WHERE `player` = '" + playerName + "';");
+			dbin = TekkitRestrict.db.query("SELECT * FROM `tr_limiter` WHERE `player` = '" + playerName + "';");
 			if (dbin == null){
 				Warning.other("Unknown error occured when trying to get limits from database!", false);
 				return r;
@@ -406,7 +414,7 @@ public class TRLimiter {
 				// id:data/DATA|id:data/DATA
 				if (blockdata.length() >= 3) {
 					if (blockdata.contains("%")) {
-						String[] prelimits = blockdata.split("%");
+						final String[] prelimits = blockdata.split("%");
 						for (int i = 0; i < prelimits.length; i++) {
 							r.itemlimits.add(loadLimitFromString(prelimits[i]));
 						}
@@ -415,9 +423,9 @@ public class TRLimiter {
 					}
 				}
 
-				for (TRLimit l : r.itemlimits) {
-					for (Location l1 : l.placedBlock) {
-						allBlockOwners.put(l1.getWorld().getName() + ":" + l1.getBlockX() + ":" + l1.getBlockY() + ":" + l1.getBlockZ(), r.player);
+				for (final TRLimit l : r.itemlimits) {
+					for (final TRLocation l1 : l.placedBlock) {
+						allBlockOwners.put(l1.world + ":" + l1.x + ":" + l1.y + ":" + l1.z, r.player);
 					}
 				}
 
@@ -425,29 +433,29 @@ public class TRLimiter {
 			}
 			
 			dbin.close();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			try {
 				if (dbin != null) dbin.close();
-			} catch (SQLException e1) {}
+			} catch (final SQLException e1) {}
 		}
 
 		return r; //Return an empty limiter
 	}
 	
 	/** Note: You should add the locations in this limit to allBlockOwners after calling this method. */
-	@NonNull private static TRLimit loadLimitFromString(@NonNull String ins) {
+	@NonNull private static TRLimit loadLimitFromString(@NonNull final String ins) {
 		// ins = ins.replace("/", "!");
-		String[] limit = ins.split("&");
+		final String[] limit = ins.split("&");
 
-		TRLimit l = new TRLimit();
+		final TRLimit l = new TRLimit();
 		if (limit.length == 2) {
-			String item = limit[0];
-			String locStr = limit[1];
+			final String item = limit[0];
+			final String locStr = limit[1];
 			// block id parse
 			if (item.length() > 0) {
 				if (item.contains(":")) {
 					// c = org.bukkit.block.
-					String[] mat = item.split(":");
+					final String[] mat = item.split(":");
 					try {
 						l.id = Integer.parseInt(mat[0]);
 						l.data = Byte.parseByte(mat[1]);
@@ -471,13 +479,13 @@ public class TRLimiter {
 				// world,x,y,z=world,x,y,z=...=...
 				if (locStr.length() > 0) {
 					if (locStr.contains("_")) {
-						String[] datas = locStr.split("_");
+						final String[] datas = locStr.split("_");
 						for (int j = 0; j < datas.length; j++) {
-							Location loc = locParse(datas[j]);
+							final TRLocation loc = locParse(datas[j]);
 							if (loc != null) l.placedBlock.add(loc);
 						}
 					} else {
-						Location loc = locParse(locStr);
+						final TRLocation loc = locParse(locStr);
 						if (loc != null) l.placedBlock.add(loc);
 					}
 				}
@@ -489,75 +497,84 @@ public class TRLimiter {
 	/** Save the limiters to the database. */
 	public static void saveLimiters() {
 		// looping through each player's limiters
-		while (changing){
+		/*
+		int i = 0;
+		while (changing2.get()){
 			try {
-				Thread.sleep(10);
+				Thread.sleep(1);
+				i++;
 			} catch (Exception ex){}
+			if (i == 10000) tekkitrestrict.instance.getLogger().warning("Saving limiter has waited over 10 seconds for window! Aborting");
+		}*/
+
+		try {
+			Iterator<TRLimiter> it = limiters.iteratorLOCKED(false);
+			while (it.hasNext()){
+				saveLimiter(it.next());
+			}
+		} finally {
+			limiters.unlockIterator(false);
 		}
-		changing = true;
-		for (TRLimiter lb : limiters){
-			saveLimiter(lb);
-		}
-		changing = false;
 	}
 
 	/**
 	 * Called by QuitListener.quit(Player) to make a players limits expire (after 6x32 = 192 ticks) when he logs off.
 	 * @see nl.taico.tekkitrestrict.listeners.QuitListener#quit(Player) QuitListener.quit(Player)
-	 * @see tekkitrestrict#initHeartBeat()
+	 * @see TekkitRestrict#initHeartBeat()
 	 */
 	public static void setExpire(@NonNull String player) {
 		player = player.toLowerCase();
 		// gets the player from the list of limiters (does nothing if player doesn't exist)
 
-		for (TRLimiter il : limiters) {
-			if (!il.player.equals(player)) continue;
-			
-			il.expire = 6; // Every 32 ticks 32*6 = Every 192 ticks
-			return;
+		try {
+			Iterator<TRLimiter> it = limiters.iteratorLOCKED(false);
+			while (it.hasNext()){
+				TRLimiter il = it.next();
+				if (!il.player.equals(player)) continue;
+				
+				il.expire = 6; // Every 32 ticks 32*6 = Every 192 ticks
+				return;
+			}
+		} finally {
+			limiters.unlockIterator(false);
 		}
 	}
 
 	/**
-	 * IMPORTANT: set Changing to true before using this and to false after using this.
 	 * Dynamically unload a player (after they logout).<br>
-	 * Saves the limiter first, then uses <code>limitBlock.clearLimits()</code> and
-	 * then uses <code>limiters.remove(limitBlock)</code>
+	 * Saves the limiter first, then uses <code>limitBlock.clearLimits()</code>.
 	 * @see #saveLimiter(TRLimiter)
 	 */
-	private static void deLoadLimiter(@NonNull TRLimiter limitBlock) {
+	private static void deLoadLimiter(final TRLimiter limitBlock) {
 		saveLimiter(limitBlock);
 		// clear limits
 		limitBlock.clearLimits();
-		// remove this limiter from the list.
-		limiters.remove(limitBlock);
 	}
 
 	private static boolean logged = false, logged2 = false;
 	
 	/** Saves 1 limiter to the database. */
-	@Safe(allownull = false)
-	private static void saveLimiter(@NonNull TRLimiter lb) {
+	private static void saveLimiter(@NonNull final TRLimiter lb) {
 		if (lb.player == null){
 			Warning.other("An error occurred while saving the limits! Error: Null player name!", false);
 			return;
 		}
-		String player = lb.player.toLowerCase();
+		final String player = lb.player.toLowerCase();
 		String blockdata = null;
 		
 		try {
-			int size = lb.itemlimits.size();
+			final int size = lb.itemlimits.size();
 			int i = 0;
-			Iterator<TRLimit> limitsIt = lb.itemlimits.iterator();
+			final Iterator<TRLimit> limitsIt = lb.itemlimits.iterator();
 			while (limitsIt.hasNext()){
-				TRLimit limit1 = limitsIt.next();
+				final TRLimit limit1 = limitsIt.next();
 				if (limit1.id == -1) continue;
 				
-				String suf;
+				final String suf;
 				if (i == size - 1) suf = "";
 				else suf = "%";
 				
-				String block = "" + limit1.id; //id or id:data
+				final String block;// = "" + limit1.id; //id or id:data
 				
 				// set data if it exists
 				if (limit1.data == 0)
@@ -569,30 +586,26 @@ public class TRLimiter {
 				// Get DATA.
 				String DATA = "";
 				// loop through each block data
-				int size2 = limit1.placedBlock.size();
+				final int size2 = limit1.placedBlock.size();
 				int j = 0;
 				
-				Iterator<Location> pblockIt = limit1.placedBlock.iterator();
+				final Iterator<TRLocation> pblockIt = limit1.placedBlock.iterator();
 				while (pblockIt.hasNext()){
-					Location l = pblockIt.next();
-					String suf1;
+					final String suf1;
 					if (j == size2 - 1) suf1 = "";
 					else suf1 = "_";
-					DATA += l.getWorld().getName() + "," + l.getBlockX() + "," + l.getBlockY() + "," + l.getBlockZ() + suf1;
+					final TRLocation l = pblockIt.next();
+					DATA += l.world + "," + l.x + "," + l.y + "," + l.z + suf1;
 					j++;
 				}
 				
-				String datarr = "";
-				if (size2 > 0) {
-					datarr = block + "&" + DATA + suf;
-				}
 				if (blockdata == null) blockdata = "";
-				blockdata += datarr;
+				if (size2 > 0) blockdata += block + "&" + DATA + suf;
 				
 				i++;
 			}
 			if (blockdata == null) blockdata = "";
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			if (!logged){
 				Warning.other("An error occurred while saving the limits! Error: Cannot create string to save to database!", false);
 				logged = true;
@@ -601,201 +614,226 @@ public class TRLimiter {
 
 		if (blockdata == null) return;
 		try {
-				tekkitrestrict.db.query("INSERT OR REPLACE INTO `tr_limiter` (`player`,`blockdata`) VALUES ('"
+				TekkitRestrict.db.query("INSERT OR REPLACE INTO `tr_limiter` (`player`,`blockdata`) VALUES ('"
 						+ player
 						+ "','"
 						+ blockdata
 						+ "');");
 			
-		} catch (SQLException ex) {
+		} catch (final SQLException ex) {
 			if (!logged2){
 				Warning.other("An error occurred while saving the limits! Error: Cannot insert into database!", false);
 				logged2 = true;
 			}
 		}
 	}
-
+	
 	/** Parses a String formatted like <code>"world,x,y,z"</code> to a location. */
-	@Nullable private static Location locParse(String ins) {
-		Location l = null;
+	@Nullable private static TRLocation locParse(final String ins) {
 		try {
 			if (ins.contains(",")) {
 				// determine if the world for this exists...
-				String[] lac = ins.split(",");
-				World cw = Bukkit.getWorld(lac[0]);
+				final String[] lac = ins.split(",");
+				final World cw = Bukkit.getWorld(lac[0]);
 				if (cw != null) {
-					l = new Location(cw, Integer.parseInt(lac[1]), Integer.parseInt(lac[2]), Integer.parseInt(lac[3]));
+					return new TRLocation(cw.getName(), Integer.parseInt(lac[1]), Integer.parseInt(lac[2]), Integer.parseInt(lac[3]));
 				}
 			}
-		} catch (Exception ex){
+		} catch (final Exception ex){
 			Warning.other("Error while loading a limiter: malformed limiter location in the database!", false);
 		}
 
-		return l;
+		return null;
 	}
 
 	/** load all of the block:player pairs from db. */
 	public static void init() {
 		ResultSet dbin = null;
+		Log.trace("Limiter - Loading Limits From Database...");
 		try {
-			dbin = tekkitrestrict.db.query("SELECT * FROM `tr_limiter`;");
+			dbin = TekkitRestrict.db.query("SELECT * FROM `tr_limiter`;");
 			if (dbin == null){
 				Warning.other("Unable to load the limits from the database!", true);
 				return;
 			}
+			
+			int m = 0;
 			while (dbin.next()) {
 				// This player exists in the database!!!
 				// load them up!
 
 				// This player does not have a bypass =(
 				// add data
-				String player = dbin.getString("player").toLowerCase();
-				String blockdata = dbin.getString("blockdata");
+				final String player = dbin.getString("player").toLowerCase();
+				final String blockdata = dbin.getString("blockdata");
 				// scheme:
 				// id:data/DATA|id:data/DATA
 				if (blockdata.length() >= 3) {
 					if (blockdata.contains("%")) {
-						String[] prelimits = blockdata.split("%");
+						final String[] prelimits = blockdata.split("%");
 						for (int i = 0; i < prelimits.length; i++) {
-							String g = prelimits[i];
-							TRLimit l = loadLimitFromString(g);
-							List<Location> blks = l.placedBlock;
-							for (Location loc : blks) {
+							final String g = prelimits[i];
+							final TRLimit l = loadLimitFromString(g);
+							final List<TRLocation> blks = l.placedBlock;
+							for (final TRLocation loc : blks) {
 								allBlockOwners.put(
-										loc.getWorld().getName() + ":"
-												+ loc.getBlockX() + ":"
-												+ loc.getBlockY() + ":"
-												+ loc.getBlockZ(), player);
+										loc.world + ":"
+												+ loc.x + ":"
+												+ loc.y + ":"
+												+ loc.z, player);
 							}
 						}
 					} else {
-						String g = blockdata;
-						TRLimit l = loadLimitFromString(g);
-						List<Location> blks = l.placedBlock;
-						for (Location loc : blks) {
-							allBlockOwners.put(loc.getWorld().getName() + ":"
-									+ loc.getBlockX() + ":" + loc.getBlockY()
-									+ ":" + loc.getBlockZ(), player);
+						final String g = blockdata;
+						final TRLimit l = loadLimitFromString(g);
+						final List<TRLocation> blks = l.placedBlock;
+						for (final TRLocation loc : blks) {
+							allBlockOwners.put(loc.world + ":"
+									+ loc.x + ":" + loc.y
+									+ ":" + loc.z, player);
 						}
 					}
 				}
+				m++;
 			}
 			dbin.close();
-		} catch (Exception ex) {
+			Log.trace("Limiter - Loaded Limits for "+m+" players");
+		} catch (final Exception ex) {
 			try {
 				if (dbin != null) dbin.close();
-			} catch (SQLException ex2) {}
+			} catch (final SQLException ex2) {}
 			Warning.otherWarnings.add("[SEVERE] An error occurred while loading the limiter!");
-			tekkitrestrict.log.severe("An error occurred while loading the limiter!");
+			Log.severe("An error occurred while loading the limiter!");
 			Log.Exception(ex, true);
 		}
 	}
 
-	/** Used by {@link #manageData()} for the Future call. */
-	private static Location tempLoc;
+//	/** Used by {@link #manageData()} for the Future call. */
+//	private static Location tempLoc;
 	/**
 	 * Manages and removes bad data.
 	 * Determines if the limit exists at a location. If not, remove it.
-	 * Called by savethread.
+	 * Called by limiter manager
 	 */
 	public static void manageData() {
-		for (TRLimiter lb : limiters) {
-			boolean changed = false;
-			for (TRLimit l : lb.itemlimits) {
-				try {
-					Iterator<Location> it = l.placedBlock.iterator();
-					while (it.hasNext()){
-						Location loc = it.next();
-						tempLoc = loc;
-						Chunk chunk = tempLoc.getChunk();
-						if (!chunk.isLoaded()){
-							try {
-								Future<Chunk> returnFuture = Bukkit.getScheduler().callSyncMethod(tekkitrestrict.getInstance(), new Callable<Chunk>() {
-								   public Chunk call() {
-									   Chunk c = tempLoc.getChunk();
-									   c.load();
-								       return c;
-								   }
-								});
-								chunk = returnFuture.get();
-							} catch (Exception ex){
-								continue;
+		try {
+			Iterator<TRLimiter> it = limiters.iteratorLOCKED(false);
+			while (it.hasNext()){
+				final TRLimiter lb = it.next();
+				boolean changed = false;
+				for (final TRLimit l : lb.itemlimits) {
+					try {
+						final Iterator<TRLocation> it2 = l.placedBlock.iterator();
+						while (it2.hasNext()){
+							final TRLocation loc = it2.next();
+							final Chunk chunk = loc.getChunk();
+							
+							if(chunk.isLoaded()){
+								final Block b = loc.getBlock();
+								
+								if (b.getTypeId() != l.id){
+									it2.remove();
+									changed = true;
+								} else if (l.data != b.getData() && l.data != -1) {//TODO IMPORTANT FIXME change THIS!
+								//} else if (l.data != b.getData() && !(b.getData() == 0 && l.data == -10) && l.data != -1) {//TODO IMPORTANT FIXME change THIS!
+									it2.remove();
+									changed = true;
+								}
 							}
 						}
-						
-						if(chunk != null){
-							Block b = loc.getBlock();
-							if (b.getTypeId() != l.id){
-								it.remove();
-								changed = true;
-							} else if (l.data != b.getData() && !(b.getData() == 0 && l.data == -10) && l.data != -1) {//TODO IMPORTANT FIXME change THIS!
-								it.remove();
-								changed = true;
-							}
-						}
+					} catch (ConcurrentModificationException ex){
+						continue;
 					}
-				} catch (ConcurrentModificationException ex){
-					continue;
+				}
+				
+				if (changed){
+					Bukkit.getScheduler().scheduleAsyncDelayedTask(TekkitRestrict.getInstance(), new Runnable(){
+						public void run(){
+							saveLimiter(lb);
+						}
+					});
 				}
 			}
-			
-			if (changed) saveLimiter(lb);
+		} finally {
+			limiters.unlockIterator(false);
 		}
 	}
 
 	/**
 	 * Called by the heartbeat to unload limits of players that are offline.
 	 * @see #deLoadLimiter(TRLimiter) Uses deLoadLimiter(TRLimitBlock)
-	 * @see tekkitrestrict#initHeartBeat() Called by tekkitrestrict.initHeartBeat()
+	 * @see TekkitRestrict#initHeartBeat() Called by tekkitrestrict.initHeartBeat()
 	 */
+	@Async
 	public static void expireLimiters() {
 		// loop through each limiter.
-		ArrayList<TRLimiter> tbr = new ArrayList<TRLimiter>();
+		final HashSet<TRLimiter> tbr = new HashSet<TRLimiter>();
 
-		for (TRLimiter il : limiters){
-			if (il.expire == -1) continue;
-			if (il.expire == 0) { // do expire
-				tbr.add(il);
-				//Expired limiter
-			} else {
-				// Age limiter
-				il.expire--;
+		try {
+			Iterator<TRLimiter> it = limiters.iteratorLOCKED(true);
+			while (it.hasNext()){
+				TRLimiter il = it.next();
+				if (il instanceof TRFakeLimiter) continue;
+				if (il.expire == -1) continue;
+				if (il.expire == 0) { // do expire
+					tbr.add(il);
+					it.remove();
+					//Expired limiter
+				} else {
+					// Age limiter
+					il.expire--;
+				}
 			}
+		} finally {
+			limiters.unlockIterator(true);
 		}
-		if (changing) return;
-		changing = true;
-		for (TRLimiter lb : tbr){
+		
+		//No lock on limiters
+		for (final TRLimiter lb : tbr){
 			deLoadLimiter(lb);
 		}
-		changing = false;
 	}
 
 	/** Called when a player logs in to make his limits not expire any more. */
-	public static void removeExpire(@NonNull String playerName) {
+	public static void removeExpire(String playerName) {
 		playerName = playerName.toLowerCase();
-		for (TRLimiter il : limiters){
-			if (il.player.toLowerCase().equals(playerName))
-				il.expire = -1;
+		
+		try {
+			Iterator<TRLimiter> it = limiters.iteratorLOCKED(false);
+			while (it.hasNext()){
+				TRLimiter il = it.next();
+				if (il.player.equalsIgnoreCase(playerName))
+					il.expire = -1;
+			}
+		} finally {
+			limiters.unlockIterator(false);
 		}
 	}
 
 	/** @return The owner of this block, or null if none is found. */
-	@Nullable public static String getPlayerAt(@NonNull Block block) {
+	@Nullable public static String getPlayerAt(@NonNull final Block block) {
 		// Cache block:owners, so this goes really fast.
-		Location bloc = block.getLocation();
-		int x = bloc.getBlockX();
-		int y = bloc.getBlockY();
-		int z = bloc.getBlockZ();
-		String pl = allBlockOwners.get(bloc.getWorld().getName() + ":" + x + ":" + y + ":" + z);
-		return pl;
+		final Location bloc = block.getLocation();
+		return allBlockOwners.get(bloc.getWorld().getName() + ":" + bloc.getBlockX() + ":" + bloc.getBlockY() + ":" + bloc.getBlockZ());
+	}
+	
+	/** @return The owner of this block, or null if none is found. */
+	@Nullable public static String getPlayerAt(@NonNull final Location bloc) {
+		// Cache block:owners, so this goes really fast.
+		return allBlockOwners.get(bloc.getWorld().getName() + ":" + bloc.getBlockX() + ":" + bloc.getBlockY() + ":" + bloc.getBlockZ());
 	}
 
 	@NonNull public static ArrayList<String> getDebugInfo(){
-		ArrayList<String> tbr = new ArrayList<String>();
-		for (TRConfigLimit limit : configLimits){
+		final ArrayList<String> tbr = new ArrayList<String>();
+		for (final TRConfigLimit limit : configLimits){
 			tbr.add("L:" + limit.id+":"+limit.data+"_"+limit.configcount);
 		}
 		
 		return tbr;
+	}
+
+	//TODO Is this correct?
+	public int hashCode(){
+		return player.hashCode();
 	}
 }

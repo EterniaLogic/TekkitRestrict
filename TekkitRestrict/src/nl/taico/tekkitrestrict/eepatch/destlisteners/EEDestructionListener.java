@@ -7,7 +7,6 @@ import org.bukkit.event.Listener;
 
 import nl.taico.tekkitrestrict.eepatch.EEPSettings;
 
-import ee.events.EEEnums.EEAction2;
 import ee.events.destruction.EEDestructionCatalystEvent;
 import ee.events.destruction.EEDestructionToolEvent;
 import ee.events.destruction.EEHyperCatalystEvent;
@@ -25,50 +24,32 @@ public class EEDestructionListener implements Listener {
 	}
 	
 	public void EEDest3Event(EEHyperCatalystEvent event){
-		Player player = event.getPlayer();
+		final Player player = event.getPlayer();
 		if (player.hasPermission("tekkitrestrict.bypass.blockactions.catalyticlens")) return;
 		
-		EEAction2 action = event.getExtraInfo();
-		
-		for (EEAction2 blocked : EEPSettings.dest3){
-			if (blocked == null) continue;
-			if (blocked == action){
-				event.setCancelled(true);
-				player.sendMessage(ChatColor.RED + "You are not allowed to do this with the Catalytic Lens!");
-				return;
-			}
+		if (EEPSettings.dest3.contains(event.getExtraInfo())){
+			event.setCancelled(true);
+			player.sendMessage(ChatColor.RED + "You are not allowed to do this with the Catalytic Lens!");
 		}
 	}
 	
 	public void EEDest2Event(EEHyperkineticLensEvent event){
-		Player player = event.getPlayer();
+		final Player player = event.getPlayer();
 		if (player.hasPermission("tekkitrestrict.bypass.blockactions.hyperkineticlens")) return;
 		
-		EEAction2 action = event.getExtraInfo();
-		
-		for (EEAction2 blocked : EEPSettings.dest2){
-			if (blocked == null) continue;
-			if (blocked == action){
-				event.setCancelled(true);
-				player.sendMessage(ChatColor.RED + "You are not allowed to do this with the Hyperkinetic Lens!");
-				return;
-			}
+		if (EEPSettings.dest2.contains(event.getExtraInfo())){
+			event.setCancelled(true);
+			player.sendMessage(ChatColor.RED + "You are not allowed to do this with the Hyperkinetic Lens!");
 		}
 	}
 	
 	public void EEDest1Event(EEDestructionCatalystEvent event){
-		Player player = event.getPlayer();
+		final Player player = event.getPlayer();
 		if (player.hasPermission("tekkitrestrict.bypass.blockactions.destructioncatalyst")) return;
 		
-		EEAction2 action = event.getExtraInfo();
-		
-		for (EEAction2 blocked : EEPSettings.dest1){
-			if (blocked == null) continue;
-			if (blocked == action){
-				event.setCancelled(true);
-				player.sendMessage(ChatColor.RED + "You are not allowed to do this with the Destruction Catalyst!");
-				return;
-			}
+		if (EEPSettings.dest1.contains(event.getExtraInfo())){
+			event.setCancelled(true);
+			player.sendMessage(ChatColor.RED + "You are not allowed to do this with the Destruction Catalyst!");
 		}
 	}
 }

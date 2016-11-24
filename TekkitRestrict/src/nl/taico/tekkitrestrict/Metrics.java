@@ -210,7 +210,7 @@ public class Metrics {
                             	plugin.getServer().getScheduler().cancelTask(taskId);
                                 taskId = -1;
                                 // Tell all plotters to stop gathering information.
-                                for (Graph graph : graphs) {
+                                for (final Graph graph : graphs) {
                                     graph.onOptOut();
                                 }
                             }
@@ -224,7 +224,7 @@ public class Metrics {
                         // After the first post we set firstPost to false
                         // Each post thereafter will be a ping
                         firstPost = false;
-                    } catch (IOException e) {
+                    } catch (final IOException e) {
                         if (debug) {
                             Bukkit.getLogger().log(Level.INFO, "[Metrics] " + e.getMessage());
                         }
@@ -234,6 +234,11 @@ public class Metrics {
 
             return true;
         }
+    }
+    
+    public void stop(){
+    	if (taskId < 0) return;
+    	plugin.getServer().getScheduler().cancelTask(taskId);
     }
 
     /**
@@ -329,7 +334,7 @@ public class Metrics {
         PluginDescriptionFile description = plugin.getDescription();
         String pluginName = description.getName();
         boolean onlineMode = Bukkit.getServer().getOnlineMode(); // TRUE if online mode is enabled
-        String pluginVersion = tekkitrestrict.version.toMetricsVersion();
+        String pluginVersion = TekkitRestrict.version.toMetricsVersion();
         String serverVersion = Bukkit.getVersion();
         int playersOnline = Bukkit.getServer().getOnlinePlayers().length;
 

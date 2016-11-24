@@ -16,8 +16,6 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class TMetrics {
@@ -39,7 +37,7 @@ public class TMetrics {
 	private boolean showWarnings;
 
 	public boolean start(){
-		if (!tekkitrestrict.useTMetrics){
+		if (!TekkitRestrict.useTMetrics){
 			stop();
 			return false;
 		}
@@ -47,6 +45,8 @@ public class TMetrics {
 		if (taskId >= 0) {
             return true;
         }
+		
+		Log.trace("Starting TMetrics...");
 		plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable(){
 			public void run() {
 				taskId = plugin.getServer().getScheduler().scheduleAsyncRepeatingTask(plugin, new Runnable() {
@@ -69,6 +69,7 @@ public class TMetrics {
 	
 	public void stop(){
 		if (taskId > 0) {
+			Log.trace("Stopping TMetrics...");
             plugin.getServer().getScheduler().cancelTask(taskId);
             taskId = -1;
         }
@@ -86,7 +87,7 @@ public class TMetrics {
 		String shortparams = "";
 		if (uid == 0 || first){
 			int onlineMode = Bukkit.getServer().getOnlineMode() ? 1 : 0;
-			String pluginVersion = tekkitrestrict.version.fullVer;
+			String pluginVersion = TekkitRestrict.version.fullVer;
 			String serverVersion = Bukkit.getVersion();
 	
 			String osname = System.getProperty("os.name");
@@ -103,7 +104,7 @@ public class TMetrics {
 			
 			int arch = 0;
 			if (osarch.equals("x86_64")) arch = 1;
-			int eepatch = tekkitrestrict.getInstance().linkEEPatch()?1:0;
+			int eepatch = PatchesAPI.hasFix(PatchesAPI.getEEPatchVer())?1:0;
 	
 			/*
 			params =  "id="+uid+"&"
@@ -188,7 +189,7 @@ public class TMetrics {
 			}
 
 			for (String s : response){
-				if (s == null || s.equals("")) continue;
+				if (s == null || s.isEmpty()) continue;
 				if (s.contains("id=")){
 					try {
 						uid = Integer.parseInt(s.replace("id=", ""));
@@ -197,13 +198,34 @@ public class TMetrics {
 					}
 				} else if (s.contains("OK:")){
 					continue;
-				} else if (s.contains("IMPORTANT: ")) {
-					if (showWarnings) scheduleRepeatingMSG(s.replace("IMPORTANT: ", ""));
-					Bukkit.getLogger().warning("[TekkitRestrict] Important Message: "+s.replace("IMPORTANT: ", ""));
+				/*
+				} else if (s.contains("IMPO/RTANT: ")) {
+					if (showWarnings) scheduleRepeatingMSG(s.replace("IMPOR/TANT: ", ""));
+					Bukkit.getLogger().warning("[TekkitRestrict] Important Message: "+s.replace("IMPOR/TANT: ", ""));
 				} else if (s.contains("MSG: ")){
 					if (showWarnings) Bukkit.getLogger().info("[TMetrics] Message from server: "+s.replace("MSG: ", ""));
-				} else {
-					if (showWarnings) Bukkit.getLogger().warning("[TMetrics] Statistics server responds: " + s);
+				*/
+				} else if (s.contains("ERROR: ")){
+					if (showWarnings){
+						int error = 0;
+						try {
+							error = Integer.parseInt(s.replace("ERROR: ", ""));
+							String msg = null;
+							if (error == 1 || error == 3 || error == 6)
+								msg = "Unable to save statistics!";
+							else if (error == 2)
+								msg = "No ID given!";
+							else if (error == 4)
+								msg = "Unable to get UID!";
+							else if (error > 100)
+								msg = "The version of TekkitRestrict you are using has a serious bug. It is highly recommended to update to TekkitRestrict 1."+(error-100)+" or a higher version.\n";
+							else
+								msg = "Unknown error: " + error;
+							Bukkit.getLogger().warning("[TMetrics] Statistics server returned: " + msg);
+						} catch (Exception ex){
+							Bukkit.getLogger().warning("[TMetrics] Statistics server returned an invalid response!");
+						}
+					}
 				}
 			}
 
@@ -219,6 +241,7 @@ public class TMetrics {
 		}
 	}
 	
+	/*
 	private void scheduleRepeatingMSG(final String message){
 		Bukkit.getScheduler().scheduleAsyncRepeatingTask(plugin, new Runnable(){
 			public void run(){
@@ -228,7 +251,7 @@ public class TMetrics {
 				}
 			}
 		}, 20*60*10, 20*60*60);
-	}
+	}*/
 
 	private void generateUIDFile(File file) {
 		Writer writer = null;

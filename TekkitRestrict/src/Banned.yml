@@ -1,0 +1,209 @@
+###################################################################################################
+## Configuration file for TekkitRestrict                                                         ##
+## Authors: Taeir, DreadEnd (aka DreadSlicer)                                                    ##
+## BukkitDev: http://dev.bukkit.org/server-mods/tekkit-restrict/                                 ##
+## Please ask questions/report issues on the BukkitDev page.                                     ##
+###################################################################################################
+# 
+###################################################################################################
+########################################### Banned Items ##########################################
+###################################################################################################
+# In the list below, you can set items that will be banned for all players on the server, except
+# if they have the bypass permission. When they try to make the item, they will be stopped. If
+# they somehow manage to get the item, it will be removed from their inventory shortly after.
+# 
+# UseBannedItems: Should this feature be enabled?
+# Default: true
+UseItemBanner: true
+# 
+# Should disabledItemBlocks be removed from the map?
+# WARNING: It can cause lag as the complete map has to be searched for disabled blocks.
+# Default: false
+RemoveDisabledItemBlocks: false
+# 
+# When a disabled item is found in someone's inventory, it is changed into this item ID.
+# Default: 3 (dirt)
+ChangeDisabledItemsIntoId: 3
+# 
+# All Items listed below will be banned. This means that if a player does not have the bypass
+# permission (tekkitrestrict.bypass.noitem), any item listed here will be uncraftable for him. If
+# he has an item listed here in his inventory, it will be changed to the item specified by
+# ChangeDisabledItemsIntoId (default dirt), and he will be informed with the message you set, or a
+# default message.
+# 
+# You can also use individual permissions to add bans to some players only.
+# The individual permission is: tekkitrestrict.noitem.ID.DATA
+# 
+# There are multiple ways to add items to this list:
+# 1. You can use single id's:
+# - "12"
+# - "13:5"
+# 2. You can use ranges(*1):
+# - "20-30"
+# - "30-45:5"(*2)
+# 3. You can use EE and IC2 item names(*3) (without spaces):
+# - "RedMatterPickaxe"
+# - "Jetpack"
+# 4. You can use preset groups (NOT caseSENSItive):
+# - "ee"
+# - "buildcraft"
+# 5. You can also use groups you made yourself in the GroupPermissions config.
+# 
+# You can also set the message that is shown to a player when he tries to craft or click on a
+# banned item like so:
+# - "50 {We don't like torches on this server...}"
+# - "EE {Equivalent Exchange is too overpowered, so it is banned!}"
+# - "20-30 {Items 20 to 30 are banned!}"
+# 
+# You can add colours(*4) and styling(*5) to these messages:
+# - "EE {&0&n(Black Underlined)NO EE!}"
+# 
+# You can add line breaks with \n:
+# - "50 {We don't like torches on this server...\nSo you are not allowed to have them!}"
+# 
+# These are all preset Groups (NOT caseSENSItive):
+# EE, RedPowerCore, RedPowerControl, RedPowerLogic, RedPowerMachine, RedPowerLighting,
+# WirelessRedstone, BuildCraft, AdditionalPipes, IronChests, IndustrialCraft, IC2, NuclearControl,
+# CompactSolars, ChargingBench, PowerConverters, MFFS, RailCraft, TubeStuff, AdvancedMachines,
+# WeaponMod, EnderChest and ChunkLoaders
+# 
+# *1: Ranges are inclusive, 20-22 means items 20, 21 and 22.
+# *2: 15-17:10 means items 15:10, 16:10 and 17:10.
+# *3: Not all items names are included. You will be informed in the console when you add
+#     an item that is not known.
+#     You can also use /tr warnings config to view these warnings.
+# *4: You can add colours with &0 to &9 and &a to &f.
+# *5: You can add styling with &k to &o. &r will reset all styling and colours.
+BannedItems: []
+# 
+###################################################################################################
+######################################## Banned Interacts #########################################
+###################################################################################################
+# If you enable this, TekkitRestrict will check on every click action if the player that clicked
+# has the permission "tekkitrestrict.nointeract.id.data[.left|right|trample]"
+# As this thus checks up to 2 permissions for each click action, it might cause some lag.
+# Default: false
+UseNoInteractPermissions: false
+# 
+######################### Disable the left or right click with the item. ##########################
+# - "27562"                          All Item Data Types, Left and Right Clicking
+# - "27562 left"                     All Item Data Types, Left clicking
+# - "27562-27566 left"               All Items in range, Left clicking
+# - "27562:1 right"                  Prevent right click (in the air and on blocks)
+# - "27562:1 both"                   Prevent left and right click (in the air and on blocks)
+# - "27562:1 trample"                Prevent trampling while holding this item
+# - "27562:1 all"                    Prevent clicking and trampling with this item
+#                                    (in the air and on blocks)
+# - "27562:1 left safezone"          Prevent left-clicking with this item in a safezone
+#                                    (in the air and on blocks)
+# - "27562:1 safezone"               Prevent clicking with this item in a safezone
+#                                    (in the air and on blocks)
+# - "27562:1 right air"              Prevent right-clicking with this item in the air
+# - "27562:1 both block"             Prevent clicking with this item on a block
+# - "27562:1 all air safezone"       Prevents clicking and trampling in the air in a safezone.
+# - "27562-27566 all block safezone" Prevents clicking and trampling on blocks in a safezone with
+#                                    a range of items
+# - "ee left"                        Prevents EE items from being right-clicked
+# 
+############################ Disable the GUI or Right-click on a block ############################
+# - "block 126:1"        When you right-click on this block, it will be disallowed.
+# - "block 126-150"      When you right-click on a block in this range, it will be disallowed.
+# - "block ee"           When you right-click on any EE block, it will be disallowed.
+BannedInteracts: []
+# 
+###################################################################################################
+########################################## Banned Clicks ##########################################
+###################################################################################################
+# Ban clicking on certain items in certain inventories.
+# 
+# Format: item [inventory] [left|right|shift]
+# If you do not specify an inventory, the action will be blocked in all inventories
+# If you do not specify left, right or shift, all clicks will be blocked.
+# 
+# Examples:
+# - "3 Chest right {You are not allowed to rightclick on dirt in chests!}"
+# - "1 left {You are not allowed to leftclick on stone!}"
+# - "1 Recycler {You are not allowed to click on stone in a Recycler!}"
+# - "1 shift {You are not allowed to shiftclick on stone!}"
+# - "1 {You are not allowed to click on stone!}"
+# 
+# Possible inventories:
+# Chest              - Chest or double chest
+# MinecartChest      - Minecart Chest
+# BrewingStand
+# EnchantingTable
+# Furnace
+# Dispenser
+# Inventory          - Player Inventory or crafting window
+# 
+# AlchemicalChest
+# Condenser
+# DMFurnace          - Dark Matter Furnace
+# RMFurnace          - Red Matter Furnace
+# Collector          - Energy Collector
+# EERelay            - Anti-Matter Relay
+# Pedestal           - Dark Matter Pedestal
+# TransmutionTable   - Transmution table and tablet
+# MercurialEye
+# Alchemy Bag
+# 
+# Builder
+# Filler
+# Template
+# Engine             - Combustion or Steam Engine
+# AutoWorkbench
+# 
+# FFCamoflage        - Forcefield Camouflage
+# AutoCraftingTable2 - Automatic Crafting Table MK 2
+# 
+# AlloyFurnace
+# BlueAlloyFurnace
+# BlulectricFurnace
+# Buffer
+# Deployer
+# Ejector
+# Filter
+# Retriever
+# Sorter
+# ItemDetector
+# Regulator
+# RPRelay            - RedPower Relay
+# ProjectTable
+# 
+# CokeOven
+# BlastFurnace
+# CartDispenser
+# EnergyLoader
+# EnergyUnloader
+# LiquidLoader
+# LiquidUnloader
+# ItemLoader
+# AdvItemLoader
+# AdvItemUnloader
+# ItemUnloader
+# RollingMachine    
+# 
+# CanningMachine
+# Compressor
+# CropMatron
+# Cropnalyzer
+# ElectricFurnace
+# Electrolyzer
+# Extractor
+# Generator
+# GeothermalGenerator
+# InductionFurnace
+# IronFurnace
+# Macerator
+# MassFabricator
+# Miner
+# NuclearReactor
+# PersonalSafe
+# Pump
+# Recycler
+# SolarPanel
+# Terraformer
+# TradeOMat
+# WaterMill
+# WindMill
+BannedClicks: []

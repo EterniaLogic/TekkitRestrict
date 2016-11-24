@@ -12,7 +12,7 @@ import ee.events.other.EEPhilosopherStoneEvent;
 public class EEPhilosopherListener implements Listener {
 	@EventHandler
 	public void onPhilo(EEPhilosopherStoneEvent event){
-		Player player = event.getPlayer();
+		final Player player = event.getPlayer();
 		if (player.hasPermission("tekkitrestrict.bypass.blockactions.philosopherstone")) return;
 		
 		if (EEPSettings.phil.contains(event.getExtraInfo())){

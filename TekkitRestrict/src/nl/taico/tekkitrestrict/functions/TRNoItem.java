@@ -1,7 +1,6 @@
 package nl.taico.tekkitrestrict.functions;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -10,13 +9,14 @@ import org.bukkit.entity.Player;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
+import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.TRException;
-import nl.taico.tekkitrestrict.TRItemProcessor;
-import nl.taico.tekkitrestrict.tekkitrestrict;
+import nl.taico.tekkitrestrict.TRItemProcessor2;
 import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.TRConfigCache.Listeners;
+import nl.taico.tekkitrestrict.config.SettingsStorage;
 import nl.taico.tekkitrestrict.objects.TRItem;
-import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
+import nl.taico.tekkitrestrict.objects.itemprocessor.TRMod;
 
 /**
  * This class defines and enables the use of determining what items
@@ -24,10 +24,14 @@ import nl.taico.tekkitrestrict.objects.TREnums.ConfigFile;
  */
 public class TRNoItem {
 	/** A list of all the (by config) banned items. */
-	public static LinkedList<TRItem> DisabledItems = new LinkedList<TRItem>();
+	private static LinkedList<TRItem> DisabledItems = new LinkedList<TRItem>();
 	/** A list of all the (by config) banned creative items. */
 	private static LinkedList<TRItem> DisabledCreativeItems = new LinkedList<TRItem>();
 	
+	private static ArrayList<String> DisabledItemGroups = new ArrayList<String>();
+	
+	public static ArrayList<TRMod> bannedMods = new ArrayList<TRMod>();
+	public static ArrayList<TRMod> bannedCreativeMods = new ArrayList<TRMod>();
 	/**
 	 * Uses allocateDisabledItems() and allocateDisabledCreativeItems()<br>
 	 * Also rechecks if TekkitRestrict should use noItem and/or LimitedCreative<br>
@@ -37,8 +41,8 @@ public class TRNoItem {
 	 * @see #allocateDisabledItems()
 	 */
 	public static void reload() {
-		DisabledItems.clear();
-		DisabledCreativeItems.clear();
+		DisabledItemGroups.clear();
+		bannedMods.clear();
 		allocateDisabledItems();
 		allocateDisabledCreativeItems();
 	}
@@ -47,28 +51,51 @@ public class TRNoItem {
 	 * Loads the Disabled Items from the config.
 	 */
 	private static void allocateDisabledItems() {
-		List<String> di = tekkitrestrict.config.getStringList(ConfigFile.DisableItems, "DisableItems");
+		Log.trace("Loading Banned Items...");
+		final List<String> di = SettingsStorage.bannedConfig.getStringList("BannedItems");
+		final LinkedList<TRItem> temp1 = new LinkedList<TRItem>();
+		
 		for (String str : di) {
 			try {
-				DisabledItems.addAll(TRItemProcessor.processItemString(str));
+				temp1.addAll(TRItemProcessor2.processString(str));
+				
+				final int m = str.indexOf('{');
+				if (m != -1) str = str.substring(0, m);
+				str = str.replace(" ", "");
+				for (final TRMod mod : TRItemProcessor2.mods){
+					if (mod.is(str)) bannedMods.add(mod);
+				}
 			} catch (TRException ex) {
 				Warning.config("You have an error in your DisableItems.config.yml in DisableItems:", false);
 				Warning.config(ex.getMessage(), false);
 				continue;
 			}
 		}
+		DisabledItems = temp1;
 	}
 	private static void allocateDisabledCreativeItems() {
-		List<String> di = tekkitrestrict.config.getStringList(ConfigFile.LimitedCreative, "LimitedCreative");
+		Log.trace("Loading Limited Creative Banned Items...");
+		final List<String> di = SettingsStorage.limitedCreativeConfig.getStringList("LimitedCreative");
+		final LinkedList<TRItem> temp1 = new LinkedList<TRItem>();
+		
 		for (String str : di) {
 			try {
-				DisabledCreativeItems.addAll(TRItemProcessor.processItemString(str));
+				temp1.addAll(TRItemProcessor2.processString(str));
+				
+				final int m = str.indexOf('{');
+				if (m != -1) str = str.substring(0, m);
+				str = str.replace(" ", "");
+				for (final TRMod mod : TRItemProcessor2.mods){
+					if (mod.is(str)) bannedMods.add(mod);
+				}
 			} catch (TRException ex) {
 				Warning.config("You have an error in your LimitedCreative.config.yml in LimitedCreative:", false);
 				Warning.config(ex.getMessage(), false);
 				continue;
 			}	
 		}
+		
+		DisabledCreativeItems = temp1;
 	}
 	
 	/**
@@ -79,9 +106,9 @@ public class TRNoItem {
 	public static boolean isBlockBanned(@NonNull Block block) {
 		if (!Listeners.UseNoItem) return false;
 		
-		int id = block.getTypeId();
-		byte data = block.getData();
-		for (TRItem bannedItem : DisabledItems) {
+		final int id = block.getTypeId();
+		final int data = block.getData();
+		for (final TRItem bannedItem : DisabledItems) {
 			if (bannedItem.compare(id, data)) return true;
 		}
 		
@@ -117,7 +144,7 @@ public class TRNoItem {
 	@Nullable public static String isItemGloballyBanned(int id, int data) {
 		if (!Listeners.UseNoItem) return null;
 		
-		for (TRItem bannedItem : DisabledItems) {
+		for (final TRItem bannedItem : DisabledItems) {
 			if (bannedItem.compare(id, data)) return bannedItem.msg == null ? "" : bannedItem.msg;
 		}
 		
@@ -140,29 +167,34 @@ public class TRNoItem {
 		if (doBypassCheck && player.hasPermission("tekkitrestrict.bypass.creative")) return null;
 		
 		if (DisabledCreativeItems != null) {
-			for (TRItem cc : DisabledCreativeItems){
+			for (final TRItem cc : DisabledCreativeItems){
 				if (cc.compare(id, data)) return cc.msg == null ? "" : cc.msg;
 			}
 		}
 		
 		if (player.hasPermission("tekkitrestrict.creative.blockall")) return "";
-
-		//TRCacheItem ci1 = TRCacheItem.getPermCacheItem(player, "c", "creative", id, data, false);
-		//if (ci1 != null) return true;
 		
-		String idStr = "tekkitrestrict.creative."+id;
+		final String idStr = "tekkitrestrict.creative."+id;
 		
 		if (player.hasPermission(idStr+"."+data)) return "";
 		else if (player.hasPermission(idStr)) return "";
 		else {
-			Iterator<String> keys = TRItemProcessor.groups.keySet().iterator();
-			while (keys.hasNext()) {
-				String key = keys.next();
-				if (player.hasPermission("tekkitrestrict.creative."+key)) {
-					List<TRItem> mi = TRItemProcessor.groups.get(key);
-					for(TRItem c:mi){
-						if (c == null) continue;
-						if (c.compare(id, data)) return "";
+			for (final TRMod mod : TRItemProcessor2.mods){
+				for (final String name : mod.names){
+					if (player.hasPermission("tekkitrestrict.creative."+name)) {
+						for(final TRItem c : mod.getItemsNoCopy()){
+							if (c.compare(id, data)) return c.msg == null?"":c.msg;
+						}
+					}
+				}
+			}
+			
+			for (final TRMod group : TRItemProcessor2.groups){
+				for (final String name : group.names){
+					if (player.hasPermission("tekkitrestrict.creative."+name)) {
+						for(final TRItem c : group.getItemsNoCopy()){
+							if (c.compare(id, data)) return c.msg == null?"":c.msg;
+						}
 					}
 				}
 			}
@@ -176,29 +208,34 @@ public class TRNoItem {
 		if (doBypassCheck && player.hasPermission("tekkitrestrict.bypass.noitem")) return null;
 
 		if (DisabledItems != null) {
-			for (TRItem cc : DisabledItems){
+			for (final TRItem cc : DisabledItems){
 				if (cc.compare(id, data)) return cc.msg == null ? "" : cc.msg;
 			}
 		}
 		
 		if (player.hasPermission("tekkitrestrict.noitem.blockall")) return "";
 		
-		//TRCacheItem ci1 = TRCacheItem.getPermCacheItem(player, "n", "noitem", id, data, false);//Perms and cache??
-		//if (ci1 != null) return true;
-		
-		String idStr = "tekkitrestrict.noitem."+id;
+		final String idStr = "tekkitrestrict.noitem."+id;
 		
 		if (player.hasPermission(idStr+"."+data)) return "";
 		else if (player.hasPermission(idStr)) return "";
 		else {
-			Iterator<String> keys = TRItemProcessor.groups.keySet().iterator();
-			while (keys.hasNext()) {
-				String key = keys.next();
-				if (player.hasPermission("tekkitrestrict.noitem."+key)) {
-					List<TRItem> mi = TRItemProcessor.groups.get(key);
-					for(TRItem c:mi){
-						if (c == null) continue;
-						if (c.compare(id, data)) return "";
+			for (final TRMod mod : TRItemProcessor2.mods){
+				for (final String name : mod.names){
+					if (player.hasPermission("tekkitrestrict.noitem."+name)) {
+						for(final TRItem c : mod.getItemsNoCopy()){
+							if (c.compare(id, data)) return c.msg == null?"":c.msg;
+						}
+					}
+				}
+			}
+			
+			for (final TRMod group : TRItemProcessor2.groups){
+				for (final String name : group.names){
+					if (player.hasPermission("tekkitrestrict.noitem."+name)) {
+						for(final TRItem c : group.getItemsNoCopy()){
+							if (c.compare(id, data)) return c.msg == null?"":c.msg;
+						}
 					}
 				}
 			}
@@ -286,10 +323,14 @@ public class TRNoItem {
 		return DisabledItems.size();
 	}
 
-	/** @return True if: id1 == id2 and (data1 = 0 or data1 == data2 or (data1 = -10 and data2 = 0)) */
+	public static List<TRItem> getBannedItems(){
+		return DisabledItems;
+	}
+	
+	/** @return True if: id1 == id2 and (data1 = -1 or data1 == data2 or (data1 = -10 and data2 = 0)) */
 	public static boolean equalSet(int id1, int data1, int id2, int data2) {
 		if (id1 != id2) return false;
-		if (data1 == -1 || data1 == data2 || (data1 == -10 && data2 == 0)) {
+		if (data1 == -1 || data1 == data2){// || (data1 == -10 && data2 == 0)) { TODO change -10
 			return true;
 		}
 		return false;

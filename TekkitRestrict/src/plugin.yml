@@ -1,9 +1,10 @@
-name: tekkitrestrict
-main: nl.taico.tekkitrestrict.tekkitrestrict
+name: TekkitRestrict
+main: nl.taico.tekkitrestrict.TekkitRestrict
 authors: [Taeir, DreadSlicer]
 prefix: TekkitRestrict
-version: 1.21 Dev 4
-description: TekkitRestrict gives server owners alot of features to prevent and block unwanted tekkit features.
+version: 2.0
+description: TekkitRestrict gives server owners a lot of features to prevent and block unwanted Tekkit features.
+softdepend: [mod_EE, GriefPrevention, PreciousStones, WorldGuard, Essentials]
 
 permissions:
     tekkitrestrict.bypass.*:
@@ -14,6 +15,7 @@ permissions:
             tekkitrestrict.bypass.dupe: true
             tekkitrestrict.bypass.noitem: true
             tekkitrestrict.bypass.limiter: true
+            tekkitrestrict.bypass.nointeract: true
             tekkitrestrict.bypass.noclick: true
             tekkitrestrict.bypass.hack: true
             tekkitrestrict.bypass.lwc: true
@@ -22,62 +24,79 @@ permissions:
             tekkitrestrict.bypass.gemarmor.offensive: true
             tekkitrestrict.bypass.blockactions: true
     tekkitrestrict.noitem.*:
-        description: removes the ability to GET "*" by item ID. (Valid 111, datavalue 1111.11, range 111-222, MOD (ic2, ee, redpower))
+        description: Having this permission makes all items banned.
+        default: false
         children:
             tekkitrestrict.noitem.blockall: true
     tekkitrestrict.limiter.*:
-        description: removes the ability to craft or GET "*" by item ID. (Valid 111, datavalue 1111.11, range 111-222, MOD (ic2, ee, redpower))
+        description: Having this permission makes all blocks limited
+        default: false
     tekkitrestrict.creative.*:
-        description: Disables the use of certain defined items
+        description: Having this permission makes all items banned in creative.
+        default: false
         children:
             tekkitrestrict.creative.blockall: true
-    tekkitrestrict.noclick.*:
+    tekkitrestrict.nointeract.*:
         description: Disables the left/rightclicking with certain items. See the bukkitdev for more info.
+        default: false
     tekkitrestrict.openalc:
-        description: adds the ability to use /alc [player] [bagcolor].
+        description: Allows the use of /openalc
+        default: op
+    tekkitrestrict.openinv:
+        description: Allows the use of /openinv
         default: op
     tekkitrestrict.checklimits:
         description: Allows the user to use /checklimits
         default: true
+    tekkitrestrict.openalc.deny.all:
+        default: false
     tekkitrestrict.bypass.creative:
         description: Enables the use of any block in creative.
     tekkitrestrict.bypass.safezone:
-        description:  Enables somebody to bypass all safezone.
+        description: Enables somebody to bypass all safezone.
     tekkitrestrict.bypass.noitem:
-        description: Allows the use of all items as described in noitem.
+        description: Allows the use of all items as described in noitem (Banned.yml).
+    tekkitrestrict.bypass.nointeract:
+        description: Banned interacts dont apply to this person (Banned.yml).
+    tekkitrestrict.bypass.noclick:
+        description: Allows the use of all (In inventory) clicks as described in NoClick (Banned.yml).
     tekkitrestrict.bypass.hack:
-        description:  Enables somebody to bypass no oil derrick preventers.
+        description: Enables somebody to bypass no oil derrick preventers.
     tekkitrestrict.bypass.hack.fly:
-        description:  Enables somebody to bypass the anti-fly hack.
+        description: Enables somebody to bypass the anti-fly hack.
     tekkitrestrict.bypass.hack.forcefield:
-        description:  Enables somebody to bypass the anti-forcefield hack.
+        description: Enables somebody to bypass the anti-forcefield hack.
     tekkitrestrict.bypass.hack.speed:
-        description:  Enables somebody to bypass the anti-speed hack.
+        description: Enables somebody to bypass the anti-speed hack.
     tekkitrestrict.bypass.gemarmor.defensive:
         description: Enables someone to use gemarmor defensively.
     tekkitrestrict.bypass.gemarmor.offensive:
         description: Enables someone to use gemarmor offensive.
     tekkitrestrict.bypass.dupe:
-        description:  Enables somebody to bypass the anti-dupe.
+        description: Enables somebody to bypass the anti-dupe.
         default: false
     tekkitrestrict.bypass.dupe.alcbag:
-        description:  Enables somebody to bypass the anti-dupe for alchemy bags.
+        description: Enables somebody to bypass the anti-dupe for alchemy bags.
+        default: false
     tekkitrestrict.bypass.dupe.projecttable:
-        description:  Enables somebody to bypass the anti-dupe for project tables
+        description: Enables somebody to bypass the anti-dupe for project tables
+        default: false
     tekkitrestrict.bypass.dupe.rmfurnace:
-        description:  Enables somebody to bypass the anti-dupe for rm furnaces.
+        description: No longer used. Enables somebody to bypass the anti-dupe for rm furnaces.
+        default: false
     tekkitrestrict.bypass.dupe.tankcart:
-        description:  Enables somebody to bypass the anti-dupe for tank carts.
+        description: No longer used. Enables somebody to bypass the anti-dupe for tank carts.
+        default: false
     tekkitrestrict.bypass.dupe.transtablet:
-        description:  Enables somebody to bypass the anti-dupe for the transmution tablet.
+        description: Enables somebody to bypass the anti-dupe for the transmution tablet.
     tekkitrestrict.bypass.dupe.pedestal:
-        description:  Enables somebody to bypass the anti-dupe for the pedestal emc generator.
+        description: Enables somebody to bypass the anti-dupe for the pedestal emc generator.
     tekkitrestrict.bypass.limiter:
-        description:  Enables somebody to have no block limits.
+        description: Enables somebody to have no block limits.
     tekkitrestrict.bypass.lwc:
-        description:  Enables somebody to bypass LWC attached protections.
+        description: Enables somebody to bypass LWC attached protections.
     tekkitrestrict.bypass.flylimit:
-        description:  Bypass global flight time limit
+        description: Bypass global flight time limit
     tekkitrestrict.notify.hack:
         description: Get notified if someone hacks.
         default: op
@@ -109,6 +128,11 @@ permissions:
             tekkitrestrict.admin: true
     tekkitrestrict.admin.update:
         description: Allows someone to update the server with /tr admin update
+        default: op
+        children:
+            tekkitrestrict.admin: true
+    tekkitrestrict.admin.testsetting:
+        description: Allows someone to use /tr admin test
         default: op
         children:
             tekkitrestrict.admin: true
@@ -166,17 +190,15 @@ permissions:
         default: op
         children:
             tekkitrestrict.emc: true
-    
     tekkitrestrict.bypass.blockactions:
         description: Bypass all EEPatch blocks.
         default: op
         children:
-            tekkitrestrict.bypass.blockactions.rings: true
             tekkitrestrict.bypass.blockactions.amulets: true
-            tekkitrestrict.bypass.blockactions.tools: true
             tekkitrestrict.bypass.blockactions.destruction: true
             tekkitrestrict.bypass.blockactions.other: true
-
+            tekkitrestrict.bypass.blockactions.rings: true
+            tekkitrestrict.bypass.blockactions.tools: true
     tekkitrestrict.bypass.blockactions.amulets:
         description: Bypass all EEPatch amulets blocks.
         children:
@@ -186,7 +208,7 @@ permissions:
         description: Bypass all EEPatch Evertide Amulet blocks.
     tekkitrestrict.bypass.blockactions.volcaniteamulet:
         description: Bypass all EEPatch Volcanite Amulet blocks.
-        
+
     tekkitrestrict.bypass.blockactions.destruction:
         description: Bypass all EEPatch amulets blocks.
         children:
@@ -200,9 +222,24 @@ permissions:
     tekkitrestrict.bypass.blockactions.catalyticlens:
         description: Bypass all EEPatch Catalytic Lens blocks.
 
+    tekkitrestrict.bypass.blockactions.other:
+        description: Bypass all EEPatch blocks for the other category
+        children:
+            tekkitrestrict.bypass.blockactions.philosopherstone: true
+            tekkitrestrict.bypass.blockactions.transmutiontablet: true
+            tekkitrestrict.bypass.blockactions.watch: true
+            tekkitrestrict.bypass.blockactions.pedestal: true
+    tekkitrestrict.bypass.blockactions.transmutiontablet:
+        description: Bypass all EEPatch Transmution Tablet blocks.
+    tekkitrestrict.bypass.blockactions.philosopherstone:
+        description: Bypass all EEPatch Philosopher Stone blocks.
+    tekkitrestrict.bypass.blockactions.pedestal:
+        description: Bypass all EEPatch Pedestal blocks.
+    tekkitrestrict.bypass.blockactions.watch:
+        description: Bypass all EEPatch Watch of Flowing Time blocks.
+
     tekkitrestrict.bypass.blockactions.rings:
         description: Bypass all EEPatch ring blocks.
-        default: op
         children:
             tekkitrestrict.bypass.blockactions.arcanering: true
             tekkitrestrict.bypass.blockactions.archangelring: true
@@ -228,16 +265,22 @@ permissions:
         description: Bypass all EEPatch Void Ring blocks.
     tekkitrestrict.bypass.blockactions.zeroring:
         description: Bypass all EEPatch Zero Ring blocks.
-    
+
 
 commands:
     tekkitrestrict:
         description: View TekkitRestrict commands.
         usage: /<command>
         aliases: tr
+    clearalc:
+        description: Clear a player's Alchemy bag(s).
+        usage: /<command> <player> <color|all>
     openalc:
         description: View a player's Alchemy bag.
         usage: /<command> <player> <color>
+    openinv:
+        description: View a player's inventory.
+        usage: /<command> <player>
     tpic:
         description: Teleports you to an area where a cluster of items is sitting on the ground.
         usage: /<command> [Min Items Threshhold] [Thorough]

@@ -25,7 +25,7 @@ import nl.taico.tekkitrestrict.objects.TRVersion;
 /**
  * Check dev.bukkit.org to find updates for a given plugin, and download the updates if needed.
  * <p/>
- * <b>VERY, VERY IMPORTANT</b>: Because there are no standards for adding auto-update toggles in your plugin's config, this system provides NO CHECK WITH YOUR CONFIG to make sure the user has allowed auto-updating.
+ * <b>VERY, VERY IMPOR/TANT</b>: Because there are no standards for adding auto-update toggles in your plugin's config, this system provides NO CHECK WITH YOUR CONFIG to make sure the user has allowed auto-updating.
  * <br>
  * It is a <b>BUKKIT POLICY</b> that you include a boolean value in your config that prevents the auto-updater from running <b>AT ALL</b>.
  * <br>
@@ -184,7 +184,7 @@ public class Updater {
 		}
 
 		String key = this.config.getString("api-key");
-		if (key.equalsIgnoreCase("PUT_API_KEY_HERE") || key.equals("")) {
+		if (key.equalsIgnoreCase("PUT_API_KEY_HERE") || key.isEmpty()) {
 			key = null;
 		}
 
@@ -424,7 +424,7 @@ public class Updater {
 			this.result = Updater.UpdateResult.FAIL_NOVERSION;
 			return false;
 		}
-		if (!tekkitrestrict.version.shouldUpdate(ver2)){
+		if (!TekkitRestrict.version.shouldUpdate(ver2)){
 			this.result = Updater.UpdateResult.NO_UPDATE;
 			return false;
 		}

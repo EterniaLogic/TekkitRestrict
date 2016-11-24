@@ -5,59 +5,89 @@ import org.bukkit.entity.Player;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
-import nl.taico.tekkitrestrict.annotations.Safe;
-
 public class TRItem {
 	public int id;
 	public int data;
-	public String msg = "";
+	public String msg;
 	
-	@NonNull public static TRItem parseItem(int id, int data, @Nullable String msg) {
-		TRItem item = new TRItem();
-		item.id = id;
-		item.data = data;
-		item.msg = msg;
-		return item;
+	public TRItem(){
+		this.msg = "";
 	}
 	
-	@NonNull public static TRItem parseItem(int id, int data) {
-		TRItem item = new TRItem();
-		item.id = id;
-		item.data = data;
-		return item;
+	public TRItem(final int id){
+		this.id = id;
+		this.data = -1;
+		this.msg = "";
 	}
 	
+	public TRItem(final int id, final int data){
+		this.id = id;
+		this.data = data;
+		this.msg = "";
+	}
+	
+	public TRItem(final int id, final int data, final String msg){
+		this.id = id;
+		this.data = data;
+		this.msg = msg;
+	}
+	
+	@NonNull public static TRItem parseItem(final int id, final int data, @Nullable final String msg) {
+		return new TRItem(id, data, msg);
+	}
+	
+	@NonNull public static TRItem parseItem(final int id, final int data) {
+		return new TRItem(id, data);
+	}
+	
+	//Two TRItems equal if their id's and data values are equal.
+	//Their message is ignored in this comparison.
 	@Override
 	public boolean equals(Object obj){
-		if (obj == null) return false;
+		if (obj == this) return false;
 		if (!(obj instanceof TRItem)) return false;
-		TRItem tri = (TRItem) obj;
-		if (tri.id == id && tri.data == data) return true;
-		return false;
+		final TRItem tri = (TRItem) obj;
+		
+		return tri.id == id && tri.data == data;
+	}
+	
+	//This hashcode is best suited for blocks, as they have a max data value of 15.
+	//This means that the chance that 2 different id:data combinations give the same
+	//hashcode result, is smaller.
+	@Override
+	public int hashCode(){
+		return 17 * (17 + id) + data;
 	}
 	
 	/** @return A string representation of this Cache Item: "id:data" */
 	@Override
 	public String toString() {
-		return new StringBuilder(12).append(id).append(":").append(data).toString();
+		return new StringBuilder(12).append(id).append(':').append(data).toString();
 	}
 	
+	/*
 	@Override
 	public Object clone(){
-		TRItem ti = new TRItem();
+		final TRItem ti = new TRItem();
 		ti.id = this.id;
 		ti.data = this.data;
 		ti.msg = this.msg;
 		return ti;
+	}*/
+	
+	@Override
+	public TRItem clone(){
+		return new TRItem(this.id, this.data, this.msg);
 	}
 	
-	public static boolean compareNP(@NonNull TRItem item, @NonNull TRItem np){
+	public TRItem cloneAndSetMsg(String msg){
+		return new TRItem(this.id, this.data, msg);
+	}
+	
+	public static boolean compareNP(final TRItem item, final TRItem np){
 		if (item.id != np.id) return false;
 		
-		if (item.data == np.data || (item.data == -10 && np.data == 0)) return true;//:0 = :0, :-1 = :-1.
-		if (np.data == -1) return true;
-		
-		return false;
+		return item.data == np.data || (item.data == -10 && np.data == 0) || np.data == -1;//:0 = :0, :-1 = :-1.
 	}
 	
 	/**
@@ -69,26 +99,26 @@ public class TRItem {
 	 * <li>this.id == id AND data == 0 AND this.data == -10</li>
 	 * </ul>
 	 */
-	@Safe
-	public boolean compare(int id, int data) {
-		return this.id == id && (this.data == data || this.data == -1 || (data == 0 && this.data == -10));
+	public boolean compare(final int id, final int data) {
+		return this.id == id && (this.data == data || this.data == -1);// || (data == 0 && this.data == -10)); TODO change -10
 	}
 	//IMPORTANT does not check messages!
-	public static boolean compare(int id, int data, @NonNull TRItem mainItem){
-		return id == mainItem.id && (data == mainItem.data || mainItem.data == -1 || (data == 0 && mainItem.data == -10));
+	public static boolean compare(final int id, final int data, @NonNull final TRItem mainItem){
+		return id == mainItem.id && (data == mainItem.data || mainItem.data == -1);// || (data == 0 && mainItem.data == -10)); TODO change -10
 	}
 	//IMPORTANT does not check messages!
-	public static boolean compare(int id, int data, int mainId, int mainData){
-		return id == mainId && (data == mainData || mainData == -1 || (data == 0 && mainData == -10));
+	public static boolean compare(final int id, final int data, final int mainId, final int mainData){
+		return id == mainId && (data == mainData || mainData == -1);// || (data == 0 && mainData == -10)); TODO change -10
 	}
 	
-	@NonNull public static String defaultMessage(){
-		return ChatColor.RED + "You are not allowed to modify/obtain this item!";
+	private static String DEFAULT = ChatColor.RED +  "You are not allowed to modify/obtain this item!";
+	public static String defaultMessage(){
+		return DEFAULT;
 	}
 	
-	public static void sendBannedMessage(@NonNull Player player, @NonNull String message){
+	public static void sendBannedMessage(@NonNull final Player player, @NonNull final String message){
 		if (message.contains("\n")){
-			String temp[] = message.split("\n");
+			final String temp[] = message.split("\n");
 			for (String msg : temp) player.sendMessage(msg);
 		} else {
 			player.sendMessage(message);

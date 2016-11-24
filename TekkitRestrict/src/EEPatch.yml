@@ -1,0 +1,562 @@
+############################################################################################
+## Configuration file for TekkitRestrict                                                  ##
+## Authors: Taeir, DreadEnd (aka DreadSlicer)                                             ##
+## BukkitDev: http://dev.bukkit.org/server-mods/tekkit-restrict/                          ##
+## Please ask questions/report issues on the BukkitDev page.                              ##
+############################################################################################
+
+############################################################################################
+#################################### EEPatch Functions #####################################
+############################################################################################
+# Set the maximum charge for a tool. (CaPSloCk Safe)
+#
+# Q: Why should I use this one over the one in ModModifications.config?
+# A: Because this one directly blocks a player from charging. The one in the other config
+#    uncharges a tool a level as soon as it finds one in someone's inventory that is
+#    charged too high. Using this one over the one in ModModifications.config results in
+#    a faster response and less server load.
+#
+# Default Charge Levels:
+# 3 Charge Levels: DM tools
+# 4 Charge Levels: RM tools, Destruction Catalyst, Hyperkinetic Lens, 
+# 5 Charge Levels: Katar, Morning Star, Zero Ring, Ring of Ignition, Evertide Amulet
+#                  Vulcanite Amulet, Philosopher's Stone, Watch of Flowing Time,
+#                  Mercurial Eye
+# 8 Charge Levels: Catalytic Lens
+#
+# NOTE: Charge Levels start at level 0. This means that:
+# DM tools have Charge Levels 0, 1 and 2
+# RM tools have Charge Levels 0, 1, 2 and 3
+# Etc.
+#
+# Example:
+# MaxCharge:
+# - "RMPickaxe 1"   - Makes Red Matter Pickaxes charge to level 1 at max.
+# - "RMTools 2"     - Makes all Red Matter Tools charge to level 2 at max. (This
+#                     does NOT include Katar and Morning Star)
+# - "ZeroRing 3"    - Makes the Zero Ring charge to level 3 at max.
+# - "Rings 2"       - Makes the Zero Ring and the Ring of Ignition charge to level 2 max.
+# - "CatalyticLens 7" - Makes Catalytic Lens charge to max level 7 (default)
+# - "MORNINGstar 4" - Makes Morning Star charge to max level 4 (default)
+# - "Katar 4"       - Makes the Katar charge to max level 4 (default)
+EEMaxCharge: []
+
+############################################################################################
+###################################### Disable Actions #####################################
+############################################################################################
+# Here you can define what tool/ring/amulet actions you want to disable.
+# Every value can either be true (allowed) or false (NOT allowed).
+#
+# Long version: 
+# Keep in mind that with EEPatch, every action that changes a block checks if the player
+# that does the action has permission in that location. This means that areas protected by
+# GriefPrevention, WorldGuard, PreciousStones, Towns, Factions, LWC or any other protection
+# plugin cannot be modified by these actions if the player does not have permission to break
+# blocks at the location.
+# For this reason, most actions that break blocks in a radius don't have to be blocked as
+# they will already be blocked in protected areas. Only if you want to prevent 
+# "nature grief" or just want to make the game harder you should disable these actions.
+#
+# Short version:
+# EEPatch itself will make griefing with EE Tools impossible where it is not wanted, so you
+# don't have to block most actions that break blocks in a radius, unless you don't want
+# people to ever use these actions, not even where they are wanted.
+#
+# NOTE: If you change someone's permissions, it can take up to 60 seconds before the changes
+# take effect.
+#
+# Default: true for all values
+Actions:
+    Tools:
+        DarkMatter:
+            Pickaxe:
+                # Break-3 is an ability that DM and RM Pickaxes and Shovels, and the Red
+                # Morning Star has.
+                #
+                # It allows you to break 3 blocks at a time (instead of the default 1).
+                # The pattern it breaks these blocks in is dependent on the mode
+                # (Tall, Wide or Long)
+                Break-3:
+                    Tall: true
+                    Wide: true
+                    Long: true
+
+                # BreakOreVein: If you rightclick on an ore block with a DM Pickaxe, it
+                # will break all ores of the same kind surrounding the ore block you
+                # clicked.
+                BreakOreVein: true
+            Axe:
+                # BreakRadius: If you press R while holding an DM Axe, or if you rightclick
+                # with one, it will break axe-type blocks in a radius that is dependent on
+                # the charge level of the tool.
+                #
+                # Axe-type blocks = blocks that are supposed to be mined with an axe.
+                # (Logs, wood and most blocks made out of wood)
+                BreakRadius: true
+            Shovel:
+                # Break-3: See DM Pickaxe
+                Break-3:
+                    Tall: true
+                    Wide: true
+                    Long: true
+
+                # BreakRadius: If you press R while holding a DM Shovel, or if you
+                # rightclick with one, it will break shovel-type blocks in a radius that
+                # is dependent on the charge level of the tool.
+                #
+                # Shovel-type blocks = blocks that are supposed to be mined with a shovel.
+                # (Dirt, grass, gravel, sand, etc.)
+                BreakRadius: true
+            Hoe:
+                # TillRadius: If you press R while holding a DM Hoe, or if you rightclick
+                # with one, it will till all grass and dirt in a radius that is dependent
+                # on the charge level of the tool.
+                #
+                # Tip of Taeir: Disable this to prevent major "nature grief".
+                TillRadius: true
+            Shears:
+                # BreakRadius: If you press R while holding DM Shears, or if you
+                # rightclick with some, it will break shear-type blocks in a radius that
+                # is dependent on the charge level of the tool.
+                #
+                # Shear-type blocks = blocks that are supposed to be broken with shears.
+                # (Wool, leaves, tall grass, vines, etc.)
+                BreakRadius: true
+
+                # Shear: If you rightclick a shearable mob (sheep, mooshroom) with DM
+                # Shears, you will shear it.
+                Shear: true
+            Hammer:
+                # MegaBreak: If you enable Mega Hammer mode, and you rightclick with a
+                # DM Hammer, it will break a very large cube of blocks around where you
+                # clicked.
+                MegaBreak: true
+
+                # BreakRadius: If you press R while holding a DM Hammer, or if you
+                # rightclick with one, it will break stone-type blocks in a square whose
+                # size is dependent on the charge level of the tool.
+                #
+                # (Hammer-type blocks = stone, cobblestone, ores, netherrack, ice, etc.)
+                BreakRadius: true
+            Sword:
+                # AttackRadius: If you press R with a DM Sword, you will attack mobs in a
+                # range around you which is dependent on the charge level of the tool.
+                # You can change the mode of the sword to switch between only damaging
+                # hostile mobs (excluding players) and all mobs (including players).
+                AttackRadius: true
+        RedMatter:
+            Pickaxe:
+                # Break-3: See DM Pickaxe
+                Break-3:
+                    Tall: true
+                    Wide: true
+                    Long: true
+
+                # BreakOreVein: If you rightclick on an ore block with a RM Pickaxe, it
+                # will break all ores of the same kind surrounding the ore block you
+                # clicked.
+                BreakOreVein: true
+            Axe:
+                # BreakRadius: If you press R while holding an RM Axe, or if you rightclick
+                # with one, it will break axe-type blocks in a radius that is dependent on
+                # the charge level of the tool.
+                #
+                # Axe-type blocks = blocks that are supposed to be mined with an axe.
+                # (Logs, wood and most blocks made out of wood)
+                BreakRadius: true
+            Shovel:
+                # Break-3: See DM Pickaxe
+                Break-3:
+                    Tall: true
+                    Wide: true
+                    Long: true
+
+                # BreakRadius: If you press R while holding a RM Shovel, or if you
+                # rightclick with one, it will break shovel-type blocks in a radius that
+                # is dependent on the charge level of the tool.
+                #
+                # Shovel-type blocks = blocks that are supposed to be mined with a shovel.
+                # (Dirt, grass, gravel, sand, etc.)
+                BreakRadius: true
+            Hoe:
+                # TillRadius: If you press R while holding a RM Hoe, or if you rightclick
+                # with one, it will till all grass and dirt in a radius that is dependent
+                # on the charge level of the tool.
+                #
+                # Tip of Taeir: Disable this to prevent major "nature grief".
+                TillRadius: true
+            Shears:
+                # BreakRadius: If you press R while holding RM Shears, or if you
+                # rightclick with some, it will break shear-type blocks in a radius that
+                # is dependent on the charge level of the tool.
+                #
+                # Shear-type blocks = blocks that are supposed to be broken with shears.
+                # (Wool, leaves, tall grass, vines, etc.)
+                BreakRadius: true
+
+                # Shear: If you rightclick a shearable mob (sheep, mooshroom) with RM
+                # Shears, you will shear it.
+                Shear: true
+            Hammer:
+                # MegaBreak: If you enable Mega Hammer mode, and you rightclick with a
+                # RM Hammer, it will break a very large cube of blocks around where you
+                # clicked.
+                MegaBreak: true
+
+                # BreakRadius: If you press R while holding a RM Hammer, or if you
+                # rightclick with one, it will break stone-type blocks in a square whose
+                # size is dependent on the charge level of the tool.
+                #
+                # (Hammer-type blocks = stone, cobblestone, ores, netherrack, ice, etc.)
+                BreakRadius: true
+            Sword:
+                # AttackRadius: If you press R with a RM Sword, you will attack mobs in a
+                # range around you which is dependent on the charge level of the tool.
+                # You can change the mode of the sword to switch between only damaging
+                # hostile mobs (excluding players) and all mobs (including players).
+                AttackRadius: true
+        Katar:
+            # BreakRadius: If you rightclick with a Katar on wood-type blocks, it will
+            # break wood-like blocks in a radius. If you rightclick on shear-type blocks,
+            # it will also break these blocks in a radius. The radius is dependent on the
+            # charge level of the katar.
+            BreakRadius: true
+
+            # TillRadius: If you rightclick with a Katar on dirt or grass, it will till
+            # all dirt and grass in a large radius around where the player clicked.
+            # The radius is dependent on the charge level of the tool.
+            #
+            # Tip of Taeir: Disable this to prevent major "nature grief".
+            TillRadius: true
+
+            # AttackRadius: If you press R with a Katar, you will attack mobs in a range
+            # around you which is dependent on the charge level of the tool.
+            # You can change the mode of the Katar to switch between only damaging
+            # hostile mobs (excluding players) and all mobs (including players).
+            AttackRadius: true
+
+            # Shear: If you rightclick a shearable mob (sheep, mooshroom) with a Katar,
+            # you will shear it.
+            Shear: true
+        MorningStar:
+            # Break-3: See DM Pickaxe
+            Break-3:
+                Tall: true
+                Wide: true
+                Long: true
+
+            # MegaBreak: If you enable Mega Hammer mode, and you rightclick with a
+            # Morning Star, it will break a very large cube of blocks around where you
+            # clicked.
+            MegaBreak: true
+
+            # BreakRadius: Same effects as
+            # - BreakOreVein for RM Pickaxe
+            # - BreakRadius for RM Shovel
+            # - BreakRadius for RM Hammer
+            BreakRadius: true
+        Destruction:
+            DestructionCatalyst:
+                # BreakRadius: Break a large amount of blocks at once with the destruction
+                # catalyst.
+                BreakRadius: true
+            HyperKineticLens:
+                # BreakRadius: Break a large amount of blocks at once with the hyper
+                # kinetic lens.
+                BreakRadius: true
+            CatalyticLens:
+                # BreakRadius: Break a large amount of blocks at once with the catalytic
+                # lens.
+                BreakRadius: true
+    Amulets:
+        Evertide:
+            # CreateWater: Create a patch of water. The size depends on the chargelevel
+            # of the Evertide Amulet.
+            CreateWater: true
+
+            # CreateWaterBall: Shoot a WaterEssence that creates water where it hits.
+            CreateWaterBall: true
+
+            # PreventDrowing: Passive of the Evertide Amulet that prevents the player
+            # from drowning.
+            PreventDrowning: true
+        Volcanite:
+            # CreateLava: Create a patch of lava. The size depends on the chargelevel
+            # of the Volcanite Amulet.
+            CreateLava: true
+
+            # CreateLavaBall: Shoot a LavaEssence that creates lava where it his.
+            CreateLavaBall: true
+
+            # Vaporize: Vaporize water around the player.
+            Vaporize: true
+
+            # FireImmune: Passive of the Volcanite Amulet that prevents the player from
+            # taking fire damage.
+            FireImmune: true
+    Rings:
+        ZeroRing:
+            # FreezeRadius: When a Zero Ring is activated or if you rightclick with it, 
+            # it will turn lava to obsidian, water to ice and put snow around the player.
+            FreezeRadius: true
+
+            # ThrowSnowball: If you leftclick with a Zero Ring, you throw a snowball.
+            ThrowSnowball: true
+
+        RingOfIgnition:
+            # BurnRadius: If you activate the Ring of Ignition it will cause things around
+            # you to start burning (mobs, burnable blocks, etc.).
+            #
+            # If you rightclick with it or if you press R while holding it, it will make
+            # large areas of fire.
+            BurnRadius: true
+
+            # PassiveExtinguishNearPlayer: When you have the RingOfIgnition in your
+            # hotbar, it will extinguish fires in a 3x3 block radius around the player.
+            PassiveExtinguishNearPlayer: true
+
+            # ThrowPyrokinesis: If you leftclick with a Ring of Ignition, you will create
+            # a fireball that spawns fire where it hits.
+            ThrowPyrokinesis: true
+
+        HarvestGodessBand:
+            # Fertilize: If you have a Harvest Godess Band in your hotbar, it will cause
+            # plants around you to grow faster and it will turn dirt around you to grass.
+            # If you activate it, it will also plant plants around you.
+            Fertilize: true
+
+            # PlantRadius: If you rightclick with a Harvest Godess Band, it will take seeds,
+            # reeds, cacti, flowers and other plants from your inventory and plant them
+            # near you.
+            PlantRadius: true
+
+            # HarvestRadius: If you activate a Harvest Godess Band, it will harvest mature
+            # plants around you. It also increases the speed at which plants around you
+            # mature.
+            HarvestRadius: true
+
+        SwiftwolfsRendingGale:
+            # NOTE: SWRG is short for Swiftwolf's Rending Gale
+
+            # NegateFallDamage: The SWRG will negate all fall damage if it's in the hotbar
+            # (Passive)
+            NegateFallDamage: true
+
+            # Interdict: When you press the G key while holding the SWRG, you will activate
+            # interdiction mode. While it is active, all mobs that try to come close to you
+            # will be pushed back.
+            Interdict: true
+
+            # Gust: If you rightclick with a SWRG or if you press R while holding it, it
+            # will create a gust. If the gust hits a block or the sky while it is raining,
+            # it will let lightning strike at the location where it hit.
+            # (random location if shot into the sky).
+            Gust: true
+
+            # ActivateInterdict: Defines whether the player can activate interdiction mode.
+            ActivateInterdict: true
+
+            # ActivateFlight: Defines whether the player can activate flight mode.
+            ActivateFlight: true
+
+        RingOfArcana:
+            # StrikeLightning: If you press R while holding a Ring of Arcana in "Wind" mode
+            # it will make lightning strike on hostile mobs near you.
+            StrikeLightning: true
+
+            # Fertilize: If you have a Ring of Arcana in "Earth" mode in your hotbar,
+            # it will make plants around you mature faster. It will also plant new plants
+            # in your vicinity. (Passive)
+            #
+            # If you press R while holding it in "Earth" mode, it will take seeds, reeds,
+            # cacti, flowers and other plants from your inventory and plant them around
+            # you.
+            # It will also use bonemeal (if you have any) to let saplings grow into trees
+            # and to make wheat mature instantly.
+            Fertilize: true
+
+            # Interdict: When you activate the Ring of Arcana in "Wind" mode, you will
+            # activate interdiction mode. While it is active, all mobs that try to come
+            # close to you will be pushed back.
+            Interdict: true
+
+            # FreezeRadius: When you activate the Ring of Arcana in in "Ice" mode, it will
+            # turn lava to obsidian, water to ice and put snow around the player.
+            #
+            # If you press R while holding it in "Ice" mode, it will do this effect in a
+            # square around you instantly.
+            FreezeRadius: true
+
+            # BurnRadius: If you activate the Ring of Arcana in "Fire" mode, it will cause
+            # things around you to start burning (mobs, burnable blocks, etc.).
+            #
+            # If you press R while holding it in "Fire" mode, it will make a large area of
+            # fire around you.
+            BurnRadius: true
+
+            # HarvestRadius: If you activate the Ring of Arcana in "Earth" mode, it will
+            # harvest matured plants around you. It will also make plants around you to
+            # grow faster.
+            HarvestRadius: true
+
+            # Gust: If you rightclick with a Ring of Arcana in "Wind" mode, it will create
+            # a gust. If the gust hits a block or the sky while it is raining, it will let
+            # lightning strike at the location where it hit.
+            # (random location if shot into the sky).
+            Gust: true
+
+            # ThrowSnowball: If you rightclick with a Ring of Arana in "Ice" mode, it will
+            # throw a snowball.
+            ThrowSnowball: true
+
+            # ThrowPyrokinesis: If you rightclick with a Ring of Arana in "Fire" mode, it
+            # will throw a fireball that creates fire where it hits.
+            ThrowPyrokinesis: true
+
+            # NegateFallDamage: The Ring of Arcana will negate all fall damage if it is in
+            # the hotbar. (Passive)
+            NegateFallDamage: true
+
+            # Activate: Defines whether a player can activate the ring or not.
+            Activate: true
+
+        BlackHoleBand:
+            # NOTE: BHB is short for Black Hole Band
+
+            # AttractItems: If you activate a BHB, it will start to attract items within
+            # a 7 block radius to you.
+            AttractItems: true
+
+            # DeleteLiquid: If you rightclick with a BHB on a water or lava source block,
+            # it will remove it.
+            DeleteLiquid: true
+
+            # Activate: Defines whether a player can activate the BHB or not.
+            Activate: true
+
+        VoidRing:
+            # AttractItems: If you activate a Void Ring, it will start to attract items
+            # within a 7 block radius to you.
+            AttractItems: true
+
+            # DeleteLiquid: If you rightclick with a Void Ring on a water or lava source
+            # block, it will remove it.
+            DeleteLiquid: true
+
+            # Teleport: If you press R while holding a Void Ring, it will teleport you
+            # to a new location depending on the direction you are facing. It can teleport
+            # through walls.
+            Teleport: true
+
+            # Condense: If you have an activated Void Ring in your inventory, it will
+            # condense all items with an emc value that are not tools into compacter forms
+            # (Iron Ingots, Gold Ingots, Diamonds, Dark Matter or Red Matter).
+            Condense: true
+
+            # Activate: Defines whether a player can activate the Void Ring or not.
+            Activate: true
+
+        ArchangelsSmite:
+            # ShootArrows: If you activate the ArchangelsSmite, it will constantly shoot
+            # homing arrows (while using EMC).
+            ShootArrows: true
+
+            # Activate: Defines whether a player can activate the ArchangelsSmite or not.
+            Activate: true
+    Armor:
+        Offensive:
+            # Activate: Defines whether a player can activate offensive powers or not.
+            Activate: true
+
+            # Explode: If you press the C key while wearing Gem armor, an explosion
+            # will be created around a player.
+            Explode: true
+
+            # Strike: If you press the R key while wearing a Gem armor Helmet, a
+            # lightning bolt will hit where you look.
+            Strike: true
+        Movement:
+            # Activate: Defines whether a player can activate movement powers or not.
+            Activate: true
+    Other:
+        PhilosopherStone:
+            # ChangeMob: The ability to change a mob into a different one at the cost
+            # of emc.
+            ChangeMob: true
+
+            # PortableCrafting: The ability to open a crafting table by pressing C
+            # while holding the Philosopher's Stone.
+            PortableCrafting: true
+
+            # Transmute: The ability to change a block into a different one by
+            # right-clicking on it with the Philosopher's Stone.
+            Transmute: true
+        TransmutionTablet:
+            # ChangeMob: The ability to change a mob into a different one at the cost
+            # of emc.
+            ChangeMob: true
+
+            # PortableTable: The ability to open your Transmution Table by pressing C
+            # or right-clicking with the Transution Tablet.
+            PortableTable: true
+        Pedestal:
+            # Activate: If players should be able to activate pedestals.
+            Activate: true
+
+            # Attract: If pedestals are allowed to attract items if the Black Hole Band
+            # is on them.
+            Attract: true
+
+            # Harvest: If pedestals are allowed to harvest nearby crops if the Harvest
+            # Godess Band is on them.
+            Harvest: true
+
+            # Heal: If pedestals are allowed to heal nearby players if the Life Stone
+            # is on them.
+            Heal: true
+
+            # Ignition: If pedestals are allowed to ignite nearby entities if the
+            # Ring of Ignition is on them.
+            Ignition: true
+
+            # Interdict: If pedestals are allowed to push mobs away from them.
+            Interdict: true
+
+            # Repair: If pedestals are allowed to repair items in the inventories of
+            # nearby players if the Repair Talisman is on them.
+            Repair: true
+
+            # ShootArrow: If pedestals are allowed to shoot arrows at nearby entities
+            # if the Grimarch Ring is on them.
+            ShootArrow: true
+
+            # StopStorm: If pedestals are allowed to stop storms from occuring when
+            # ???? is on them.
+            StopStorm: true
+
+            # Storm: If pedestals are allowed to start storms if ???? is on them.
+            Storm: true
+
+            # StrikeLightning: If pedestals are allowed to strike lightning at nearby
+            # entities if ???? is on them.
+            StrikeLightning: true
+
+            # Time: If pedestals are allowed to speed up EE machines when the Watch of
+            # Flowing Time is on them.
+            Time: true
+        WatchOfFlowingTime:
+            # ScrollTimeForwards: The ability to make time go faster with the watch.
+            ScrollTimeForwards: true
+
+            # ScrollTimeBackwards: The ability to make time go backwards with the watch.
+            ScrollTimeBackwards: true
+
+#########################################################################################
+# By default, the RM furnace doubles the amount of ingots you get from smelting
+# ores. If you set AllowRMFurnaceOreDuplication: false, you will always get one ingot
+# when you smelt one ore.
+#
+# Default: true
+AllowRMFurnaceOreDuplication: true
+
+#########################################################################################

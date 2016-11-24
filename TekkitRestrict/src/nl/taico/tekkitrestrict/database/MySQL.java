@@ -18,7 +18,7 @@ import java.util.logging.Level;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
-import nl.taico.tekkitrestrict.tekkitrestrict;
+import nl.taico.tekkitrestrict.Log;
 
 @SuppressWarnings("resource")
 public class MySQL extends Database {
@@ -162,7 +162,7 @@ public class MySQL extends Database {
 	}
 	
 	protected void write(@Nullable String toWrite, @NonNull Level level) {
-		if (toWrite == null || toWrite.equals("")) return;
-		tekkitrestrict.log.log(level, "[MySQL] " + toWrite);
+		if (toWrite == null || toWrite.isEmpty()) return;
+		Log.log(level, "[MySQL] " + toWrite);
 	}
 }

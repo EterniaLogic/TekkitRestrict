@@ -19,8 +19,9 @@ import org.bukkit.plugin.PluginManager;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
+import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.TRDB;
-import nl.taico.tekkitrestrict.tekkitrestrict;
+import nl.taico.tekkitrestrict.TekkitRestrict;
 import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.TRConfigCache.SafeZones;
 import nl.taico.tekkitrestrict.api.SafeZones.SafeZoneCreate;
@@ -29,6 +30,7 @@ import nl.taico.tekkitrestrict.objects.TREnums.SSMode;
 import nl.taico.tekkitrestrict.objects.TREnums.SafeZone;
 
 import me.ryanhamshire.GriefPrevention.Claim;
+import me.ryanhamshire.GriefPrevention.DataStore;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import net.sacredlabyrinth.Phaed.PreciousStones.FieldFlag;
 import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
@@ -83,14 +85,15 @@ public class TRSafeZone {
 		return data;
 	}
 	
-	public static void init() {
-		if (SafeZones.UseWG) worldGuard = PM().getPlugin("WorldGuard");
-		if (SafeZones.UseGP) griefPrevention = PM().getPlugin("GriefPrevention");
-		if (SafeZones.UsePS) preciousStones = PM().getPlugin("PreciousStones");
+	public static void init(Plugin wg, Plugin gp, Plugin ps) {
+		Log.trace("SafeZones - Initializing...");
+		if (SafeZones.UseWG) worldGuard = wg;
+		if (SafeZones.UseGP) griefPrevention = gp;
+		if (SafeZones.UsePS) preciousStones = ps;
 		
 		ResultSet rs = null;
 		try {
-			rs = tekkitrestrict.db.query("SELECT * FROM `tr_saferegion`;");
+			rs = TekkitRestrict.db.query("SELECT * FROM `tr_saferegion`;");
 			if (rs == null){
 				Warning.other("Unable to get SafeZones from database!", true);
 				return;
@@ -121,7 +124,7 @@ public class TRSafeZone {
 					if (region != null){
 						BlockVector loc1 = region.getMinimumPoint();
 						BlockVector loc2 = region.getMaximumPoint();
-						sz.location = TRPos.parse(loc1, loc2);
+						sz.location = new TRPos(loc1, loc2);
 						sz.pluginRegion = region;
 						/*
 						sz.x1 = loc1.getBlockX();
@@ -145,8 +148,15 @@ public class TRSafeZone {
 						*/
 						sz.locSet = true;
 					}
+				} else if (sz.mode == 0){
+					if (!SafeZones.useNative) continue;
+					String temp[] = sz.data.split(",");
+					sz.location = new TRPos(temp);
+					sz.locSet = true;
+					sz.pluginRegion = null;
 				}
 				zones.add(sz);
+				Log.trace("SafeZones - Loaded Safezone: "+sz.name);
 			}
 			rs.close();
 		} catch (SQLException e) {
@@ -283,7 +293,7 @@ public class TRSafeZone {
 			if (!z.loadedFromSql) {
 				// insert the new rows!
 				try {
-					tekkitrestrict.db.query("INSERT OR REPLACE INTO `tr_saferegion` (`id`,`name`,`mode`,`data`,`world`) VALUES ('"
+					TekkitRestrict.db.query("INSERT OR REPLACE INTO `tr_saferegion` (`id`,`name`,`mode`,`data`,`world`) VALUES ('"
 									+ z.getID() +"','"
 									+ TRDB.antisqlinject(z.name)
 									+ "'," + z.mode + ",'" + z.getData() + "','"
@@ -301,7 +311,7 @@ public class TRSafeZone {
 	
 	private static void delete(@NonNull TRSafeZone zone){
 		try {
-			tekkitrestrict.db.query("DELETE FROM `tr_saferegion` WHERE name='" + zone.name +"');");
+			TekkitRestrict.db.query("DELETE FROM `tr_saferegion` WHERE name='" + zone.name +"');");
 		} catch (Exception ex) {
 		}
 	}
@@ -313,6 +323,12 @@ public class TRSafeZone {
 	 * @return True if the removal succeeded.
 	 */
 	public static boolean removeSafeZone(@NonNull TRSafeZone zone){
+		if (zone.mode == 0){
+			zones.remove(zone);
+			delete(zone);
+			return true;
+		}
+		
 		if (zone.mode == 1){
 			zones.remove(zone); //Remove from database
 			delete(zone);
@@ -322,7 +338,7 @@ public class TRSafeZone {
 		if (zone.mode == 4){
 			//IMPORTANT Potential problem when a claim gets resized.
 			if (griefPrevention == null) return false;
-			if (zone.getData().equals("")) return false;
+			if (zone.getData().isEmpty()) return false;
 			World world = Bukkit.getWorld(zone.world);
 			if (world == null) return false;
 			Location loc;
@@ -352,7 +368,7 @@ public class TRSafeZone {
 		return false;
 	}
 	
-	@NonNull public static SafeZoneCreate addSafeZone(@NonNull Player player, @NonNull String pluginName, @NonNull String name){
+	@NonNull public static SafeZoneCreate addSafeZone(@NonNull Player player, @NonNull String pluginName, @NonNull String name, @Nullable TRPos pos){
 		if (!SafeZones.UseSafeZones) return SafeZoneCreate.SafeZonesDisabled;
 		
 		name = name.toLowerCase();
@@ -406,7 +422,7 @@ public class TRSafeZone {
 				
 				TRSafeZone zone = new TRSafeZone();
 				zone.mode = 1;
-				zone.location = TRPos.parse(loc1, loc2);
+				zone.location = new TRPos(loc1, loc2);
 				zone.pluginRegion = pr;
 				zone.locSet = true;
 
@@ -418,6 +434,16 @@ public class TRSafeZone {
 			} catch (Exception E) {
 				return SafeZoneCreate.Unknown;
 			}
+		} else if (SafeZones.useNative && pluginName.equals("native")){
+			TRSafeZone zone = new TRSafeZone();
+			zone.mode = 0;
+			zone.location = pos;
+			zone.locSet = true;
+			zone.name = name;
+			zone.world = player.getWorld().getName();
+			TRSafeZone.zones.add(zone);
+			TRSafeZone.save();
+			return SafeZoneCreate.Success;
 		} else {
 			return SafeZoneCreate.PluginNotFound;
 		}
@@ -451,7 +477,7 @@ public class TRSafeZone {
 	 * @return A string with information about the type of safezone and its name/owner.<br>
 	 * Returns "" if there is none.
 	 */
-	@NonNull public static String getSafeZoneByLocation(@NonNull Location loc, boolean doGP) {
+	@NonNull public static String getSafeZoneByLocation(Location loc, boolean doGP) {
 		if (!SafeZones.UseSafeZones) return "";
 		if (lastZone != null){
 			if (lastZone.mode == 1){
@@ -464,7 +490,7 @@ public class TRSafeZone {
 					if (lastZone.pluginRegion != null){
 						Claim c = (Claim) lastZone.pluginRegion;
 						String r = c.ownerName;
-						if (r == null || r.equals("")) r = "Admin";
+						if (r == null || r.isEmpty()) r = "Admin";
 						return "GriefPrevention Safezone Claim owned by: " + r;
 					} else {
 						return "GriefPrevention Safezone Claim: " + lastZone.name;
@@ -512,7 +538,7 @@ public class TRSafeZone {
 					if (a.pluginRegion != null){
 						Claim c = (Claim) a.pluginRegion;
 						r = c.ownerName;
-						if (r == null || r.equals("")) r = "Admin";
+						if (r == null || r.isEmpty()) r = "Admin";
 						return "GriefPrevention Safezone Claim owned by: " + r;
 					} else {
 						return "GriefPrevention Safezone Claim: " + a.name;
@@ -528,7 +554,7 @@ public class TRSafeZone {
 						if (a.pluginRegion != null){
 							Claim c = (Claim) a.pluginRegion;
 							r = c.ownerName;
-							if (r == null || r.equals("")) r = "Admin";
+							if (r == null || r.isEmpty()) r = "Admin";
 							return "GriefPrevention Safezone Claim owned by: " + r;
 						} else {
 							return "GriefPrevention Safezone Claim: " + a.name;
@@ -547,6 +573,7 @@ public class TRSafeZone {
 		if (!SafeZones.UseSafeZones) return false;
 		if (doBypassCheck && player.hasPermission("tekkitrestrict.bypass.safezone")) return false;
 		
+		if (Native.isSafeZoneFor(player)) return true;
 		if (GP.isSafeZoneFor(player)) return true;
 		if (WG.isSafeZoneFor(player)) return true;
 		
@@ -561,10 +588,15 @@ public class TRSafeZone {
 	/** Only used by /tr admin safezone check */
 	@NonNull public static Object[] getSafeZoneStatusFor(@NonNull Player player){
 		Object[] obj = new Object[3];
-		obj[0] = "GriefPrevention";
-		SafeZone status = GP.getSafeZoneStatusFor(player);
-		obj[1] = GP.lastGP;
+		obj[0] = "Native";
+		SafeZone status = Native.getSafeZoneStatusFor(player);
+		obj[1] = Native.lastNative;
 		
+		if (status == SafeZone.isNone || status == SafeZone.pluginDisabled){
+			obj[0] = "GriefPrevention";
+			status = GP.getSafeZoneStatusFor(player);
+			obj[1] = GP.lastGP;
+		}
 		if (status == SafeZone.isNone || status == SafeZone.pluginDisabled){
 			obj[0] = "WorldGuard";
 			status = WG.getSafeZoneStatusFor(player);
@@ -657,10 +689,11 @@ public class TRSafeZone {
 		@NonNull public static SafeZone getSafeZoneStatusFor(@NonNull Player player){
 			if (!SafeZones.UseSafeZones || griefPrevention == null) return SafeZone.pluginDisabled;
 			
-			GriefPrevention gpPlugin = (GriefPrevention) griefPrevention;
+			DataStore ds = ((GriefPrevention) griefPrevention).dataStore;
+			if (ds == null) return SafeZone.pluginDisabled;
 			Location loc = player.getLocation();
 			
-			Claim claim = gpPlugin.dataStore.getClaimAt(loc, false, null);
+			Claim claim = ds.getClaimAt(loc, false, null);
 			if (claim == null) return SafeZone.isNone;
 			lastGP = (claim.ownerName == "" ? "Admin" : claim.ownerName);
 			
@@ -777,8 +810,9 @@ public class TRSafeZone {
 			
 			Location loc = player.getLocation();
 			
-			GriefPrevention pl = (GriefPrevention) griefPrevention;
-			Claim claim = pl.dataStore.getClaimAt(loc, false, null);
+			DataStore ds = ((GriefPrevention) griefPrevention).dataStore;
+			if (ds == null) return false;
+			Claim claim = ds.getClaimAt(loc, false, null);
 			if (claim == null) return false; //If no claim here, return false. (allowed)
 			
 			String name = player.getName().toLowerCase();
@@ -1045,6 +1079,38 @@ public class TRSafeZone {
 			}
 			
 			return true;
+		}
+	}
+
+	public static class Native {
+		public static String lastNative = "";
+		@NonNull public static SafeZone getSafeZoneStatusFor(@NonNull Player player){
+			if (!SafeZones.UseSafeZones || !SafeZones.useNative) return SafeZone.pluginDisabled;
+			
+			Location loc = player.getLocation();
+			for (TRSafeZone zone : zones){
+				if (zone.mode != 0) continue;
+				if (!zone.location.containsIgnoreY(loc)) continue;
+				lastNative = zone.name;
+				if (player.hasPermission("tekkitrestrict.safezone."+zone.name)){
+					return SafeZone.isAllowedStrict;
+				} else {
+					return SafeZone.isDisallowed;
+				}
+			}
+			return SafeZone.isNone;
+		}
+		
+		public static boolean isSafeZoneFor(@NonNull Player player){
+			if (!SafeZones.UseSafeZones || !SafeZones.useNative) return false;
+			
+			Location loc = player.getLocation();
+			for (TRSafeZone zone : zones){
+				if (zone.mode != 0) continue;
+				if (!zone.location.containsIgnoreY(loc)) continue;
+				return !player.hasPermission("tekkitrestrict.safezone."+zone.name);
+			}
+			return false;
 		}
 	}
 }

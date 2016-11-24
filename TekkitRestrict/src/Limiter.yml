@@ -1,0 +1,26 @@
+###################################################################################################
+## Configuration file for TekkitRestrict                                                         ##
+## Authors: Taeir, DreadEnd (aka DreadSlicer)                                                    ##
+## BukkitDev: http://dev.bukkit.org/server-mods/tekkit-restrict/                                 ##
+## Please ask questions/report issues on the BukkitDev page.                                     ##
+###################################################################################################
+# 
+###################################################################################################
+###################################### Limiter Configuration ######################################
+###################################################################################################
+# With the limiter, you can set how many of a certain block a player may have placed at a time.
+# For example, you could limit the amount of collectors Mk. 3 someone can have by adding "126:2 1"
+# to the list below.
+# 
+# UseLimiter: Should the limiter be enabled?
+# Default: true
+UseLimiter: true
+# 
+# Item Limit (Please use ONE space between the Item and the limit to separate them)
+# - "153 1"
+# - "100-200 1"
+# - "52:55 1"
+# - "227-228:10 3"
+# - "ee 5 {&cYou can only have &a5 &cee blocks!}"
+# - "Wool 10 {&cOnly &a10 &cWool per player, sorry :P}"
+LimitBlocks: []

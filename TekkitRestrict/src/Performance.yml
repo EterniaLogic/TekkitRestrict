@@ -1,0 +1,70 @@
+###################################################################################################
+## Configuration file for TekkitRestrict                                                         ##
+## Authors: Taeir, DreadEnd (aka DreadSlicer)                                                    ##
+## BukkitDev: http://dev.bukkit.org/server-mods/tekkit-restrict/                                 ##
+## Please ask questions/report issues on the BukkitDev page.                                     ##
+###################################################################################################
+# 
+###################################################################################################
+#################################### Performance Configuration ####################################
+###################################################################################################
+# Should TekkitRestrict favor server performance over memory usage?
+# Default: true
+FavorPerformanceOverMemory: true
+# 
+###################################################################################################
+##################################### Threading Configuration #####################################
+###################################################################################################
+# Do not edit these values unless you know what you are doing.
+# These numbers are in Milliseconds. (1000 milliseconds = 1 second)
+# Lower values = more server strain (more lag)
+# 
+# The amount of time the thread that disables GemArmor powers (see ModModifications config) sleeps
+# for.
+# If you set this too high, players might be able to use their powers by spamming.
+# If you set this too low, it might lag the server.
+# 
+# Recommended: [100-200]
+# Default: 120
+GemArmorDThread: 120
+# 
+# The amount of time the thread that removes entities in SafeZones powers (see SafeZones config)
+# sleeps for.
+# If removing entities from a SafeZones is not something that is very important for your server,
+# you can raise this to 1000-2000 (1-2 seconds)
+# 
+# Recommended: [350-2000]
+# Default: 500
+SSEntityRemoverThread: 500
+# 
+# The amount of time the inventory thread sleeps for.
+# The inventory thread takes care of removing DisabledItems, Decharging EE Tools and Applying the
+# Max EU values.
+# 
+# Recommended: [250-500]
+# Default: 400
+InventoryThread: 400
+# 
+# The amount of time the WorldCleanerThread sleeps for.
+# This thread takes care of the Removal of Banned blocks from the world.
+# 
+# Recommended: [60000-120000] (1-2 minutes)
+# Default: 60000
+WorldCleanerThread: 60000
+# 
+# The time between checking for unloading chunks. If the amount of chunks loaded is to high,
+# chunks will be unloaded shortly after the check.
+# 
+# Recommended: [60000-120000] (1-2 minutes)
+# Default: 90000
+ChunkUnloader: 90000
+# 
+# The amount of time the AutoSave Thread sleeps for.
+# This thread makes sure that all information is correctly saved to the database.
+# In case of a crash, you will only lose any data that has been modified within the sleep time of
+# this thread. (e.g. if you set this to 11000, you will only lose data changed within 11 seconds
+# before the crash)
+# 
+# Recommended: [10000-30000]
+# Default: 11000
+AutoSaveThreadSpeed: 11000

@@ -12,7 +12,7 @@ import java.util.logging.Level;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
-import nl.taico.tekkitrestrict.tekkitrestrict;
+import nl.taico.tekkitrestrict.Log;
 
 @SuppressWarnings("resource")
 public class SQLite extends Database {
@@ -141,7 +141,7 @@ public class SQLite extends Database {
 	}
 	
 	protected void write(@Nullable String toWrite, @NonNull Level level) {
-		if (toWrite == null || toWrite.equals("")) return;
-		tekkitrestrict.log.log(level, "[SQLite] " + toWrite);
+		if (toWrite == null || toWrite.isEmpty()) return;
+		Log.log(level, "[SQLite] " + toWrite);
 	}
 }
