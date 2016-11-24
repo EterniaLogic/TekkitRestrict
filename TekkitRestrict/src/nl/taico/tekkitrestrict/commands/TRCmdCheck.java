@@ -1,7 +1,17 @@
 package nl.taico.tekkitrestrict.commands;
 
+import static nl.taico.tekkitrestrict.commands.TRCmdHelper.msg;
+import static nl.taico.tekkitrestrict.commands.TRCmdHelper.msgr;
+import static nl.taico.tekkitrestrict.commands.TRCmdHelper.noConsole;
+import static nl.taico.tekkitrestrict.commands.TRCmdHelper.noPerm;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import nl.taico.tekkitrestrict.TRPermHandler;
+import nl.taico.tekkitrestrict.functions.TRLimiter;
+import nl.taico.tekkitrestrict.objects.TRLimit;
+import nl.taico.tekkitrestrict.objects.TRPermLimit;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -10,19 +20,26 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import nl.taico.tekkitrestrict.TRPermHandler;
-import nl.taico.tekkitrestrict.functions.TRLimiter;
-import nl.taico.tekkitrestrict.objects.TRLimit;
-import nl.taico.tekkitrestrict.objects.TRPermLimit;
-import static nl.taico.tekkitrestrict.commands.TRCmdHelper.*;
-
 public class TRCmdCheck implements CommandExecutor {	
+	public static List<String> getAllPerms(Player player, List<TRLimit> skip){
+		final List<TRPermLimit> perms = TRPermHandler.getAllLimiterPerms(player);
+		final List<String> tbr = new ArrayList<String>();
+		outer:
+			for (TRPermLimit limit : perms){
+				for (TRLimit l : skip){
+					if ((l.id == limit.id) && ((l.data == -1) || (l.data == limit.data) || (limit.data == -1))) continue outer;
+				}
+				tbr.add("["+ limit.id + ":" + limit.data + "] - 0/"+((limit.max == -2) || (limit.max == -1) ? 0 : limit.max) + " blocks");
+			}
+		return tbr;
+	}
+
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (noConsole(sender)) return true;
-		
+
 		if (noPerm(sender, "checklimits")) return true;
-		
+
 		if (args.length > 1){
 			msgr(sender, "Incorrect syntaxis!");
 			msg(sender, "/checklimits", "Check all your limits.");
@@ -31,15 +48,15 @@ public class TRCmdCheck implements CommandExecutor {
 			return true;
 		}
 		final Player player = (Player) sender;
-		
+
 		final TRLimiter cc = TRLimiter.getOnlineLimiter(player);
-		
+
 		if (args.length == 1){
 			if(cc.itemlimits.isEmpty()){
 				msgr(sender, "You don't have any limits!");
 				return true;
 			}
-			
+
 			int id;
 			try {
 				id = Integer.parseInt(args[0]);
@@ -62,7 +79,7 @@ public class TRCmdCheck implements CommandExecutor {
 					return true;
 				}
 			}
-			
+
 			for (TRLimit l : cc.itemlimits) {
 				if (l.id != id) continue;
 				final int cccl = cc.getMax(player, l.id, l.data);
@@ -83,19 +100,6 @@ public class TRCmdCheck implements CommandExecutor {
 			for (String msg : permMsgs) msg(sender, msg);
 		}
 		return true;
-	}
-	
-	public static List<String> getAllPerms(Player player, List<TRLimit> skip){
-		final List<TRPermLimit> perms = TRPermHandler.getAllLimiterPerms(player);
-		final List<String> tbr = new ArrayList<String>();
-		outer:
-		for (TRPermLimit limit : perms){
-			for (TRLimit l : skip){
-				if (l.id == limit.id && (l.data == -1 || l.data == limit.data || limit.data == -1)) continue outer;
-			}
-			tbr.add("["+ limit.id + ":" + limit.data + "] - 0/"+(limit.max == -2 || limit.max == -1 ? 0 : limit.max) + " blocks");
-		}
-		return tbr;
 	}
 
 }

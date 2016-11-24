@@ -1,14 +1,14 @@
 package nl.taico.tekkitrestrict.listeners;
 
+import nl.taico.tekkitrestrict.NameProcessor;
+import nl.taico.tekkitrestrict.TRConfigCache.Logger;
+import nl.taico.tekkitrestrict.TRLogger;
+
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-
-import nl.taico.tekkitrestrict.NameProcessor;
-import nl.taico.tekkitrestrict.TRLogger;
-import nl.taico.tekkitrestrict.TRConfigCache.Logger;
 
 import ee.events.EEEvent;
 import ee.events.amulet.EEAmuletEvent;
@@ -18,6 +18,12 @@ import ee.events.ring.EERingEvent;
 import ee.events.rm.EERMToolEvent;
 
 public class EEListener implements Listener {
+	private void logUse(String logname, Player player, int id){
+		Location loc = player.getLocation();
+		TRLogger.Log(logname, "[" + player.getName() + "][" + player.getWorld().getName() +
+				" - " + loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ() + "] used (" + id + ") `" + NameProcessor.getEEName(id) + "`");
+	}
+
 	//IMPORTANT TODO WIP
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onEEEvent(EEEvent e){
@@ -45,11 +51,5 @@ public class EEListener implements Listener {
 			if (!Logger.LogEEMisc) return;
 			//IMPORTANT TODO continue this
 		}
-	}
-	
-	private void logUse(String logname, Player player, int id){
-		Location loc = player.getLocation();
-		TRLogger.Log(logname, "[" + player.getName() + "][" + player.getWorld().getName() +
-				" - " + loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ() + "] used (" + id + ") `" + NameProcessor.getEEName(id) + "`");
 	}
 }

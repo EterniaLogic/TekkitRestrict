@@ -3,6 +3,11 @@ package nl.taico.tekkitrestrict.listeners;
 import java.util.HashMap;
 
 import net.minecraft.server.EntityPlayer;
+import nl.taico.tekkitrestrict.TRConfigCache.Hacks;
+import nl.taico.tekkitrestrict.functions.TRNoHack;
+import nl.taico.tekkitrestrict.objects.TREnums.HackType;
+import nl.taico.tekkitrestrict.objects.TRItemStack;
+import nl.taico.tekkitrestrict.util.ArrayUtil;
 
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -18,27 +23,9 @@ import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import nl.taico.tekkitrestrict.TRConfigCache.Hacks;
-import nl.taico.tekkitrestrict.functions.TRNoHack;
-import nl.taico.tekkitrestrict.objects.TREnums.HackType;
-import nl.taico.tekkitrestrict.objects.TRItemStack;
-import nl.taico.tekkitrestrict.util.ArrayUtil;
-
 public class NoHackFly implements Listener {
 	private static HashMap<String, Integer> tickTolerance = new HashMap<String, Integer>();
 	private static HashMap<String, Double> tickLastLoc = new HashMap<String, Double>();
-
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	private void handleFly(PlayerMoveEvent event) {
-		Player player = event.getPlayer();
-		if (player == null || player.getName().contains("[ComputerCraft]") || player.hasPermission("tekkitrestrict.bypass.hack.fly")) return;
-		if (player.getGameMode() == GameMode.CREATIVE) return;
-		if (!isFlying(player)) return;
-		//if (Util.hasHackBypass(player, "fly")) return;
-		
-		groundPlayer(player);
-		TRNoHack.handleHack(player, HackType.fly);
-	}
 
 	private static int[] nearBlocks = new int[] {
 		65,//Ladder
@@ -51,43 +38,57 @@ public class NoHackFly implements Listener {
 		235,//Iron scaffold
 		212 //Ladder rail
 	};
-	
+
+	//async
+	public static void clearMaps() {
+		tickTolerance = new HashMap<String, Integer>();
+		tickLastLoc = new HashMap<String, Double>();
+	}
+
+	/**
+	 * Teleport the player to the highest block on the ground.
+	 */
+	private static void groundPlayer(Player player) {
+		Block highest = player.getWorld().getHighestBlockAt(player.getLocation());
+		player.teleport(highest.getLocation(), TeleportCause.COMMAND);
+	}
+
 	/**
 	 * @return If the player is flying.
 	 */
 	public static boolean isFlying(Player player) {
 		if (player.getName().contains("[ComputerCraft]")) return false;
-		
+
 		int flyTolerance = Hacks.fly.tolerance;
 		int minHeight = (int) Hacks.fly.value;
-		
+
 		final PlayerInventory inventory = player.getInventory();
 		final ItemStack boots = inventory.getBoots();
-		
+
 		if (boots != null){
 			//checks if the player is wearing boots before deciding whether or not they are flyhacking
-			if (boots.getTypeId() == 30171 && (inventory.getBoots().getDurability() < 27)) { //wearing quantum boots. checks for charge
+			if ((boots.getTypeId() == 30171) && (inventory.getBoots().getDurability() < 27)) { //wearing quantum boots. checks for charge
 				minHeight += 12;//10 is required for this to work
-		    } else if (boots.getTypeId() == 27582) { //hurricane boots
-		    	return false; //has flyItem
-		    }
+			} else if (boots.getTypeId() == 27582) { //hurricane boots
+				return false; //has flyItem
+			}
 		}
-		
+
 		final ItemStack chest = inventory.getChestplate();
 		if (chest != null){
 			//jetpack check
-			if (chest.getTypeId() == 30209 || chest.getTypeId() == 30210) {
+			if ((chest.getTypeId() == 30209) || (chest.getTypeId() == 30210)) {
 				if (TRItemStack.getJetpackCharge(chest)>0) return false;
 			}
 		}
-		
+
 		for (int i = 0; i<=8; i++){ //Ring on hotbar check
 			final ItemStack itemStack = inventory.getItem(i);
 			if (itemStack == null) continue;
 			int id = itemStack.getTypeId();
-			
-			if (id == 27536 || id == 27584) return false;
-			
+
+			if ((id == 27536) || (id == 27584)) return false;
+
 			/*
 			if (id == 27536){
 				NBTTagCompound tag = ((CraftItemStack)itemStack).getHandle().tag;
@@ -99,12 +100,12 @@ public class NoHackFly implements Listener {
 				}
 			}
 			else if (id == 27584) return false;
-			*/
+			 */
 		}
-		
-		
+
+
 		if (player.isInsideVehicle()) return false;
-		
+
 		final String name = player.getName();
 		EntityPlayer Eplayer = ((CraftPlayer) player).getHandle();
 		if (!Eplayer.abilities.isFlying) {
@@ -121,19 +122,19 @@ public class NoHackFly implements Listener {
 						flight = false; //If there is a block, flight = false.
 						break;
 					}
-					
+
 					y--;
 				}
-				
+
 				if (flight) {
 					Double oldY = tickLastLoc.get(name);
-					
+
 					double velo, playery = loc.getY();
 					if (oldY == null)
 						velo = 0;
 					else
 						velo = playery - oldY;
-					
+
 					tickLastLoc.put(name, playery);
 
 					// they are constant 0 or are going upwards
@@ -144,11 +145,11 @@ public class NoHackFly implements Listener {
 							lowerScore(name, 1);
 							return false;
 						}
-						
+
 						Integer ticks = tickTolerance.get(name);
 						if (ticks == null) ticks = 1;
 						else ticks = ticks + 1;
-						
+
 						if (ticks >= flyTolerance) {
 							resetScore(name);
 							return true;
@@ -172,11 +173,11 @@ public class NoHackFly implements Listener {
 				lowerScore(name, 1);
 				return false;
 			}
-			
+
 			Integer ticks = tickTolerance.get(name);
 			if (ticks == null) ticks = 1;
 			else ticks = ticks + 1;
-			
+
 			if (ticks >= flyTolerance) {
 				resetScore(name);
 				return true;
@@ -186,28 +187,16 @@ public class NoHackFly implements Listener {
 			}
 		}
 	}
-	
+
 	//sync
 	private static void lowerScore(String name, int amount){
 		Integer ticks = tickTolerance.get(name);
 		if (ticks == null) ticks = 0;
 		else if (ticks > 0) ticks = ticks - amount;
 		else if (ticks == 0) return;
-		
+
 		if (ticks < 0 ) ticks = 0;
 		tickTolerance.put(name, ticks);
-	}
-	
-	//sync
-	private static void resetScore(String name){
-		tickTolerance.remove(name);
-		tickLastLoc.remove(name);
-	}
-
-	//async
-	public static void clearMaps() {
-		tickTolerance = new HashMap<String, Integer>();
-		tickLastLoc = new HashMap<String, Double>();
 	}
 
 	//sync
@@ -215,12 +204,22 @@ public class NoHackFly implements Listener {
 		tickTolerance.remove(playerName);
 		tickLastLoc.remove(playerName);
 	}
-	
-	/**
-	 * Teleport the player to the highest block on the ground.
-	 */
-	private static void groundPlayer(Player player) {
-		Block highest = player.getWorld().getHighestBlockAt(player.getLocation());
-		player.teleport(highest.getLocation(), TeleportCause.COMMAND);
+
+	//sync
+	private static void resetScore(String name){
+		tickTolerance.remove(name);
+		tickLastLoc.remove(name);
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	private void handleFly(PlayerMoveEvent event) {
+		Player player = event.getPlayer();
+		if ((player == null) || player.getName().contains("[ComputerCraft]") || player.hasPermission("tekkitrestrict.bypass.hack.fly")) return;
+		if (player.getGameMode() == GameMode.CREATIVE) return;
+		if (!isFlying(player)) return;
+		//if (Util.hasHackBypass(player, "fly")) return;
+
+		groundPlayer(player);
+		TRNoHack.handleHack(player, HackType.fly);
 	}
 }

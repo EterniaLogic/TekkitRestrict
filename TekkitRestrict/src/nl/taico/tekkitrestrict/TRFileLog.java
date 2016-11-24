@@ -1,20 +1,11 @@
 package nl.taico.tekkitrestrict;
 
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
+import javax.annotation.Nullable;
+
+import lombok.NonNull;
 
 public class TRFileLog extends FileLog {
-	
-	private TRFileLog(String type, boolean consoleLog) {
-		super(type, consoleLog);
-	}
-	
-	@Override
-	@NonNull protected String formatMsg(@Nullable String msg){
-		if (msg == null) msg = "null";
-		return msg;
-	}
-	
+
 	public static TRFileLog getLogOrMake(String type, boolean consoleLog){
 		if (type == null) type = "null";
 		FileLog tbr = Logs.get(type);
@@ -22,5 +13,15 @@ public class TRFileLog extends FileLog {
 		else if (!(tbr instanceof TRFileLog)) throw new RuntimeException("FileLog with this name already exists!");
 		else return (TRFileLog) tbr;
 	}
-	
+
+	private TRFileLog(String type, boolean consoleLog) {
+		super(type, consoleLog);
+	}
+
+	@Override
+	@NonNull protected String formatMsg(@Nullable String msg){
+		if (msg == null) msg = "null";
+		return msg;
+	}
+
 }

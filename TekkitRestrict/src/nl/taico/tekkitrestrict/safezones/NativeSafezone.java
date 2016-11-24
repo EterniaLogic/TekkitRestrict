@@ -2,13 +2,29 @@ package nl.taico.tekkitrestrict.safezones;
 
 import java.util.ArrayList;
 
+import nl.taico.tekkitrestrict.objects.TRWorldPos;
+
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import nl.taico.tekkitrestrict.objects.TRWorldPos;
-
 public class NativeSafezone extends TRSafezone {
 	protected static ArrayList<NativeSafezone> nativezones = new ArrayList<NativeSafezone>();
+	public static ArrayList<NativeSafezone> getZones(){
+		synchronized (nativezones){
+			return new ArrayList<NativeSafezone>(nativezones);
+		}
+	}
+
+	public static boolean isInSafezone(final Player player){
+		final Location loc = player.getLocation();
+		for (final NativeSafezone zone : getZones()){
+			if (!zone.location.contains(loc)) continue;
+			return zone.isSafezoneFor(player);
+		}
+
+		return false;
+	}
+
 	protected NativeSafezone(final String name, final Location loc1, final Location loc2) {
 		super(0, name);
 		this.world = loc1.getWorld().getName().toLowerCase();
@@ -18,7 +34,7 @@ public class NativeSafezone extends TRSafezone {
 			nativezones.add(this);
 		}
 	}
-	
+
 	protected NativeSafezone(final String name, final TRWorldPos loc) {
 		super(0, name);
 		this.world = loc.getWorld().getName().toLowerCase();
@@ -46,7 +62,14 @@ public class NativeSafezone extends TRSafezone {
 		cache.put(player.getName(), true);
 		return true;
 	}
-	
+
+	@Override
+	protected void remove(){
+		synchronized (nativezones){
+			nativezones.remove(this);
+		}
+	}
+
 	public boolean shortCheck(final Player player) {
 		final Boolean b = cache.get(player.getName());
 		if (b != null) return b.booleanValue();
@@ -62,32 +85,10 @@ public class NativeSafezone extends TRSafezone {
 		cache.put(player.getName(), true);
 		return true;
 	}
-	
-	public static ArrayList<NativeSafezone> getZones(){
-		synchronized (nativezones){
-			return new ArrayList<NativeSafezone>(nativezones);
-		}
-	}
-	
-	public static boolean isInSafezone(final Player player){
-		final Location loc = player.getLocation();
-		for (final NativeSafezone zone : getZones()){
-			if (!zone.location.contains(loc)) continue;
-			return zone.isSafezoneFor(player);
-		}
-		
-		return false;
-	}
 
 	@Override
 	public void update() {
 		cache.clear();
-	}
-	
-	protected void remove(){
-		synchronized (nativezones){
-			nativezones.remove(this);
-		}
 	}
 
 }

@@ -12,7 +12,6 @@ import java.util.logging.Handler;
 import java.util.logging.Logger;
 
 import lombok.ToString;
-
 import nl.taico.taeirlib.config.interfaces.ISection;
 import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.logging.TRFilter.Priority;
@@ -24,12 +23,12 @@ public class TRLogFilterPlus {
 	public static Filter consoleFilter = new TRConsoleFilter();
 	public static Filter forgeFilter = new TRForgeFilter();
 	public static Filter logFilter = new TRLogFilter();
-	
+
 	private TRMatchMethod method;
 	private Set<String> filters = new HashSet<String>();
 	private final TRFilterType type;
 	public static ArrayList<TRLogFilterPlus> allFilters = new ArrayList<TRLogFilterPlus>();
-	
+
 	public static void assignFilters(){
 		Log.trace("TRLogFilterPlus - Assigning filters");
 		for (final Handler h : Logger.getLogger("Minecraft").getHandlers()){
@@ -68,14 +67,14 @@ public class TRLogFilterPlus {
 			}
 		}
 	}
-	
+
 	public static void disable(){
 		Log.trace("TRLogFilterPlus - Disabling filters");
 		for (final Handler h : Logger.getLogger("Minecraft").getHandlers()){
 			Filter f = h.getFilter();
 			if (f instanceof TRFilter){
 				((TRFilter) f).removeAndConvert(h, consoleFilter, logFilter);
-			} else if (f == consoleFilter || f == logFilter) h.setFilter(null);
+			} else if ((f == consoleFilter) || (f == logFilter)) h.setFilter(null);
 		}
 
 		for (final Handler h : Logger.getLogger("ForgeModLoader").getHandlers()){
@@ -85,7 +84,7 @@ public class TRLogFilterPlus {
 			} else if (f == forgeFilter) h.setFilter(null);
 		}
 	}
-	
+
 	public static void loadFilters(ISection cs){
 		allFilters.clear();
 		Log.trace("TRLogFilterPlus - Loading filters from config");
@@ -117,7 +116,40 @@ public class TRLogFilterPlus {
 		((TRForgeFilter) forgeFilter).reload();
 		((TRLogFilter) logFilter).reload();
 	}
-	
+
+	public static boolean matches(TRMatchMethod method, String input, String filter){
+		switch (method){
+		case REGEX:
+			if (!method.isCS()) input = input.toLowerCase(Locale.ENGLISH);
+			return input.matches(filter);
+		case CONTAINS: 
+			if (!method.isCS()){
+				input = input.toLowerCase(Locale.ENGLISH);
+				filter = filter.toLowerCase(Locale.ENGLISH);
+			}
+			return input.contains(filter);
+		case ENDS_WITH: 
+			if (!method.isCS()){
+				input = input.toLowerCase(Locale.ENGLISH);
+				filter = filter.toLowerCase(Locale.ENGLISH);
+			}
+			return input.endsWith(filter);
+		case EQUALS: 
+			if (!method.isCS()){
+				input = input.toLowerCase(Locale.ENGLISH);
+				filter = filter.toLowerCase(Locale.ENGLISH);
+			}
+			return input.equals(filter);
+		case STARTS_WITH: 
+			if (!method.isCS()){
+				input = input.toLowerCase(Locale.ENGLISH);
+				filter = filter.toLowerCase(Locale.ENGLISH);
+			}
+			return input.startsWith(filter);
+		default: return false;
+		}
+	}
+
 	public TRLogFilterPlus(TRMatchMethod method, TRFilterType type, Collection<String> filters){
 		this.method = method;
 		this.type = type;
@@ -125,80 +157,47 @@ public class TRLogFilterPlus {
 		allFilters.add(this);
 		Log.trace("TRLogFilterPlus - Added Filter: " + this);
 	}
-	
+
+	public TRFilterType getType() {
+		return type;
+	}
+
 	public boolean matches(String input){
 		if (!method.isCS()) input = input.toLowerCase(Locale.ENGLISH);
 		switch (method){
-			case CONTAINS:
-				for (String filter : filters){
-					if (input.contains(filter)) return true;
-				}
-				return false;
-			case ENDS_WITH:
-				for (String filter : filters){
-					if (input.endsWith(filter)) return true;
-				}
-				return false;
-			case EQUALS:
-				return filters.contains(input);
-			case STARTS_WITH:
-				for (String filter : filters){
-					if (input.startsWith(filter)) return true;
-				}
-				return false;
-			case REGEX:
-				for (String filter : filters){
-					if (input.matches(filter)) return true;
-				}
-				return false;
-			default:
-				return false;
+		case CONTAINS:
+			for (String filter : filters){
+				if (input.contains(filter)) return true;
+			}
+			return false;
+		case ENDS_WITH:
+			for (String filter : filters){
+				if (input.endsWith(filter)) return true;
+			}
+			return false;
+		case EQUALS:
+			return filters.contains(input);
+		case STARTS_WITH:
+			for (String filter : filters){
+				if (input.startsWith(filter)) return true;
+			}
+			return false;
+		case REGEX:
+			for (String filter : filters){
+				if (input.matches(filter)) return true;
+			}
+			return false;
+		default:
+			return false;
 		}
 	}
-	
+
 	public void setCaseInSensitive(){
 		if (method.isCS()){
 			method.caseSensitive = false;
 			Set<String> temp = new HashSet<String>();
 			for (String s : filters) temp.add(s.toLowerCase(Locale.ENGLISH));
 			filters = temp;
-		}
-	}
-	
-	public TRFilterType getType() {
-		return type;
-	}
-	
-	public static boolean matches(TRMatchMethod method, String input, String filter){
-		switch (method){
-			case REGEX:
-				if (!method.isCS()) input = input.toLowerCase(Locale.ENGLISH);
-				return input.matches(filter);
-			case CONTAINS: 
-				if (!method.isCS()){
-					input = input.toLowerCase(Locale.ENGLISH);
-					filter = filter.toLowerCase(Locale.ENGLISH);
-				}
-				return input.contains(filter);
-			case ENDS_WITH: 
-				if (!method.isCS()){
-					input = input.toLowerCase(Locale.ENGLISH);
-					filter = filter.toLowerCase(Locale.ENGLISH);
-				}
-				return input.endsWith(filter);
-			case EQUALS: 
-				if (!method.isCS()){
-					input = input.toLowerCase(Locale.ENGLISH);
-					filter = filter.toLowerCase(Locale.ENGLISH);
-				}
-				return input.equals(filter);
-			case STARTS_WITH: 
-				if (!method.isCS()){
-					input = input.toLowerCase(Locale.ENGLISH);
-					filter = filter.toLowerCase(Locale.ENGLISH);
-				}
-				return input.startsWith(filter);
-			default: return false;
 		}
 	}
 }

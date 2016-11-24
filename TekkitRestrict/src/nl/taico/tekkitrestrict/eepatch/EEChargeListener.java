@@ -10,17 +10,18 @@ import ee.events.EEChargeEvent;
 public class EEChargeListener implements Listener {
 	@EventHandler
 	public void onCharge(EEChargeEvent event){
-		Player player = event.getPlayer();
-		if (player.hasPermission("tekkitrestrict.bypass.maxcharge")) return;
 		
+		Player player = (Player) event.getHuman();
+		if (player.hasPermission("tekkitrestrict.bypass.maxcharge")) return;
+
 		int old = event.getOldChargeLevel();
 		int nw = event.getNewChargeLevel();
 		if (old > nw) return; //Discharge always allowed
 
 		int id = event.getItem().id;
-		
+
 		Integer charge = EEPSettings.MaxCharge.get(id);
-		
+
 		if (charge == null){
 			if (player.hasPermission("tekkitrestrict.maxcharge."+id+"."+old)){
 				event.setCancelled(true);

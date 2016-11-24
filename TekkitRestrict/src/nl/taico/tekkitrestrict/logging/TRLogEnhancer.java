@@ -20,6 +20,16 @@ import nl.taico.tekkitrestrict.logging.TRFilter.Priority;
 
 public class TRLogEnhancer implements Filter {
 	private static TRLogEnhancer instance = new TRLogEnhancer();
+	private static boolean enhanceCMD;
+
+	private static boolean changeGive;
+
+	private static boolean shortenErrors;
+	private static boolean enhanceCMDDeny;
+	private static HashMap<Pattern, String> replacements = new HashMap<Pattern, String>();
+	private static Pattern givePattern = Pattern.compile("Giving (\\d+) of (.*) to (.*)\\.");
+	private static Pattern neiGive = Pattern.compile("Giving (.*) (\\d+) of (.*)");
+
 	public static void assignFilters(){
 		for (final Handler h : Logger.getLogger("Minecraft").getHandlers()){
 			if (h instanceof ConsoleHandler){
@@ -41,7 +51,6 @@ public class TRLogEnhancer implements Filter {
 			}
 		}
 	}
-	
 	public static void disable(){
 		for (final Handler h : Logger.getLogger("Minecraft").getHandlers()){
 			Filter f = h.getFilter();
@@ -50,15 +59,14 @@ public class TRLogEnhancer implements Filter {
 			} else if (f == instance) h.setFilter(null);
 		}
 	}
-	
 	public static void reload(){
 		enhanceCMD = SettingsStorage.loggingConfig.getBoolean("EnchanceEssentialsCmd", true);
 		changeGive = SettingsStorage.loggingConfig.getBoolean("ChangeGive", true);
 		shortenErrors = SettingsStorage.loggingConfig.getBoolean("ShortenErrors", true);
 		enhanceCMDDeny = SettingsStorage.loggingConfig.getBoolean("EnhanceEssentialsCmdDeny", true);
-		
+
 		ISection cs = SettingsStorage.loggingConfig.getSection("Reformat");
-		if (cs == null || cs.getKeys(false).isEmpty()){
+		if ((cs == null) || cs.getKeys(false).isEmpty()){
 			replacements.clear();
 			return;
 		}
@@ -68,15 +76,8 @@ public class TRLogEnhancer implements Filter {
 		}
 		replacements = l;
 	}
-	private static boolean enhanceCMD;
-	private static boolean changeGive;
-	private static boolean shortenErrors;
-	private static boolean enhanceCMDDeny;
-	
-	private static HashMap<Pattern, String> replacements = new HashMap<Pattern, String>();
-	private static Pattern givePattern = Pattern.compile("Giving (\\d+) of (.*) to (.*)\\.");
-	private static Pattern neiGive = Pattern.compile("Giving (.*) (\\d+) of (.*)");
 
+	@Override
 	public boolean isLoggable(LogRecord record){
 		String msg = record.getMessage();
 		if (enhanceCMD){
@@ -85,28 +86,28 @@ public class TRLogEnhancer implements Filter {
 				record.setLevel(Log.cmd);
 			}
 		}
-		
+
 		{
-		Matcher m;
-		if (changeGive){
-			if ((m=givePattern.matcher(msg)).matches()){
-				msg = m.replaceAll("SERVER: /give $3 $2 $1");
-				record.setLevel(Log.cmd);
-			}
-			else if ((m=neiGive.matcher(msg)).matches()){
-				msg = m.replaceAll("NEI: /give $1 $3 $2");
-				record.setLevel(Log.cmd);
-			}
-		}}
-		
-		
-		if (shortenErrors && record.getLevel() == Level.SEVERE){
-			
+			Matcher m;
+			if (changeGive){
+				if ((m=givePattern.matcher(msg)).matches()){
+					msg = m.replaceAll("SERVER: /give $3 $2 $1");
+					record.setLevel(Log.cmd);
+				}
+				else if ((m=neiGive.matcher(msg)).matches()){
+					msg = m.replaceAll("NEI: /give $1 $3 $2");
+					record.setLevel(Log.cmd);
+				}
+			}}
+
+
+		if (shortenErrors && (record.getLevel() == Level.SEVERE)){
+
 		}
-		if (enhanceCMDDeny && record.getLevel() == Level.WARNING && msg.contains(" was denied access to command.")){
+		if (enhanceCMDDeny && (record.getLevel() == Level.WARNING) && msg.contains(" was denied access to command.")){
 			record.setLevel(Log.cmd);
 		}
-		
+
 		try {
 			final Iterator<Entry<Pattern, String>> it = replacements.entrySet().iterator();
 			while (it.hasNext()){
@@ -115,9 +116,9 @@ public class TRLogEnhancer implements Filter {
 				if ((matcher = e.getKey().matcher(msg)).matches()) msg = matcher.replaceAll(e.getValue());
 			}
 		} catch (Exception ex){
-			
+
 		}
-		
+
 		record.setMessage(msg);
 		return true;
 		//Giving 8 of x27563 to

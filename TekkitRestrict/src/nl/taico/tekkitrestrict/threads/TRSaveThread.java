@@ -1,10 +1,10 @@
 package nl.taico.tekkitrestrict.threads;
 
 import nl.taico.tekkitrestrict.Log;
-import nl.taico.tekkitrestrict.TRLogger;
-import nl.taico.tekkitrestrict.TekkitRestrict;
 import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.TRConfigCache.Threads;
+import nl.taico.tekkitrestrict.TRLogger;
+import nl.taico.tekkitrestrict.TekkitRestrict;
 import nl.taico.tekkitrestrict.functions.TRLimiter;
 import nl.taico.tekkitrestrict.functions.TRSafeZone;
 
@@ -15,7 +15,7 @@ public class TRSaveThread extends Thread {
 	public boolean isSaving(){
 		return saving;
 	}
-	
+
 	@Override
 	public void run() {
 		last = false;
@@ -23,11 +23,11 @@ public class TRSaveThread extends Thread {
 			if (TekkitRestrict.disable) return; //If plugin is disabling, then stop the thread. The savethread triggers again if interrupted.
 			Thread.sleep(Threads.saveSpeed);
 		} catch (InterruptedException ex) {}
-		
+
 		while (true) {
 			if (last) break;
 			save();
-			
+
 			if (TekkitRestrict.disable) break;
 
 			try {
@@ -38,10 +38,10 @@ public class TRSaveThread extends Thread {
 				TekkitRestrict.instance.getLogger().warning("Save Thread was interrupted by an unknown thread.");
 			}
 		}
-		
+
 		save();
 	}
-	
+
 	private void save(){
 		saving = true;
 		// runs save functions for both safezones and itemlimiter
@@ -54,7 +54,7 @@ public class TRSaveThread extends Thread {
 				err1 = true;
 			}
 		}
-		
+
 		try {
 			TRSafeZone.save();
 		} catch (Exception ex) {

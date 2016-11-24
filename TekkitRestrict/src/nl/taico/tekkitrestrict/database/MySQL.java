@@ -15,9 +15,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
+import javax.annotation.Nullable;
 
+import lombok.NonNull;
 import nl.taico.tekkitrestrict.Log;
 
 @SuppressWarnings("resource")
@@ -38,35 +38,6 @@ public class MySQL extends Database {
 		this.database = database;
 		this.username = username;
 		this.password = password;
-	}
-
-	@Override
-	protected boolean initialize() {
-		if (initialized) return working;
-		
-		initialized = true;
-		try {
-			Class.forName("com.mysql.jdbc.Driver");
-			working = true;
-			return true;
-		} catch (ClassNotFoundException e) {
-			write("The MySQL driver class is missing: " + e.getMessage() + ".", Level.SEVERE);
-			return false;
-		}
-	}
-
-	@Override
-	public boolean open() {
-		if (!initialize()) return false;
-		String url = "";
-		try {
-			url = "jdbc:mysql://" + hostname + ":" + port + "/" + database;
-			connection = DriverManager.getConnection(url, username, password);
-			return true;
-		} catch (SQLException e) {
-			write("Could not connect to database at \""+url+"\". Error: " + e.getMessage() + ".", Level.SEVERE);
-			return false;
-		}
 	}
 
 	/**
@@ -91,6 +62,21 @@ public class MySQL extends Database {
 		return connection;
 	}
 
+	@Override
+	protected boolean initialize() {
+		if (initialized) return working;
+
+		initialized = true;
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			working = true;
+			return true;
+		} catch (ClassNotFoundException e) {
+			write("The MySQL driver class is missing: " + e.getMessage() + ".", Level.SEVERE);
+			return false;
+		}
+	}
+
 	/**
 	 * Checks if the connection is open (valid).
 	 * @return If the connection is closed or null will return false. Otherwise will return true.
@@ -98,11 +84,58 @@ public class MySQL extends Database {
 	@Override
 	public boolean isOpen() {
 		if (connection == null) return false;
-		
+
 		try {
 			return connection.isValid(1);
 		} catch (SQLException e) {
 			return false;
+		}
+	}
+
+	@Override
+	public boolean open() {
+		if (!initialize()) return false;
+		String url = "";
+		try {
+			url = "jdbc:mysql://" + hostname + ":" + port + "/" + database;
+			connection = DriverManager.getConnection(url, username, password);
+			return true;
+		} catch (SQLException e) {
+			write("Could not connect to database at \""+url+"\". Error: " + e.getMessage() + ".", Level.SEVERE);
+			return false;
+		}
+	}
+
+	@Override
+	@Nullable public PreparedStatement prepare(@NonNull String query) {
+		if (query.contains("INSERT OR REPLACE INTO")) query = query.replace("INSERT OR REPLACE INTO", "REPLACE INTO");
+		try {
+			PreparedStatement ps = connection.prepareStatement(query);
+			return ps;
+		} catch (SQLException e) {
+			if (!e.toString().contains("not return ResultSet")) {
+				write("Error in SQL prepare() query: " + e.getMessage(), Level.WARNING);
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Executes a query in a PreparedStatement.
+	 * @return A resultSet if the query returned one.<br>
+	 * If the query was an update, delete or insert type query it will return null.<br>
+	 * If the query Failed, it will throw an SQLExcpetion.
+	 */
+	@Override
+	@Nullable public ResultSet query(@NonNull PreparedStatement ps) throws SQLException {
+		try {
+			if (ps.execute())
+				return ps.getResultSet();
+			else
+				return null;
+		} catch (SQLException ex) {
+			write("Error when trying to execute query! Error: " + ex.toString(), Level.WARNING);
+			throw ex;
 		}
 	}
 
@@ -127,42 +160,9 @@ public class MySQL extends Database {
 			throw ex;
 		}
 	}
-	
-	/**
-	 * Executes a query in a PreparedStatement.
-	 * @return A resultSet if the query returned one.<br>
-	 * If the query was an update, delete or insert type query it will return null.<br>
-	 * If the query Failed, it will throw an SQLExcpetion.
-	 */
-	@Override
-	@Nullable public ResultSet query(@NonNull PreparedStatement ps) throws SQLException {
-		try {
-			if (ps.execute())
-				return ps.getResultSet();
-			else
-				return null;
-		} catch (SQLException ex) {
-			write("Error when trying to execute query! Error: " + ex.toString(), Level.WARNING);
-			throw ex;
-		}
-	}
 
-	@Override
-	@Nullable public PreparedStatement prepare(@NonNull String query) {
-		if (query.contains("INSERT OR REPLACE INTO")) query = query.replace("INSERT OR REPLACE INTO", "REPLACE INTO");
-		try {
-			PreparedStatement ps = connection.prepareStatement(query);
-			return ps;
-		} catch (SQLException e) {
-			if (!e.toString().contains("not return ResultSet")) {
-				write("Error in SQL prepare() query: " + e.getMessage(), Level.WARNING);
-			}
-		}
-		return null;
-	}
-	
 	protected void write(@Nullable String toWrite, @NonNull Level level) {
-		if (toWrite == null || toWrite.isEmpty()) return;
+		if ((toWrite == null) || toWrite.isEmpty()) return;
 		Log.log(level, "[MySQL] " + toWrite);
 	}
 }

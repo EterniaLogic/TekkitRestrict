@@ -6,9 +6,9 @@ public class TRHackSettings {
 	public String command = "";
 	public int triggerAfter;
 	public double value;
-	
+
 	public TRHackSettings(){}
-	
+
 	public TRHackSettings(final boolean enable, final boolean broadcast, final boolean kick, final int tolerance, final double value, final boolean useCommand, final int triggerAfter, final String command){
 		this.enable = enable;
 		this.broadcast = broadcast;

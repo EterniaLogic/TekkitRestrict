@@ -9,7 +9,7 @@ public class TRVersion {
 	public boolean beta;
 	public boolean dev;
 	public int extra = -1;
-	
+
 	public TRVersion(String str){
 		if (str == null) return;
 		//str = str.toLowerCase();
@@ -23,7 +23,7 @@ public class TRVersion {
 			major = Integer.parseInt(temp[0]);
 			minor = Integer.parseInt(temp[1]);
 		}
-		
+
 		if (!fullVer.contains(" ")){
 			beta = false;
 			dev = false;
@@ -31,7 +31,7 @@ public class TRVersion {
 		} else if (fullVer.toLowerCase().contains("beta")){
 			beta = true;
 			dev = false;
-			
+
 			final String[] temp = fullVer.split(" ");//1.18,beta,1
 			if (temp.length == 2)
 				extra = 1;
@@ -40,7 +40,7 @@ public class TRVersion {
 		} else if (fullVer.toLowerCase().contains("dev")){
 			beta = false;
 			dev = true;
-			
+
 			final String[] temp = fullVer.split(" ");//1.18,dev
 			if (temp.length == 2)
 				extra = 1;
@@ -48,35 +48,35 @@ public class TRVersion {
 				extra = Integer.parseInt(temp[2]);
 		}
 	}
-	
+
 	public boolean isNewer(final TRVersion ver2){
 		if (ver2 == null) return false;
 		if (this.major > ver2.major) return false;
 		if (this.minor > ver2.minor) return false;
-		
+
 		if (beta){													//1.18 beta
 			if (!ver2.beta && !ver2.dev) return true;				//not beta, not dev, at least 1.18 release, so newer
 			if (ver2.beta){
 				if (ver2.minor > this.minor) return true;			//beta 1.19 newer than beta 1.18
-				
+
 				if (ver2.minor == this.minor){						//both 1.18 beta
 					if (ver2.extra > this.extra) return true;		//1.18 beta 2 newer than 1.18 beta 1
 					return false;									//1.18 beta x not newer than 1.18 beta x
 				}
 			}
-			
+
 			return false;											//dont update to dev versions from beta versions 
 		} else if (dev){
 			if (!ver2.beta && !ver2.dev) return true;				//not beta, not dev, at least 1.18 release, so newer
 			if (ver2.dev){
 				if (ver2.minor > this.minor) return true;			//dev 1.19 newer than dev 1.18
-				
+
 				if (ver2.minor == this.minor){						//both 1.18 dev
 					if (ver2.extra > this.extra) return true;		//1.18 dev 2 newer than 1.18 dev 1
 					return false;									//1.18 dev x not newer than 1.18 dev x
 				}
 			}
-			
+
 			return false;											//dont update to beta versions from dev versions
 		} else {													//1.18 release
 			if (ver2.beta || ver2.dev) return false;				//dont update to devs or betas, not even newer ones.
@@ -84,17 +84,17 @@ public class TRVersion {
 			return true;
 		}
 	}
-	
+
 	public boolean shouldUpdate(final TRVersion ver2){
 		if (ver2 == null) return false;
 		if (this.major > ver2.major) return false;
 		if (this.minor > ver2.minor) return false;
-		
+
 		if (beta){													//1.18 beta
 			if (!ver2.beta && !ver2.dev) return true;				//not beta, not dev, at least 1.18 release, so newer
 			if (ver2.beta){
 				if (ver2.minor > this.minor) return true;			//beta 1.19 newer than beta 1.18
-				
+
 				if (ver2.minor == this.minor){						//both 1.18 beta
 					if (ver2.extra > this.extra) return true;		//1.18 beta 2 newer than 1.18 beta 1
 					return false;									//1.18 beta x not newer than 1.18 beta x
@@ -106,13 +106,13 @@ public class TRVersion {
 				}
 				return false;										//dont update to dev versions from beta
 			}
-			
+
 			return false;											//dont update to dev versions from beta versions 
 		} else if (dev){
 			if (!ver2.beta && !ver2.dev) return true;				//not beta, not dev, at least 1.18 release, so newer
 			if (ver2.dev){
 				if (ver2.minor > this.minor) return true;			//dev 1.19 newer than dev 1.18
-				
+
 				if (ver2.minor == this.minor){						//both 1.18 dev
 					if (ver2.extra > this.extra) return true;		//1.18 dev 2 newer than 1.18 dev 1
 					return false;									//1.18 dev x not newer than 1.18 dev x
@@ -124,7 +124,7 @@ public class TRVersion {
 				}
 				return false;										//dont update to beta versions from dev
 			}
-			
+
 			return false;											//dont update to beta versions from dev versions
 		} else {													//1.18 release
 			if (ver2.beta || ver2.dev){								//dont update to devs or betas, not even newer ones.
@@ -141,7 +141,7 @@ public class TRVersion {
 			}
 		}
 	}
-	
+
 	public String toMetricsVersion(){
 		String base = "" + major + "." + minor;
 		if (beta) base += " Beta " + extra;

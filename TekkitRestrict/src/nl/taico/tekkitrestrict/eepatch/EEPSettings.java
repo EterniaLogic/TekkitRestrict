@@ -7,18 +7,17 @@ import java.util.List;
 import nl.taico.taeirlib.config.interfaces.ISection;
 import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.config.SettingsStorage;
-
 import ee.events.EEEnums.EEAction2;
 import ee.events.EEEnums.EEAmuletAction;
+import ee.events.EEEnums.EEArmorAction;
 import ee.events.EEEnums.EEPedestalAction;
 import ee.events.EEEnums.EERingAction;
-import ee.events.EEEnums.EEArmorAction;
 import ee.events.EEEnums.EETransmuteAction;
 import ee.events.EEEnums.EEWatchAction;
 
 public class EEPSettings {
 	public static HashMap<Integer, Integer> MaxCharge = new HashMap<>();
-	
+
 	public static HashMap<String, ArrayList<Integer>> Groups = new HashMap<>();
 	public static HashMap<String, Integer> EENames = new HashMap<>();
 	static {
@@ -39,30 +38,30 @@ public class EEPSettings {
 		EENames.put("rmaxe", 27568);
 		EENames.put("rmshears", 27569);
 		EENames.put("rmhammer", 27570);
-		
+
 		EENames.put("rmkatar", 27572);
 		EENames.put("redkatar", 27572);
 		EENames.put("katar", 27572);
 		EENames.put("rmmorningstar", 27573);
 		EENames.put("redmorningstar", 27573);
 		EENames.put("morningstar", 27573);
-		
+
 		EENames.put("destructioncatalyst", 27527);
 		EENames.put("hyperkineticlens", 27535);
 		EENames.put("hyperlens", 27535);
 		EENames.put("cataclycticlens", 27556);
 		EENames.put("catalyticlens", 27556);
-		
+
 		EENames.put("evertideamulet", 27530);
 		EENames.put("volcaniteamulet", 27531);
-		
+
 		EENames.put("zeroring", 27574);
 		EENames.put("freezering", 27574);
 		EENames.put("snowring", 27574);
 		EENames.put("ringofignition", 27533);
 		EENames.put("ignitionring", 27533);
 		EENames.put("firering", 27533);
-		
+
 		EENames.put("ringofarcana", 27584);
 		EENames.put("arcanaring", 27584);
 		EENames.put("voidring", 27593);
@@ -79,28 +78,28 @@ public class EEPSettings {
 		EENames.put("swiftwolfsring", 27536);
 		EENames.put("swiftwolfring", 27536);
 		EENames.put("SWRG", 27536);
-		
+
 		EENames.put("philosopherstone", 27526);
 		EENames.put("philosophersstone", 27526);
 		EENames.put("watchofflowingtime", 27538);
 		EENames.put("watchoftime", 27538);
 		EENames.put("watch", 27538);
 		EENames.put("mercurialeye", 27583);
-		
+
 		EENames.put("dmchest", 27549);
 		EENames.put("dmchestplate", 27549);
 		EENames.put("dmhelmet", 27550);
 		EENames.put("dmleggings", 27551);
 		EENames.put("dmgreaves", 27551);
 		EENames.put("dmboots", 27552);
-		
+
 		EENames.put("rmchest", 27575);
 		EENames.put("rmchestplate", 27575);
 		EENames.put("rmhelmet", 27576);
 		EENames.put("rmleggings", 27577);
 		EENames.put("rmgreaves", 27577);
 		EENames.put("rmboots", 27578);
-		
+
 		EENames.put("infernalarmor", 27579);
 		EENames.put("gemchest", 27579);
 		EENames.put("gemchestplate", 27579);
@@ -111,19 +110,19 @@ public class EEPSettings {
 		EENames.put("gemleggings", 27581);
 		EENames.put("hurricaneboots", 27582);
 		EENames.put("gemboots", 27582);
-		
+
 		EENames.put("gemofeternaldensity", 27553);
 		EENames.put("repairtalisman", 27554);
-		
+
 		EENames.put("soulstone", 27529);
 		EENames.put("bodystone", 27588);
 		EENames.put("lifestone", 27589);
 		EENames.put("mindstone", 27590);
-		
+
 		EENames.put("diviningrod", 27585);
-		
+
 		EENames.put("transmutationtablet", 27592);
-		
+
 		EENames.put("kleinstarein", 27557);
 		EENames.put("kleinstar1", 27557);
 		EENames.put("kleinstarzwei", 27558);
@@ -137,7 +136,7 @@ public class EEPSettings {
 		EENames.put("kleinstaromega", 27591);
 		EENames.put("kleinstar6", 27591);
 		EENames.put("alchemybag", 27562);
-		
+
 		ArrayList<Integer> dmtools = new ArrayList<Integer>(8);
 		dmtools.add(27543);
 		dmtools.add(27544);
@@ -147,7 +146,7 @@ public class EEPSettings {
 		dmtools.add(27548);
 		dmtools.add(27555);
 		Groups.put("dmtools", dmtools);
-		
+
 		ArrayList<Integer> rmtools = new ArrayList<Integer>(8);
 		rmtools.add(27564);
 		rmtools.add(27565);
@@ -157,62 +156,67 @@ public class EEPSettings {
 		rmtools.add(27569);
 		rmtools.add(27570);
 		Groups.put("rmtools", rmtools);
-		
+
 		ArrayList<Integer> amulets = new ArrayList<Integer>(2);
 		amulets.add(27530);
 		amulets.add(27531);
 		Groups.put("amulets", amulets);
-		
+
 		ArrayList<Integer> rings = new ArrayList<Integer>(2);
 		rings.add(27574);
 		rings.add(27533);
 		Groups.put("rings", rings);
 	}
-	
+
+	public static ArrayList<EERingAction> zeroring = new ArrayList<EERingAction>();
+
+	public static ArrayList<EERingAction> firering = new ArrayList<EERingAction>();
+
+	public static ArrayList<EERingAction> harvestring = new ArrayList<EERingAction>();
+
+	public static ArrayList<EERingAction> flyring = new ArrayList<EERingAction>();
+	public static ArrayList<EERingAction> arcanering = new ArrayList<EERingAction>();
+	public static ArrayList<EERingAction> blackholeband = new ArrayList<EERingAction>();
+	public static ArrayList<EERingAction> voidring = new ArrayList<EERingAction>();
+
+	public static ArrayList<EERingAction> archangelring = new ArrayList<EERingAction>();
+	public static ArrayList<EEAction2> dest1 = new ArrayList<EEAction2>();
+	public static ArrayList<EEAction2> dest2 = new ArrayList<EEAction2>();
+	public static ArrayList<EEAction2> dest3 = new ArrayList<EEAction2>();
+	public static ArrayList<EEAmuletAction> evertide = new ArrayList<EEAmuletAction>();
+
+	public static ArrayList<EEAmuletAction> volcanite = new ArrayList<EEAmuletAction>();
+	public static ArrayList<EEAction2> dmaxe = new ArrayList<EEAction2>();
+	public static ArrayList<EEAction2> dmpick = new ArrayList<EEAction2>();
+	public static ArrayList<EEAction2> dmshovel = new ArrayList<EEAction2>();
+
+	public static ArrayList<EEAction2> dmhoe = new ArrayList<EEAction2>();
+	public static ArrayList<EEAction2> dmshears = new ArrayList<EEAction2>();
+
+	public static ArrayList<EEAction2> dmhammer = new ArrayList<EEAction2>();
+
+	public static ArrayList<EEAction2> dmsword = new ArrayList<EEAction2>();
+	public static ArrayList<EEAction2> rmaxe = new ArrayList<EEAction2>();
+	public static ArrayList<EEAction2> rmpick = new ArrayList<EEAction2>();
+	public static ArrayList<EEAction2> rmshovel = new ArrayList<EEAction2>();
+	public static ArrayList<EEAction2> rmhoe = new ArrayList<EEAction2>();
+	public static ArrayList<EEAction2> rmshears = new ArrayList<EEAction2>();
+	public static ArrayList<EEAction2> rmhammer = new ArrayList<EEAction2>();
+
+	public static ArrayList<EEAction2> rmsword = new ArrayList<EEAction2>();
+
+	public static ArrayList<EEAction2> katar = new ArrayList<EEAction2>();
+	public static ArrayList<EEAction2> morningstar = new ArrayList<EEAction2>();
+	public static ArrayList<EEArmorAction> armor = new ArrayList<EEArmorAction>();
+	public static ArrayList<EETransmuteAction> phil = new ArrayList<EETransmuteAction>();
+	public static ArrayList<EETransmuteAction> trans = new ArrayList<EETransmuteAction>();
+	public static ArrayList<EEPedestalAction> pedestal = new ArrayList<EEPedestalAction>();
+	public static ArrayList<EEWatchAction> watch = new ArrayList<EEWatchAction>();
+
 	public static ArrayList<Integer> getGroup(String name){
 		return Groups.get(name);
 	}
-	
-	public static void loadMaxCharge(){
-		Log.trace("EEPatch - Loading MaxCharges...");
-		MaxCharge.clear();
-		
-		List<String> mc = SettingsStorage.eepatchConfig.getStringList("EEMaxCharge");
-		for (String current : mc){
-			if (current == null) continue;
-			if (!current.contains(" ")){
-				Log.Warning.config("There is an invalid value in the MaxCharge list in EEPatch.config.yml: \""+current+"\"", false);
-				continue;
-			}
-			
-			String temp[] = current.toLowerCase().split(" ");
-			
-			int charge = 0;
-			try {
-				charge = Integer.parseInt(temp[1]);
-			} catch (NumberFormatException ex){
-				Log.Warning.config("\""+temp[1]+"\" is not a valid chargelevel in the MaxCharge list in EEPatch.config.yml", false);
-				continue;
-			}
-			
-			Integer id = EENames.get(temp[0]);
-			if (id == null){
-				ArrayList<Integer> ids = getGroup(temp[0]);
-				if (ids == null){
-					Log.Warning.config("\""+temp[0]+"\" is not a valid itemname or itemgroup in the MaxCharge list in EEPatch.config.yml", false);
-					continue;
-				}
-				
-				for (int nr : ids){
-					MaxCharge.put(nr, charge);
-				}
-				
-			} else {
-				MaxCharge.put(id, charge);
-			}
-		}
-	}
-	
+
 	public static void loadAllDisabledActions(){
 		loadDisabledRingActions(SettingsStorage.eepatchConfig.getSection("Actions.Rings"));
 		loadDisabledDestActions(SettingsStorage.eepatchConfig.getSection("Actions.Tools.Destruction"));
@@ -223,16 +227,55 @@ public class EEPSettings {
 		loadArmorActions(SettingsStorage.eepatchConfig.getSection("Actions.Armor"));
 		loadOtherActions(SettingsStorage.eepatchConfig.getSection("Actions.Other"));
 	}
-	
-	public static ArrayList<EERingAction> zeroring = new ArrayList<EERingAction>();
-	public static ArrayList<EERingAction> firering = new ArrayList<EERingAction>();
-	public static ArrayList<EERingAction> harvestring = new ArrayList<EERingAction>();
-	public static ArrayList<EERingAction> flyring = new ArrayList<EERingAction>();
-	
-	public static ArrayList<EERingAction> arcanering = new ArrayList<EERingAction>();
-	public static ArrayList<EERingAction> blackholeband = new ArrayList<EERingAction>();
-	public static ArrayList<EERingAction> voidring = new ArrayList<EERingAction>();
-	public static ArrayList<EERingAction> archangelring = new ArrayList<EERingAction>();
+	public static void loadArmorActions(ISection config){
+		Log.trace("EEPatch - Loading Disabled Gem Armor Actions...");
+		armor.clear();
+
+		if (!config.getBoolean("Offensive.Activate", true))
+			armor.add(EEArmorAction.OffensiveActivate);
+		if (!config.getBoolean("Offensive.Explode", true))
+			armor.add(EEArmorAction.OffensiveExplode);
+		if (!config.getBoolean("Offensive.Strike", true))
+			armor.add(EEArmorAction.OffensiveStrike);
+		if (!config.getBoolean("Movement.Activate", true))
+			armor.add(EEArmorAction.MovementActivate);
+	}
+
+	public static void loadDisabledAmuletActions(ISection config){
+		Log.trace("EEPatch - Loading Disabled Amulet Actions...");
+		evertide.clear();
+		volcanite.clear();
+
+		if (!config.getBoolean("Evertide.CreateWater", true))
+			evertide.add(EEAmuletAction.CreateWater);
+		if (!config.getBoolean("Evertide.CreateWaterBall", true))
+			evertide.add(EEAmuletAction.CreateWaterBall);
+		if (!config.getBoolean("Evertide.PreventDrowning", true))
+			evertide.add(EEAmuletAction.StopDrowning);
+
+		if (!config.getBoolean("Volcanite.CreateLava", true))
+			volcanite.add(EEAmuletAction.CreateLava);
+		if (!config.getBoolean("Volcanite.CreateLavaBall", true))
+			volcanite.add(EEAmuletAction.CreateLavaBall);
+		if (!config.getBoolean("Volcanite.Vaporize", true))
+			volcanite.add(EEAmuletAction.Vaporize);
+		if (!config.getBoolean("Volcanite.FireImmune", true))
+			volcanite.add(EEAmuletAction.FireImmune);
+	}
+
+	public static void loadDisabledDestActions(ISection config){
+		Log.trace("EEPatch - Loading Disabled Destruction Actions...");
+		dest1.clear();
+		dest2.clear();
+		dest3.clear();
+
+		if (!config.getBoolean("DestructionCatalyst.BreakRadius", true))
+			dest1.add(EEAction2.BreakRadius);
+		if (!config.getBoolean("HyperKineticLens.BreakRadius", true))
+			dest2.add(EEAction2.BreakRadius);
+		if (!config.getBoolean("CatalyticLens.BreakRadius", true))
+			dest3.add(EEAction2.BreakRadius);
+	}
 	public static void loadDisabledRingActions(ISection config){
 		Log.trace("EEPatch - Loading Disabled Ring Actions...");
 		zeroring.clear();
@@ -243,26 +286,26 @@ public class EEPSettings {
 		blackholeband.clear();
 		voidring.clear();
 		archangelring.clear();
-		
+
 		if (!config.getBoolean("ZeroRing.FreezeRadius", true))
 			zeroring.add(EERingAction.Freeze);
 		if (!config.getBoolean("ZeroRing.ThrowSnowball", true))
 			zeroring.add(EERingAction.ThrowSnowball);
-		
+
 		if (!config.getBoolean("RingOfIgnition.BurnRadius", true))
 			firering.add(EERingAction.Burn);
 		if (!config.getBoolean("RingOfIgnition.PassiveExtinguishNearPlayer", true))
 			firering.add(EERingAction.Extinguish);
 		if (!config.getBoolean("RingOfIgnition.ThrowPyrokinesis", true))
 			firering.add(EERingAction.ThrowPyrokinesis);
-		
+
 		if (!config.getBoolean("HarvestGodessBand.Fertilize", true))
 			harvestring.add(EERingAction.Fertilize);
 		if (!config.getBoolean("HarvestGodessBand.PlantRadius", true))
 			harvestring.add(EERingAction.PlantRadius);
 		if (!config.getBoolean("HarvestGodessBand.HarvestRadius", true))
 			harvestring.add(EERingAction.Harvest);
-		
+
 		if (!config.getBoolean("SwiftwolfsRendingGale.NegateFallDamage", true))
 			flyring.add(EERingAction.NegateFallDamage);
 		if (!config.getBoolean("SwiftwolfsRendingGale.Interdict", true))
@@ -273,7 +316,7 @@ public class EEPSettings {
 			flyring.add(EERingAction.ActivateInterdict);
 		if (!config.getBoolean("SwiftwolfsRendingGale.ActivateFlight", true))
 			flyring.add(EERingAction.Activate);
-		
+
 		if (!config.getBoolean("RingOfArcana.StrikeLightning", true))
 			arcanering.add(EERingAction.StrikeLightning);
 		if (!config.getBoolean("RingOfArcana.Fertilize", true))
@@ -296,14 +339,14 @@ public class EEPSettings {
 			arcanering.add(EERingAction.NegateFallDamage);
 		if (!config.getBoolean("RingOfArcana.Activate", true))
 			arcanering.add(EERingAction.Activate);
-		
+
 		if (!config.getBoolean("BlackHoleBand.AttractItems", true))
 			blackholeband.add(EERingAction.AttractItems);
 		if (!config.getBoolean("BlackHoleBand.DeleteLiquid", true))
 			blackholeband.add(EERingAction.DeleteLiquid);
 		if (!config.getBoolean("BlackHoleBand.Activate", true))
 			blackholeband.add(EERingAction.Activate);
-		
+
 		if (!config.getBoolean("VoidRing.AttractItems", true))
 			voidring.add(EERingAction.AttractItems);
 		if (!config.getBoolean("VoidRing.DeleteLiquid", true))
@@ -314,62 +357,13 @@ public class EEPSettings {
 			voidring.add(EERingAction.Condense);
 		if (!config.getBoolean("VoidRing.Activate", true))
 			voidring.add(EERingAction.Activate);
-		
+
 		if (!config.getBoolean("ArchangelsSmite.ShootArrows", true))
 			archangelring.add(EERingAction.ShootArrows);
 		if (!config.getBoolean("ArchangelsSmite.Activate", true))
 			archangelring.add(EERingAction.Activate);
 	}
 
-	public static ArrayList<EEAction2> dest1 = new ArrayList<EEAction2>();
-	public static ArrayList<EEAction2> dest2 = new ArrayList<EEAction2>();
-	public static ArrayList<EEAction2> dest3 = new ArrayList<EEAction2>();
-	public static void loadDisabledDestActions(ISection config){
-		Log.trace("EEPatch - Loading Disabled Destruction Actions...");
-		dest1.clear();
-		dest2.clear();
-		dest3.clear();
-		
-		if (!config.getBoolean("DestructionCatalyst.BreakRadius", true))
-			dest1.add(EEAction2.BreakRadius);
-		if (!config.getBoolean("HyperKineticLens.BreakRadius", true))
-			dest2.add(EEAction2.BreakRadius);
-		if (!config.getBoolean("CatalyticLens.BreakRadius", true))
-			dest3.add(EEAction2.BreakRadius);
-	}
-	
-	public static ArrayList<EEAmuletAction> evertide = new ArrayList<EEAmuletAction>();
-	public static ArrayList<EEAmuletAction> volcanite = new ArrayList<EEAmuletAction>();
-	
-	public static void loadDisabledAmuletActions(ISection config){
-		Log.trace("EEPatch - Loading Disabled Amulet Actions...");
-		evertide.clear();
-		volcanite.clear();
-		
-		if (!config.getBoolean("Evertide.CreateWater", true))
-			evertide.add(EEAmuletAction.CreateWater);
-		if (!config.getBoolean("Evertide.CreateWaterBall", true))
-			evertide.add(EEAmuletAction.CreateWaterBall);
-		if (!config.getBoolean("Evertide.PreventDrowning", true))
-			evertide.add(EEAmuletAction.StopDrowning);
-		
-		if (!config.getBoolean("Volcanite.CreateLava", true))
-			volcanite.add(EEAmuletAction.CreateLava);
-		if (!config.getBoolean("Volcanite.CreateLavaBall", true))
-			volcanite.add(EEAmuletAction.CreateLavaBall);
-		if (!config.getBoolean("Volcanite.Vaporize", true))
-			volcanite.add(EEAmuletAction.Vaporize);
-		if (!config.getBoolean("Volcanite.FireImmune", true))
-			volcanite.add(EEAmuletAction.FireImmune);
-	}
-
-	public static ArrayList<EEAction2> dmaxe = new ArrayList<EEAction2>();
-	public static ArrayList<EEAction2> dmpick = new ArrayList<EEAction2>();
-	public static ArrayList<EEAction2> dmshovel = new ArrayList<EEAction2>();
-	public static ArrayList<EEAction2> dmhoe = new ArrayList<EEAction2>();
-	public static ArrayList<EEAction2> dmshears = new ArrayList<EEAction2>();
-	public static ArrayList<EEAction2> dmhammer = new ArrayList<EEAction2>();
-	public static ArrayList<EEAction2> dmsword = new ArrayList<EEAction2>();
 
 	public static void loadDMToolActions(ISection config){
 		Log.trace("EEPatch - Loading Disabled DM Tool Actions...");
@@ -380,7 +374,7 @@ public class EEPSettings {
 		dmshears.clear();
 		dmhammer.clear();
 		dmsword.clear();
-		
+
 		if (!config.getBoolean("Pickaxe.Break-3.Tall", true))
 			dmpick.add(EEAction2.TallBreak);
 		if (!config.getBoolean("Pickaxe.Break-3.Wide", true))
@@ -389,10 +383,10 @@ public class EEPSettings {
 			dmpick.add(EEAction2.LongBreak);
 		if (!config.getBoolean("Pickaxe.BreakOreVein", true))
 			dmpick.add(EEAction2.BreakRadius);
-		
+
 		if (!config.getBoolean("Axe.BreakRadius", true))
 			dmaxe.add(EEAction2.BreakRadius);
-		
+
 		if (!config.getBoolean("Shovel.Break-3.Tall", true))
 			dmshovel.add(EEAction2.TallBreak);
 		if (!config.getBoolean("Shovel.Break-3.Wide", true))
@@ -401,129 +395,62 @@ public class EEPSettings {
 			dmshovel.add(EEAction2.LongBreak);
 		if (!config.getBoolean("Shovel.BreakRadius", true))
 			dmshovel.add(EEAction2.BreakRadius);
-		
+
 		if (!config.getBoolean("Hoe.TillRadius", true))
 			dmhoe.add(EEAction2.TillRadius);
-		
+
 		if (!config.getBoolean("Shears.BreakRadius", true))
 			dmshears.add(EEAction2.BreakRadius);
 		if (!config.getBoolean("Shears.Shear", true))
 			dmshears.add(EEAction2.Shear);
-		
+
 		if (!config.getBoolean("Hammer.MegaBreak", true))
 			dmhammer.add(EEAction2.MegaBreak);
 		if (!config.getBoolean("Hammer.BreakRadius", true))
 			dmhammer.add(EEAction2.BreakRadius);
-		
+
 		if (!config.getBoolean("Sword.AttackRadius", true))
 			dmsword.add(EEAction2.AttackRadius);
 	}
-	
-	public static ArrayList<EEAction2> rmaxe = new ArrayList<EEAction2>();
-	public static ArrayList<EEAction2> rmpick = new ArrayList<EEAction2>();
-	public static ArrayList<EEAction2> rmshovel = new ArrayList<EEAction2>();
-	public static ArrayList<EEAction2> rmhoe = new ArrayList<EEAction2>();
-	public static ArrayList<EEAction2> rmshears = new ArrayList<EEAction2>();
-	public static ArrayList<EEAction2> rmhammer = new ArrayList<EEAction2>();
-	public static ArrayList<EEAction2> rmsword = new ArrayList<EEAction2>();
+	public static void loadMaxCharge(){
+		Log.trace("EEPatch - Loading MaxCharges...");
+		MaxCharge.clear();
 
-	public static void loadRMToolActions(ISection config){
-		Log.trace("EEPatch - Loading Disabled RM Tool Actions...");
-		rmaxe.clear();
-		rmpick.clear();
-		rmshovel.clear();
-		rmhoe.clear();
-		rmshears.clear();
-		rmhammer.clear();
-		rmsword.clear();
-		
-		if (!config.getBoolean("Pickaxe.Break-3.Tall", true))
-			rmpick.add(EEAction2.TallBreak);
-		if (!config.getBoolean("Pickaxe.Break-3.Wide", true))
-			rmpick.add(EEAction2.WideBreak);
-		if (!config.getBoolean("Pickaxe.Break-3.Long", true))
-			rmpick.add(EEAction2.LongBreak);
-		if (!config.getBoolean("Pickaxe.BreakOreVein", true))
-			rmpick.add(EEAction2.BreakRadius);
-		
-		if (!config.getBoolean("Axe.BreakRadius", true))
-			rmaxe.add(EEAction2.BreakRadius);
-		
-		if (!config.getBoolean("Shovel.Break-3.Tall", true))
-			rmshovel.add(EEAction2.TallBreak);
-		if (!config.getBoolean("Shovel.Break-3.Wide", true))
-			rmshovel.add(EEAction2.WideBreak);
-		if (!config.getBoolean("Shovel.Break-3.Long", true))
-			rmshovel.add(EEAction2.LongBreak);
-		if (!config.getBoolean("Shovel.BreakRadius", true))
-			rmshovel.add(EEAction2.BreakRadius);
-		
-		if (!config.getBoolean("Hoe.TillRadius", true))
-			rmhoe.add(EEAction2.TillRadius);
-		
-		if (!config.getBoolean("Shears.BreakRadius", true))
-			rmshears.add(EEAction2.BreakRadius);
-		if (!config.getBoolean("Shears.Shear", true))
-			rmshears.add(EEAction2.Shear);
-		
-		if (!config.getBoolean("Hammer.MegaBreak", true))
-			rmhammer.add(EEAction2.MegaBreak);
-		if (!config.getBoolean("Hammer.BreakRadius", true))
-			rmhammer.add(EEAction2.BreakRadius);
-		
-		if (!config.getBoolean("Sword.AttackRadius", true))
-			rmsword.add(EEAction2.AttackRadius);
-	}
-	
-	public static ArrayList<EEAction2> katar = new ArrayList<EEAction2>();
-	public static ArrayList<EEAction2> morningstar = new ArrayList<EEAction2>();
-	
-	public static void loadRedToolActions(ISection config){
-		Log.trace("EEPatch - Loading Disabled Red Tool (Katar and Morning Star) Actions...");
-		katar.clear();
-		morningstar.clear();
-		
-		if (!config.getBoolean("Katar.BreakRadius", true))
-			katar.add(EEAction2.BreakRadius);
-		if (!config.getBoolean("Katar.TillRadius", true))
-			katar.add(EEAction2.TillRadius);
-		if (!config.getBoolean("Katar.AttackRadius", true))
-			katar.add(EEAction2.AttackRadius);
-		if (!config.getBoolean("Katar.Shear", true))
-			katar.add(EEAction2.Shear);
-		
-		if (!config.getBoolean("MorningStar.Break-3.Tall", true))
-			morningstar.add(EEAction2.TallBreak);
-		if (!config.getBoolean("MorningStar.Break-3.Wide", true))
-			morningstar.add(EEAction2.WideBreak);
-		if (!config.getBoolean("MorningStar.Break-3.Long", true))
-			morningstar.add(EEAction2.LongBreak);
-		if (!config.getBoolean("MorningStar.MegaBreak", true))
-			morningstar.add(EEAction2.MegaBreak);
-		if (!config.getBoolean("MorningStar.BreakRadius", true))
-			morningstar.add(EEAction2.BreakRadius);
-	}
-	
-	public static ArrayList<EEArmorAction> armor = new ArrayList<EEArmorAction>();
-	public static void loadArmorActions(ISection config){
-		Log.trace("EEPatch - Loading Disabled Gem Armor Actions...");
-		armor.clear();
-		
-		if (!config.getBoolean("Offensive.Activate", true))
-			armor.add(EEArmorAction.OffensiveActivate);
-		if (!config.getBoolean("Offensive.Explode", true))
-			armor.add(EEArmorAction.OffensiveExplode);
-		if (!config.getBoolean("Offensive.Strike", true))
-			armor.add(EEArmorAction.OffensiveStrike);
-		if (!config.getBoolean("Movement.Activate", true))
-			armor.add(EEArmorAction.MovementActivate);
-	}
+		List<String> mc = SettingsStorage.eepatchConfig.getStringList("EEMaxCharge");
+		for (String current : mc){
+			if (current == null) continue;
+			if (!current.contains(" ")){
+				Log.Warning.config("There is an invalid value in the MaxCharge list in EEPatch.config.yml: \""+current+"\"", false);
+				continue;
+			}
 
-	
-	public static ArrayList<EETransmuteAction> phil = new ArrayList<EETransmuteAction>();
-	public static ArrayList<EETransmuteAction> trans = new ArrayList<EETransmuteAction>();
-	public static ArrayList<EEPedestalAction> pedestal = new ArrayList<EEPedestalAction>();
-	public static ArrayList<EEWatchAction> watch = new ArrayList<EEWatchAction>();
+			String temp[] = current.toLowerCase().split(" ");
+
+			int charge = 0;
+			try {
+				charge = Integer.parseInt(temp[1]);
+			} catch (NumberFormatException ex){
+				Log.Warning.config("\""+temp[1]+"\" is not a valid chargelevel in the MaxCharge list in EEPatch.config.yml", false);
+				continue;
+			}
+
+			Integer id = EENames.get(temp[0]);
+			if (id == null){
+				ArrayList<Integer> ids = getGroup(temp[0]);
+				if (ids == null){
+					Log.Warning.config("\""+temp[0]+"\" is not a valid itemname or itemgroup in the MaxCharge list in EEPatch.config.yml", false);
+					continue;
+				}
+
+				for (int nr : ids){
+					MaxCharge.put(nr, charge);
+				}
+
+			} else {
+				MaxCharge.put(id, charge);
+			}
+		}
+	}
 	public static void loadOtherActions(ISection config){
 		Log.trace("EEPatch - Loading Disabled Other Actions (PhilosopherStone, Transmution Tablet, Pedestal, WatchOfFlowingTime)...");
 		phil.clear();
@@ -536,12 +463,12 @@ public class EEPSettings {
 			phil.add(EETransmuteAction.PortableCrafting);
 		if (!config.getBoolean("PhilosopherStone.Transmute", true))
 			phil.add(EETransmuteAction.Transmute);
-		
+
 		if (!config.getBoolean("TransmutionTablet.ChangeMob", true))
 			trans.add(EETransmuteAction.ChangeMob);
 		if (!config.getBoolean("TransmutionTablet.PortableTable", true))
 			trans.add(EETransmuteAction.PortableTable);
-		
+
 		if (!config.getBoolean("Pedestal.Activate", true))
 			pedestal.add(EEPedestalAction.Activate);
 		if (!config.getBoolean("Pedestal.Attract", true))
@@ -566,10 +493,82 @@ public class EEPSettings {
 			pedestal.add(EEPedestalAction.StrikeLightning);
 		if (!config.getBoolean("Pedestal.Time", true))
 			pedestal.add(EEPedestalAction.Time);
-		
+
 		if (!config.getBoolean("WatchOfFlowingTime.ScrollTimeForwards", true))
 			watch.add(EEWatchAction.TimeForward);
 		if (!config.getBoolean("WatchOfFlowingTime.ScrollTimeBackwards", true))
 			watch.add(EEWatchAction.TimeBackward);
+	}
+	public static void loadRedToolActions(ISection config){
+		Log.trace("EEPatch - Loading Disabled Red Tool (Katar and Morning Star) Actions...");
+		katar.clear();
+		morningstar.clear();
+
+		if (!config.getBoolean("Katar.BreakRadius", true))
+			katar.add(EEAction2.BreakRadius);
+		if (!config.getBoolean("Katar.TillRadius", true))
+			katar.add(EEAction2.TillRadius);
+		if (!config.getBoolean("Katar.AttackRadius", true))
+			katar.add(EEAction2.AttackRadius);
+		if (!config.getBoolean("Katar.Shear", true))
+			katar.add(EEAction2.Shear);
+
+		if (!config.getBoolean("MorningStar.Break-3.Tall", true))
+			morningstar.add(EEAction2.TallBreak);
+		if (!config.getBoolean("MorningStar.Break-3.Wide", true))
+			morningstar.add(EEAction2.WideBreak);
+		if (!config.getBoolean("MorningStar.Break-3.Long", true))
+			morningstar.add(EEAction2.LongBreak);
+		if (!config.getBoolean("MorningStar.MegaBreak", true))
+			morningstar.add(EEAction2.MegaBreak);
+		if (!config.getBoolean("MorningStar.BreakRadius", true))
+			morningstar.add(EEAction2.BreakRadius);
+	}
+	public static void loadRMToolActions(ISection config){
+		Log.trace("EEPatch - Loading Disabled RM Tool Actions...");
+		rmaxe.clear();
+		rmpick.clear();
+		rmshovel.clear();
+		rmhoe.clear();
+		rmshears.clear();
+		rmhammer.clear();
+		rmsword.clear();
+
+		if (!config.getBoolean("Pickaxe.Break-3.Tall", true))
+			rmpick.add(EEAction2.TallBreak);
+		if (!config.getBoolean("Pickaxe.Break-3.Wide", true))
+			rmpick.add(EEAction2.WideBreak);
+		if (!config.getBoolean("Pickaxe.Break-3.Long", true))
+			rmpick.add(EEAction2.LongBreak);
+		if (!config.getBoolean("Pickaxe.BreakOreVein", true))
+			rmpick.add(EEAction2.BreakRadius);
+
+		if (!config.getBoolean("Axe.BreakRadius", true))
+			rmaxe.add(EEAction2.BreakRadius);
+
+		if (!config.getBoolean("Shovel.Break-3.Tall", true))
+			rmshovel.add(EEAction2.TallBreak);
+		if (!config.getBoolean("Shovel.Break-3.Wide", true))
+			rmshovel.add(EEAction2.WideBreak);
+		if (!config.getBoolean("Shovel.Break-3.Long", true))
+			rmshovel.add(EEAction2.LongBreak);
+		if (!config.getBoolean("Shovel.BreakRadius", true))
+			rmshovel.add(EEAction2.BreakRadius);
+
+		if (!config.getBoolean("Hoe.TillRadius", true))
+			rmhoe.add(EEAction2.TillRadius);
+
+		if (!config.getBoolean("Shears.BreakRadius", true))
+			rmshears.add(EEAction2.BreakRadius);
+		if (!config.getBoolean("Shears.Shear", true))
+			rmshears.add(EEAction2.Shear);
+
+		if (!config.getBoolean("Hammer.MegaBreak", true))
+			rmhammer.add(EEAction2.MegaBreak);
+		if (!config.getBoolean("Hammer.BreakRadius", true))
+			rmhammer.add(EEAction2.BreakRadius);
+
+		if (!config.getBoolean("Sword.AttackRadius", true))
+			rmsword.add(EEAction2.AttackRadius);
 	}
 }

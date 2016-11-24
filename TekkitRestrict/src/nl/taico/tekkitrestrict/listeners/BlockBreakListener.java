@@ -1,5 +1,11 @@
 package nl.taico.tekkitrestrict.listeners;
 
+import net.minecraft.server.TileEntity;
+import nl.taico.tekkitrestrict.Log;
+import nl.taico.tekkitrestrict.Log.Warning;
+import nl.taico.tekkitrestrict.TekkitRestrict;
+import nl.taico.tekkitrestrict.functions.TRLimiter;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -12,30 +18,24 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 
-import nl.taico.tekkitrestrict.Log;
-import nl.taico.tekkitrestrict.TekkitRestrict;
-import nl.taico.tekkitrestrict.Log.Warning;
-import nl.taico.tekkitrestrict.functions.TRLimiter;
-
-import net.minecraft.server.TileEntity;
 import ee.TileAlchChest;
 
 public class BlockBreakListener implements Listener{
 	/** @return <b>True</b> if id < 8 or id = 12, 13, 17, 24, 35, 44, 98 or 142. <b>False</b> otherwise. */
 	private static boolean exempt(int id){
-		return (id < 8 || id == 12 || id == 13 || id == 17 || id == 24 || id == 35 || id == 44 || id == 98 || id == 142);
+		return ((id < 8) || (id == 12) || (id == 13) || (id == 17) || (id == 24) || (id == 35) || (id == 44) || (id == 98) || (id == 142));
 	}
-	
+
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onBlockBreak(BlockBreakEvent event) {
 		final int id = event.getBlock().getTypeId();
 		if (exempt(id)) return;
-		
+
 		final Block block = event.getBlock();
 		final byte data = block.getData();
 		final Player player = event.getPlayer();
-		
-		if (id == 128 && data == 0){
+
+		if ((id == 128) && (data == 0)){
 			final TileEntity entity = ((CraftWorld) block.getWorld()).getTileEntityAt(block.getX(), block.getY(), block.getZ());
 			if (entity instanceof TileAlchChest){
 				for (HumanEntity h : ((TileAlchChest) entity).getViewers()){
@@ -66,14 +66,15 @@ public class BlockBreakListener implements Listener{
 				}
 			}*/
 		}
-		
+
 		if (player == null) return;
-		
+
 		final ItemStack used = player.getItemInHand();
-		if (used != null && (used.getTypeId() == 30183 || used.getTypeId() == 30140)) return;
+		if ((used != null) && ((used.getTypeId() == 30183) || (used.getTypeId() == 30140))) return;
 
 		final Location bloc = block.getLocation();
 		Bukkit.getScheduler().scheduleAsyncDelayedTask(TekkitRestrict.getInstance(), new Runnable(){
+			@Override
 			public void run(){
 				try {
 					final String blockPlayerName = TRLimiter.getPlayerAt(bloc);
@@ -87,6 +88,6 @@ public class BlockBreakListener implements Listener{
 				}
 			}
 		});
-		
+
 	}
 }

@@ -8,83 +8,6 @@ import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.config.SettingsStorage;
 
 public class TREMCSet {
-	public static void reload() {
-		loadConfigEMC();
-	}
-	
-	/**
-	 * Add or set the EMC value of a single item.
-	 * If EMC = 0, it will remove the EMC value of that item.
-	 * @see #removeEMC(int, int)
-	 */
-	public static void setEMC(final int id, final int data, final int EMC){
-		Log.trace("Setting EMC of "+id+":"+data+" to "+EMC);
-		if (EMC == 0)
-			removeEMC(id, data);
-		else
-			ee.EEMaps.addEMC(id, data, EMC);
-	}
-	
-	/**
-	 * Remove the EMC value of an item.
-	 * WARNING: If that item is also used as fuel, unexpected behavior may occur.
-	 * */
-	public static void removeEMC(final int id, final int data){
-		final HashMap<Integer, Integer> old = (HashMap<Integer, Integer>) ee.EEMaps.alchemicalValues.get(id);
-		if (old == null) return;
-		old.remove(data);
-		ee.EEMaps.alchemicalValues.put(id, old);
-	}
-
-	private static void loadConfigEMC() {
-		final List<String> configEMC = SettingsStorage.modModificationsConfig.getStringList("SetEMC");
-		
-		for (final String current : configEMC){
-			if (!current.contains(" ")){
-				Log.Warning.config("You have an invalid value in SetEMC in ModModifications.config: \""+current+"\"", false);
-				continue;
-			}
-			
-			final String values[] = current.split(" ");
-			int EMC = 0, id = 0;
-			final ArrayList<Integer> data;
-			
-			try {
-				EMC = Integer.parseInt(values[1]);
-			} catch (NumberFormatException ex){
-				Log.Warning.config("You have an invalid value in SetEMC in ModModifications.config: \""+current+"\"", false);
-				continue;
-			}
-			
-			if (values[0].contains(":")){
-				final String temp[] = values[0].split(":");
-				
-				data = handleData(temp[1], current);
-				
-				try {
-					id = Integer.parseInt(temp[0]);
-				} catch (NumberFormatException ex){
-					Log.Warning.config("You have an invalid value in SetEMC in ModModifications.config: \""+current+"\"", false);
-					continue;
-				}
-			} else {
-				data = new ArrayList<Integer>();
-				data.add(0);
-				
-				try {
-					id = Integer.parseInt(values[0]);
-				} catch (NumberFormatException ex){
-					Log.Warning.config("You have an invalid value in SetEMC in ModModifications.config: \""+current+"\"", false);
-					continue;
-				}
-			}
-			
-			for (final int currentdata : data){
-				setEMC(id, currentdata, EMC);
-			}
-		}
-	}
-	
 	/**
 	 * Get a list of Integers from a String range.
 	 * @return An ArrayList of Integers with the values specified by the given range.
@@ -147,5 +70,82 @@ public class TREMCSet {
 			}
 		}
 		return allData;
+	}
+
+	private static void loadConfigEMC() {
+		final List<String> configEMC = SettingsStorage.modModificationsConfig.getStringList("SetEMC");
+
+		for (final String current : configEMC){
+			if (!current.contains(" ")){
+				Log.Warning.config("You have an invalid value in SetEMC in ModModifications.config: \""+current+"\"", false);
+				continue;
+			}
+
+			final String values[] = current.split(" ");
+			int EMC = 0, id = 0;
+			final ArrayList<Integer> data;
+
+			try {
+				EMC = Integer.parseInt(values[1]);
+			} catch (NumberFormatException ex){
+				Log.Warning.config("You have an invalid value in SetEMC in ModModifications.config: \""+current+"\"", false);
+				continue;
+			}
+
+			if (values[0].contains(":")){
+				final String temp[] = values[0].split(":");
+
+				data = handleData(temp[1], current);
+
+				try {
+					id = Integer.parseInt(temp[0]);
+				} catch (NumberFormatException ex){
+					Log.Warning.config("You have an invalid value in SetEMC in ModModifications.config: \""+current+"\"", false);
+					continue;
+				}
+			} else {
+				data = new ArrayList<Integer>();
+				data.add(0);
+
+				try {
+					id = Integer.parseInt(values[0]);
+				} catch (NumberFormatException ex){
+					Log.Warning.config("You have an invalid value in SetEMC in ModModifications.config: \""+current+"\"", false);
+					continue;
+				}
+			}
+
+			for (final int currentdata : data){
+				setEMC(id, currentdata, EMC);
+			}
+		}
+	}
+
+	public static void reload() {
+		loadConfigEMC();
+	}
+
+	/**
+	 * Remove the EMC value of an item.
+	 * WARNING: If that item is also used as fuel, unexpected behavior may occur.
+	 * */
+	public static void removeEMC(final int id, final int data){
+		final HashMap<Integer, Integer> old = ee.EEMaps.alchemicalValues.get(id);
+		if (old == null) return;
+		old.remove(data);
+		ee.EEMaps.alchemicalValues.put(id, old);
+	}
+
+	/**
+	 * Add or set the EMC value of a single item.
+	 * If EMC = 0, it will remove the EMC value of that item.
+	 * @see #removeEMC(int, int)
+	 */
+	public static void setEMC(final int id, final int data, final int EMC){
+		Log.trace("Setting EMC of "+id+":"+data+" to "+EMC);
+		if (EMC == 0)
+			removeEMC(id, data);
+		else
+			ee.EEMaps.addEMC(id, data, EMC);
 	}
 }

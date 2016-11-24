@@ -2,6 +2,11 @@ package nl.taico.tekkitrestrict.listeners;
 
 import java.util.concurrent.ConcurrentHashMap;
 
+import nl.taico.tekkitrestrict.TRConfigCache.Hacks;
+import nl.taico.tekkitrestrict.TekkitRestrict;
+import nl.taico.tekkitrestrict.functions.TRNoHack;
+import nl.taico.tekkitrestrict.objects.TREnums.HackType;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -13,44 +18,49 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-import nl.taico.tekkitrestrict.TekkitRestrict;
-import nl.taico.tekkitrestrict.TRConfigCache.Hacks;
-import nl.taico.tekkitrestrict.functions.TRNoHack;
-import nl.taico.tekkitrestrict.objects.TREnums.HackType;
-
 public class NoHackForcefield implements Listener {
 	private static ConcurrentHashMap<String, Integer> tickTolerance = new ConcurrentHashMap<String, Integer>();
-	
+
+	public static void clearMaps() {
+		tickTolerance.clear();
+	}
+
+	// private static double min = 10000, max=-10000;
+	public static void playerLogout(String playerName) {
+		tickTolerance.remove(playerName);
+	}
+
 	@EventHandler(priority = EventPriority.MONITOR)
 	private void onEntityDamage(EntityDamageByEntityEvent e) {
 		//If not player or no damage
-		if (!(e.getDamager() instanceof Player) || e.getDamage() == 0) return;
-		
-		if (e.getCause() != DamageCause.ENTITY_ATTACK && e.getCause() != DamageCause.CUSTOM) return;
-		
+		if (!(e.getDamager() instanceof Player) || (e.getDamage() == 0)) return;
+
+		if ((e.getCause() != DamageCause.ENTITY_ATTACK) && (e.getCause() != DamageCause.CUSTOM)) return;
+
 		//Self harm
 		if (e.getEntity() == e.getDamager()) return;
-		
+
 		final Player damager = (Player) e.getDamager();
 
 		if (damager.hasPermission("tekkitrestrict.bypass.hack.forcefield")) return;
-		
+
 		//Ignore rm sword and katar.
-		if (damager.getItemInHand() != null && (damager.getItemInHand().getTypeId() == 27567 || damager.getItemInHand().getTypeId() == 27572)) return;
-		
+		if ((damager.getItemInHand() != null) && ((damager.getItemInHand().getTypeId() == 27567) || (damager.getItemInHand().getTypeId() == 27572))) return;
+
 		if (e.getCause() == DamageCause.ENTITY_ATTACK){
 			ItemStack[] inv = damager.getInventory().getContents();
 			for (int i = 0; i<9; i++){
 				ItemStack stack = inv[i];
 				if (stack == null) continue;
-				if (stack.getTypeId()==27534 && stack.getDurability()==1) return;//Archangelring damage
+				if ((stack.getTypeId()==27534) && (stack.getDurability()==1)) return;//Archangelring damage
 			}
 		}
 		final Location Attackerloc = damager.getLocation();
-		
+
 		final Location Damagedloc = e.getEntity().getLocation();
-		
+
 		Bukkit.getScheduler().scheduleAsyncDelayedTask(TekkitRestrict.getInstance(), new Runnable(){
+			@Override
 			public void run(){
 				// ok, to solve this, we are going to perform vector
 				// projections // first, let's project the entities location
@@ -75,8 +85,8 @@ public class NoHackForcefield implements Listener {
 					pdir = Math.abs(pdir + 360.00d);
 				}
 
-				double anglej = xloc.angle(ploc) * 180 / Math.PI;//The angle in degrees. If the angle is 180, that means the 
-				double angle = zloc.angle(ploc) * 180 / Math.PI;
+				double anglej = (xloc.angle(ploc) * 180) / Math.PI;//The angle in degrees. If the angle is 180, that means the 
+				double angle = (zloc.angle(ploc) * 180) / Math.PI;
 
 				// angle 0 -> 3.14-> 0
 				// angle 0 -> 180 -> 0
@@ -90,7 +100,7 @@ public class NoHackForcefield implements Listener {
 				// tekkitrestrict.log.info("proj:  "+pdir+" / "+angle);
 				//TRLogger.Log("debug", "Angle: " + angle);
 				// change between 0 and 360.
-				double cr1 = ((pdir + Hacks.forcefield.value) > 360) ? pdir + Hacks.forcefield.value - 360 : pdir + Hacks.forcefield.value;
+				double cr1 = ((pdir + Hacks.forcefield.value) > 360) ? (pdir + Hacks.forcefield.value) - 360 : pdir + Hacks.forcefield.value;
 				double cr2 = ((pdir - Hacks.forcefield.value) < 0) ? 360 - Math.abs(pdir - Hacks.forcefield.value) : pdir - Hacks.forcefield.value;
 				// r1 = 360 r2 = 5
 				// 360 + 30 = 390 - 360 = 30 < 5 false
@@ -98,7 +108,7 @@ public class NoHackForcefield implements Listener {
 				// 5 - 30 = 360-25 = 335 > 360 false
 
 				String name = damager.getName();
-				if (cr1 < angle || cr2 > angle) {
+				if ((cr1 < angle) || (cr2 > angle)) {
 					Integer oldValue = tickTolerance.get(name);
 					if (oldValue == null) tickTolerance.put(name, 1);//If not exist yet, make one
 					else {//Otherwise, check if it exeeds the limit.
@@ -111,23 +121,14 @@ public class NoHackForcefield implements Listener {
 				} else {
 					Integer oldValue = tickTolerance.get(name);
 					if (oldValue == null) return;
-					
+
 					if (oldValue < 2) tickTolerance.remove(name);
 					else tickTolerance.put(name, oldValue - 1);
 				}
 			}
 		});
-		
-		
-	}
 
-	// private static double min = 10000, max=-10000;
-	public static void playerLogout(String playerName) {
-		tickTolerance.remove(playerName);
-	}
 
-	public static void clearMaps() {
-		tickTolerance.clear();
 	}
 
 

@@ -19,60 +19,34 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class TMetrics {
-	public TMetrics(final JavaPlugin plugin, boolean showWarnings){
-		this.plugin = plugin;
-		this.showWarnings = showWarnings;
-	}
-
 	private static final String BASE_URL = "http://metrics.taico.nl/";
+
 	private static final String REPORT_URL = "tekkitrestrict.php";
 	private static final int PING_INTERVAL = 15;
-
 	public int uid = 0;
+
 	private int savedId = 0;
 	private boolean first = true;
 	private boolean logged = false;
 	private final JavaPlugin plugin;
 	private int taskId = -1;
 	private boolean showWarnings;
-
-	public boolean start(){
-		if (!TekkitRestrict.useTMetrics){
-			stop();
-			return false;
-		}
-		
-		if (taskId >= 0) {
-            return true;
-        }
-		
-		Log.trace("Starting TMetrics...");
-		plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable(){
-			public void run() {
-				taskId = plugin.getServer().getScheduler().scheduleAsyncRepeatingTask(plugin, new Runnable() {
-		            public void run() {
-		                try {
-		                    postPlugin();
-		                } catch (TMetricsException ex) {
-		                    if (showWarnings) {
-		                        Bukkit.getLogger().warning("[TMetrics] Error: " + ex.toString());
-		                    }
-		                }
-		            }
-		        }, 0, PING_INTERVAL * 1200);
-			}
-		}, 20);//Execute 20 ticks after all plugins have loaded
-		
-
-        return true;
+	public TMetrics(final JavaPlugin plugin, boolean showWarnings){
+		this.plugin = plugin;
+		this.showWarnings = showWarnings;
 	}
-	
-	public void stop(){
-		if (taskId > 0) {
-			Log.trace("Stopping TMetrics...");
-            plugin.getServer().getScheduler().cancelTask(taskId);
-            taskId = -1;
-        }
+
+	private void generateUIDFile(File file) {
+		Writer writer = null;
+
+		try {
+			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "utf-8"));
+			writer.write(""+uid);
+		} catch (IOException ex){
+			if (showWarnings) Bukkit.getLogger().warning("[TMetrics] Unable to write UID to file!");
+		} finally {
+			try {if (writer != null) writer.close();} catch (IOException ex) {}
+		}
 	}
 
 	private void postPlugin() throws TMetricsException {
@@ -85,11 +59,11 @@ public class TMetrics {
 		int playersOnline = Bukkit.getServer().getOnlinePlayers().length;
 		//String params = "";
 		String shortparams = "";
-		if (uid == 0 || first){
+		if ((uid == 0) || first){
 			int onlineMode = Bukkit.getServer().getOnlineMode() ? 1 : 0;
 			String pluginVersion = TekkitRestrict.version.fullVer;
 			String serverVersion = Bukkit.getVersion();
-	
+
 			String osname = System.getProperty("os.name");
 			String osarch = System.getProperty("os.arch");
 			String osversion = System.getProperty("os.version");
@@ -98,14 +72,14 @@ public class TMetrics {
 			long memory = Runtime.getRuntime().maxMemory();
 			if (memory == Long.MAX_VALUE) memory = Runtime.getRuntime().totalMemory();
 			memory = Math.round(memory/(1024*1024));
-	
+
 			// normalize os arch .. amd64 -> x86_64
 			if (osarch.equals("amd64")) osarch = "x86_64";
-			
+
 			int arch = 0;
 			if (osarch.equals("x86_64")) arch = 1;
 			int eepatch = PatchesAPI.hasFix(PatchesAPI.getEEPatchVer())?1:0;
-	
+
 			/*
 			params =  "id="+uid+"&"
 					+ "pver="+pluginVersion+"&"
@@ -119,30 +93,30 @@ public class TMetrics {
 					+ "cores="+coreCount+"&"
 					+ "memory="+memory+"&"
 					+ "eepatch="+eepatch;
-			*/
-			
+			 */
+
 			shortparams =
-					  "id="+uid+"&"
-					+ "a="+pluginVersion+"&"
-					+ "b="+serverVersion+"&"
-					+ "c="+onlineMode+"&"
-					+ "z="+playersOnline+"&"
-					+ "d="+osname+"&"
-					+ "e="+arch+"&"
-					+ "f="+osversion+"&"
-					+ "g="+java_version+"&"
-					+ "h="+coreCount+"&"
-					+ "i="+memory+"&"
-					+ "j="+eepatch;
+					"id="+uid+"&"
+							+ "a="+pluginVersion+"&"
+							+ "b="+serverVersion+"&"
+							+ "c="+onlineMode+"&"
+							+ "z="+playersOnline+"&"
+							+ "d="+osname+"&"
+							+ "e="+arch+"&"
+							+ "f="+osversion+"&"
+							+ "g="+java_version+"&"
+							+ "h="+coreCount+"&"
+							+ "i="+memory+"&"
+							+ "j="+eepatch;
 		} else {
 			/*
 			params =  "id="+uid+"&"
 					+ "players="+playersOnline;
-			*/
-			
+			 */
+
 			shortparams =
-					  "id="+uid+"&"
-					+ "z="+playersOnline;
+					"id="+uid+"&"
+							+ "z="+playersOnline;
 		}
 		//String request = "http://metrics.taico.nl/tekkitrestrict.php";
 		String request = BASE_URL + REPORT_URL;
@@ -189,7 +163,7 @@ public class TMetrics {
 			}
 
 			for (String s : response){
-				if (s == null || s.isEmpty()) continue;
+				if ((s == null) || s.isEmpty()) continue;
 				if (s.contains("id=")){
 					try {
 						uid = Integer.parseInt(s.replace("id=", ""));
@@ -198,20 +172,20 @@ public class TMetrics {
 					}
 				} else if (s.contains("OK:")){
 					continue;
-				/*
+					/*
 				} else if (s.contains("IMPO/RTANT: ")) {
 					if (showWarnings) scheduleRepeatingMSG(s.replace("IMPOR/TANT: ", ""));
 					Bukkit.getLogger().warning("[TekkitRestrict] Important Message: "+s.replace("IMPOR/TANT: ", ""));
 				} else if (s.contains("MSG: ")){
 					if (showWarnings) Bukkit.getLogger().info("[TMetrics] Message from server: "+s.replace("MSG: ", ""));
-				*/
+					 */
 				} else if (s.contains("ERROR: ")){
 					if (showWarnings){
 						int error = 0;
 						try {
 							error = Integer.parseInt(s.replace("ERROR: ", ""));
 							String msg = null;
-							if (error == 1 || error == 3 || error == 6)
+							if ((error == 1) || (error == 3) || (error == 6))
 								msg = "Unable to save statistics!";
 							else if (error == 2)
 								msg = "No ID given!";
@@ -229,7 +203,7 @@ public class TMetrics {
 				}
 			}
 
-			if (savedId != uid || savedId == 0) generateUIDFile(file);
+			if ((savedId != uid) || (savedId == 0)) generateUIDFile(file);
 		} catch (Exception ex){
 			if (connection != null){
 				connection.disconnect();
@@ -238,31 +212,6 @@ public class TMetrics {
 				logged = true;
 				throw new TMetricsException("An error occured while trying to send statistics: "+ex.toString()+"\n"+"This error will only be logged once.");
 			}
-		}
-	}
-	
-	/*
-	private void scheduleRepeatingMSG(final String message){
-		Bukkit.getScheduler().scheduleAsyncRepeatingTask(plugin, new Runnable(){
-			public void run(){
-				Bukkit.getLogger().warning("[TekkitRestrict] Important Message: "+message);
-				for (Player player : Bukkit.getOnlinePlayers()){
-					if (player.isOp()) player.sendMessage(ChatColor.BLUE+"[TekkitRestrict] Important Message: " + message);
-				}
-			}
-		}, 20*60*10, 20*60*60);
-	}*/
-
-	private void generateUIDFile(File file) {
-		Writer writer = null;
-
-		try {
-			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "utf-8"));
-			writer.write(""+uid);
-		} catch (IOException ex){
-			if (showWarnings) Bukkit.getLogger().warning("[TMetrics] Unable to write UID to file!");
-		} finally {
-			try {if (writer != null) writer.close();} catch (IOException ex) {}
 		}
 	}
 
@@ -294,5 +243,58 @@ public class TMetrics {
 		}
 
 		return 0;
+	}
+
+	/*
+	private void scheduleRepeatingMSG(final String message){
+		Bukkit.getScheduler().scheduleAsyncRepeatingTask(plugin, new Runnable(){
+			public void run(){
+				Bukkit.getLogger().warning("[TekkitRestrict] Important Message: "+message);
+				for (Player player : Bukkit.getOnlinePlayers()){
+					if (player.isOp()) player.sendMessage(ChatColor.BLUE+"[TekkitRestrict] Important Message: " + message);
+				}
+			}
+		}, 20*60*10, 20*60*60);
+	}*/
+
+	public boolean start(){
+		if (!TekkitRestrict.useTMetrics){
+			stop();
+			return false;
+		}
+
+		if (taskId >= 0) {
+			return true;
+		}
+
+		Log.trace("Starting TMetrics...");
+		plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable(){
+			@Override
+			public void run() {
+				taskId = plugin.getServer().getScheduler().scheduleAsyncRepeatingTask(plugin, new Runnable() {
+					@Override
+					public void run() {
+						try {
+							postPlugin();
+						} catch (TMetricsException ex) {
+							if (showWarnings) {
+								Bukkit.getLogger().warning("[TMetrics] Error: " + ex.toString());
+							}
+						}
+					}
+				}, 0, PING_INTERVAL * 1200);
+			}
+		}, 20);//Execute 20 ticks after all plugins have loaded
+
+
+		return true;
+	}
+
+	public void stop(){
+		if (taskId > 0) {
+			Log.trace("Stopping TMetrics...");
+			plugin.getServer().getScheduler().cancelTask(taskId);
+			taskId = -1;
+		}
 	}
 }

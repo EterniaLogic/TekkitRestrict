@@ -9,9 +9,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
+import javax.annotation.Nullable;
 
+import lombok.NonNull;
 import nl.taico.tekkitrestrict.Log;
 
 @SuppressWarnings("resource")
@@ -31,33 +31,6 @@ public class SQLite extends Database {
 		if (!folder.exists()) folder.mkdir();
 
 		sqlFile = new File(folder.getAbsolutePath() + File.separator + name + ".db");
-	}
-	
-	@Override
-	protected boolean initialize() {
-		if (initialized) return working;
-		
-		initialized = true;
-		try {
-			Class.forName("org.sqlite.JDBC");
-			working = true;
-			return true;
-		} catch (ClassNotFoundException e) {
-			write("Unable to find the SQLite library!", Level.SEVERE);
-			return false;
-		}
-	}
-
-	@Override
-	public boolean open() {
-		if (!initialize()) return false;
-		try {
-			connection = DriverManager.getConnection("jdbc:sqlite:" + sqlFile.getAbsolutePath());
-			return true;
-		} catch (SQLException e) {
-			write("Error when trying to open the database. " + e, Level.SEVERE);
-			return false;
-		}
 	}
 
 	@Override
@@ -80,6 +53,21 @@ public class SQLite extends Database {
 	}
 
 	@Override
+	protected boolean initialize() {
+		if (initialized) return working;
+
+		initialized = true;
+		try {
+			Class.forName("org.sqlite.JDBC");
+			working = true;
+			return true;
+		} catch (ClassNotFoundException e) {
+			write("Unable to find the SQLite library!", Level.SEVERE);
+			return false;
+		}
+	}
+
+	@Override
 	public boolean isOpen() {
 		if (connection == null) return false;
 		try {
@@ -88,26 +76,32 @@ public class SQLite extends Database {
 			return false;
 		}
 	}
-	
-	/**
-	 * Executes a query.
-	 * @return A resultSet if the query returned one.<br>
-	 * If the query was an update, delete or insert query it will return null.<br>
-	 * If the query Failed, it will throw an SQLExcpetion.
-	 */
-	@Nullable public ResultSet query(@NonNull String query) throws SQLException {
+
+	@Override
+	public boolean open() {
+		if (!initialize()) return false;
 		try {
-			Statement statement = getConnection().createStatement();
-			if (statement.execute(query))
-				return statement.getResultSet();
-			else
-				return null;
-		} catch (SQLException ex) {
-			write("Error when trying to execute query! Error: " + ex.toString(), Level.WARNING);
-			throw ex;
+			connection = DriverManager.getConnection("jdbc:sqlite:" + sqlFile.getAbsolutePath());
+			return true;
+		} catch (SQLException e) {
+			write("Error when trying to open the database. " + e, Level.SEVERE);
+			return false;
 		}
 	}
-	
+
+	@Override
+	@Nullable public PreparedStatement prepare(@NonNull String query) {
+		try {
+			PreparedStatement ps = getConnection().prepareStatement(query);
+			return ps;
+		} catch (SQLException e) {
+			if (!e.toString().contains("not return ResultSet")) {
+				write("Error in SQL prepare() query: " + e.getMessage(), Level.WARNING);
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * Executes a query in a PreparedStatement.
 	 * @return A resultSet if the query returned one.<br>
@@ -127,21 +121,28 @@ public class SQLite extends Database {
 		}
 	}
 
+	/**
+	 * Executes a query.
+	 * @return A resultSet if the query returned one.<br>
+	 * If the query was an update, delete or insert query it will return null.<br>
+	 * If the query Failed, it will throw an SQLExcpetion.
+	 */
 	@Override
-	@Nullable public PreparedStatement prepare(@NonNull String query) {
+	@Nullable public ResultSet query(@NonNull String query) throws SQLException {
 		try {
-			PreparedStatement ps = getConnection().prepareStatement(query);
-			return ps;
-		} catch (SQLException e) {
-			if (!e.toString().contains("not return ResultSet")) {
-				write("Error in SQL prepare() query: " + e.getMessage(), Level.WARNING);
-			}
+			Statement statement = getConnection().createStatement();
+			if (statement.execute(query))
+				return statement.getResultSet();
+			else
+				return null;
+		} catch (SQLException ex) {
+			write("Error when trying to execute query! Error: " + ex.toString(), Level.WARNING);
+			throw ex;
 		}
-		return null;
 	}
-	
+
 	protected void write(@Nullable String toWrite, @NonNull Level level) {
-		if (toWrite == null || toWrite.isEmpty()) return;
+		if ((toWrite == null) || toWrite.isEmpty()) return;
 		Log.log(level, "[SQLite] " + toWrite);
 	}
 }

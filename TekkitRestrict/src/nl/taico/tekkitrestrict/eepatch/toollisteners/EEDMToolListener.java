@@ -2,12 +2,12 @@ package nl.taico.tekkitrestrict.eepatch.toollisteners;
 
 import java.util.ArrayList;
 
+import nl.taico.tekkitrestrict.eepatch.EEPSettings;
+
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-
-import nl.taico.tekkitrestrict.eepatch.EEPSettings;
 
 import ee.events.EEEnums.EEAction2;
 import ee.events.dm.EEDMAxeEvent;
@@ -25,7 +25,7 @@ public class EEDMToolListener implements Listener {
 		final Player player = event.getPlayer();
 		final ArrayList<EEAction2> toSearch;
 		final String name;
-		
+
 		if (event instanceof EEDMPickaxeEvent){
 			if (player.hasPermission("tekkitrestrict.bypass.blockactions.dmpickaxe")) return;
 			toSearch = EEPSettings.dmpick;
@@ -57,7 +57,7 @@ public class EEDMToolListener implements Listener {
 		} else {
 			return;
 		}
-		
+
 		if (toSearch.contains(event.getExtraInfo())){
 			event.setCancelled(true);
 			player.sendMessage(ChatColor.RED + "You are not allowed to do this with the "+name+"!");

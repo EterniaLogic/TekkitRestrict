@@ -14,7 +14,7 @@ public class WrenchFixer implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onBlockBreak(BlockBreakEvent event){
 		final ItemStack item = event.getPlayer().getItemInHand();
-		if (item == null || (item.getTypeId() != 30183 && item.getTypeId() != 30140)) return;
+		if ((item == null) || ((item.getTypeId() != 30183) && (item.getTypeId() != 30140))) return;
 		final Block block = event.getBlock();
 		if (!(((CraftWorld) block.getWorld()).getHandle().getTileEntity(block.getX(), block.getY(), block.getZ()) instanceof IWrenchable)) event.setCancelled(true);
 	}

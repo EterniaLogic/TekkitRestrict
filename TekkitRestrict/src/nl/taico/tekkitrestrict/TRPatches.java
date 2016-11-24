@@ -13,61 +13,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import nl.taico.tekkitrestrict.Log.Warning;
-import nl.taico.tekkitrestrict.lib.RandomString;
-
 import net.minecraft.server.Block;
 import net.minecraft.server.ItemStack;
 import net.minecraft.server.RedPowerMachine;
+import nl.taico.tekkitrestrict.Log.Warning;
+import nl.taico.tekkitrestrict.lib.RandomString;
 
 public class TRPatches {
-	public static boolean patchMiningLaser(){
-		Log.trace("TRPatches - Patching Mining Laser...");
-		try {
-			final ArrayList<Block> miningLaser = new ArrayList<Block>();
-			for (final Block block : EntityMiningLaser.unmineableBlocks) miningLaser.add(block);
-			
-			miningLaser.add(Block.byId[194]);
-			EntityMiningLaser.unmineableBlocks = miningLaser.toArray(new Block[miningLaser.size()]);
-			return true;
-		} catch (Exception ex){
-			Log.debugEx(ex);
-			return false;
-		}
-	}
-	
-	public static boolean patchDeployer(){
-		Log.trace("TRPatches - Patching Deployer...");
-		try {			
-			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(6362));//REP
-			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(6359));//Wireless sniffer
-			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(6363));//Private sniffer
-			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(27562));//Alcbag
-			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(27585));//Divining ROd
-			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(30122));//Cropnalyser
-			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(30104));//Debug item
-			
-			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(27592));//transtablet
-			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(7493));//Ender pouch
-			return true;
-		} catch (Exception ex){
-			Log.debugEx(ex);
-			return false;
-		}
-	}
-	
-	public static boolean patchBlockBreaker(){
-		Log.trace("TRPatches - Patching Block Breaker...");
-		try {
-			//.add(dmg << 15 | id)
-			RedPowerMachine.breakerBlacklist.add(Integer.valueOf(-1 << 15 | 194));
-			return true;
-		} catch (Exception ex){
-			Log.debugEx(ex);
-			return false;
-		}
-	}
-	
 	public static boolean addNetherOresRecipes(){
 		Log.trace("TRPatches - Adding Nether Ore Macerator Recipes...");
 		try {
@@ -79,30 +31,42 @@ public class TRPatches {
 			return false;
 		}
 	}
-	
+
+	public static boolean patchBlockBreaker(){
+		Log.trace("TRPatches - Patching Block Breaker...");
+		try {
+			//.add(dmg << 15 | id)
+			RedPowerMachine.breakerBlacklist.add(Integer.valueOf((-1 << 15) | 194));
+			return true;
+		} catch (Exception ex){
+			Log.debugEx(ex);
+			return false;
+		}
+	}
+
 	public static void patchCC(){
 		final String s = File.separator;
 		Character nul = '\000';//not final to make sure this gets compiled correctly
 		final String path = "mods"+s+"ComputerCraft"+s+"lua"+s+"rom"+s;
 		final File patched = new File(path+"patched3"+s);
 		if (patched.exists()) return;
-		
+
 		Log.trace("TRPatches - Patching ComputerCraft...");
-		
+
 		BufferedReader input = null;
 		final File file = new File(path+"startup"+s);
 		if (!file.exists()){
 			Warning.load("[CCPatch] ComputerCraft file cannot be found! (" + file.getPath() + ")", false);
 			return;
 		}
-		
+
 		try {
 			input = new BufferedReader(new FileReader(file));
 		} catch (FileNotFoundException e2) {
 			Warning.load("[CCPatch] ComputerCraft file cannot be found! (" + file.getPath() + ")", false);
 			return;
 		}
-		
+
 		final LinkedList<String> lines = new LinkedList<String>();
 		try {
 			String line;
@@ -122,10 +86,10 @@ public class TRPatches {
 			if (curline == null) continue;
 			if (curline.contains("os.reboot = nil") || curline.contains("os.reboot=nil")) rebootPatch = false;
 			else if (curline.contains("bypassAntiRedstoneCrashBug = rs.setOutput") || curline.contains("rs.setOutput = function(side, bool)")) rsCrashPatch = false;
-			
+
 			if (!rebootPatch && !rsCrashPatch) break;
 		}
-		
+
 		if (!rebootPatch && !rsCrashPatch && !nulPatch){
 			try {
 				patched.createNewFile();
@@ -143,7 +107,7 @@ public class TRPatches {
 		} else {
 			Log.info("[CCPatch] Reboot patch already found, skipping reboot patch...");
 		}
-		
+
 		if (rsCrashPatch) {
 			final String extra = new RandomString(10).nextString();
 			Log.info("[CCPatch] Adding redstone crash patch...");
@@ -156,9 +120,9 @@ public class TRPatches {
 		} else {
 			Log.info("[CCPatch] Redstone crash patch already found, skipping redstone crash patch...");
 		}
-		
+
 		if (nulPatch){
-			
+
 			boolean corrupt = false;
 			final char d = RandomString.randomChar();
 			for (int i = 0;i<lines.size();i++){
@@ -169,13 +133,13 @@ public class TRPatches {
 					lines.set(i, l2);
 				}
 			}
-			
+
 			if (corrupt){
 				Log.info("[CCPatch] Your Computers startupfile was corrupt and has been repaired!");
 			}
-			
+
 		}
-		
+
 		BufferedWriter output = null;
 		try {
 			output = new BufferedWriter(new FileWriter(file));
@@ -188,7 +152,7 @@ public class TRPatches {
 			Warning.load("[CCPatch] Unable to write changes to file!", false);
 			return;
 		}
-		
+
 		try {
 			patched.createNewFile();
 		} catch (IOException e) {
@@ -197,5 +161,40 @@ public class TRPatches {
 		}
 		Log.info("[CCPatch] Patching completed!");
 		return;
+	}
+
+	public static boolean patchDeployer(){
+		Log.trace("TRPatches - Patching Deployer...");
+		try {			
+			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(6362));//REP
+			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(6359));//Wireless sniffer
+			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(6363));//Private sniffer
+			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(27562));//Alcbag
+			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(27585));//Divining ROd
+			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(30122));//Cropnalyser
+			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(30104));//Debug item
+
+			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(27592));//transtablet
+			RedPowerMachine.deployerBlacklist.add(Integer.valueOf(7493));//Ender pouch
+			return true;
+		} catch (Exception ex){
+			Log.debugEx(ex);
+			return false;
+		}
+	}
+
+	public static boolean patchMiningLaser(){
+		Log.trace("TRPatches - Patching Mining Laser...");
+		try {
+			final ArrayList<Block> miningLaser = new ArrayList<Block>();
+			for (final Block block : EntityMiningLaser.unmineableBlocks) miningLaser.add(block);
+
+			miningLaser.add(Block.byId[194]);
+			EntityMiningLaser.unmineableBlocks = miningLaser.toArray(new Block[miningLaser.size()]);
+			return true;
+		} catch (Exception ex){
+			Log.debugEx(ex);
+			return false;
+		}
 	}
 }

@@ -19,7 +19,7 @@ public class SettingsStorage {
 	public static Config safeZoneConfig;
 	public static Config unloadConfig;
 	public static Config eepatchConfig;
-	
+
 	//Intentionally empty: the class is loaded when this method is called.
 	public static void loadConfigs(){
 		advancedConfig 			= Config.getNewConfig(TekkitRestrict.instance.getLogger(), TekkitRestrict.instance.getDataFolder(), "Advanced.yml");
@@ -37,7 +37,7 @@ public class SettingsStorage {
 		unloadConfig 			= Config.getNewConfig(TekkitRestrict.instance.getLogger(), TekkitRestrict.instance.getDataFolder(), "ChunkUnloader.yml");
 		eepatchConfig 			= Config.getNewConfig(TekkitRestrict.instance.getLogger(), TekkitRestrict.instance.getDataFolder(), "EEPatch.yml");
 	}
-	
+
 	public static void reloadConfigs(){
 		Log.trace("Reloading Configs From Disk...");
 		boolean b = true;
@@ -54,10 +54,10 @@ public class SettingsStorage {
 		b &= performanceConfig.reloadConfig();
 		b &= safeZoneConfig.reloadConfig();
 		b &= unloadConfig.reloadConfig();
-		
+
 		b &= eepatchConfig.reloadConfig();
-		
+
 		if (!b) Log.Warning.config("One or more config files were not reloaded.", false);
 	}
-	
+
 }

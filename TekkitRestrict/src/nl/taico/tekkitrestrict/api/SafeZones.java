@@ -2,11 +2,11 @@ package nl.taico.tekkitrestrict.api;
 
 import java.util.List;
 
-import org.bukkit.Location;
-import org.bukkit.entity.Player;
-
 import nl.taico.tekkitrestrict.functions.TRSafeZone;
 import nl.taico.tekkitrestrict.objects.TREnums.SSPlugin;
+
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 public class SafeZones {
 	public static enum SafeZoneCreate {
@@ -25,27 +25,6 @@ public class SafeZones {
 		/** Unknown reason. */
 		Unknown;
 	}
-	//TODO add getSafeZonePlayerIsIn and add a cache with isPlayerInSafeZone
-	//to allow fast checks of both.
-	/**
-	 * Uses {@link #getSafeZoneFor(Player)}.
-	 * @return If the player is in a safezone that applies to him.
-	 * @see #isSafeZoneFor(Player, List)
-	 */
-	public static boolean isSafeZoneFor(Player player) {
-		return !getSafeZoneFor(player).isEmpty();
-	}
-	
-	/**
-	 * Uses {@link #getSafeZoneFor(Player, List)}.<br>
-	 * Checks plugins in the specified order.
-	 * @return If the player is in a safezone that applies to him.
-	 * @see #isSafeZoneFor(Player)
-	 */
-	public static boolean isSafeZoneFor(Player player, List<SSPlugin> order) {
-		return !getSafeZoneFor(player, order).isEmpty();
-	}
-	
 	/**
 	 * @param player This player is used for the location and for the permissions checks.<br>
 	 * If the player is not allowed to build in a WorldGuard region, or if he is not on the managers
@@ -63,60 +42,7 @@ public class SafeZones {
 	public static SafeZoneCreate createSafeZone(Player player, String pluginName, String zoneName){
 		return TRSafeZone.addSafeZone(player, pluginName, zoneName, null);
 	}
-	
-	/**
-	 * Removes a WorldGuard/GriefPrevention safezone from the database.<br>
-	 * Do not use this method in a loop. It will cause ConcurrentModificationExceptions.
-	 * @return True if the removal succeeded. False otherwise.
-	 */
-	public static boolean removeSafeZone(TRSafeZone zone){
-		return TRSafeZone.removeSafeZone(zone);
-	}
-	
-	/**
-	 * This checks if there is a Factions safezone at his location that applies to him.<br><br>
-	 * 
-	 * Note: Does not check if safezones are disabled.<br>
-	 * Note: Does not check for bypass permission (tekkitrestrict.bypass.safezone)
-	 * @return <b>If the player is in a Factions Safezone that applies to him.</b><br>
-	 */
-	public static boolean isFactionsSafeZoneForPlayer(Player player){
-		return TRSafeZone.Factions.isSafeZoneFor(player, true);
-	}
-	
-	/**
-	 * This checks if there is a PreciousStones safezone at his location that applies to him.<br><br>
-	 * 
-	 * Note: Does not check if safezones are disabled.<br>
-	 * Note: Does not check for bypass permission (tekkitrestrict.bypass.safezone)
-	 * @return <b>If the player is in a PreciousStones Safezone that applies to him.</b><br>
-	 */
-	public static boolean isPreciousStonesSafeZoneForPlayer(Player player){
-		return TRSafeZone.PS.isSafeZoneFor(player, true);
-	}
-	
-	/**
-	 * This checks if there is a Towny safezone at his location that applies to him.<br><br>
-	 * 
-	 * Note: Does not check if safezones are disabled.<br>
-	 * Note: Does not check for bypass permission (tekkitrestrict.bypass.safezone)
-	 * @return <b>If the player is in a Towny Safezone that applies to him.</b><br>
-	 */
-	public static boolean isTownySafeZoneForPlayer(Player player){
-		return TRSafeZone.Towny.isSafeZoneFor(player, true);
-	}
-	
-	/**
-	 * This checks if there is a GriefPrevention safezone at his location that applies to him.<br><br>
-	 * 
-	 * Note: Does not check if safezones are disabled.<br>
-	 * Note: Does not check for bypass permission (tekkitrestrict.bypass.safezone)<br>
-	 * @return <b>If the player is in a GriefPrevention Safezone that applies to him.</b><br>
-	 */
-	public static boolean isGriefPreventionSafeZoneForPlayer(Player player){
-		return TRSafeZone.GP.isSafeZoneFor(player);
-	}
-	
+
 	/**
 	 * Searches for a WorldGuard safezone in the database for the given location.
 	 * If checkGP is true, it will also check for GriefPrevention Safezones.
@@ -125,7 +51,7 @@ public class SafeZones {
 	public static String getSafeZoneByLocation(Location location, boolean checkGP){
 		return TRSafeZone.getSafeZoneByLocation(location, checkGP);
 	}
-	
+
 	/**
 	 * Get a safezone at the players current position that applies to him.<br>
 	 * First checks GriefPrevention, then WorldGuard, Towny, Factions and last PreciousStones.
@@ -134,17 +60,17 @@ public class SafeZones {
 	 */
 	public static String getSafeZoneFor(Player player){
 		if (isGriefPreventionSafeZoneForPlayer(player)) return "GriefPrevention Safezone Claim owned by: " + TRSafeZone.GP.lastGP;
-		
+
 		String r = getSafeZoneByLocation(player.getLocation(), false);
 		if (!r.isEmpty()) return r;
-		
+
 		if (isTownySafeZoneForPlayer(player)) return "Towny Safezone";
 		if (isFactionsSafeZoneForPlayer(player)) return "Safezone Faction: " + TRSafeZone.Factions.lastFaction;
 		if (isPreciousStonesSafeZoneForPlayer(player)) return "PreciousStones SafeZone Field: " + TRSafeZone.PS.lastPS;
-		
+
 		return "";
 	}
-	
+
 	/**
 	 * Get a safezone at the players current position that applies to him.<br>
 	 * Checks in the order of the given list.
@@ -167,5 +93,79 @@ public class SafeZones {
 			}
 		}
 		return "";
+	}
+
+	/**
+	 * This checks if there is a Factions safezone at his location that applies to him.<br><br>
+	 * 
+	 * Note: Does not check if safezones are disabled.<br>
+	 * Note: Does not check for bypass permission (tekkitrestrict.bypass.safezone)
+	 * @return <b>If the player is in a Factions Safezone that applies to him.</b><br>
+	 */
+	public static boolean isFactionsSafeZoneForPlayer(Player player){
+		return TRSafeZone.Factions.isSafeZoneFor(player, true);
+	}
+
+	/**
+	 * This checks if there is a GriefPrevention safezone at his location that applies to him.<br><br>
+	 * 
+	 * Note: Does not check if safezones are disabled.<br>
+	 * Note: Does not check for bypass permission (tekkitrestrict.bypass.safezone)<br>
+	 * @return <b>If the player is in a GriefPrevention Safezone that applies to him.</b><br>
+	 */
+	public static boolean isGriefPreventionSafeZoneForPlayer(Player player){
+		return TRSafeZone.GP.isSafeZoneFor(player);
+	}
+
+	/**
+	 * This checks if there is a PreciousStones safezone at his location that applies to him.<br><br>
+	 * 
+	 * Note: Does not check if safezones are disabled.<br>
+	 * Note: Does not check for bypass permission (tekkitrestrict.bypass.safezone)
+	 * @return <b>If the player is in a PreciousStones Safezone that applies to him.</b><br>
+	 */
+	public static boolean isPreciousStonesSafeZoneForPlayer(Player player){
+		return TRSafeZone.PS.isSafeZoneFor(player, true);
+	}
+
+	//TODO add getSafeZonePlayerIsIn and add a cache with isPlayerInSafeZone
+	//to allow fast checks of both.
+	/**
+	 * Uses {@link #getSafeZoneFor(Player)}.
+	 * @return If the player is in a safezone that applies to him.
+	 * @see #isSafeZoneFor(Player, List)
+	 */
+	public static boolean isSafeZoneFor(Player player) {
+		return !getSafeZoneFor(player).isEmpty();
+	}
+
+	/**
+	 * Uses {@link #getSafeZoneFor(Player, List)}.<br>
+	 * Checks plugins in the specified order.
+	 * @return If the player is in a safezone that applies to him.
+	 * @see #isSafeZoneFor(Player)
+	 */
+	public static boolean isSafeZoneFor(Player player, List<SSPlugin> order) {
+		return !getSafeZoneFor(player, order).isEmpty();
+	}
+
+	/**
+	 * This checks if there is a Towny safezone at his location that applies to him.<br><br>
+	 * 
+	 * Note: Does not check if safezones are disabled.<br>
+	 * Note: Does not check for bypass permission (tekkitrestrict.bypass.safezone)
+	 * @return <b>If the player is in a Towny Safezone that applies to him.</b><br>
+	 */
+	public static boolean isTownySafeZoneForPlayer(Player player){
+		return TRSafeZone.Towny.isSafeZoneFor(player, true);
+	}
+
+	/**
+	 * Removes a WorldGuard/GriefPrevention safezone from the database.<br>
+	 * Do not use this method in a loop. It will cause ConcurrentModificationExceptions.
+	 * @return True if the removal succeeded. False otherwise.
+	 */
+	public static boolean removeSafeZone(TRSafeZone zone){
+		return TRSafeZone.removeSafeZone(zone);
 	}
 }

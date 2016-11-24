@@ -1,9 +1,9 @@
 package nl.taico.tekkitrestrict.api;
 
+import nl.taico.tekkitrestrict.functions.TRNoItem;
+
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-
-import nl.taico.tekkitrestrict.functions.TRNoItem;
 
 public class Bans {
 	/**
@@ -12,7 +12,7 @@ public class Bans {
 	public static boolean isBlockBanned(Block block){
 		return TRNoItem.isBlockBanned(block);
 	}
-	
+
 	/**
 	 * Note: It checks this player's permissions for tekkitrestrict.noitem.id[.data]
 	 * and for tekkitrestrict.bypass.noitem
@@ -23,13 +23,6 @@ public class Bans {
 		return TRNoItem.isItemBanned(player, id, data, true) != null;
 	}
 	/**
-	 * @return If the given item/block is banned in the config.
-	 */
-	public static boolean isItemGloballyBanned(int id, int data){
-		return TRNoItem.isItemGloballyBanned(id, data) != null;
-	}
-	
-	/**
 	 * Note: It checks this player's permissions for tekkitrestrict.creative.id[.data]
 	 * and for tekkitrestrict.bypass.creative
 	 * 
@@ -39,6 +32,13 @@ public class Bans {
 	public static boolean isItemBannedInCreative(Player player, int id, int data){
 		return TRNoItem.isItemBannedInCreative(player, id, data, true) != null;
 	}
-	
-	
+
+	/**
+	 * @return If the given item/block is banned in the config.
+	 */
+	public static boolean isItemGloballyBanned(int id, int data){
+		return TRNoItem.isItemGloballyBanned(id, data) != null;
+	}
+
+
 }

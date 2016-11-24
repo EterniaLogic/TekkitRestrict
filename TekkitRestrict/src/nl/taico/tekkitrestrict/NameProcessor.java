@@ -8,12 +8,13 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.annotation.Nullable;
+
+import lombok.NonNull;
+import nl.taico.tekkitrestrict.objects.TRItem;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
-
-import nl.taico.tekkitrestrict.objects.TRItem;
 
 import com.earth2me.essentials.Essentials;
 import com.earth2me.essentials.ItemDb;
@@ -61,9 +62,9 @@ public class NameProcessor {
 		EEItems.put(27559,"Klein Star Drei");
 		EEItems.put(27560,"Klein Star Vier");
 		EEItems.put(27561,"Klein Star Sphere");
-		
+
 		EEItems.put(27591,"Klein Star Omega");
-		
+
 		EEItems.put(27562,"Alchemy Bag");
 		EEItems.put(27563,"Red Matter");
 		EEItems.put(27564,"Red Matter Pickaxe");
@@ -95,11 +96,8 @@ public class NameProcessor {
 		EEItems.put(27593,"Void Ring");
 		EEItems.put(27594,"Alchemy Tome");
 	}
-	@NonNull public static String getEEName(final int id){
-		final String s = EEItems.get(id);
-		return (s == null ? "x"+id : s);
-	}
-	
+	private static final LinkedHashMap<TRItem, String> All = new LinkedHashMap<TRItem, String>(2048);
+
 	/*
 
 	private static final HashMap<Integer, String> IC2Items = new HashMap<Integer, String>();
@@ -108,58 +106,57 @@ public class NameProcessor {
 		IC2Items.put(30172,"Quantum Chestplate");
 		IC2Items.put(30173,"Quantum Leggings");
 		IC2Items.put(30174,"Quantum Boots");
-		
+
 		IC2Items.put(30178,"Nano Helmet");
 		IC2Items.put(30177,"Nano Chestplate");
 		IC2Items.put(30176,"Nano Leggings");
 		IC2Items.put(30175,"Nano Boots");
-		
+
 		IC2Items.put(30209,"Electric Jetpack");
-		
+
 		IC2Items.put(30180,"Batpack");
 		IC2Items.put(30127,"Lappack");
-		
+
 		IC2Items.put(30233,"Chainsaw");
 		IC2Items.put(30235,"Mining Drill");
 		IC2Items.put(30234,"Diamond Drill");
-		
+
 		IC2Items.put(30119,"Electric Hoe");
 		IC2Items.put(30141,"Electric Wrench");
 		IC2Items.put(30124,"Electric Treetap");
-		
+
 		IC2Items.put(30148,"Nano Saber");
-		
+
 		IC2Items.put(30208,"Mining Laser");
-		
+
 		IC2Items.put(30242,"RE-Battery");
 		IC2Items.put(30241,"Energy Crystal");
 		IC2Items.put(30240,"Lapatron Crystal");
 		IC2Items.put(30220,"OD-Scanner");
 		IC2Items.put(30219,"OV-Scanner");
-		
+
 		IC2Items.put(31257,"Digital Thermometer");
 	}
-	*/
-	
-	private static final LinkedHashMap<TRItem, String> All = new LinkedHashMap<TRItem, String>(2048);
+	 */
+
 	static {
 		All.put(TRItem.parseItem(1,-1),"Stone");
 		All.put(TRItem.parseItem(2,-1),"Grass Block");
 		All.put(TRItem.parseItem(3,-1),"Dirt");
 		All.put(TRItem.parseItem(4,-1),"Cobblestone");
-		
+
 		All.put(TRItem.parseItem(5,0),"Oak Wood Planks");
 		All.put(TRItem.parseItem(5,1),"Spruce Wood Planks");
 		All.put(TRItem.parseItem(5,2),"Birch Wood Planks");
 		All.put(TRItem.parseItem(5,3),"Jungle Wood Planks");
 		All.put(TRItem.parseItem(5,-1),"Wooden Planks");
-		
+
 		All.put(TRItem.parseItem(6,0),"Oak Sapling");
 		All.put(TRItem.parseItem(6,1),"Spruce Sapling");
 		All.put(TRItem.parseItem(6,2),"Birch Sapling");
 		All.put(TRItem.parseItem(6,3),"Jungle Sapling");
 		All.put(TRItem.parseItem(6,-1),"Saplings");
-		
+
 		All.put(TRItem.parseItem(7,-1),"Bedrock");
 		All.put(TRItem.parseItem(8,-1),"Water");
 		All.put(TRItem.parseItem(9,-1),"Still Water");
@@ -170,31 +167,31 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(14,-1),"Gold Ore");
 		All.put(TRItem.parseItem(15,-1),"Iron Ore");
 		All.put(TRItem.parseItem(16,-1),"Coal Ore");
-		
+
 		All.put(TRItem.parseItem(17,0),"Oak Wood");
 		All.put(TRItem.parseItem(17,1),"Spruce Wood");
 		All.put(TRItem.parseItem(17,2),"Birch Wood");
 		All.put(TRItem.parseItem(17,3),"Jungle Wood");
 		All.put(TRItem.parseItem(17,-1),"Wood");
 		All.put(TRItem.parseItem(17,-1),"Logs");
-		
+
 		All.put(TRItem.parseItem(18,0),"Oak Leaves");
 		All.put(TRItem.parseItem(18,1),"Spruce Leaves");
 		All.put(TRItem.parseItem(18,2),"Birch Leaves");
 		All.put(TRItem.parseItem(18,3),"Jungle Leaves");
 		All.put(TRItem.parseItem(18,-1),"Leaves");
-		
+
 		All.put(TRItem.parseItem(19,-1),"Sponge");
 		All.put(TRItem.parseItem(20,-1),"Glass");
 		All.put(TRItem.parseItem(21,-1),"Lapis Lazuli Ore");
 		All.put(TRItem.parseItem(22,-1),"Lapis Lazuli Block");
 		All.put(TRItem.parseItem(23,-1),"Dispenser");
-		
+
 		All.put(TRItem.parseItem(24,0),"Sandstone");
 		All.put(TRItem.parseItem(24,1),"Chiseled Sandstone");
 		All.put(TRItem.parseItem(24,2),"Smooth Sandstone");
 		All.put(TRItem.parseItem(24,-1),"Sandstone");
-		
+
 		All.put(TRItem.parseItem(25,-1),"Note Block");
 		All.put(TRItem.parseItem(26,-1),"Bed (Block)");
 		All.put(TRItem.parseItem(27,-1),"Powered Rail (Block)");
@@ -266,13 +263,13 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(95,-1),"Locked chest");
 		All.put(TRItem.parseItem(96,-1),"Trapdoor");
 		All.put(TRItem.parseItem(97,-1),"Monster Egg");
-		
+
 		All.put(TRItem.parseItem(98,0),"Stone Bricks");
 		All.put(TRItem.parseItem(98,1),"Mossy Stone Bricks");
 		All.put(TRItem.parseItem(98,2),"Cracked Stone Bricks");
 		All.put(TRItem.parseItem(98,3),"Chiseled Stone Bricks");
 		All.put(TRItem.parseItem(98,-1),"Stone Bricks");
-		
+
 		All.put(TRItem.parseItem(99,-1),"Brown Mushroom Block");
 		All.put(TRItem.parseItem(100,-1),"Red Mushroom Block");
 		All.put(TRItem.parseItem(101,-1),"Iron Bars");
@@ -315,28 +312,28 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(126, 10),"Nova Catalyst");
 		All.put(TRItem.parseItem(126, 11),"Nova Cataclysm");
 		All.put(TRItem.parseItem(126, -1),"Basic EE Blocks");
-		
+
 		All.put(TRItem.parseItem(127, -1),"DM Pedestal");
-		
+
 		All.put(TRItem.parseItem(128, 0),"Alchemical Chest");
 		All.put(TRItem.parseItem(128, 1),"Energy Condenser");
 		All.put(TRItem.parseItem(128, -1),"Alchemical Chest and Energy Condenser");
-		
+
 		All.put(TRItem.parseItem(129, -1),"Interdiction Torch");
 		All.put(TRItem.parseItem(130, -1),"Transmution Tablet");
 		//################################################################\\
 		//End Of EE Blocks
 		//################################################################\\
-		
+
 		All.put(TRItem.parseItem(133,0),"Backplane");
 		All.put(TRItem.parseItem(133,1),"8K RAM Module");
 		All.put(TRItem.parseItem(133,-1),"x133");
-		
+
 		All.put(TRItem.parseItem(134,0),"Monitor");
 		All.put(TRItem.parseItem(134,1),"Central Processing Unit");
 		All.put(TRItem.parseItem(134,2),"Disk Drive");
 		All.put(TRItem.parseItem(134,-1),"Computer IO");
-		
+
 		All.put(TRItem.parseItem(135,0),"Nether Coal");
 		All.put(TRItem.parseItem(135,1),"Nether Diamond");
 		All.put(TRItem.parseItem(135,2),"Nether Gold Ore");
@@ -346,7 +343,7 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(135,6),"Nether Copper Ore");
 		All.put(TRItem.parseItem(135,7),"Nether Tin Ore");
 		All.put(TRItem.parseItem(135,-1),"Nether Ores");
-		
+
 		/*
 		All.put(TRItem.parseItem(136,0),"Cobblestone Cover");
 		All.put(TRItem.parseItem(136,1),"Stone Cover");
@@ -401,9 +398,9 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(136,56),"Sapphire Block Cover");
 		All.put(TRItem.parseItem(136,64),"Sandstone Cover");
 		All.put(TRItem.parseItem(136,65),"Wood Cover");
-		*/
+		 */
 		All.put(TRItem.parseItem(136,256),"Red Alloy Wire");
-		
+
 		/*
 		All.put(TRItem.parseItem(136,512),"White Insulated Wire");
 		All.put(TRItem.parseItem(136,513),"Orange Insulated Wire");
@@ -421,7 +418,7 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(136,525),"Green Insulated Wire");
 		All.put(TRItem.parseItem(136,526),"Red Insulated Wire");
 		All.put(TRItem.parseItem(136,527),"Black Insulated Wire");
-		*/
+		 */
 		All.put(TRItem.parseItem(136,768),"Bundled Cable");
 		/*
 		All.put(TRItem.parseItem(136,769),"White Bundled Cable");
@@ -440,7 +437,7 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(136,782),"Green Bundled Cable");
 		All.put(TRItem.parseItem(136,783),"Red Bundled Cable");
 		All.put(TRItem.parseItem(136,784),"Black Bundled Cable");
-		*/
+		 */
 		All.put(TRItem.parseItem(136,1280),"Blue Alloy Wire");
 		All.put(TRItem.parseItem(136,1792),"Fluid Pipe");
 		All.put(TRItem.parseItem(136,2048),"Pneumatic Tube");
@@ -2194,7 +2191,7 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(136,16951),"Emerald Block Jacketed Bluewire");
 		All.put(TRItem.parseItem(136,16952),"Sapphire Block Jacketed Bluewire");
 		//2195-351=
-		*/
+		 */
 		All.put(TRItem.parseItem(136,-1),"RedPower Microblocks and Wires");
 		//IMPORTANT Marker at the end of Redpower
 		All.put(TRItem.parseItem(137,0),"Alloy Furnace");
@@ -2203,7 +2200,7 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(137,3),"Project Table");
 		All.put(TRItem.parseItem(137,4),"Blulectric Alloy Furnace");
 		All.put(TRItem.parseItem(137,-1),"RedPower Furnaces (x137)");
-		
+
 		All.put(TRItem.parseItem(138,0),"Timer");
 		All.put(TRItem.parseItem(138,1),"Sequencer");
 		All.put(TRItem.parseItem(138,2),"State Cell");
@@ -2230,11 +2227,11 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(138,768),"Counter");
 		All.put(TRItem.parseItem(138,1024),"Bus Transceiver");
 		All.put(TRItem.parseItem(138,-1),"RedPower Logic Gates");
-		
+
 		All.put(TRItem.parseItem(139,0),"Indigo Flower");
 		All.put(TRItem.parseItem(139,1),"Rubber Sapling");
 		All.put(TRItem.parseItem(139,-1),"x139");
-		
+
 		All.put(TRItem.parseItem(140,0),"Ruby Ore");
 		All.put(TRItem.parseItem(140,1),"Emerald Ore");
 		All.put(TRItem.parseItem(140,2),"Sapphire Ore");
@@ -2244,23 +2241,23 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(140,6),"Tungsten Ore");
 		All.put(TRItem.parseItem(140,7),"Nikolite Ore");
 		All.put(TRItem.parseItem(140,-1),"RedPower Ores");
-		
+
 		All.put(TRItem.parseItem(141,-1),"Rubber Tree Leaves");
-		
+
 		All.put(TRItem.parseItem(142,0),"Marble");
 		All.put(TRItem.parseItem(142,1),"Basalt");
 		All.put(TRItem.parseItem(142,2),"Marble Brick");
 		All.put(TRItem.parseItem(142,3),"Basalt Cobblestone");
 		All.put(TRItem.parseItem(142,4),"Basalt Brick");
 		All.put(TRItem.parseItem(142,-1),"Marble and Basalt");
-		
+
 		All.put(TRItem.parseItem(143,-1),"Rubberwood");
-		
+
 		All.put(TRItem.parseItem(145,0),"Ruby Block");
 		All.put(TRItem.parseItem(145,1),"Emerald Block");
 		All.put(TRItem.parseItem(145,2),"Sapphire Block");
 		All.put(TRItem.parseItem(145,-1),"Gem Blocks");
-		
+
 		All.put(TRItem.parseItem(147,0),"White Lamp");
 		All.put(TRItem.parseItem(147,1),"Orange Lamp");
 		All.put(TRItem.parseItem(147,2),"Magenta Lamp");
@@ -2278,9 +2275,9 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(147,14),"Red Lamp");
 		All.put(TRItem.parseItem(147,15),"Black Lamp");
 		All.put(TRItem.parseItem(147,-1),"Lamps");
-		
+
 		All.put(TRItem.parseItem(148,-1),"IO Expander");
-		
+
 		All.put(TRItem.parseItem(150,0),"Deployer");
 		All.put(TRItem.parseItem(150,1),"Block Breaker");
 		All.put(TRItem.parseItem(150,2),"Transposer");
@@ -2297,13 +2294,13 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(150,14),"Ejector");
 		All.put(TRItem.parseItem(150,15),"Relay");
 		All.put(TRItem.parseItem(150,-1),"RedPower Machines");
-		
+
 		All.put(TRItem.parseItem(151,0),"Solar Panel");
 		All.put(TRItem.parseItem(151,1),"Pump");
 		All.put(TRItem.parseItem(151,2),"Accelerator");
 		All.put(TRItem.parseItem(151,3),"Grate");
 		All.put(TRItem.parseItem(151,-1),"x151");
-		
+
 		All.put(TRItem.parseItem(152,-1),"Support Frame");
 		All.put(TRItem.parseItem(153,-1),"Quarry");
 		All.put(TRItem.parseItem(154,-1),"Land Mark");
@@ -2311,12 +2308,12 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(157,-1),"Builder");
 		All.put(TRItem.parseItem(158,-1),"Template Drawing Table");
 		All.put(TRItem.parseItem(160,-1),"Frame");
-		
+
 		All.put(TRItem.parseItem(161,0),"Redstone Engine");
 		All.put(TRItem.parseItem(161,1),"Steam Engine");
 		All.put(TRItem.parseItem(161,2),"Combustion Engine");
 		All.put(TRItem.parseItem(161,-1),"Engines");
-		
+
 		All.put(TRItem.parseItem(162,-1),"Oil");
 		All.put(TRItem.parseItem(164,-1),"Pump");
 		All.put(TRItem.parseItem(165,-1),"Tank");
@@ -2327,7 +2324,7 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(177,-1),"Wireless Receiver");
 		All.put(TRItem.parseItem(178,-1),"Ender Chest");
 		All.put(TRItem.parseItem(179,-1),"Teleport Tether");
-		
+
 		All.put(TRItem.parseItem(181,0),"Iron Chest");
 		All.put(TRItem.parseItem(181,1),"Gold Chest");
 		All.put(TRItem.parseItem(181,2),"Diamond Chest");
@@ -2335,17 +2332,17 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(181,4),"Silver Chest");
 		All.put(TRItem.parseItem(181,5),"Crystal Chest");
 		All.put(TRItem.parseItem(181,-1),"Advanced Chests");
-		
+
 		All.put(TRItem.parseItem(183,0),"Low Voltage Solar Array");
 		All.put(TRItem.parseItem(183,1),"Medium Voltage Solar Array");
 		All.put(TRItem.parseItem(183,2),"High Voltage Solar Array");
 		All.put(TRItem.parseItem(183,-1),"Solar Arrays");
-		
+
 		All.put(TRItem.parseItem(187,0),"Charging Bench Mk1");
 		All.put(TRItem.parseItem(187,1),"Charging Bench Mk2");
 		All.put(TRItem.parseItem(187,2),"Charging Bench Mk3");
 		All.put(TRItem.parseItem(187,-1),"Charging Benches");
-		
+
 		All.put(TRItem.parseItem(188,0),"Rotary Macerator");
 		All.put(TRItem.parseItem(188,1),"Singularity Compressor");
 		All.put(TRItem.parseItem(188,2),"Centrifuge Extractor");
@@ -2358,7 +2355,7 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(190,6),"Geothermal Generator Mk. 2");
 		All.put(TRItem.parseItem(190,7),"Water Strainer");
 		All.put(TRItem.parseItem(190,-1),"Power Converters");
-		
+
 		All.put(TRItem.parseItem(192,0),"Thermal Monitor");
 		All.put(TRItem.parseItem(192,1),"Industrial Alarm");
 		All.put(TRItem.parseItem(192,2),"Howler Alarm");
@@ -2366,7 +2363,7 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(192,4),"Industrial Information Panel");
 		All.put(TRItem.parseItem(192,5),"Information Panel Extender");
 		All.put(TRItem.parseItem(192,-1),"Alarms (x192)");
-		
+
 		All.put(TRItem.parseItem(194,0),"Buffer");
 		All.put(TRItem.parseItem(194,1),"Automatic Crafting Table MkII");
 		All.put(TRItem.parseItem(194,2),"Black Hole Chest");
@@ -2374,7 +2371,7 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(194,4),"Duplicator");
 		All.put(TRItem.parseItem(194,5),"Retrievulator");
 		All.put(TRItem.parseItem(194,-1),"Tubestuffs");
-		
+
 		All.put(TRItem.parseItem(206,0),"Boarding Track");
 		All.put(TRItem.parseItem(206,1),"Holding Track");
 		All.put(TRItem.parseItem(206,2),"One-Way Track");
@@ -2400,14 +2397,14 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(206,22),"Coupler Track");
 		All.put(TRItem.parseItem(206,23),"Decoupler Track");
 		All.put(TRItem.parseItem(206,-1),"Special Tracks");
-		
+
 		All.put(TRItem.parseItem(207,-1),"Computer");
-		
+
 		All.put(TRItem.parseItem(208,0),"Disk Drive");
 		All.put(TRItem.parseItem(208,1),"Wireless Modem");
 		All.put(TRItem.parseItem(208,2),"Monitor");
 		All.put(TRItem.parseItem(208,-1),"Computer IO Devices");
-		
+
 		All.put(TRItem.parseItem(209,1),"Duel-Head Block Signal");
 		All.put(TRItem.parseItem(209,2),"Switch Motor");
 		All.put(TRItem.parseItem(209,3),"Block Signal");
@@ -2418,7 +2415,7 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(209,9),"Signal Controller Box");
 		All.put(TRItem.parseItem(209,10),"Distant Signal");
 		All.put(TRItem.parseItem(209,-1),"x209");
-		
+
 		All.put(TRItem.parseItem(211,0),"Detector - Storage");
 		All.put(TRItem.parseItem(211,1),"Detector - Any");
 		All.put(TRItem.parseItem(211,2),"Detector - Empty");
@@ -2434,9 +2431,9 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(211,12),"Detector - Train");
 		All.put(TRItem.parseItem(211,13),"Detector - Sheep");
 		All.put(TRItem.parseItem(211,-1),"Detectors");
-		
+
 		All.put(TRItem.parseItem(212,-1),"Elevator Track");
-		
+
 		All.put(TRItem.parseItem(213,0),"Item Loader");
 		All.put(TRItem.parseItem(213,1),"Item Unloader");
 		All.put(TRItem.parseItem(213,2),"Adv. Item Loader");
@@ -2454,45 +2451,45 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(213,14),"Banded Planks");
 		All.put(TRItem.parseItem(213,15),"Item Loader");
 		All.put(TRItem.parseItem(213,-1),"RailCraft Machines");
-		
+
 		All.put(TRItem.parseItem(214,0),"World Anchor");
 		All.put(TRItem.parseItem(214,1),"Block of Concrete");
 		All.put(TRItem.parseItem(214,2),"Block of Steel");
 		All.put(TRItem.parseItem(214,3),"Infernal Brick");
 		All.put(TRItem.parseItem(214,-1),"World Anchors");
-		
+
 		All.put(TRItem.parseItem(215,0),"Sensor");
 		All.put(TRItem.parseItem(215,1),"Sensor Controller");
 		All.put(TRItem.parseItem(215,-1),"Sensors");
-		
+
 		All.put(TRItem.parseItem(216,0),"Turtle");
 		All.put(TRItem.parseItem(216,1),"Mining Turtle");
 		All.put(TRItem.parseItem(216,2),"Wireless Turtle");
 		All.put(TRItem.parseItem(216,3),"Wireless Mining Turtle");
 		All.put(TRItem.parseItem(216,-1),"Turtles");
-		
+
 		All.put(TRItem.parseItem(218,-1),"Crop");
 		All.put(TRItem.parseItem(219,-1),"Luminator");
 		All.put(TRItem.parseItem(220,-1),"Scaffold");
 		All.put(TRItem.parseItem(222,-1),"Construction Foam");
-		
+
 		All.put(TRItem.parseItem(223,0),"Teleporter");
 		All.put(TRItem.parseItem(223,1),"Tesla Coil");
 		All.put(TRItem.parseItem(223,2),"Crop-Matron");
 		All.put(TRItem.parseItem(223,-1),"x223");
-		
+
 		All.put(TRItem.parseItem(224,0),"Copper Block");
 		All.put(TRItem.parseItem(224,1),"Tin Block");
 		All.put(TRItem.parseItem(224,2),"Bronze Block");
 		All.put(TRItem.parseItem(224,3),"Uranium Block");
 		All.put(TRItem.parseItem(224,-1),"Copper, Tin, Bronze and Uranium blocks");
-		
+
 		All.put(TRItem.parseItem(225,0),"Personal Safe");
 		All.put(TRItem.parseItem(225,1),"Trade-O-Mat");
 		All.put(TRItem.parseItem(225,-1),"x225");
-		
+
 		All.put(TRItem.parseItem(226,-1),"Luminator");
-		
+
 		All.put(TRItem.parseItem(227,0),"BatBox");
 		All.put(TRItem.parseItem(227,1),"MFE");
 		All.put(TRItem.parseItem(227,2),"MFSU");
@@ -2500,7 +2497,7 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(227,4),"MV-Transformer");
 		All.put(TRItem.parseItem(227,5),"HV-Transformer");
 		All.put(TRItem.parseItem(227,-1),"Power Containers and Transformers");
-		
+
 		All.put(TRItem.parseItem(230,-1),"Reinforced Glass");
 		All.put(TRItem.parseItem(231,-1),"Reinforced Stone");
 		All.put(TRItem.parseItem(232,-1),"Iron Fence");
@@ -2513,7 +2510,7 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(242,-1),"Leaves");
 		All.put(TRItem.parseItem(243,-1),"Rubber Wood");
 		All.put(TRItem.parseItem(244,-1),"Mining Pipe");
-		
+
 		All.put(TRItem.parseItem(246,0),"Generator");
 		All.put(TRItem.parseItem(246,1),"Geothermal Generator");
 		All.put(TRItem.parseItem(246,2),"Water Mill");
@@ -2521,11 +2518,11 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(246,4),"Wind Mill");
 		All.put(TRItem.parseItem(246,5),"Nuclear Reactor");
 		All.put(TRItem.parseItem(246,-1),"Power Generators");
-		
+
 		All.put(TRItem.parseItem(247,-1),"Uranium Ore");
 		All.put(TRItem.parseItem(248,-1),"Tin Ore");
 		All.put(TRItem.parseItem(249,-1),"Copper Ore");
-		
+
 		All.put(TRItem.parseItem(250,0),"Machine Block");
 		All.put(TRItem.parseItem(250,1),"Iron Furnace");
 		All.put(TRItem.parseItem(250,2),"Electric Furnace");
@@ -2543,8 +2540,8 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(250,14),"Mass Fabricator");
 		All.put(TRItem.parseItem(250,15),"Terraformer");
 		All.put(TRItem.parseItem(250,-1),"IC2 Machines");
-		
-		
+
+
 		All.put(TRItem.parseItem(253,0),"Forcefield core");
 		All.put(TRItem.parseItem(253,1),"MFFS area projector");
 		All.put(TRItem.parseItem(253,2),"Directional forcefield projector");
@@ -2556,7 +2553,7 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(253,8),"MFFS reactor heat control");
 		All.put(TRItem.parseItem(253,9),"MFFS reactor heat monitor server");
 		All.put(TRItem.parseItem(253,-1),"MFFS Main Block");
-		
+
 		All.put(TRItem.parseItem(254,0),"MFFS reactor heat monitor client");
 		All.put(TRItem.parseItem(254,1),"Forcefield underwater upgrade");
 		All.put(TRItem.parseItem(254,2),"Forcefield dome upgrade");
@@ -2570,7 +2567,7 @@ public class NameProcessor {
 		//################################################################\\
 		//End Of Blocks
 		//################################################################\\
-		
+
 		All.put(TRItem.parseItem(256,-1),"Iron Shovel");
 		All.put(TRItem.parseItem(257,-1),"Iron Pickaxe");
 		All.put(TRItem.parseItem(258,-1),"Iron Axe");
@@ -2578,11 +2575,11 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(260,-1),"Apple");
 		All.put(TRItem.parseItem(261,-1),"Bow");
 		All.put(TRItem.parseItem(262,-1),"Arrow");
-		
+
 		All.put(TRItem.parseItem(263,0),"Coal");
 		All.put(TRItem.parseItem(263,1),"Charcoal");
 		All.put(TRItem.parseItem(263,-1),"Coal");
-		
+
 		All.put(TRItem.parseItem(264,-1),"Diamond");
 		All.put(TRItem.parseItem(265,-1),"Iron Ingot");
 		All.put(TRItem.parseItem(266,-1),"Gold Ingot");
@@ -2670,7 +2667,7 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(348,-1),"Glowstone Dust");
 		All.put(TRItem.parseItem(349,-1),"Raw Fish");
 		All.put(TRItem.parseItem(350,-1),"Cooked Fish");
-		
+
 		All.put(TRItem.parseItem(351,0),"Ink Sac");
 		All.put(TRItem.parseItem(351,1),"Rose Red");
 		All.put(TRItem.parseItem(351,2),"Cactus Green");
@@ -2688,7 +2685,7 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(351,14),"Orange Dye");
 		All.put(TRItem.parseItem(351,15),"Bone Meal");
 		All.put(TRItem.parseItem(351,-1),"Dyes");
-		
+
 		All.put(TRItem.parseItem(352,-1),"Bone");
 		All.put(TRItem.parseItem(353,-1),"Sugar");
 		All.put(TRItem.parseItem(354,-1),"Cake");
@@ -2710,7 +2707,7 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(370,-1),"Ghast Tear");
 		All.put(TRItem.parseItem(371,-1),"Gold Nugget");
 		All.put(TRItem.parseItem(372,-1),"Nether Wart");
-		
+
 		All.put(TRItem.parseItem(373,0),"Water Bottle");
 		All.put(TRItem.parseItem(373,1),"Potion of Regeneration");
 		All.put(TRItem.parseItem(373,2),"Potion of Swiftness");
@@ -2726,7 +2723,7 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(373,13),"Artless Potion");
 		All.put(TRItem.parseItem(373,14),"Thin Potion");
 		All.put(TRItem.parseItem(373,-1),"Potions");
-		
+
 		All.put(TRItem.parseItem(374,-1),"Glass Bottle");
 		All.put(TRItem.parseItem(375,-1),"Spider Eye");
 		All.put(TRItem.parseItem(376,-1),"Fermented Spider Eye");
@@ -2736,7 +2733,7 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(380,-1),"Cauldron");
 		All.put(TRItem.parseItem(381,-1),"Eye of Ender");
 		All.put(TRItem.parseItem(382,-1),"Glistering Melon");
-		
+
 		All.put(TRItem.parseItem(383,0),"Spawn Egg");
 		All.put(TRItem.parseItem(383,1),"Spawn Item");
 		All.put(TRItem.parseItem(383,2),"Spawn Experience Orb");
@@ -2781,10 +2778,10 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(383,99),"Spawn Iron Golem");
 		All.put(TRItem.parseItem(383,119),"Spawn Minecart Chest");
 		All.put(TRItem.parseItem(383,-1),"Spawn Eggs");
-		
+
 		All.put(TRItem.parseItem(384,-1),"Bottle o' Enchanting");
 		All.put(TRItem.parseItem(385,-1),"Fire Charge");
-		
+
 		All.put(TRItem.parseItem(1256,0),"White Lumar");
 		All.put(TRItem.parseItem(1256,1),"Orange Lumar");
 		All.put(TRItem.parseItem(1256,2),"Magenta Lumar");
@@ -2802,7 +2799,7 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(1256,14),"Red Lumar");
 		All.put(TRItem.parseItem(1256,15),"Black Lumar");
 		All.put(TRItem.parseItem(1256,-1),"Lumar");
-		
+
 		All.put(TRItem.parseItem(1257,0),"Ruby");
 		All.put(TRItem.parseItem(1257,1),"Emerald");
 		All.put(TRItem.parseItem(1257,2),"Sapphire");
@@ -2811,7 +2808,7 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(1257,5),"Copper Ingot");
 		All.put(TRItem.parseItem(1257,6),"Nikolite");
 		All.put(TRItem.parseItem(1257,-1),"Redpower Valuables");
-		
+
 		All.put(TRItem.parseItem(1258,0),"Red Alloy Ingot");
 		All.put(TRItem.parseItem(1258,1),"Blue Alloy Ingot");
 		All.put(TRItem.parseItem(1258,2),"Brass Ingot");
@@ -2825,12 +2822,12 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(1258,10),"Copper Coil");
 		All.put(TRItem.parseItem(1258,11),"Blulectric Motor");
 		All.put(TRItem.parseItem(1258,-1),"Redpower Main Item");
-		
+
 		All.put(TRItem.parseItem(1259,-1),"Indigo Dye");
 		All.put(TRItem.parseItem(1260,-1),"Iron Handsaw");
 		All.put(TRItem.parseItem(1261,-1),"Diamond Handsaw");
 		All.put(TRItem.parseItem(1262,-1),"Screwdriver");
-		
+
 		All.put(TRItem.parseItem(1263,0),"Stone Wafer");
 		All.put(TRItem.parseItem(1263,1),"Stone Wire");
 		All.put(TRItem.parseItem(1263,2),"Stone Anode");
@@ -2842,7 +2839,7 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(1263,8),"Tainted Silicon Chip");
 		All.put(TRItem.parseItem(1263,9),"Stone Bundle");
 		All.put(TRItem.parseItem(1263,-1),"Stone Wafers");
-		
+
 		All.put(TRItem.parseItem(1264,-1),"Ruby Handsaw");
 		All.put(TRItem.parseItem(1265,-1),"Emerald Handsaw");
 		All.put(TRItem.parseItem(1266,-1),"Sapphire Handsaw");
@@ -2911,11 +2908,11 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(1329,-1),"Athame");
 		All.put(TRItem.parseItem(1331,-1),"Diamond Drawplate");
 		All.put(TRItem.parseItem(1332,-1),"Wool Card");
-		
+
 		All.put(TRItem.parseItem(1333,0),"Floppy Disk");
 		All.put(TRItem.parseItem(1333,1),"FORTH Boot Disk");
 		All.put(TRItem.parseItem(1333,-1),"Floppy Disk");
-		
+
 		All.put(TRItem.parseItem(1334,0),"Iron Nugget");
 		All.put(TRItem.parseItem(1334,1),"Silver Nugget");
 		All.put(TRItem.parseItem(1334,2),"Tin Nugget");
@@ -2932,8 +2929,8 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(1492,9),"Thaumcraft2 SensorModule");
 		All.put(TRItem.parseItem(1492,10),"Proximity SensorModule");
 		All.put(TRItem.parseItem(1492,-1),"Sensor Modules");
-		
-		
+
+
 		All.put(TRItem.parseItem(1493,0),"Blank Transmitter Card");
 		All.put(TRItem.parseItem(1493,1),"Transmitter Card [Red]");
 		All.put(TRItem.parseItem(1493,2),"Transmitter Card [Purple]");
@@ -2946,7 +2943,7 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(1493,9),"Transmitter Card [Black]");
 		All.put(TRItem.parseItem(1493,10),"Transmitter Card [Pink]");
 		All.put(TRItem.parseItem(1493,-1),"Transmitter Cards");
-		
+
 		All.put(TRItem.parseItem(1494,0),"Computer Redstone Chip");
 		All.put(TRItem.parseItem(1494,1),"Computer Iron Chip");
 		All.put(TRItem.parseItem(1494,2),"Computer Gold Chip");
@@ -2955,7 +2952,7 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(1494,5),"Computer Stone Chip");
 		All.put(TRItem.parseItem(1494,6),"Computer Obsidian Chip");
 		All.put(TRItem.parseItem(1494,-1),"Computer Chips");
-		
+
 		All.put(TRItem.parseItem(2256,-1),"Music Disc");
 		All.put(TRItem.parseItem(4056,-1),"Wooden Gear");
 		All.put(TRItem.parseItem(4057,-1),"Stone Gear");
@@ -2992,16 +2989,16 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(4320,-1),"Wooden Conductive Pipe");
 		All.put(TRItem.parseItem(4322,-1),"Stone Conductive Pipe");
 		All.put(TRItem.parseItem(4324,-1),"Golden Conductive Pipe");
-		
+
 		All.put(TRItem.parseItem(6357,-1),"Triangulators");
-		
+
 		All.put(TRItem.parseItem(6358,-1),"Wireless Remotes");
-		
+
 		All.put(TRItem.parseItem(6359,-1),"Wireless Sniffer");
 		All.put(TRItem.parseItem(6360,-1),"Wireless Map");
-		
+
 		All.put(TRItem.parseItem(6361,-1),"Wireless Trackers");
-		
+
 		All.put(TRItem.parseItem(6362,-1),"REP");
 		All.put(TRItem.parseItem(6363,-1),"Private Sniffer");
 		All.put(TRItem.parseItem(6406,-1),"Obsidian Stick");
@@ -3016,7 +3013,7 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(7260,-1),"Signal Tuner");
 		All.put(TRItem.parseItem(7261,-1),"Signal Block Surveyor");
 		All.put(TRItem.parseItem(7262,-1),"Rebar");
-		
+
 		All.put(TRItem.parseItem(7266,0),"Metal Post");
 		All.put(TRItem.parseItem(7266,1),"Black Metal Post");
 		All.put(TRItem.parseItem(7266,2),"Red Metal Post");
@@ -3198,12 +3195,12 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(30104,-1),"Debug Item");
 		All.put(TRItem.parseItem(30105,-1),"Weed-EX");
 		All.put(TRItem.parseItem(30106,-1),"Grin Powder");
-		
+
 		All.put(TRItem.parseItem(30107,0),"Zero");
 		All.put(TRItem.parseItem(30107,1),"Watery Soup Brew");
 		All.put(TRItem.parseItem(30107,2),"Rum");
 		All.put(TRItem.parseItem(30107,-1),"Rum/Watery Soup Brew");
-		
+
 		All.put(TRItem.parseItem(30108,0),"Empty Booze Barrel");
 		All.put(TRItem.parseItem(30108,1),"1L Booze Barrel");
 		All.put(TRItem.parseItem(30108,4),"Empty Booze Barrel");
@@ -3214,12 +3211,12 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(30108,13),"4L Booze Barrel");
 		All.put(TRItem.parseItem(30108,-1),"Booze Barrel");
 		All.put(TRItem.parseItem(30109,-1),"Hops");
-		
+
 		All.put(TRItem.parseItem(30110,0),"Cold Coffee");
 		All.put(TRItem.parseItem(30110,1),"Dark Coffee");
 		All.put(TRItem.parseItem(30110,2),"Coffee");
 		All.put(TRItem.parseItem(30110,-1),"Coffee");
-		
+
 		All.put(TRItem.parseItem(30111,-1),"Stone Mug");
 		All.put(TRItem.parseItem(30112,-1),"Coffee Powder");
 		All.put(TRItem.parseItem(30113,-1),"Coffee Beans");
@@ -3233,12 +3230,12 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(30121,-1),"Fertilizer");
 		All.put(TRItem.parseItem(30122,-1),"Cropnalyzer");
 		All.put(TRItem.parseItem(30124,-1),"Electric Treetap");
-		
+
 		All.put(TRItem.parseItem(30125,0),"Overclocker Upgrade");
 		All.put(TRItem.parseItem(30125,1),"Transformer Upgrade");
 		All.put(TRItem.parseItem(30125,2),"Energy Storage Upgrade");
 		All.put(TRItem.parseItem(30125,-1),"Machine Upgrades");
-		
+
 		All.put(TRItem.parseItem(30126,-1),"Seed Package");
 		All.put(TRItem.parseItem(30127,-1),"Lappack");
 		All.put(TRItem.parseItem(30128,-1),"Iridium Ore");
@@ -3280,7 +3277,7 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(30181,-1),"Electrolyzed Water Cell");
 		All.put(TRItem.parseItem(30182,-1),"EU-Reader");
 		All.put(TRItem.parseItem(30183,-1),"Wrench");
-		
+
 		All.put(TRItem.parseItem(30184,0),"Copper Cable");
 		All.put(TRItem.parseItem(30184,1),"Uninsulated Copper Cable");
 		All.put(TRItem.parseItem(30184,2),"Gold Cable");
@@ -3295,7 +3292,7 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(30184,11),"EU-Detector Cable");
 		All.put(TRItem.parseItem(30184,12),"EU-Splitter Cable");
 		All.put(TRItem.parseItem(30184,-1),"Cables");
-		
+
 		All.put(TRItem.parseItem(30185,-1),"Reinforced Door");
 		All.put(TRItem.parseItem(30186,-1),"Industrial Credit");
 		All.put(TRItem.parseItem(30187,-1),"Advanced Alloy");
@@ -3378,15 +3375,15 @@ public class NameProcessor {
 		All.put(TRItem.parseItem(31263,-1),"Energy Sensor Location Card");
 		All.put(TRItem.parseItem(31264,-1),"Energy Array Location Card");
 	}
-	
 	private static final LinkedHashMap<String, TRItem> AllNames = new LinkedHashMap<String, TRItem>(2048);
+
 	static {
 		for (Entry<TRItem, String> entry : All.entrySet()){
 			AllNames.put(entry.getValue().replace(" ", "").toLowerCase(), entry.getKey());
 		}
 	}
-	
 	private static final ArrayList<String> mods = new ArrayList<String>(32);
+
 	static {
 		mods.add("Equivalent Exchange");
 		mods.add("Buildcraft");
@@ -3410,86 +3407,10 @@ public class NameProcessor {
 		mods.add("RailCraft");
 		mods.add("Chunk Loaders");
 	}
-	public static LinkedHashMap<String, TRItem> getAllItems(){
-		final LinkedHashMap<String, TRItem> items = new LinkedHashMap<String, TRItem>(2048);
-		
-		for (Entry<TRItem, String> entry : All.entrySet()){
-			items.put(entry.getValue(), entry.getKey());
-		}
-		
-		return items;
-	}
-	
-	public static ArrayList<String> getAllMods(){
-		return new ArrayList<String>(mods);
-	}
-	
-	/** 
-	 * @return The name of the given item, or null if not found.
-	 */
-	@Nullable public static String getName(@NonNull final TRItem item){
-		final Iterator<Entry<TRItem, String>> it = All.entrySet().iterator();
-		while (it.hasNext()){
-			final Entry<TRItem, String> entry = it.next();
-			if (!TRItem.compareNP(item, entry.getKey())) continue;
-			return entry.getValue();
-		}
-		
-		return null;
-	}
-	
-	/**
-	 * @return An item representing the given String, or null if not found.
-	 */
-	@Nullable public static TRItem getItem(@NonNull final String string){
-		final TRItem it = AllNames.get(string.replace(" ", "").toLowerCase());
-		return it == null ? null : it.clone();
-	}
-	
-	public static LinkedHashMap<TRItem, String> getDefaultBlocks(@Nullable LinkedHashMap<TRItem, String> map){
-		if (map == null) map = new LinkedHashMap<TRItem, String>(256);
-		final Iterator<Entry<TRItem, String>> all = All.entrySet().iterator();
-		while (all.hasNext()){
-			final Entry<TRItem, String> entry = all.next(); 
-			map.put(entry.getKey().clone(), entry.getValue());
-			if (entry.getKey().id == 124) break;
-		}
-		return map;
-	}
-	
-	public static LinkedHashMap<TRItem, String> getEEBlocks(@Nullable LinkedHashMap<TRItem, String> map){
-		if (map == null) map = new LinkedHashMap<TRItem, String>(32);
-		
-		final Iterator<Entry<TRItem, String>> all = All.entrySet().iterator();
-		while (all.hasNext()){
-			final Entry<TRItem, String> entry = all.next(); 
-			final TRItem item = entry.getKey();
-			if (item.id < 126) continue;
-			map.put(item.clone(), entry.getValue());
-			if (item.id == 130) break;
-		}
-		return map;
-	}
-
-	public static void addTekkitMaterials(){
-		Log.trace("Adding Tekkit Material Names...");
-		for (int i = 126; i < 255; i++){
-			final String name = getName(TRItem.parseItem(i, -1));
-			if (name == null) continue;
-			Material.setMaterialName(i, name.replace("Mk. ", "MK"));
-		}
-		for (int i = 1256; i < 31265; i++){
-			if (i > 2255 && i < 2267) continue;
-			final String name = getName(TRItem.parseItem(i, -1));
-			if (name == null) continue;
-			Material.setMaterialName(i, name);
-		}
-	}
-	
 	public static boolean addEEItemsToEssentials(){
 		try {
 			if (!Bukkit.getPluginManager().isPluginEnabled("Essentials")) return false;
-			
+
 			Map<String, Integer> items = null;
 			Map<String, Short> durabilities = null;
 			try {
@@ -3504,11 +3425,11 @@ public class NameProcessor {
 				Log.debugEx(ex);
 				return false;
 			}
-			
-			if (items == null || durabilities == null) return false;
-			
+
+			if ((items == null) || (durabilities == null)) return false;
+
 			final ArrayList<String> it = new ArrayList<String>();
-	
+
 			it.add("energycollectormk1,126,0");
 			it.add("energycollector,126,0");
 			it.add("collectormk1,126,0");
@@ -3544,7 +3465,7 @@ public class NameProcessor {
 			it.add("transtablet,130,0");
 			it.add("transmutiontable,130,0");
 			it.add("transmutetable,130,0");
-			
+
 			it.add("philosopherstone,27526,0");
 			it.add("philosopher,27526,0");
 			it.add("philostone,27526,0");
@@ -3714,10 +3635,10 @@ public class NameProcessor {
 				try {
 					final String[] parts = line.trim().toLowerCase(Locale.ENGLISH).split("[^a-z0-9]");
 					if (parts.length < 2) continue;
-		
+
 					final int numeric = Integer.parseInt(parts[1]);
-		
-					durabilities.put(parts[0], Short.valueOf(parts.length > 2 && !parts[2].equals("0") ? Short.parseShort(parts[2]) : 0));
+
+					durabilities.put(parts[0], Short.valueOf((parts.length > 2) && !parts[2].equals("0") ? Short.parseShort(parts[2]) : 0));
 					items.put(parts[0], numeric);
 				} catch (Exception ex){}
 			}
@@ -3726,5 +3647,85 @@ public class NameProcessor {
 			Log.debugEx(ex);
 			return false;
 		}
+	}
+	public static void addTekkitMaterials(){
+		Log.trace("Adding Tekkit Material Names...");
+		for (int i = 126; i < 255; i++){
+			final String name = getName(TRItem.parseItem(i, -1));
+			if (name == null) continue;
+			Material.setMaterialName(i, name.replace("Mk. ", "MK"));
+		}
+		for (int i = 1256; i < 31265; i++){
+			if ((i > 2255) && (i < 2267)) continue;
+			final String name = getName(TRItem.parseItem(i, -1));
+			if (name == null) continue;
+			Material.setMaterialName(i, name);
+		}
+	}
+
+	public static LinkedHashMap<String, TRItem> getAllItems(){
+		final LinkedHashMap<String, TRItem> items = new LinkedHashMap<String, TRItem>(2048);
+
+		for (Entry<TRItem, String> entry : All.entrySet()){
+			items.put(entry.getValue(), entry.getKey());
+		}
+
+		return items;
+	}
+
+	public static ArrayList<String> getAllMods(){
+		return new ArrayList<String>(mods);
+	}
+
+	public static LinkedHashMap<TRItem, String> getDefaultBlocks(@Nullable LinkedHashMap<TRItem, String> map){
+		if (map == null) map = new LinkedHashMap<TRItem, String>(256);
+		final Iterator<Entry<TRItem, String>> all = All.entrySet().iterator();
+		while (all.hasNext()){
+			final Entry<TRItem, String> entry = all.next(); 
+			map.put(entry.getKey().clone(), entry.getValue());
+			if (entry.getKey().id == 124) break;
+		}
+		return map;
+	}
+
+	public static LinkedHashMap<TRItem, String> getEEBlocks(@Nullable LinkedHashMap<TRItem, String> map){
+		if (map == null) map = new LinkedHashMap<TRItem, String>(32);
+
+		final Iterator<Entry<TRItem, String>> all = All.entrySet().iterator();
+		while (all.hasNext()){
+			final Entry<TRItem, String> entry = all.next(); 
+			final TRItem item = entry.getKey();
+			if (item.id < 126) continue;
+			map.put(item.clone(), entry.getValue());
+			if (item.id == 130) break;
+		}
+		return map;
+	}
+
+	@NonNull public static String getEEName(final int id){
+		final String s = EEItems.get(id);
+		return (s == null ? "x"+id : s);
+	}
+
+	/**
+	 * @return An item representing the given String, or null if not found.
+	 */
+	@Nullable public static TRItem getItem(@NonNull final String string){
+		final TRItem it = AllNames.get(string.replace(" ", "").toLowerCase());
+		return it == null ? null : it.clone();
+	}
+
+	/** 
+	 * @return The name of the given item, or null if not found.
+	 */
+	@Nullable public static String getName(@NonNull final TRItem item){
+		final Iterator<Entry<TRItem, String>> it = All.entrySet().iterator();
+		while (it.hasNext()){
+			final Entry<TRItem, String> entry = it.next();
+			if (!TRItem.compareNP(item, entry.getKey())) continue;
+			return entry.getValue();
+		}
+
+		return null;
 	}
 }

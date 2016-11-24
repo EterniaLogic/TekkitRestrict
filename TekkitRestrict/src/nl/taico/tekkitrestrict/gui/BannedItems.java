@@ -7,8 +7,6 @@ package nl.taico.tekkitrestrict.gui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import nl.taico.tekkitrestrict.gui.lib.JSuggestField;
-
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -17,11 +15,10 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-
-
 import javax.swing.table.DefaultTableModel;
 
 import nl.taico.tekkitrestrict.NameProcessor;
+import nl.taico.tekkitrestrict.gui.lib.JSuggestField;
 
 /**
  *
@@ -29,8 +26,71 @@ import nl.taico.tekkitrestrict.NameProcessor;
  */
 @SuppressWarnings("serial")
 public class BannedItems extends javax.swing.JFrame {
-	
+
+	private class RowListener implements ListSelectionListener {
+		@Override
+		public void valueChanged(ListSelectionEvent event) {
+			if (event.getValueIsAdjusting()) {
+				return;
+			}
+			rowEvent();
+		}
+	}
+	/**
+	 * @param args the command line arguments
+	 */
+	public static void main(String args[]) {
+		/* Set the Nimbus look and feel */
+		//<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+		/* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+		 * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+		 */
+		try {
+			for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+				if ("Nimbus".equals(info.getName())) {
+					javax.swing.UIManager.setLookAndFeel(info.getClassName());
+					break;
+				}
+			}
+		} catch (ClassNotFoundException ex) {
+			java.util.logging.Logger.getLogger(BannedItems.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+		} catch (InstantiationException ex) {
+			java.util.logging.Logger.getLogger(BannedItems.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+		} catch (IllegalAccessException ex) {
+			java.util.logging.Logger.getLogger(BannedItems.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+		} catch (javax.swing.UnsupportedLookAndFeelException ex) {
+			java.util.logging.Logger.getLogger(BannedItems.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+		}
+		//</editor-fold>
+
+		/* Create and display the form */
+		java.awt.EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				new BannedItems().setVisible(true);
+			}
+		});
+	}
+
 	private int lastid = 0;
+
+	// Variables declaration - do not modify                     
+	private JPanel jPanel1;
+
+	private JScrollPane jScrollPane1;                                      
+
+	private JTable jTable1; 
+
+	private JSuggestField suggestField;
+	private JButton btnAdd;
+	private javax.swing.JButton btnChange;
+	private javax.swing.JButton btnRemove;
+	private javax.swing.JLabel jLabel1;
+
+	private javax.swing.JLabel jLabel2;
+	private javax.swing.JPanel jPanel2;
+	private javax.swing.JTextField msgField;
+	private JTextField hiddenField1;
 	/**
 	 * Creates new form BannedItems
 	 */
@@ -39,7 +99,30 @@ public class BannedItems extends javax.swing.JFrame {
 
 
 	}
-
+	private void btnAddActionPerformed(){
+		if (!suggestField.getSuggestData().contains(suggestField.getText())){
+			if (suggestField.suggestions.isEmpty()) return;
+			suggestField.setText(suggestField.suggestions.get(0));
+		}
+		DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+		model.addRow(new Object[]{lastid, suggestField.getText(), msgField.getText()});
+		lastid++;
+	}
+	private void btnChangeActionPerformed(java.awt.event.ActionEvent evt) {
+		if (!suggestField.getSuggestData().contains(suggestField.getText())){
+			if (suggestField.suggestions.isEmpty()) return;
+			suggestField.setText(suggestField.suggestions.get(0));
+		}
+		int row = Integer.parseInt(hiddenField1.getText());
+		if (jTable1.getModel().getRowCount() <= row) return;
+		jTable1.getModel().setValueAt(suggestField.getText(), row, 1);
+		jTable1.getModel().setValueAt(msgField.getText(), row, 2);
+	}
+	private void btnRemoveActionPerformed(java.awt.event.ActionEvent evt) {
+		int row = Integer.parseInt(hiddenField1.getText());
+		if (jTable1.getModel().getRowCount() <= row) return;
+		((DefaultTableModel)jTable1.getModel()).removeRow(row);
+	}
 	/**
 	 * This method is called from within the constructor to initialize the form.
 	 * WARNING: Do NOT modify this code. The content of this method is always
@@ -74,19 +157,21 @@ public class BannedItems extends javax.swing.JFrame {
 			Class[] types = new Class[] {java.lang.Integer.class, java.lang.String.class, java.lang.String.class};
 			boolean[] canEdit = new boolean[] {false, false, true};
 
+			@Override
 			@SuppressWarnings("rawtypes")
 			public Class getColumnClass(int columnIndex) {
 				return types[columnIndex];
 			}
 
+			@Override
 			public boolean isCellEditable(int rowIndex, int columnIndex) {
 				return canEdit[columnIndex];
 			}
 		});
 		jScrollPane1.setViewportView(jTable1);
 		jTable1.getColumnModel().getColumn(0).setMinWidth(50);
-        jTable1.getColumnModel().getColumn(0).setPreferredWidth(50);
-        jTable1.getColumnModel().getColumn(0).setMaxWidth(50);
+		jTable1.getColumnModel().getColumn(0).setPreferredWidth(50);
+		jTable1.getColumnModel().getColumn(0).setMaxWidth(50);
 		jTable1.getColumnModel().getColumn(1).setCellEditor(null);
 		suggestField.setText("");
 
@@ -100,16 +185,18 @@ public class BannedItems extends javax.swing.JFrame {
 
 		jTable1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		jTable1.getSelectionModel().addListSelectionListener(new RowListener());
-		
+
 		btnAdd.setText("Add");
 		btnAdd.addActionListener(new ActionListener(){
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				btnAddActionPerformed();
 			}
 		});
-		
+
 		btnChange.setText("Change");
 		btnChange.addActionListener(new java.awt.event.ActionListener() {
+			@Override
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				btnChangeActionPerformed(evt);
 			}
@@ -117,6 +204,7 @@ public class BannedItems extends javax.swing.JFrame {
 
 		btnRemove.setText("Remove");
 		btnRemove.addActionListener(new java.awt.event.ActionListener() {
+			@Override
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				btnRemoveActionPerformed(evt);
 			}
@@ -204,95 +292,11 @@ public class BannedItems extends javax.swing.JFrame {
 
 		pack();
 	}
-	
-	private void btnAddActionPerformed(){
-		if (!suggestField.getSuggestData().contains(suggestField.getText())){
-			if (suggestField.suggestions.isEmpty()) return;
-			suggestField.setText(suggestField.suggestions.get(0));
-		}
-		DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-		model.addRow(new Object[]{lastid, suggestField.getText(), msgField.getText()});
-		lastid++;
-	}
-	
-	private void btnChangeActionPerformed(java.awt.event.ActionEvent evt) {
-		if (!suggestField.getSuggestData().contains(suggestField.getText())){
-			if (suggestField.suggestions.isEmpty()) return;
-			suggestField.setText(suggestField.suggestions.get(0));
-		}
-		int row = Integer.parseInt(hiddenField1.getText());
-		if (jTable1.getModel().getRowCount() <= row) return;
-		jTable1.getModel().setValueAt(suggestField.getText(), row, 1);
-		jTable1.getModel().setValueAt(msgField.getText(), row, 2);
-	}                                      
-
-	private void btnRemoveActionPerformed(java.awt.event.ActionEvent evt) {
-		int row = Integer.parseInt(hiddenField1.getText());
-		if (jTable1.getModel().getRowCount() <= row) return;
-		((DefaultTableModel)jTable1.getModel()).removeRow(row);
-	} 
-
-	/**
-	 * @param args the command line arguments
-	 */
-	public static void main(String args[]) {
-		/* Set the Nimbus look and feel */
-		//<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-		/* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-		 * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-		 */
-		try {
-			for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-				if ("Nimbus".equals(info.getName())) {
-					javax.swing.UIManager.setLookAndFeel(info.getClassName());
-					break;
-				}
-			}
-		} catch (ClassNotFoundException ex) {
-			java.util.logging.Logger.getLogger(BannedItems.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-		} catch (InstantiationException ex) {
-			java.util.logging.Logger.getLogger(BannedItems.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-		} catch (IllegalAccessException ex) {
-			java.util.logging.Logger.getLogger(BannedItems.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-		} catch (javax.swing.UnsupportedLookAndFeelException ex) {
-			java.util.logging.Logger.getLogger(BannedItems.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-		}
-		//</editor-fold>
-
-		/* Create and display the form */
-		java.awt.EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				new BannedItems().setVisible(true);
-			}
-		});
-	}
-	// Variables declaration - do not modify                     
-	private JPanel jPanel1;
-	private JScrollPane jScrollPane1;
-	private JTable jTable1;
-	private JSuggestField suggestField;
-
-	private JButton btnAdd;
-	private javax.swing.JButton btnChange;
-	private javax.swing.JButton btnRemove;
-	private javax.swing.JLabel jLabel1;
-	private javax.swing.JLabel jLabel2;
-	private javax.swing.JPanel jPanel2;
-	private javax.swing.JTextField msgField;
-	private JTextField hiddenField1;
 	// End of variables declaration            
 	public void rowEvent(){
 		int r = jTable1.getSelectedRow();
 		hiddenField1.setText(""+r);
 		suggestField.setText((String) jTable1.getModel().getValueAt(r, 1));
 		msgField.setText((String) jTable1.getModel().getValueAt(r, 2));
-	}
-	private class RowListener implements ListSelectionListener {
-		public void valueChanged(ListSelectionEvent event) {
-			if (event.getValueIsAdjusting()) {
-				return;
-			}
-			rowEvent();
-		}
 	}
 }

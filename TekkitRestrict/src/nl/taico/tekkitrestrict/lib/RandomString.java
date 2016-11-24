@@ -10,7 +10,11 @@ public class RandomString {
 		}
 	}
 
+	public static char randomChar() {
+		return (char) ('a' + (new Random()).nextInt(26));
+	}
 	private final Random random = new Random();
+
 	private final char[] buf;
 
 	public RandomString(int length) {
@@ -24,9 +28,5 @@ public class RandomString {
 			if (buf[idx] == '\0') idx--;
 		}
 		return new String(buf);
-	}
-
-	public static char randomChar() {
-		return (char) ('a' + (new Random()).nextInt(26));
 	}
 }

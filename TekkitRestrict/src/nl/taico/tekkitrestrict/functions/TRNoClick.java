@@ -6,15 +6,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
-import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.ItemStack;
-
 import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.TRException;
 import nl.taico.tekkitrestrict.TRItemProcessor2;
 import nl.taico.tekkitrestrict.config.SettingsStorage;
 import nl.taico.tekkitrestrict.objects.TRItem;
+
+import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.ItemStack;
 
 public class TRNoClick {
 	public static HashMap<String, String> inventories = new HashMap<String, String>();
@@ -99,23 +99,41 @@ public class TRNoClick {
 
 		inventories.put("FFCamoflage", "Camoflageupgrade");
 	}
-	
+
 	private static ArrayList<TRNoClick> noclicks = new ArrayList<TRNoClick>();
-	private List<TRItem> items;
-	private String inventory;
-	private boolean left, right, shift;
-	
-	private TRNoClick(){}
-	
-	public TRNoClick(List<TRItem> items, String inventory, boolean left, boolean right, boolean shift){
-		this.items = items;
-		this.inventory = inventory;
-		this.left = left;
-		this.right = right;
-		this.shift = shift;
-		noclicks.add(this);
+	public static String blockClick(InventoryClickEvent event){
+		ItemStack item;
+		try {
+			item = event.getCurrentItem();
+		} catch (Exception ex){
+			return null;
+		}
+
+		if (item == null) return null;
+
+		final Player player = (Player) event.getWhoClicked();
+		if (player.hasPermission("tekkitrestrict.bypass.noclick")) return null;
+
+		final int id = item.getTypeId();
+		final int data = item.getDurability();
+		final String title = event.getView().getTitle();
+		final boolean shift = event.isShiftClick();
+		final boolean left = event.isLeftClick();
+		final boolean right = event.isRightClick();
+
+		for (TRNoClick nc : noclicks){
+			if ((nc.inventory != null) && !nc.inventory.equalsIgnoreCase(title)) continue;
+			if ((left && nc.left) || (right && nc.right) || (shift && nc.shift)){
+				for (TRItem tritem : nc.items){
+					if (tritem.compare(id, data)){
+						return tritem.msg == null ? "" : tritem.msg;
+					}
+
+				}
+			}
+		}
+		return null;
 	}
-	
 	public static void load(){
 		ArrayList<TRNoClick> tempclicks = new ArrayList<TRNoClick>();
 		List<String> it = SettingsStorage.bannedConfig.getStringList("BannedClicks");
@@ -147,73 +165,55 @@ public class TRNoClick {
 				}
 				if (!b) tempclicks.add(nc);
 			}
-			
+
 			//new TRNoClick(TRItemProcessor.processItemString(temp[0]+msg);
 		}
-		
+
 		noclicks = tempclicks;
 	}
-	
 	private static boolean loadType(String line, String type, TRNoClick nc){
 		switch (type.toLowerCase()){
-			case "left": nc.left = true;
-				break;
-			case "right": nc.right = true;
-				break;
-			case "shift": nc.shift = true;
-				break;
-			default:
-				if (nc.inventory != null){
-					Warning.config("You have an invalid value in Banned.yml at \""+line+"\": You can only specify 1 inventory per item.", false);
-					return false;
+		case "left": nc.left = true;
+		break;
+		case "right": nc.right = true;
+		break;
+		case "shift": nc.shift = true;
+		break;
+		default:
+			if (nc.inventory != null){
+				Warning.config("You have an invalid value in Banned.yml at \""+line+"\": You can only specify 1 inventory per item.", false);
+				return false;
+			}
+			Iterator<Entry<String, String>> itt = inventories.entrySet().iterator();
+			while (itt.hasNext()){
+				Entry<String, String> e = itt.next();
+				if (e.getKey().equalsIgnoreCase(type)){
+					nc.inventory = e.getValue();
+					break;
 				}
-				Iterator<Entry<String, String>> itt = inventories.entrySet().iterator();
-				while (itt.hasNext()){
-					Entry<String, String> e = itt.next();
-					if (e.getKey().equalsIgnoreCase(type)){
-						nc.inventory = e.getValue();
-						break;
-					}
-				}
-				if (nc.inventory == null){
-					Warning.config("You have an invalid value in Banned.yml: "+type+" is not a valid value (left, right, shift or an inventoryname)", false);
-					return false;
-				}
+			}
+			if (nc.inventory == null){
+				Warning.config("You have an invalid value in Banned.yml: "+type+" is not a valid value (left, right, shift or an inventoryname)", false);
+				return false;
+			}
 		}
 		return true;
 	}
 
-	public static String blockClick(InventoryClickEvent event){
-		ItemStack item;
-		try {
-			item = event.getCurrentItem();
-		} catch (Exception ex){
-			return null;
-		}
-		
-		if (item == null) return null;
-		
-		final Player player = (Player) event.getWhoClicked();
-		if (player.hasPermission("tekkitrestrict.bypass.noclick")) return null;
-		
-		final int id = item.getTypeId();
-		final int data = item.getDurability();
-		final String title = event.getView().getTitle();
-		final boolean shift = event.isShiftClick();
-		final boolean left = event.isLeftClick();
-		final boolean right = event.isRightClick();
-		
-		for (TRNoClick nc : noclicks){
-			if (nc.inventory != null && !nc.inventory.equalsIgnoreCase(title)) continue;
-			if ((left && nc.left) || (right && nc.right) || (shift && nc.shift)){
-				for (TRItem tritem : nc.items){
-					if (tritem.compare(id, data)){
-						return tritem.msg == null ? "" : tritem.msg;
-					}
-					
-				}
-			}
-		}
-		return null;
+	private List<TRItem> items;
+
+	private String inventory;
+
+	private boolean left, right, shift;
+
+	private TRNoClick(){}
+
+	public TRNoClick(List<TRItem> items, String inventory, boolean left, boolean right, boolean shift){
+		this.items = items;
+		this.inventory = inventory;
+		this.left = left;
+		this.right = right;
+		this.shift = shift;
+		noclicks.add(this);
 	}
 }

@@ -10,19 +10,16 @@ import net.minecraft.server.CraftingManager;
 import net.minecraft.server.CraftingRecipe;
 import net.minecraft.server.FurnaceRecipes;
 import net.minecraft.server.ItemStack;
-
 import nl.taico.tekkitrestrict.Log;
+import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.TRException;
 import nl.taico.tekkitrestrict.TRItemProcessor2;
-import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.config.SettingsStorage;
 import nl.taico.tekkitrestrict.objects.TRItem;
 
 public class TRRecipeBlock {
 	public static int recipesSize, furnaceSize;
-	public static void reload() {
-		blockConfigRecipes();
-	}
+	private static Field meta;
 
 	public static void blockConfigRecipes() {
 		recipesSize = 0;
@@ -80,15 +77,13 @@ public class TRRecipeBlock {
 			if (recipe == null) continue;
 			final net.minecraft.server.ItemStack result = recipe.b();
 			if (result == null) continue;
-			if (result.id == id && (data == -1 || result.getData() == data)){// || (data == -10 && result.getData() == 0))) { TODO change -10
+			if ((result.id == id) && ((data == -1) || (result.getData() == data))){// || (data == -10 && result.getData() == 0))) { TODO change -10
 				recipes.remove();
 				status = true;
 			}
 		}
 		return status;
 	}
-	private static Field meta;
-	
 	@SuppressWarnings("rawtypes")
 	public static boolean blockFurnaceRecipe(int id, int data) {
 		Log.trace("Disabling furnace recipes for "+id+":"+data+"...");
@@ -96,16 +91,16 @@ public class TRRecipeBlock {
 			try {
 				meta = FurnaceRecipes.class.getField("metaSmeltingList");
 				if (meta == null) return false;
-				
+
 				if (!meta.isAccessible()) meta.setAccessible(true);
 			} catch (NoSuchFieldException | SecurityException ex) {
 				return false;
 			}
 		}
-		
+
 		boolean a = FurnaceRecipes.getInstance().getRecipies().containsKey(id);
 		boolean b = false;
-		
+
 		try {
 			Object obj = meta.get(FurnaceRecipes.getInstance());
 			if (obj instanceof Map){
@@ -113,18 +108,18 @@ public class TRRecipeBlock {
 				while (it.hasNext()){
 					final Entry<List<Integer>, ItemStack> e = it.next();
 					if (id != e.getKey().get(0).intValue()) continue;
-					
-					if (data == -1 || data == e.getKey().get(1)) {
+
+					if ((data == -1) || (data == e.getKey().get(1))) {
 						it.remove();
 						b = true;
 					}
 				}
-				
-				if ((!b || data == -1) && a){
+
+				if ((!b || (data == -1)) && a){
 					FurnaceRecipes.getInstance().getRecipies().remove(id);
 					b = true;
 				}
-				
+
 				return b;
 			} else {
 				return false;
@@ -132,5 +127,9 @@ public class TRRecipeBlock {
 		} catch (SecurityException | IllegalArgumentException | IllegalAccessException ex) {
 			return false;
 		}
+	}
+
+	public static void reload() {
+		blockConfigRecipes();
 	}
 }

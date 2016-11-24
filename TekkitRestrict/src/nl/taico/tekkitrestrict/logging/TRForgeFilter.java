@@ -8,14 +8,6 @@ import nl.taico.tekkitrestrict.Log;
 
 public class TRForgeFilter implements Filter {
 	private ArrayList<TRLogFilterPlus> filters;
-	public void reload(){
-		ArrayList<TRLogFilterPlus> tbr = new ArrayList<TRLogFilterPlus>();
-		for (TRLogFilterPlus f : TRLogFilterPlus.allFilters){
-			if (f.getType().isForgeLog()) tbr.add(f);
-		}
-		filters = tbr;
-	}
-	
 	@Override
 	public boolean isLoggable(LogRecord record) {
 		try {
@@ -25,7 +17,7 @@ public class TRForgeFilter implements Filter {
 					if (f.getType().isForgeLog()) filters.add(f);
 				}
 			}
-			
+
 			try {
 				final String msg = record.getMessage();
 				for (TRLogFilterPlus filter: filters){
@@ -36,6 +28,14 @@ public class TRForgeFilter implements Filter {
 			}
 		} catch (Exception ex){}
 		return true;
+	}
+
+	public void reload(){
+		ArrayList<TRLogFilterPlus> tbr = new ArrayList<TRLogFilterPlus>();
+		for (TRLogFilterPlus f : TRLogFilterPlus.allFilters){
+			if (f.getType().isForgeLog()) tbr.add(f);
+		}
+		filters = tbr;
 	}
 
 }
