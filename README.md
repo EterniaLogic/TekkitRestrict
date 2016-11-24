@@ -3,7 +3,7 @@ TekkitRestrict
 
 TekkitRestrict is licenced under the GNU General Public License version 3 (GPLv3) (See LICENSE.txt in the src folder).
 
-Copyright (C) 2016 Brent Clancy Original work.
+Copyright (C) 2016 Brent Clancy, Taico Aerts.
 
 TekkitRestrict is a continuation of the similarily named project "TekkitRestrict" by dreadslicer@gmail.com (aliases "DreadEnd" and "DreadSlicer" are both pertaining to dreadslicer@gmail.com) with permission from the author.
 
