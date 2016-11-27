@@ -3,6 +3,7 @@
 	<name>TekkitRestrict</name>
 	<comment></comment>
 	<projects>
+		<project>EEPatch_TR</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

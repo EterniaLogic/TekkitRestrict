@@ -86,8 +86,8 @@ Anti-Hacks:
             TriggerAfter: 1
     Forcefield:
         Enabled: true
-        Tolerance: 25
-        Angle: 50
+        Tolerance: 30
+        Angle: 60
         Broadcast: true
         Log: true
         Kick: false

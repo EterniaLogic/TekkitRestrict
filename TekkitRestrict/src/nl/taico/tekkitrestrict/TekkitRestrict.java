@@ -38,7 +38,7 @@ import nl.taico.tekkitrestrict.commands.TRCmdTr;
 import nl.taico.tekkitrestrict.config.SettingsStorage;
 import nl.taico.tekkitrestrict.database.Database;
 import nl.taico.tekkitrestrict.eepatch.EEPSettings;
-import nl.taico.tekkitrestrict.functions.TRChunkUnloader2;
+import nl.taico.tekkitrestrict.functions.TRChunkUnloadCommandLogic;
 import nl.taico.tekkitrestrict.functions.TREMCSet;
 import nl.taico.tekkitrestrict.functions.TRLWCProtect;
 import nl.taico.tekkitrestrict.functions.TRLimiter;
@@ -649,7 +649,7 @@ public class TekkitRestrict extends JavaPlugin {
 		else						 Warning.load("Unable to add EE Items to Essentials", false);
 
 		for (World world : Bukkit.getWorlds()){
-			new TRChunkUnloader2(world);
+			new TRChunkUnloadCommandLogic(world);
 		}
 
 		//#################################################### Check Update #####################################################

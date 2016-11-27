@@ -80,6 +80,8 @@ public class TRLogEnhancer implements Filter {
 	@Override
 	public boolean isLoggable(LogRecord record){
 		String msg = record.getMessage();
+		if(msg == null) return false; // ERROR!
+		
 		if (enhanceCMD){
 			if (msg.startsWith("[PLAYER_COMMAND] ")){
 				msg = msg.substring(17);

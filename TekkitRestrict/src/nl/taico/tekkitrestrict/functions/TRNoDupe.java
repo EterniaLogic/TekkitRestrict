@@ -58,7 +58,7 @@ public class TRNoDupe {
 					try {
 						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), convert(Dupes.alcBag.command, "AlcBag", player, id, data));
 					} catch (Exception ex) {
-						Warning.config("The command set for Anti-Dupes.AlchemyBagDupe returned an error!", false);
+						Warning.config("The command set for Anti-Dupes. AlchemyBagDupe returned an error!", false);
 					}
 					cmdBag.remove(player.getName());
 				} else {
@@ -79,7 +79,7 @@ public class TRNoDupe {
 					try {
 						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), convert(Dupes.rmFurnace.command, "RMFurnace", player, id, data));
 					} catch (Exception ex) {
-						Warning.config("The command set for Anti-Dupes.RMFurnaceDupe returned an error!", false);
+						Warning.config("The command set for Anti-Dupes. RMFurnaceDupe returned an error!", false);
 					}
 					cmdRM.remove(player.getName());
 				} else {
@@ -100,7 +100,7 @@ public class TRNoDupe {
 					try {
 						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), convert(Dupes.tankcart.command, "TankCart", player, id, data));
 					} catch (Exception ex) {
-						Warning.config("The command set for Anti-Dupes.TankCartDupe returned an error!", false);
+						Warning.config("The command set for Anti-Dupes. TankCartDupe returned an error!", false);
 					}
 					cmdTC.remove(player.getName());
 				} else {
@@ -121,7 +121,7 @@ public class TRNoDupe {
 					try {
 						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), convert(Dupes.tankcartGlitch.command, "TankCartGlitch", player, id, data));
 					} catch (Exception ex) {
-						Warning.config("The command set for Anti-Dupes.TankCartGlitch returned an error!", false);
+						Warning.config("The command set for Anti-Dupes. TankCartGlitch returned an error!", false);
 					}
 					cmdTCG.remove(player.getName());
 				} else {
@@ -142,14 +142,14 @@ public class TRNoDupe {
 					try {
 						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), convert(Dupes.transmute.command, "Transmute", player, id, data));
 					} catch (Exception ex) {
-						Warning.config("The command set for Anti-Dupes.TransmuteDupe returned an error!", false);
+						Warning.config("The command set for Anti-Dupes. TransmuteDupe returned an error!", false);
 					}
 					cmdTransmution.remove(player.getName());
 				} else {
 					cmdTransmution.put(player.getName(), cur);
 				}
 			}
-			message = convert(Dupes.broadcastFormat, "Transmution Table(t)", player, id, data);
+			message = convert(Dupes.broadcastFormat, "Transmutation Table(t)", player, id, data);
 			if (Dupes.transmute.broadcast) 	Util.broadcastNoConsole("[TRDupe] " + message, "tekkitrestrict.notify.dupe");
 			if (Dupes.transmute.kick) 		Util.kick(player, "[TRDupe] " + message);
 			break;
@@ -163,7 +163,7 @@ public class TRNoDupe {
 					try {
 						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), convert(Dupes.pedestal.command, "Pedestal", player, id, data));
 					} catch (Exception ex) {
-						Warning.config("The command set for Anti-Dupes.PedestalEmcGen returned an error!", false);
+						Warning.config("The command set for Anti-Dupes. PedestalEmcGen returned an error!", false);
 					}
 					cmdPedestal.remove(player.getName());
 				} else {
@@ -184,7 +184,7 @@ public class TRNoDupe {
 					try {
 						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), convert(Dupes.diskdrive.command, "Disk Drive", player, id, data));
 					} catch (Exception ex) {
-						Warning.config("The command set for Anti-Dupes.DiskDrive returned an error!", false);
+						Warning.config("The command set for Anti-Dupes. DiskDrive returned an error!", false);
 					}
 					cmdDiskdrive.remove(player.getName());
 				} else {

@@ -84,8 +84,9 @@ public class NoHackForcefield implements Listener {
 				if (pdir < 0) {
 					pdir = Math.abs(pdir + 360.00d);
 				}
-
-				double anglej = (xloc.angle(ploc) * 180) / Math.PI;//The angle in degrees. If the angle is 180, that means the 
+				
+				//The angle in degrees. If the angle is 180, that means the angle is back behind the player
+				double anglej = (xloc.angle(ploc) * 180) / Math.PI;
 				double angle = (zloc.angle(ploc) * 180) / Math.PI;
 
 				// angle 0 -> 3.14-> 0

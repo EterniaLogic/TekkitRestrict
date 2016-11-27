@@ -4,7 +4,7 @@ import nl.taico.tekkitrestrict.Log;
 import nl.taico.tekkitrestrict.Log.Warning;
 import nl.taico.tekkitrestrict.TRConfigCache.Threads;
 import nl.taico.tekkitrestrict.TekkitRestrict;
-import nl.taico.tekkitrestrict.functions.TRChunkUnloader;
+import nl.taico.tekkitrestrict.functions.TRThreadedChunkUnloader;
 
 import org.bukkit.Bukkit;
 
@@ -13,9 +13,10 @@ public class TRChunkUnloaderThread extends Thread{
 	private boolean done = true;
 	@Override
 	public void run(){
+		this.setName("TekkitRestrict ChunkUnloader");
 		while (true){
 			if (done){
-				Bukkit.getScheduler().scheduleSyncDelayedTask(TekkitRestrict.getInstance(), new Runnable(){
+				/*Bukkit.getScheduler().scheduleSyncDelayedTask(TekkitRestrict.getInstance(), new Runnable(){
 					@Override
 					public void run(){
 						try {
@@ -31,7 +32,13 @@ public class TRChunkUnloaderThread extends Thread{
 							}
 						}
 					}
-				});
+				});*/
+				
+				try{
+					TRThreadedChunkUnloader.unloadSChunks();
+				}catch(Exception e){
+					Log.Exception(e, true);
+				}
 			}
 
 			try {

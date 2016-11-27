@@ -23,20 +23,20 @@ import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.event.world.ChunkUnloadEvent;
 
-public class TRChunkUnloader2 {
-	public static Collection<TRChunkUnloader2> getAll(){
+public class TRChunkUnloadCommandLogic {
+	public static Collection<TRChunkUnloadCommandLogic> getAll(){
 		return cus.values();
 	}
-	public static TRChunkUnloader2 getForWorld(String worldname){
+	public static TRChunkUnloadCommandLogic getForWorld(String worldname){
 		return cus.get(worldname.toLowerCase());
 	}
 	private final World world;
 	private ChunkUnloadMethod method;
 	private TRChunkIndex index;
 
-	private static HashMap<String, TRChunkUnloader2> cus = new HashMap<String, TRChunkUnloader2>();
+	private static HashMap<String, TRChunkUnloadCommandLogic> cus = new HashMap<String, TRChunkUnloadCommandLogic>();
 
-	public TRChunkUnloader2(World world){
+	public TRChunkUnloadCommandLogic(World world){
 		this.world = world;
 		this.method = ChunkUnloadMethod.UnloadLowWhenForced;
 		cus.put(world.getName().toLowerCase(), this);

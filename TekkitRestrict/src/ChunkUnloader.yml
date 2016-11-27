@@ -22,7 +22,7 @@
 # from disabling your server over time.
 # 
 # If you lower it below 1000, you have a chance of lagging your server by player movements.
-UseChunkUnloader: false
+UseChunkUnloader: true
 # 
 # The maximal amount of chunks loaded at a time. If this amount is exceeded, chunks will be
 # forcefully unloaded (even if they have chunk loaders) to clear RAM.

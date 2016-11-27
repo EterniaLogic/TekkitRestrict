@@ -56,7 +56,7 @@ public class TRNoHack {
 					try {
 						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), Hacks.fly.command.replace("{PLAYER}", player.getName()).replace("{TYPE}", "fly"));
 					} catch (Exception ex) {
-						Warning.config("The command set for Anti-Hacks.Fly returned an error!", false);
+						Warning.config("The command set for Anti-Hacks. Fly returned an error!", false);
 					}
 					cmdFly.remove(player.getName());
 				} else {
@@ -77,7 +77,7 @@ public class TRNoHack {
 					try {
 						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), Hacks.forcefield.command.replace("{PLAYER}", player.getName()).replace("{TYPE}", "forcefield"));
 					} catch (Exception ex) {
-						Warning.config("The command set for Anti-Hacks.Forcefield returned an error!", false);
+						Warning.config("The command set for Anti-Hacks. Forcefield returned an error!", false);
 					}
 					cmdForcefield.remove(player.getName());
 				} else {
@@ -98,7 +98,7 @@ public class TRNoHack {
 					try {
 						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), Hacks.speed.command.replace("{PLAYER}", player.getName()).replace("{TYPE}", "movespeed"));
 					} catch (Exception ex) {
-						Warning.config("The command set for Anti-Hacks.MoveSpeed returned an error!", false);
+						Warning.config("The command set for Anti-Hacks. MoveSpeed returned an error!", false);
 					}
 					cmdSpeed.remove(player.getName());
 				} else {

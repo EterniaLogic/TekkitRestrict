@@ -1,8 +1,8 @@
 name: TekkitRestrict
 main: nl.taico.tekkitrestrict.TekkitRestrict
-authors: [Taeir, DreadSlicer]
+authors: [Taeir, EterniaLogic]
 prefix: TekkitRestrict
-version: 2.0
+version: 2.1
 description: TekkitRestrict gives server owners a lot of features to prevent and block unwanted Tekkit features.
 softdepend: [mod_EE, GriefPrevention, PreciousStones, WorldGuard, Essentials]
 

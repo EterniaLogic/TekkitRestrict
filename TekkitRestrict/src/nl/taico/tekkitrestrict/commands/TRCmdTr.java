@@ -32,7 +32,7 @@ import nl.taico.tekkitrestrict.Updater.UpdateResult;
 import nl.taico.tekkitrestrict.api.SafeZones.SafeZoneCreate;
 import nl.taico.tekkitrestrict.config.SettingsStorage;
 import nl.taico.tekkitrestrict.eepatch.EEPSettings;
-import nl.taico.tekkitrestrict.functions.TRChunkUnloader2;
+import nl.taico.tekkitrestrict.functions.TRChunkUnloadCommandLogic;
 import nl.taico.tekkitrestrict.functions.TREMCSet;
 import nl.taico.tekkitrestrict.functions.TRLimiter;
 import nl.taico.tekkitrestrict.functions.TRNoInteract;
@@ -54,9 +54,9 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 public class TRCmdTr implements CommandExecutor {
 	private void about(CommandSender sender){
 		msgy(sender, "[TekkitRestrict About]");
-		msgb(sender, "Former author and creator: " + ChatColor.GREEN + "DreadSlicer/EterniaLogic");
-		msgb(sender, "Current author: " + ChatColor.GREEN + "Taeir / Taico Aerts");
-		msgb(sender, "Copyright (C) 2015 Taico Aerts");
+		msgb(sender, "Author and Creator: " + ChatColor.GREEN + "MC DreadEnd, EterniaLogic");
+		msgb(sender, "Former author: " + ChatColor.GREEN + "Taeir / Taico Aerts");
+		msgb(sender, "Copyright (C) 2016 Brent Clancy, Taico Aerts");
 		msg(sender, "");
 		msgb(sender, "Version: " + ChatColor.GREEN + TekkitRestrict.version.toMetricsVersion());
 		if (TekkitRestrict.useTMetrics){
@@ -362,7 +362,7 @@ public class TRCmdTr implements CommandExecutor {
 			return;
 		}
 
-		for (TRChunkUnloader2 unloader : TRChunkUnloader2.getAll()){
+		for (TRChunkUnloadCommandLogic unloader : TRChunkUnloadCommandLogic.getAll()){
 			unloader.forceUnload(sender, method);
 		}
 	}
