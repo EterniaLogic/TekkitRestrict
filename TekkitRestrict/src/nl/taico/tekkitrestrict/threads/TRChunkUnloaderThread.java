@@ -37,7 +37,7 @@ public class TRChunkUnloaderThread extends Thread{
 				try{
 					TRThreadedChunkUnloader.unloadSChunks();
 				}catch(Exception e){
-					Log.Exception(e, true);
+					//Log.Exception(e, true);
 				}
 			}
 

@@ -40,12 +40,20 @@ class CLThread extends Thread{
 		Thread.currentThread().setName("TekkitRestrict Thread world chunk unloader ("+world.getName()+")");
 		
 		
-		List<Chunk> chunks = TRThreadedChunkUnloader.getWorldChunks(world,400,true,true);
+		try{
+			List<Chunk> chunks = TRThreadedChunkUnloader.getWorldChunks(world,400,true,true);
+			int chunksi = TRThreadedChunkUnloader.doUnloadChunkList(chunks,true,true);
+		}catch(Exception e){}
 		
-		int chunksi = TRThreadedChunkUnloader.doUnloadChunkList(chunks,true,true);
 		//Warning.other("TR unloaded "+world.getName()+" "+chunksi+" Chunks (Async)", false);
 		
 		done=true;
+		
+		
+		// stop this thread; done.
+		try {
+			this.join();
+		} catch (InterruptedException e) {}
 	}
 }
 
@@ -130,9 +138,9 @@ public class TRThreadedChunkUnloader {
 				}
 			}
 		} catch (Exception e) {
-			Warning.other(" Error: TRChunkUnload.doUnloadChunk at " + mcChunk.x
-					+ ", " + mcChunk.z + "  :(", false);
-			Warning.other(e.getStackTrace().toString(), false);
+			///Warning.other(" Error: TRChunkUnload.doUnloadChunk at " + mcChunk.x
+			//		+ ", " + mcChunk.z + "  :(", false);
+			//Warning.other(e.getStackTrace().toString(), false);
 		}
 		
 		return false;
@@ -154,8 +162,8 @@ public class TRThreadedChunkUnloader {
 					java.util.concurrent.TimeUnit.MICROSECONDS.sleep(10);
 				}
 			} catch (Exception ex){
-				Log.debug("Unable to unload chunk at ["+x+","+z+"] in world " + chunk.getWorld().getName());
-				amount++;
+				//Log.debug("Unable to unload chunk at ["+x+","+z+"] in world " + chunk.getWorld().getName());
+				//amount++;
 			}
 		}
 
@@ -241,8 +249,8 @@ public class TRThreadedChunkUnloader {
 				//toRemove.clear();
 
 			} catch (Exception ex) {
-				Warning.other("An error occurred in the Chunk Unloader!", false);
-				Log.Exception(ex, false);
+				//Warning.other("An error occurred in the Chunk Unloader!", false);
+				//Log.Exception(ex, false);
 			}
 
 			return toRemove;
@@ -330,7 +338,7 @@ public class TRThreadedChunkUnloader {
 				for (World world : worlds) {
 					List<Chunk> toRemove = getWorldChunks(world, 0, false, false);
 					int chunksi = doUnloadChunkList(toRemove,false,false);
-					Warning.other("TR unloaded "+world.getName()+" "+chunksi+" Chunks (Sync)", false);
+					//Warning.other("TR unloaded "+world.getName()+" "+chunksi+" Chunks (Sync)", false);
 				}
 			}
 		}
