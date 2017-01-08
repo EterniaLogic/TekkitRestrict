@@ -3,7 +3,7 @@ TekkitRestrict
 
 TekkitRestrict is licenced under the GNU General Public License version 3 (GPLv3) (See LICENSE.txt in the src folder).
 
-Copyright (C) 2016 Brent Clancy.
+Copyright (C) 2016 Brent Clancy, Taeir.
 
 
 How to compile TekkitRestrict
